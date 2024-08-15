@@ -62,7 +62,7 @@ gem 'whenever', '~> 1.0.0', require: false
 gem 'translate_enum', '~> 0.2.0'
 gem 'jsonapi-serializer', '~> 2.2.0'
 gem 'rubyzip', '~> 2.3.2'
-gem 'devise-jwt', '~> 0.11.0'
+gem 'devise-jwt', '~> 0.12.1'
 gem 'jwt', '~> 2.8.2'
 gem 'rack-cors', '~> 2.0.2', require: 'rack/cors'
 gem 'geocoder', '~> 1.8.3'
