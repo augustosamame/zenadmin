@@ -39,7 +39,7 @@ gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"
 gem "audited", "~> 5.7.0"
 gem "sidekiq", "~> 7.3"
-gem "dotenv-rails", "~> 2.8", require: 'dotenv/rails-now'
+gem "dotenv-rails", "~> 3.1", require: 'dotenv/rails-now'
 gem "cssbundling-rails", "~> 1.4.1"
 gem "jsbundling-rails", "~> 1.3.1"
 gem "devise", "~> 4.9.4"
