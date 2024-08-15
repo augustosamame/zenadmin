@@ -7,3 +7,4 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+Setting.create!(name: 'login_type', data_type: "type_string", internal: false, localized_name: "Tipo de Login", string_value: 'email')

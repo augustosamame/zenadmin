@@ -3,29 +3,29 @@
 <% end %>
 
 <div class="px-4">
-  <div class="flex justify-between items-center mt-4 container mx-auto">
-    <h2 class="text-base font-medium text-slate-700 dark:text-slate-300 mb-0">
+  <div class="container flex items-center justify-between mx-auto mt-4">
+    <h2 class="mb-0 text-base font-medium text-slate-700 dark:text-slate-300">
       Recent stats
     </h2>
     <div data-controller="modal">
-      <button type="button" class="btn btn-white space-x-2" tabindex="0" data-action="click->modal#open">
+      <button type="button" class="space-x-2 btn btn-white" tabindex="0" data-action="click->modal#open">
         <%= icon "cog-6-tooth", classes: "stroke-current w-4 h-4 text-slate-600 dark:text-slate-300" %>
         <span class="pointer-events-none">Customize dashboard</span>
       </button>
       <div aria-labelledby="modal-title" aria-modal="true" data-action="keyup@window->modal#closeWithEsc"
-        data-modal-target="container" class="hidden fixed inset-0 z-50 overflow-y-auto" role="dialog">
-        <div class="h-screen w-full relative">
+        data-modal-target="container" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog">
+        <div class="relative w-full h-screen">
           <div data-modal-target="content" data-transition-enter-active="transition ease-out duration-300"
             data-transition-enter-from="transform opacity-0 scale-95"
             data-transition-enter-to="transform opacity-100 scale-100"
             data-transition-leave-active="transition ease-in duration-300"
             data-transition-leave-from="transform opacity-100 scale-100"
             data-transition-leave-to="transform opacity-0 scale-95"
-            class="hidden rounded shadow-xl max-w-2xl h-auto mx-auto bg-white m-4 p-8 dark:bg-slate-700">
-            <div class="prose dark:bg-slate-700 dark:text-slate-200 m-auto">
+            class="hidden h-auto max-w-2xl p-8 m-4 mx-auto bg-white rounded shadow-xl dark:bg-slate-700">
+            <div class="m-auto prose dark:bg-slate-700 dark:text-slate-200">
               <h2 id="modal-title" class="dark:text-slate-100">Customize dashboard</h2>
               <p>This could be some sort of widget enabling interface for the dashboard</p>
-              <div class="flex justify-end items-center flex-wrap space-x-4">
+              <div class="flex flex-wrap items-center justify-end space-x-4">
                 <button class="btn btn-primary" data-action="click->modal#close">Close</button>
               </div>
             </div>
@@ -35,17 +35,17 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-12 md:gap-6 gap-4 mt-4 container mx-auto mb-24">
+  <div class="container grid grid-cols-12 gap-4 mx-auto mt-4 mb-24 md:gap-6">
     <div
-      class="md:col-span-6 lg:col-span-3 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-4">
+      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
-        <div class="rounded-full w-10 h-10 flex items-center justify-center bg-primary-50 dark:bg-primary-600/30">
+        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-600/30">
           <%= icon "envelope-open", classes: "w-5 h-5 text-primary-600 stroke-current dark:text-primary-300" %>
         </div>
         <div class="flex-1">
-          <span class="text-primary-500 dark:text-primary-400/90 text-sm font-medium">Open deals</span>
-          <div class="flex items-center space-x-2 mt-1 mb-2">
-            <h3 class="h2 tracking-tight">32</h3>
+          <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Open deals</span>
+          <div class="flex items-center mt-1 mb-2 space-x-2">
+            <h3 class="text-4xl font-bold tracking-tight">32</h3>
             <p class="text-red-600">-2</p>
           </div>
           <p class="text-sm text-slate-400">vs last month: <strong
@@ -55,15 +55,15 @@
       </div>
     </div>
     <div
-      class="md:col-span-6 lg:col-span-3 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-4">
+      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
-        <div class="rounded-full w-10 h-10 flex items-center justify-center bg-red-50 dark:bg-red-500/20">
+        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/20">
           <%= icon "exclamation-circle", classes: "w-6 h-6 text-red-600 stroke-current dark:text-red-400/90" %>
         </div>
         <div class="flex-1">
-          <span class="text-red-400 dark:text-red-400/90 text-sm font-medium">Untouched deals</span>
-          <div class="flex items-center space-x-2 mt-1 mb-2">
-            <h3 class="h2 tracking-tight">40</h3>
+          <span class="text-sm font-medium text-red-400 dark:text-red-400/90">Untouched deals</span>
+          <div class="flex items-center mt-1 mb-2 space-x-2">
+            <h3 class="text-4xl font-bold tracking-tight">40</h3>
             <p class="text-green-600">+1</p>
           </div>
           <p class="text-sm text-slate-500">vs last month: <strong
@@ -73,15 +73,15 @@
       </div>
     </div>
     <div
-      class="md:col-span-6 lg:col-span-3 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-4">
+      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
-        <div class="rounded-full w-10 h-10 flex items-center justify-center bg-blue-50 dark:bg-blue-500/20">
+        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/20">
           <%= icon "phone-arrow-up-right", classes: "w-5 h-5 text-blue-600 stroke-current dark:text-blue-400/80" %>
         </div>
         <div class="flex-1">
-          <span class="text-blue-500 dark:text-blue-300/90 text-sm font-medium">Calls today</span>
-          <div class="flex items-center space-x-2 mt-1 mb-2">
-            <h3 class="h2 tracking-tight">25</h3>
+          <span class="text-sm font-medium text-blue-500 dark:text-blue-300/90">Calls today</span>
+          <div class="flex items-center mt-1 mb-2 space-x-2">
+            <h3 class="text-4xl font-bold tracking-tight">25</h3>
             <p class="text-green-600">+7</p>
           </div>
           <p class="text-sm text-slate-500">vs yesterday: <strong
@@ -92,16 +92,16 @@
 
     </div>
     <div
-      class="md:col-span-6 lg:col-span-3 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-4">
+      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
-        <div class="rounded-full w-10 h-10 flex items-center justify-center bg-green-50 dark:bg-green-500/20">
+        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 dark:bg-green-500/20">
           <%= icon "currency-dollar", classes: "w-6 h-6 text-green-600 stroke-current dark:text-green-400/80" %>
         </div>
         <div class="flex-1">
-          <span class="text-green-500 dark:text-green-400/90 text-sm font-medium">Revenue this month</span>
+          <span class="text-sm font-medium text-green-500 dark:text-green-400/90">Revenue this month</span>
 
-          <div class="flex items-center space-x-2 mt-1 mb-2">
-            <h3 class="h3 tracking-tight">$125,302</h3>
+          <div class="flex items-center mt-1 mb-2 space-x-2">
+            <h3 class="text-3xl font-bold tracking-tight">$125,302</h3>
             <p class="text-green-600">+2%</p>
           </div>
           <p class="text-sm text-slate-500">vs last month: <strong
@@ -111,49 +111,49 @@
       </div>
     </div>
 
-    <div class="col-span-12 flex items-center">
-      <div class="h-px w-1/2 bg-gradient-to-l from-slate-200 dark:from-slate-600"></div>
-      <div class="h-px w-1/2 bg-gradient-to-r from-slate-200 dark:from-slate-600"></div>
+    <div class="flex items-center col-span-12">
+      <div class="w-1/2 h-px bg-gradient-to-l from-slate-200 dark:from-slate-600"></div>
+      <div class="w-1/2 h-px bg-gradient-to-r from-slate-200 dark:from-slate-600"></div>
     </div>
 
     <div
-      class="lg:col-span-7 md:col-span-6 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-6 dark:text-slate-300">
+      class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-7 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none dark:text-slate-300">
       <div class="flex items-start justify-between pb-10">
         <div class="flex-1">
-          <h4 class="font-medium text-slate-800 dark:text-slate-300 tracking-tight text-xl m-0">Deal revenue forecast
+          <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Deal revenue forecast
           </h4>
         </div>
         <select name="revenue_period" id="revenue_period"
-          class="form-select w-1/5 shadow-none bg-slate-50 border-none text-sm dark:bg-slate-900">
+          class="w-1/5 text-sm border-none shadow-none form-select bg-slate-50 dark:bg-slate-900">
           <option value="month">Year</option>
           <option value="quarter">Quarter</option>
           <option value="annual">Month</option>
         </select>
       </div>
-      <div class="grid grid-cols-12 items-start">
-        <div class="lg:col-span-4 col-span-12">
+      <div class="grid items-start grid-cols-12">
+        <div class="col-span-12 lg:col-span-4">
           <div>
             <p class="mb-3 text-slate-700 dark:text-slate-300">Company goals</p>
             <div id="company_goals" data-dashboard-target="companygoals"></div>
           </div>
         </div>
-        <div class="lg:col-span-8 col-span-12">
+        <div class="col-span-12 lg:col-span-8">
           <div>
             <p class="mb-3 text-slate-700 dark:text-slate-300">Team goals</p>
-            <div id="team_goals" class="w-full -ml-6 -mt-4" data-dashboard-target="teamgoals"></div>
+            <div id="team_goals" class="w-full -mt-4 -ml-6" data-dashboard-target="teamgoals"></div>
           </div>
         </div>
       </div>
     </div>
 
     <div
-      class="lg:col-span-5 md:col-span-6 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-6">
+      class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-center justify-between">
-        <h4 class="font-medium text-slate-800 dark:text-slate-300 tracking-tight text-xl m-0">New contacts</h4>
+        <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">New contacts</h4>
         <%= link_to "View all", "#", class: "font-medium text-sm hover:text-primary-600 text-slate-600 dark:text-slate-400 dark:hover:text-primary-300" %>
       </div>
 
-      <ul class="divide-y mt-6 text-slate-600 dark:text-slate-300 dark:divide-slate-600">
+      <ul class="mt-6 divide-y text-slate-600 dark:text-slate-300 dark:divide-slate-600">
       <% [
         {
           name: "John Smith",
@@ -195,7 +195,7 @@
           tag_classes: "bg-yellow-100 text-yellow-800 dark:bg-yellow-300/10 dark:text-yellow-500/80",
           img: { id: "76", variant: "women" }
         }].each do |contact| %>
-          <li class="flex flex-wrap justify-between items-start py-3">
+          <li class="flex flex-wrap items-start justify-between py-3">
             <div class="flex items-start space-x-3">
               <%= link_to "#", class: "flex items-center sm:mb-0 mb-1" do %>
                 <%= image_tag demo_avatar_url(id: contact[:img][:id], variant: contact[:img][:variant]), alt: contact[:name], class: "w-10 h-10 rounded-full" %>
@@ -220,7 +220,7 @@
     </div>
 
     <div
-      class="lg:col-span-6 md:cols-span-12 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-6">
+      class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-6 md:cols-span-12 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-center justify-between mb-4">
         <h4 class="text-lg font-medium">Open deals</h4>
         <% if respond_to?(:admin_projects_path) %>
@@ -258,10 +258,10 @@
           }
         ].each do | deal | %>
           <%= link_to "#", class: "p-2 flex flex-wrap items-center group" do %>
-            <div class="md:flex-1 md:block flex justify-between w-full">
+            <div class="flex justify-between w-full md:flex-1 md:block">
               <div class="flex items-center space-x-3">
                 <%= image_tag demo_avatar_url(id: deal[:img][:id], variant: deal[:img][:variant]), alt: deal[:name], class: "md:w-6 w-8 md:h-6 h-8 rounded-full" %>
-                <p class="font-medium hover:text-primary-600 flex-1"><%= deal[:name] %></p>
+                <p class="flex-1 font-medium hover:text-primary-600"><%= deal[:name] %></p>
               </div>
               <div class="text-left">
                 <span class="<%= deal[:tag_classes] %>"><%= deal[:tag] %></span>
@@ -269,12 +269,12 @@
             </div>
 
             <div
-              class="md:text-right text-left md:group-hover:-translate-x-1 md:group-hover:transition duration-200 md:group-hover:transform md:w-auto w-full md:pt-0 pt-3">
+              class="w-full pt-3 text-left duration-200 md:text-right md:group-hover:-translate-x-1 md:group-hover:transition md:group-hover:transform md:w-auto md:pt-0">
               <p class="font-medium text-slate-600 dark:text-slate-300"><%= deal[:address] %></p>
               <p class="text-xs text-slate-500 dark:text-slate-400">Closing date: <%= deal[:close_date] %></p>
             </div>
             <div
-              class="opacity-0 group-hover:opacity-100 transition ease-in-out group-hover:transform group-hover:translate-x-1 md:block hidden">
+              class="hidden transition ease-in-out opacity-0 group-hover:opacity-100 group-hover:transform group-hover:translate-x-1 md:block">
               <%= icon "chevron-right", classes: "w-4 h-4 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-300" %>
             </div>
           <% end %>
@@ -282,13 +282,13 @@
       </div>
     </div>
     <div
-      class="lg:col-span-6 md:cols-span-12 col-span-12 rounded-lg shadow-sm border border-slate-200 bg-white dark:bg-slate-800 dark:border-none p-6">
+      class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-6 md:cols-span-12 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-center justify-between mb-4">
-        <h4 class="font-medium text-slate-800 dark:text-slate-300 tracking-tight text-xl m-0">Recent projects</h4>
+        <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Recent projects</h4>
         <%= link_to "View all", "#", class: "font-medium text-sm hover:text-primary-600 text-slate-600 dark:text-slate-400 dark:hover:text-primary-300" %>
       </div>
 
-      <ul class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+      <ul class="grid grid-cols-1 gap-4 sm:grid-cols-2">
       <% [
         {
           title: "Enhanced User Authentication System",
@@ -313,8 +313,8 @@
       ].each do |project| %>
         <li>
           <%= link_to (defined?(admin_project_path) ? admin_project_path : "#"), class: "border border-slate-300/80 hover:border-slate-400/70 rounded-lg shadow-sm p-4 focus:ring-4 focus:ring-primary-200/50 bg-white block group dark:bg-slate-700 dark:border-none dark:focus:ring-slate-500/20" do %>
-            <p class="font-medium dark:group-hover:text-primary-300 group-hover:text-primary-600 line-clamp-1 mb-2"><%= project[:title] %></p>
-            <p class="line-clamp-2 text-sm text-slate-500"><%= project[:description] %></p>
+            <p class="mb-2 font-medium dark:group-hover:text-primary-300 group-hover:text-primary-600 line-clamp-1"><%= project[:title] %></p>
+            <p class="text-sm line-clamp-2 text-slate-500"><%= project[:description] %></p>
           <% end %>
         </li>
         <% end %>

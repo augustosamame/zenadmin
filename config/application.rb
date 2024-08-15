@@ -18,7 +18,7 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Zenadmin
+module EdukaiErp
   class Application < Rails::Application
     config.generators do |g|
       g.template_engine :railsui

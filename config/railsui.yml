@@ -1,5 +1,5 @@
 --- !ruby/object:Railsui::Configuration
-application_name: ZenAdmin
+application_name: EdukaiErp
 support_email: augusto@devtechperu.com
 theme: hound
 pages:

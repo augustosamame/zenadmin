@@ -35,6 +35,41 @@ gem "image_processing", "~> 1.2"
 
 gem "railsui", github: "getrailsui/railsui", branch: "main"
 
+gem "interactor", "~> 3.0"
+gem "cancancan", "~> 3.6.1"
+gem "audited", "~> 5.7.0"
+gem "sidekiq", "~> 7.3"
+gem "dotenv-rails", "~> 2.8", require: 'dotenv/rails-now'
+gem "cssbundling-rails", "~> 1.4.1"
+gem "jsbundling-rails", "~> 1.3.1"
+gem "devise", "~> 4.9.4"
+gem 'devise-i18n', '~> 1.12.1'
+gem 'httparty', '~> 0.22.0'
+gem 'rollbar', '~> 3.5.2'
+gem 'simple_form', '~> 5.3.1'
+gem 'money-rails', '~> 1.15.0'
+gem 'pg_search', '~> 2.3.7'
+gem 'hashids'
+gem 'aws-sdk-s3', '~> 1'
+gem "shrine", "~> 3.6.0"
+gem "ruby-vips", "~> 2.2.2"
+gem "streamio-ffmpeg", "~> 3.0.2"
+gem "rails_feather", "~> 0.1.0"
+gem 'country_select', '~> 8.0'
+gem 'twilio-ruby', '~> 7.2.3'
+gem 'faker', '~> 3.4.2'
+gem 'whenever', '~> 1.0.0', require: false
+gem 'translate_enum', '~> 0.2.0'
+gem 'jsonapi-serializer', '~> 2.2.0'
+gem 'rubyzip', '~> 2.3.2'
+gem 'devise-jwt', '~> 0.11.0'
+gem 'jwt', '~> 2.8.2'
+gem 'rack-cors', '~> 2.0.2', require: 'rack/cors'
+gem 'geocoder', '~> 1.8.3'
+gem 'kaminari', '~> 1.2.2'
+gem 'web-push', '~> 3.0.1'
+
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -43,10 +78,27 @@ group :development, :test do
   gem "brakeman", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
+  gem 'rubocop', require: false
   gem "rubocop-rails-omakase", require: false
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
+  gem "awesome_print"
+  gem 'byebug'
+  gem 'bullet', '~> 7.2.0'
+  gem 'bootstrap-generators', github: 'WorkBravely/bootstrap-generators', branch: 'master'
+  gem 'rails-admin-scaffold', github: 'augustosamame/rails-admin-scaffold', branch: 'master'
+
+  gem "capistrano", "~> 3.19.1", require: false
+  gem "capistrano-rails", "~> 1.6.3", require: false
+  gem 'capistrano-rails-console', require: false
+  gem 'capistrano-yarn'
+  #gem 'capistrano3-puma', '~> 5.2.0'
+  gem 'capistrano3-puma', github: "seuros/capistrano-puma"
+  #gem 'capistrano-rvm'
+  gem 'capistrano-sidekiq'
+  gem 'capistrano-dotenv', require: false
+  gem 'capistrano-faster-assets', '~> 1.0'
 end
