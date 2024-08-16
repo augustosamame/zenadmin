@@ -1,5 +1,4 @@
 class Api::V1::UserSettingsController < Api::V1::ApiBaseController
-
   def index
     @user_settings = UserSetting.where(user_id: current_user.id, internal: false).order(id: :desc)
     authorize! :read, UserSetting

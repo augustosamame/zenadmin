@@ -1,11 +1,11 @@
 class Api::V1::UserMediaPermissionRequestsController < Api::V1::ApiBaseController
-  before_action :set_user_medium, only: [:create, :update]
+  before_action :set_user_medium, only: [ :create, :update ]
 
   def create
     @permission_request = UserMediaPermissionRequest.new(user: current_user, user_medium: @user_medium)
 
     if @permission_request.save
-      render json: { success: 'Permission request submitted' }, status: :created
+      render json: { success: "Permission request submitted" }, status: :created
     else
       render json: { errors: @permission_request.errors.full_messages }, status: :unprocessable_entity
     end
@@ -19,7 +19,7 @@ class Api::V1::UserMediaPermissionRequestsController < Api::V1::ApiBaseControlle
       elsif @permission_request.denied?
         UserMediaAllowedUser.where(user: @permission_request.user, user_medium: @permission_request.user_medium).destroy_all
       end
-      render json: { success: 'Permission request updated' }, status: :ok
+      render json: { success: "Permission request updated" }, status: :ok
     else
       render json: { errors: @permission_request.errors.full_messages }, status: :unprocessable_entity
     end

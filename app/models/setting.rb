@@ -1,5 +1,4 @@
 class Setting < ApplicationRecord
-
   audited
 
   enum status: { active: 0, inactive: 1 }
@@ -11,21 +10,20 @@ class Setting < ApplicationRecord
 
   def get_value
     case data_type
-    when 'type_string'
+    when "type_string"
       string_value
-    when 'type_integer'
+    when "type_integer"
       integer_value
-    when 'type_float'
+    when "type_float"
       float_value
-    when 'type_datetime'
+    when "type_datetime"
       datetime_value
-    when 'type_boolean'
+    when "type_boolean"
       boolean_value
-    when 'type_hash'
+    when "type_hash"
       hash_value
     else
       string_value
     end
   end
-
 end

@@ -8,8 +8,8 @@ class DeviseMailerPreview < ActionMailer::Preview
   # Requires enablement on app/models/user.rb
 
   # def unlock_instructions
-   # Devise::Mailer.unlock_instructions(User.first, "faketoken")
-  #end
+  # Devise::Mailer.unlock_instructions(User.first, "faketoken")
+  # end
 
   def reset_password_instructions
     Devise::Mailer.reset_password_instructions(User.first, "faketoken")

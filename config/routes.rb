@@ -40,5 +40,5 @@ Rails.application.routes.draw do
   # Defines the root path route ("/")
   # root "posts#index"
 
-  get 'not_authorized' => 'application#not_authorized'
+  get "not_authorized" => "application#not_authorized"
 end

@@ -10,8 +10,8 @@ class User < ApplicationRecord
   attr_writer :login
 
   # Validations for email and phone number
-  validates :email, presence: true, if: -> { login_type == 'email' }
-  validates :phone, presence: true, if: -> { login_type == 'phone' }
+  validates :email, presence: true, if: -> { login_type == "email" }
+  validates :phone, presence: true, if: -> { login_type == "phone" }
   validates :login, presence: true, uniqueness: true
 
   # Add a custom method to determine the login type
@@ -22,7 +22,7 @@ class User < ApplicationRecord
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
-    where(conditions.to_h).where(["login = :value", { value: login }]).first
+    where(conditions.to_h).where([ "login = :value", { value: login } ]).first
   end
 
   private
@@ -30,6 +30,6 @@ class User < ApplicationRecord
   def login_type
     # Replace this with your actual global setting logic
     # For example, it could be an environment variable or a value stored in the database
-    Setting.login_type || 'email'
+    Setting.login_type || "email"
   end
 end

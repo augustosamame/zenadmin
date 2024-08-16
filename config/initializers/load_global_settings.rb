@@ -1,7 +1,6 @@
 return true
 Rails.application.config.after_initialize do
-  
-  REQUIRED_SETTINGS = [:login_type, :admin_2fa_required]
+  REQUIRED_SETTINGS = [ :login_type, :admin_2fa_required ]
 
   def load_global_settings
     settings = Setting.all.each_with_object({}) do |setting, hash|
