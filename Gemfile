@@ -38,8 +38,8 @@ gem "railsui", github: "getrailsui/railsui", branch: "main"
 gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"
 gem "audited", "~> 5.7.0"
-gem "sidekiq", "~> 7.3"
-gem "dotenv-rails", "~> 2.8", require: 'dotenv/rails-now'
+gem "sidekiq", "~> 7.3.1"
+gem "dotenv-rails", "~> 3.1.2", require: 'dotenv/rails-now'
 gem "cssbundling-rails", "~> 1.4.1"
 gem "jsbundling-rails", "~> 1.3.1"
 gem "devise", "~> 4.9.4"
@@ -50,19 +50,19 @@ gem 'simple_form', '~> 5.3.1'
 gem 'money-rails', '~> 1.15.0'
 gem 'pg_search', '~> 2.3.7'
 gem 'hashids'
-gem 'aws-sdk-s3', '~> 1'
+gem 'aws-sdk-s3', '~> 1.158.0'
 gem "shrine", "~> 3.6.0"
 gem "ruby-vips", "~> 2.2.2"
 gem "streamio-ffmpeg", "~> 3.0.2"
 gem "rails_feather", "~> 0.1.0"
-gem 'country_select', '~> 8.0'
+gem 'country_select', '~> 9.0'
 gem 'twilio-ruby', '~> 7.2.3'
 gem 'faker', '~> 3.4.2'
 gem 'whenever', '~> 1.0.0', require: false
 gem 'translate_enum', '~> 0.2.0'
 gem 'jsonapi-serializer', '~> 2.2.0'
 gem 'rubyzip', '~> 2.3.2'
-gem 'devise-jwt', '~> 0.11.0'
+gem 'devise-jwt', '~> 0.12.1'
 gem 'jwt', '~> 2.8.2'
 gem 'rack-cors', '~> 2.0.2', require: 'rack/cors'
 gem 'geocoder', '~> 1.8.3'

@@ -33,3 +33,24 @@ we use RBAC: https://medium.com/@solidity101/%EF%B8%8F-demystifying-role-based-a
 users and roles have a many to many relationship
 all permissions and ACLs are defined in the Ability class
 
+* Deployment
+
+First you should prepare an EC2 server to be able to receive / run the project
+Requirements:
+
+Ruby 3.3.4 systemwide with jemalloc and YJIT turned on: --with-jemalloc --enable-yjit
+
+https://github.com/ruby/ruby/blob/master/doc/yjit/yjit.md#installation
+
+apt-get install --no-install-recommends -y libjemalloc2
+ENV LD_PRELOAD="libjemalloc.so.2" \
+    MALLOC_CONF="dirty_decay_ms:1000,narenas:2,background_thread:true,stats_print:true" \
+    RUBY_YJIT_ENABLE="1"
+
+bundle / bundler should be installed systemwide
+run bundle
+
+
+
+
+
