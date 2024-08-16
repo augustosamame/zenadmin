@@ -105,7 +105,7 @@ class Api::V1::UsersController < Api::V1::ApiBaseController
       if params[:push_token].is_a?(String)
         push_token = params[:push_token]
       else
-        push_token = params[:push_token].permit!.to_h
+        push_token = params[:push_token].permit(:endpoint, keys: [:p256dh, :auth]).to_h
       end
 
       if push_token.is_a?(Hash) && push_token.key?('endpoint') && push_token.key?('keys')
