@@ -8,6 +8,9 @@
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
 setting_1 = Setting.find_or_create_by!(name: 'login_type', data_type: "type_string", internal: false, localized_name: "Tipo de Login", string_value: 'email')
+setting_2 = Setting.find_or_create_by!(name: 'track_inventory', data_type: "type_boolean", internal: false, localized_name: "Medición de Inventarios", boolean_value: true)
+setting_3 = Setting.find_or_create_by!(name: 'multi_region', data_type: "type_boolean", internal: false, localized_name: "Gestión de Múltiples Regiones", boolean_value: false)
+
 brand_1 = Brand.find_or_create_by!(name: 'Infanti')
 category_1 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche')
 category_2 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche Gigantes', parent: category_1)

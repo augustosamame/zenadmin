@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -84,8 +84,32 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
 
   create_table "factory_factories", force: :cascade do |t|
     t.string "name", null: false
+    t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_factory_factories_on_region_id"
+  end
+
+  create_table "locations", force: :cascade do |t|
+    t.string "name"
+    t.bigint "region_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_locations_on_region_id"
+  end
+
+  create_table "orders", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "location_id", null: false
+    t.bigint "region_id", null: false
+    t.integer "total_price_cents"
+    t.integer "total_discount_cents"
+    t.datetime "order_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_orders_on_location_id"
+    t.index ["region_id"], name: "index_orders_on_region_id"
+    t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
   create_table "product_categories", force: :cascade do |t|
@@ -146,13 +170,23 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
 
   create_table "purchases_purchases", force: :cascade do |t|
     t.bigint "vendor_id", null: false
+    t.bigint "region_id", null: false
     t.datetime "purchase_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_purchases_purchases_on_region_id"
     t.index ["vendor_id"], name: "index_purchases_purchases_on_vendor_id"
   end
 
   create_table "purchases_vendors", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "region_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_purchases_vendors_on_region_id"
+  end
+
+  create_table "regions", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -186,8 +220,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
     t.string "name", null: false
     t.string "sourceable_type"
     t.bigint "sourceable_id"
+    t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_suppliers_on_region_id"
     t.index ["sourceable_type", "sourceable_id"], name: "index_suppliers_on_sourceable"
   end
 
@@ -236,16 +272,33 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "warehouses", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "region_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["region_id"], name: "index_warehouses_on_region_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "factory_factories", "regions"
+  add_foreign_key "locations", "regions"
+  add_foreign_key "orders", "locations"
+  add_foreign_key "orders", "regions"
+  add_foreign_key "orders", "users"
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
+  add_foreign_key "purchases_purchases", "regions"
+  add_foreign_key "purchases_vendors", "regions"
+  add_foreign_key "suppliers", "regions"
   add_foreign_key "taggings", "products"
   add_foreign_key "taggings", "tags"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
+  add_foreign_key "warehouses", "regions"
 end
