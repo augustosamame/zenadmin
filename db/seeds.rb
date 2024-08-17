@@ -7,4 +7,22 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
-Setting.create!(name: 'login_type', data_type: "type_string", internal: false, localized_name: "Tipo de Login", string_value: 'email')
+setting_1 = Setting.find_or_create_by!(name: 'login_type', data_type: "type_string", internal: false, localized_name: "Tipo de Login", string_value: 'email')
+brand_1 = Brand.find_or_create_by!(name: 'Infanti')
+category_1 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche')
+category_2 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche Gigantes', parent: category_1)
+
+vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti')
+vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price')
+factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory')
+
+supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1)
+supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
+
+product_1 = Product.find_or_create_by!(name: 'Oso de Peluche con corazón', description: '', permalink: '', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+
+# Associate the product with categories
+product_1.product_categories << category_1
+product_1.product_categories << category_2
+
+tag_1 = Tag.find_or_create_by!(name: 'Osos de Peluche')

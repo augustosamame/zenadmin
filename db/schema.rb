@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_14_130124) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_17_123942) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -74,6 +74,90 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_14_130124) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "brands", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "image"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "factory_factories", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "product_categories", force: :cascade do |t|
+    t.string "name", null: false
+    t.bigint "parent_id"
+    t.text "image"
+    t.integer "product_category_type", default: 0
+    t.integer "category_order", default: 0
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_product_categories_on_parent_id"
+  end
+
+  create_table "product_categories_products", force: :cascade do |t|
+    t.bigint "product_category_id", null: false
+    t.bigint "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_category_id", "product_id"], name: "idx_on_product_category_id_product_id_468b5d9f0b", unique: true
+    t.index ["product_category_id"], name: "index_product_categories_products_on_product_category_id"
+    t.index ["product_id"], name: "index_product_categories_products_on_product_id"
+  end
+
+  create_table "products", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "brand_id"
+    t.text "description", null: false
+    t.string "sourceable_type"
+    t.bigint "sourceable_id"
+    t.text "image"
+    t.string "permalink", null: false
+    t.integer "price_cents", null: false
+    t.integer "discounted_price_cents"
+    t.text "meta_keywords"
+    t.text "meta_description"
+    t.boolean "stockable", default: true
+    t.datetime "available_at"
+    t.datetime "deleted_at"
+    t.integer "product_order", default: 0
+    t.integer "status", default: 0
+    t.decimal "weight", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sourceable_type", "sourceable_id"], name: "index_products_on_sourceable"
+  end
+
+  create_table "purchases_purchase_lines", force: :cascade do |t|
+    t.bigint "purchase_id"
+    t.bigint "product_id"
+    t.integer "quantity", null: false
+    t.decimal "price", precision: 10, scale: 2
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_purchases_purchase_lines_on_product_id"
+    t.index ["purchase_id"], name: "index_purchases_purchase_lines_on_purchase_id"
+  end
+
+  create_table "purchases_purchases", force: :cascade do |t|
+    t.bigint "vendor_id", null: false
+    t.datetime "purchase_date"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["vendor_id"], name: "index_purchases_purchases_on_vendor_id"
+  end
+
+  create_table "purchases_vendors", force: :cascade do |t|
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "roles", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -96,6 +180,33 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_14_130124) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_settings_on_name", unique: true
+  end
+
+  create_table "suppliers", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "sourceable_type"
+    t.bigint "sourceable_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["sourceable_type", "sourceable_id"], name: "index_suppliers_on_sourceable"
+  end
+
+  create_table "taggings", force: :cascade do |t|
+    t.bigint "tag_id", null: false
+    t.bigint "product_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_taggings_on_product_id"
+    t.index ["tag_id", "product_id"], name: "index_taggings_on_tag_id_and_product_id", unique: true
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+  end
+
+  create_table "tags", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
   create_table "user_roles", force: :cascade do |t|
@@ -127,6 +238,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_14_130124) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "product_categories", "product_categories", column: "parent_id"
+  add_foreign_key "product_categories_products", "product_categories"
+  add_foreign_key "product_categories_products", "products"
+  add_foreign_key "purchases_purchase_lines", "products"
+  add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
+  add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
+  add_foreign_key "taggings", "products"
+  add_foreign_key "taggings", "tags"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
 end
