@@ -1,7 +1,7 @@
 class ProductCategory < ApplicationRecord
   # Self-referential association for parent-child relationships (subcategories)
-  belongs_to :parent, class_name: 'ProductCategory', optional: true
-  has_many :subcategories, class_name: 'ProductCategory', foreign_key: 'parent_id', dependent: :destroy
+  belongs_to :parent, class_name: "ProductCategory", optional: true
+  has_many :subcategories, class_name: "ProductCategory", foreign_key: "parent_id", dependent: :destroy
 
   # Many-to-many relationship with products
   has_and_belongs_to_many :products

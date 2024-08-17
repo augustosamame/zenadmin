@@ -5,6 +5,6 @@ class CreateTaggings < ActiveRecord::Migration[7.2]
       t.references :product, null: false, foreign_key: true
       t.timestamps
     end
-    add_index :taggings, [:tag_id, :product_id], unique: true
+    add_index :taggings, [ :tag_id, :product_id ], unique: true
   end
 end
