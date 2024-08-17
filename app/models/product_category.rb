@@ -15,8 +15,16 @@ class ProductCategory < ApplicationRecord
   # Enum for the status of the product category
   enum :status, { active: 0, inactive: 1 }
 
-  # Method to get the full name of the product category or subcategory
+  after_commit :create_or_update_tag, on: [ :create, :update ]
+
   def full_name
-    parent.present? ? "#{parent.full_name} - #{name}" : name
+    self.parent.present? ? "#{self.parent.full_name} - #{self.name}" : self.name
   end
+
+  private
+
+    def create_or_update_tag
+      tag = Tag.find_or_create_by(name: name)
+      tag.update(name: self.name) if tag.name != self.name
+    end
 end

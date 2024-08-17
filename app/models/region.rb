@@ -12,11 +12,9 @@ class Region < ApplicationRecord
 
   def self.default
     # Check if multi_region is false
-    multi_region_setting = Setting.find_by(name: 'multi_region')
-    
-    if multi_region_setting && !multi_region_setting.boolean_value
+    if Rails.application.config.global_settings[:multi_region] == false
       # Find or create the default region
-      find_or_create_by(name: 'default')
+      find_or_create_by(name: "default")
     else
       nil
     end

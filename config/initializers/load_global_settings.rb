@@ -1,4 +1,3 @@
-return true
 Rails.application.config.after_initialize do
   REQUIRED_SETTINGS = [ :login_type, :admin_2fa_required ]
 
