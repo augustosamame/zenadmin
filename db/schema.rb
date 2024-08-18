@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_18_045400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -135,7 +135,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
   end
 
   create_table "products", force: :cascade do |t|
-    t.string "sku"
+    t.string "sku", null: false
     t.string "name", null: false
     t.integer "brand_id"
     t.text "description", null: false
@@ -273,6 +273,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
+  create_table "warehouse_inventories", force: :cascade do |t|
+    t.bigint "warehouse_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "stock", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_warehouse_inventories_on_product_id"
+    t.index ["warehouse_id"], name: "index_warehouse_inventories_on_warehouse_id"
+  end
+
   create_table "warehouses", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "region_id", null: false
@@ -301,5 +311,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
   add_foreign_key "taggings", "tags"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
+  add_foreign_key "warehouse_inventories", "products"
+  add_foreign_key "warehouse_inventories", "warehouses"
   add_foreign_key "warehouses", "regions"
 end

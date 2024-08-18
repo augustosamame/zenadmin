@@ -1,5 +1,4 @@
-class Admin::ProductsController < ApplicationController
-	layout "admin"
+class Admin::ProductsController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
 	def index
@@ -10,7 +9,10 @@ class Admin::ProductsController < ApplicationController
     respond_to do |format|
       format.html do
         @products = Product.all
-        if @products.count > 2000
+          .joins(:warehouse_inventories)
+          .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
+          .select('products.*, warehouse_inventories.stock')
+        if @products.size > 2000
           @datatable_options = "server_side:true"
         end
       end

@@ -5,6 +5,8 @@ class Product < ApplicationRecord
   has_many :taggings, dependent: :destroy
   has_many :tags, through: :taggings
   has_many :purchase_lines, class_name: "Purchases::PurchaseLine"
+  has_many :warehouse_inventories, dependent: :destroy
+  has_many :warehouses, through: :warehouse_inventories
 
   validates :sku, presence: true
   validates :name, presence: true
@@ -22,6 +24,11 @@ class Product < ApplicationRecord
     else
       raise ActiveRecord::RecordNotFound, "Tag with name '#{tag_name_or_object}' not found"
     end
+  end
+
+  def update_stock(warehouse, quantity)
+    inventory = WarehouseInventory.find_or_create_by(warehouse: warehouse, product: self)
+    inventory.update(stock: quantity)
   end
 
   private

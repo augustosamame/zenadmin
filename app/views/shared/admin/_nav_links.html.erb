@@ -1,24 +1,40 @@
 <li>
-  <%= nav_link_to "Dashboard", send("admin_dashboard_path"), class: "nav-link" %>
+  <%= nav_link_to "Tablero", send("admin_dashboard_path"), class: "nav-link" %>
 </li>
 <li>
-  <%= nav_link_to "Projects", send("admin_projects_path"), class: "nav-link" %>
+  <%= nav_link_to "Ventas", send("admin_products_path"), class: "nav-link" %>
 </li>
 <li>
-  <%= nav_link_to "Messages", send("admin_messages_path"), class: "nav-link" %>
-</li>
-<li>
-  <%= nav_link_to "Assignments", send("admin_assignments_path"), class: "nav-link" %>
-</li>
-<li>
-  <%= nav_link_to "Calendar", send("admin_calendar_path"), class: "nav-link" %>
-</li>
-<li>
-  <%= nav_link_to "People", send("admin_people_path"), class: "nav-link" %>
+  <%= nav_link_to "Inventario", send("admin_products_path"), class: "nav-link" %>
 </li>
 <li>
   <%= nav_link_to "Productos", send("admin_products_path"), class: "nav-link" %>
 </li>
 <li>
-  <%= nav_link_to "Activity", send("admin_activity_path"), class: "nav-link" %>
+  <%= nav_link_to "Reportes", send("admin_products_path"), class: "nav-link" %>
+</li>
+<li data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Others
+  </button>
+  <ul data-dropdown-target="menu" class="absolute hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Activity", send("admin_activity_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Ventas", send("admin_projects_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Inventario", send("admin_messages_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Reportes", send("admin_assignments_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Calendar", send("admin_calendar_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "People", send("admin_people_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+  </ul>
 </li>

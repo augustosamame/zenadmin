@@ -1,4 +1,4 @@
-<%= render "shared/admin/nav", { header_title: "Productos" } do %>
+<%= render "shared/admin/nav", { header_title: "Productos - #{@current_warehouse&.name}" } do %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 
@@ -69,7 +69,7 @@
             <td class="px-4 py-2"><%= product.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(product.price_cents / 100.0) %></td>
             <td class="px-4 py-2"><%= product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : 'N/A' %></td>
-            <td class="px-4 py-2"><%= product.available_at ? product.available_at.strftime("%b %d, %Y") : 'N/A' %></td>
+            <td class="px-4 py-2"><%= product.stock %></td>
             <td class="px-4 py-2"><%= product.status == 0 ? 'Active' : 'Inactive' %></td>
             <td class="px-4 py-2">
               <div data-controller="dropdown" class="relative">
