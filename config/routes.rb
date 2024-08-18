@@ -21,6 +21,11 @@ Rails.application.routes.draw do
   get "pricing", to: "page#pricing"
   get "about", to: "page#about"
 
+  #create a namespace for admin
+  namespace :admin do
+    resources :products
+  end
+
   # Inherits from Railsui::PageController#index
   # To overide, add your own page#index view or change to a new root
   # Visit the start page for Rails UI any time at /railsui/start
