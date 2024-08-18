@@ -44,31 +44,29 @@
 </div>
 -->
 
-<div class="px-4 mb-16" data-controller="datatable" >
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
   <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
-          <th class="px-4 py-2 text-left ">Name</th>
-          <th class="px-4 py-2 text-left">Brand</th>
-          <th class="px-4 py-2 text-left">Price</th>
-          <th class="px-4 py-2 text-left">Discounted Price</th>
-          <th class="px-4 py-2 text-left">Available At</th>
-          <th class="px-4 py-2 text-left">Status</th>
-          <th class="px-4 py-2 text-left">Actions</th>
+          <th class="px-4 py-2 text-left">Codigo</th>
+          <th class="px-4 py-2 text-left">Imagen</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Precio</th>
+          <th class="px-4 py-2 text-left">Precio Descontado</th>
+          <th class="px-4 py-2 text-left">Stock</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
       </thead>
       <tbody>
         <% @products.each do |product| %>
           <tr>
+            <td class="px-4 py-2"><%= product.sku %></td>
             <td class="flex items-center px-4 py-2 space-x-3">
               <%= image_tag product.image, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.image.present? %>
-              <div>
-                <%= link_to product.name, "#", class: "sm:font-medium text-slate-900 hover:text-primary-600 sm:text-base text-lg font-semibold dark:text-slate-200" %>
-                <p class="text-sm text-slate-500"><%= product.permalink %></p>
-              </div>
             </td>
-            <td class="px-4 py-2"><%= product.brand_id ? Brand.find(product.brand_id).name : 'No Brand' %></td>
+            <td class="px-4 py-2"><%= product.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(product.price_cents / 100.0) %></td>
             <td class="px-4 py-2"><%= product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : 'N/A' %></td>
             <td class="px-4 py-2"><%= product.available_at ? product.available_at.strftime("%b %d, %Y") : 'N/A' %></td>

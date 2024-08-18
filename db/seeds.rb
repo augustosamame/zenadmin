@@ -23,12 +23,13 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory')
 supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
-product_1 = Product.find_or_create_by!(name: 'Oso de Peluche con corazón', description: '', permalink: '', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_2 = Product.find_or_create_by!(name: 'Oso de Peluche rosado', description: '', permalink: '', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_3 = Product.find_or_create_by!(name: 'Oso de Peluche con rosas', description: '', permalink: '', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_1 = Product.find_or_create_by!(sku: "OSO0001", name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_2 = Product.find_or_create_by!(sku: "OSO0002", name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_3 = Product.find_or_create_by!(sku: "OSO0003", name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 0, sourceable: vendor_1, brand: brand_1)
 
 60.times do
   Product.create!(
+    sku: Faker::Alphanumeric.alpha(number: 10),
     name: Faker::Commerce.product_name,
     brand_id: Brand.all.sample.id, # Assuming you have some brands in your database
     description: Faker::Lorem.paragraph(sentence_count: 2),

@@ -43,6 +43,12 @@ export default class extends Controller {
     };
 
     const allAdditionalOptions = this.optionsValue;
+
+    if (allAdditionalOptions.includes("server_side:true")) {
+      initialOptions.serverSide = true;
+      initialOptions.ajax = "/admin/products.json";
+    }
+
     if (allAdditionalOptions.length > 0) {
       allAdditionalOptions.split(';').forEach(additionalOption => {
         if (additionalOption.trim() === "select_single") {
@@ -80,6 +86,10 @@ export default class extends Controller {
       $(tableElement).on('draw.dt', () => {
         // console.log('draw.dt event triggered');
         this.applyTailwindClasses();
+
+        setTimeout(() => {
+          this.applyPaginationStyles();
+        }, 100);
       });
 
       // Observe for the wrapper to be added to the DOM

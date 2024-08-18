@@ -6,6 +6,12 @@ class Product < ApplicationRecord
   has_many :tags, through: :taggings
   has_many :purchase_lines, class_name: "Purchases::PurchaseLine"
 
+  validates :sku, presence: true
+  validates :name, presence: true
+  validates :description, presence: true
+  validates :permalink, presence: true
+  validates :price_cents, presence: true
+
   def add_tag(tag_name_or_object)
     tag = find_or_get_tag(tag_name_or_object)
 

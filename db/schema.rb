@@ -135,6 +135,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_17_164400) do
   end
 
   create_table "products", force: :cascade do |t|
+    t.string "sku"
     t.string "name", null: false
     t.integer "brand_id"
     t.text "description", null: false
