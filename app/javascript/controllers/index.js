@@ -22,6 +22,15 @@ application.register("modal", ModalController)
 import NavController from "./nav_controller"
 application.register("nav", NavController)
 
+import OrderItemsController from "./order_items_controller"
+application.register("order-items", OrderItemsController)
+
+import KeypadController from "./keypad_controller"
+application.register("keypad", KeypadController)
+
+import ProductGridController from "./product_grid_controller"
+application.register("product-grid", ProductGridController)
+
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
 

@@ -2,7 +2,7 @@
   <%= nav_link_to "Tablero", send("admin_dashboard_path"), class: "nav-link" %>
 </li>
 <li>
-  <%= nav_link_to "Ventas", send("admin_products_path"), class: "nav-link" %>
+  <%= nav_link_to "Ventas", send("admin_pos_path"), class: "nav-link" %>
 </li>
 <li>
   <%= nav_link_to "Inventario", send("admin_products_path"), class: "nav-link" %>
@@ -18,23 +18,19 @@
     Others
   </button>
   <ul data-dropdown-target="menu" class="absolute hidden w-48 mt-2 bg-white rounded shadow-md">
+    <% @railsui_demo_links.each do |link| %>
+      <li>
+        <%= nav_link_to link.to_s, send("admin_#{link.to_s}_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+    <% end %>
+
+
     <li>
-      <%= nav_link_to "Activity", send("admin_activity_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      <%= nav_link_to "Pricing", send("pricing_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
-      <%= nav_link_to "Ventas", send("admin_projects_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      <%= nav_link_to "Abiut", send("about_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
-    <li>
-      <%= nav_link_to "Inventario", send("admin_messages_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "Reportes", send("admin_assignments_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "Calendar", send("admin_calendar_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "People", send("admin_people_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
+    
   </ul>
 </li>

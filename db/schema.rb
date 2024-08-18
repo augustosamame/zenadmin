@@ -280,6 +280,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_045400) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_warehouse_inventories_on_product_id"
+    t.index ["warehouse_id", "product_id"], name: "index_warehouse_inventories_on_warehouse_id_and_product_id", unique: true
     t.index ["warehouse_id"], name: "index_warehouse_inventories_on_warehouse_id"
   end
 

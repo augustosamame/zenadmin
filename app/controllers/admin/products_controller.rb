@@ -23,6 +23,19 @@ class Admin::ProductsController < Admin::AdminController
     end
 	end
 
+  def product_search
+    if params[:query].blank?
+      @products = Product.all
+    else
+      if params[:query].length <= 50
+        @products = Product.search_by_sku_and_name(params[:query])
+      else
+        @products = []
+      end
+    end
+    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.image, price: product.price_cents / 100 } }
+  end
+
   private
     #TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
     def datatable_json

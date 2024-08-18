@@ -2,6 +2,27 @@ class ApplicationController < ActionController::Base
   helper Railsui::ThemeHelper
 
   before_action :configure_permitted_parameters, if: :devise_controller?
+  before_action :set_railsui_demo_links
+
+  def set_railsui_demo_links
+    @railsui_demo_links = [
+      :integrations, 
+      :team, 
+      :billing, 
+      :notifications, 
+      :settings, 
+      :activity, 
+      :profile, 
+      :people, 
+      :calendar, 
+      :assignments, 
+      :message, 
+      :messages, 
+      :project, 
+      :projects, 
+      :dashboard
+    ]
+  end
 
   rescue_from CanCan::AccessDenied do |exception|
     respond_to do |format|

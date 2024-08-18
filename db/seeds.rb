@@ -25,9 +25,9 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
 
-product_1 = Product.find_or_create_by!(sku: "OSO0001", name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_2 = Product.find_or_create_by!(sku: "OSO0002", name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_3 = Product.find_or_create_by!(sku: "OSO0003", name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: ['product']), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: ['product']), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: ['product']), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 0, sourceable: vendor_1, brand: brand_1)
 
 60.times do
   Product.create!(

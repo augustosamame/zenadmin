@@ -24,6 +24,8 @@ Rails.application.routes.draw do
   #create a namespace for admin
   namespace :admin do
     resources :products
+    get "pos", to: "pos#new"
+    get "product_search", to: "products#product_search"
   end
 
   # Inherits from Railsui::PageController#index
