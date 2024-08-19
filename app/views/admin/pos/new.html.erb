@@ -4,12 +4,12 @@
 
 <div id="max-price-discount-percentage" data-value="<%= Rails.application.config.global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
 
-<div class="flex h-screen text-black bg-white dark:bg-black dark:text-white" data-controller="order-items">
+<div class="flex h-screen text-black bg-white dark:bg-black dark:text-white" data-controller="pos--order-items">
   <!-- Left Section -->
   <div class="w-2/3 p-4 bg-gray-100 dark:bg-gray-800">
     <!-- Top Section: Order Items -->
     <div class="flex flex-col p-4 mb-4 bg-white rounded shadow-md dark:bg-gray-700">
-      <div id="order-items">
+      <div id="pos--order-items">
         <!-- Column Titles -->
         <div class="grid grid-cols-8 gap-2 mb-2 font-bold">
           <div class="col-span-5">Producto</div>
@@ -19,12 +19,12 @@
         </div>
 
         <!-- Container for dynamically added items -->
-        <div data-order-items-target="items" class="min-h-40"></div>
+        <div data-pos--order-items-target="items" class="min-h-40"></div>
 
         <!-- Total -->
         <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
           <span>Total:</span>
-          <span data-order-items-target="total">S/ 0.00</span>
+          <span data-pos--order-items-target="total">S/ 0.00</span>
         </div>
       </div>
     </div>
@@ -34,15 +34,15 @@
       <div class="flex justify-between mb-4">
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Comentarios</button>
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Cliente</button>
-      <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->order-items#completeOrder">Pagar</button>
+      <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--order-items#completeOrder">Pagar</button>
       <div id="draft-button-container">
         <% if draft_order_present? %>
-          <a href="#" class="block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500" data-action="click->order-items#loadDraft">Recuperar Borrador</a>
+          <a href="#" class="block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500" data-action="click->pos--order-items#loadDraft">Recuperar Borrador</a>
         <% end %>
       </div> <!-- Container for the "Recuperar Borrador" button -->
     </div>
       <!-- Numeric Keypad -->
-      <div id="keypad" data-controller="keypad">
+      <div id="keypad" data-controller="pos--keypad">
         <div class="grid grid-cols-4 gap-2">
           <button class="bg-white btn keypad-button dark:bg-gray-800">1</button>
           <button class="bg-white btn keypad-button dark:bg-gray-800">2</button>
@@ -70,11 +70,11 @@
 
   <!-- Right Section: Product Grid -->
   <div class="w-1/3 p-4 bg-gray-200 dark:bg-gray-900">
-    <div id="product-grid" data-controller="product-grid">
+    <div id="product-grid" data-controller="pos--product-grid">
       <!-- Search Bar -->
-      <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-product-grid-target="search" data-action="input->product-grid#searchProducts">
+      <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
 
-      <div class="grid grid-cols-2 gap-4" data-product-grid-target="productContainer">
+      <div class="grid grid-cols-2 gap-4" data-pos--product-grid-target="productContainer">
         <!-- Products will be rendered here -->
       </div>
     </div>

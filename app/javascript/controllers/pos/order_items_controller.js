@@ -42,7 +42,7 @@ export default class extends Controller {
       itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer')
       itemElement.setAttribute('data-item-name', product.name)
       itemElement.setAttribute('data-item-original-price', product.price);
-      itemElement.setAttribute('data-action', 'click->order-items#selectItem')
+      itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem')
 
       itemElement.innerHTML = `
         <div class="col-span-5">
@@ -53,7 +53,7 @@ export default class extends Controller {
           <span data-item-quantity="${product.quantity}">${product.quantity}</span>
         </div>
         <div class="col-span-1">
-          <span class="editable-price" contenteditable="false" data-action="blur->order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
+          <span class="editable-price" contenteditable="false" data-action="blur->pos--order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
         </div>
         <div class="col-span-1">
           <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
@@ -239,7 +239,7 @@ export default class extends Controller {
   showDraftButton() {
     const draftButtonContainer = document.getElementById('draft-button-container')
     draftButtonContainer.innerHTML = `
-      <a href="#" class="p-4 bg-yellow-400 rounded btn dark:bg-yellow-500 block w-full text-center" data-action="click->order-items#loadDraft">Recuperar Borrador</a>
+      <a href="#" class="p-4 bg-yellow-400 rounded btn dark:bg-yellow-500 block w-full text-center" data-action="click->pos--order-items#loadDraft">Recuperar Borrador</a>
     `
   }
   hideDraftButton() {

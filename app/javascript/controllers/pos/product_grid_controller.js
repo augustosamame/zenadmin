@@ -54,11 +54,11 @@ export default class extends Controller {
   }
 
   addProductToOrder(product) {
-    // Find the element that contains the order-items controller
-    const orderItemsContainer = document.querySelector('[data-controller="order-items"]');
+    // Find the element that contains the pos--order-items controller
+    const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]');
 
     // Get the controller instance
-    const orderItemsController = this.application.getControllerForElementAndIdentifier(orderItemsContainer, 'order-items');
+    const orderItemsController = this.application.getControllerForElementAndIdentifier(orderItemsContainer, 'pos--order-items');
 
     console.log('Order Items Controller:', orderItemsController);
 

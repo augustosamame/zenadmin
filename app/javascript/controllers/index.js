@@ -22,14 +22,14 @@ application.register("modal", ModalController)
 import NavController from "./nav_controller"
 application.register("nav", NavController)
 
-import OrderItemsController from "./order_items_controller"
-application.register("order-items", OrderItemsController)
+import Pos__KeypadController from "./pos/keypad_controller"
+application.register("pos--keypad", Pos__KeypadController)
 
-import KeypadController from "./keypad_controller"
-application.register("keypad", KeypadController)
+import Pos__OrderItemsController from "./pos/order_items_controller"
+application.register("pos--order-items", Pos__OrderItemsController)
 
-import ProductGridController from "./product_grid_controller"
-application.register("product-grid", ProductGridController)
+import Pos__ProductGridController from "./pos/product_grid_controller"
+application.register("pos--product-grid", Pos__ProductGridController)
 
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
