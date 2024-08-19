@@ -2,12 +2,12 @@
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 
-<div class="flex h-screen text-black bg-white dark:bg-black dark:text-white">
+<div class="flex h-screen text-black bg-white dark:bg-black dark:text-white" data-controller="order-items">
   <!-- Left Section -->
   <div class="w-2/3 p-4 bg-gray-100 dark:bg-gray-800">
     <!-- Top Section: Order Items -->
     <div class="flex flex-col p-4 mb-4 bg-white rounded shadow-md dark:bg-gray-700">
-      <div id="order-items" data-controller="order-items">
+      <div id="order-items">
         <!-- Column Titles -->
         <div class="grid grid-cols-8 gap-2 mb-2 font-bold">
           <div class="col-span-5">Producto</div>
@@ -22,7 +22,7 @@
         <!-- Total -->
         <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
           <span>Total:</span>
-          <span data-order-items-target="total">0.00 €</span>
+          <span data-order-items-target="total">S/ 0.00</span>
         </div>
       </div>
     </div>
@@ -30,10 +30,15 @@
     <!-- Bottom Section: Buttons and Numeric Keypad -->
     <div class="flex flex-col h-1/3">
       <div class="flex justify-between mb-4">
-        <button class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Comentarios</button>
-        <button class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Cliente</button>
-        <button class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400">Pagar</button>
-      </div>
+      <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Comentarios</button>
+      <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Cliente</button>
+      <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->order-items#completeOrder">Pagar</button>
+      <div id="draft-button-container">
+        <% if draft_order_present? %>
+          <a href="#" class="block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500" data-action="click->order-items#loadDraft">Recuperar Borrador</a>
+        <% end %>
+      </div> <!-- Container for the "Recuperar Borrador" button -->
+    </div>
       <!-- Numeric Keypad -->
       <div id="keypad" data-controller="keypad">
         <div class="grid grid-cols-4 gap-2">
@@ -70,7 +75,6 @@
       <div class="grid grid-cols-2 gap-4" data-product-grid-target="productContainer">
         <!-- Products will be rendered here -->
       </div>
-
     </div>
   </div>
 </div>

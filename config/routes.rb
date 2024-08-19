@@ -26,7 +26,15 @@ Rails.application.routes.draw do
     resources :products
     get "pos", to: "pos#new"
     get "product_search", to: "products#product_search"
+
+    resources :orders, only: [:new, :create, :update] do
+      collection do
+        post :save_as_draft
+        get :load_draft
+      end
+    end
   end
+
 
   # Inherits from Railsui::PageController#index
   # To overide, add your own page#index view or change to a new root
