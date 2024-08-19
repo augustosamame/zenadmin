@@ -6,7 +6,6 @@ class CreateProducts < ActiveRecord::Migration[7.2]
       t.integer :brand_id
       t.text :description, null: false
       t.references :sourceable, polymorphic: true, index: true
-      t.text :image
       t.string :permalink, null: false
       t.integer :price_cents, null: false
       t.integer :discounted_price_cents

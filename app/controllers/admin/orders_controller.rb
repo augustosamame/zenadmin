@@ -1,4 +1,6 @@
 class Admin::OrdersController < Admin::AdminController
+  include ActionView::Helpers::NumberHelper
+
   def new
     @order_data = session[:draft_order] || {}
   end
@@ -12,6 +14,10 @@ class Admin::OrdersController < Admin::AdminController
     else
       render json: { status: "error", errors: @order.errors.full_messages }
     end
+  end
+
+  def pos
+    @order = Order.new
   end
 
   private

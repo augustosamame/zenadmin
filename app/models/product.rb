@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
   include PgSearch::Model
+  include MediaAttachable
 
   belongs_to :brand
   belongs_to :sourceable, polymorphic: true, optional: true

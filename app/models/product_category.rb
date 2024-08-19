@@ -1,4 +1,6 @@
 class ProductCategory < ApplicationRecord
+  include MediaAttachable
+
   # Self-referential association for parent-child relationships (subcategories)
   belongs_to :parent, class_name: "ProductCategory", optional: true
   has_many :subcategories, class_name: "ProductCategory", foreign_key: "parent_id", dependent: :destroy

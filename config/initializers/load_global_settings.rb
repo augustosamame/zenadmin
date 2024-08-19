@@ -19,6 +19,12 @@ Rails.application.config.after_initialize do
     Rails.application.config.global_settings = settings
   end
 
-  # Load settings at startup
-  load_global_settings
+  # Load settings at startup unless db does not exist yet
+  begin
+  ActiveRecord::Base.connection
+    load_global_settings
+  rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad => e
+    Rails.logger.warn "Database not available: #{e.message}. Skipping global settings load."
+  end
+
 end

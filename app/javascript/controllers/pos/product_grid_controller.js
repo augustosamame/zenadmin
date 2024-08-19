@@ -16,7 +16,7 @@ export default class extends Controller {
   }
 
   loadProducts(query = '') {
-    axios.get('/admin/product_search', { params: { query: query } })
+    axios.get('/admin/products/search', { params: { query: query } })
       .then(response => {
         console.log('Qty of products fetched:', response.data.length)
         this.renderProducts(response.data)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -76,7 +76,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
 
   create_table "brands", force: :cascade do |t|
     t.string "name", null: false
-    t.text "image"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -96,6 +95,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["region_id"], name: "index_locations_on_region_id"
+  end
+
+  create_table "media", force: :cascade do |t|
+    t.string "file_path", null: false
+    t.integer "media_type", default: 0
+    t.string "mediable_type", null: false
+    t.bigint "mediable_id", null: false
+    t.integer "position", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["mediable_type", "mediable_id"], name: "index_media_on_mediable"
   end
 
   create_table "order_items", force: :cascade do |t|
@@ -155,12 +165,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
+  create_table "payment_methods", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "description", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "product_categories", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "parent_id"
     t.text "image"
     t.integer "product_category_type", default: 0
     t.integer "category_order", default: 0
+    t.boolean "pos_visible", default: false
+    t.text "pos_image"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -184,7 +204,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
     t.text "description", null: false
     t.string "sourceable_type"
     t.bigint "sourceable_id"
-    t.text "image"
     t.string "permalink", null: false
     t.integer "price_cents", null: false
     t.integer "discounted_price_cents"
@@ -302,6 +321,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
     t.string "email"
     t.string "phone"
     t.string "login", null: false
+    t.string "temporary_password"
+    t.boolean "require_password_change", default: false
     t.string "encrypted_password", default: "", null: false
     t.string "reset_password_token"
     t.datetime "reset_password_sent_at"
@@ -309,6 +330,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_18_223913) do
     t.string "first_name"
     t.string "last_name"
     t.boolean "admin", default: false
+    t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email"

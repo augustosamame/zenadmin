@@ -26,9 +26,9 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
 
-product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 0, sourceable: vendor_1, brand: brand_1)
-product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 0, sourceable: vendor_1, brand: brand_1)
+#product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
+#product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
+#product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)
 
 60.times do
   Product.create!(
@@ -36,7 +36,7 @@ product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr
     name: Faker::Commerce.product_name,
     brand_id: Brand.all.sample.id, # Assuming you have some brands in your database
     description: Faker::Lorem.paragraph(sentence_count: 2),
-    image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]),
+    #image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]),
     permalink: Faker::Internet.slug,
     price_cents: Faker::Number.between(from: 1000, to: 100_000),
     discounted_price_cents: Faker::Number.between(from: 500, to: 90_000),
@@ -53,11 +53,19 @@ end
 
 
 # Associate the product with categories
-product_1.product_categories << category_1
-product_1.product_categories << category_2
+#product_1.product_categories << category_1
+#product_1.product_categories << category_2
 
 tag_1 = Tag.find_or_create_by!(name: 'Osos de Peluche')
 
 Product.all.each do |product|
   WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
 end
+
+PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarjeta de Crédito / Débito')
+PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')
+PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
+PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectivo')
+PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
+PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
+

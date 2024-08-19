@@ -7,6 +7,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       t.string :email
       t.string :phone
       t.string :login, null: false
+      t.string :temporary_password
+      t.boolean :require_password_change, default: false
       t.string :encrypted_password, null: false, default: ""
 
       ## Recoverable
@@ -15,6 +17,13 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
 
       ## Rememberable
       t.datetime :remember_created_at
+
+      t.string :first_name
+      t.string :last_name
+      t.boolean :admin, default: false
+      t.integer :status, default: 0
+
+      t.timestamps null: false
 
       ## Trackable
       # t.integer  :sign_in_count, default: 0, null: false
@@ -33,12 +42,6 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       # t.integer  :failed_attempts, default: 0, null: false # Only if lock strategy is :failed_attempts
       # t.string   :unlock_token # Only if unlock strategy is :email or :both
       # t.datetime :locked_at
-
-      t.string :first_name
-      t.string :last_name
-      t.boolean :admin, default: false
-
-      t.timestamps null: false
     end
 
     add_index :users, :email

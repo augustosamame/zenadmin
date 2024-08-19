@@ -23,14 +23,18 @@ Rails.application.routes.draw do
 
   # create a namespace for admin
   namespace :admin do
-    resources :products
-    get "pos", to: "pos#new"
-    get "product_search", to: "products#product_search"
+    resources :products do
+      resources :media, module: :admin
+      get "search", on: :collection
+    end
+
+    resources :product_categories do
+      resources :media, module: :admin
+    end
 
     resources :orders, only: [ :new, :create, :update ] do
       collection do
-        post :save_as_draft
-        get :load_draft
+        get "pos"
       end
     end
   end

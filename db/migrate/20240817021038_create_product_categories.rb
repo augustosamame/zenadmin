@@ -6,6 +6,8 @@ class CreateProductCategories < ActiveRecord::Migration[7.2]
       t.text :image
       t.integer :product_category_type, default: 0
       t.integer :category_order, default: 0
+      t.boolean :pos_visible, default: false #will determine if the category is visible in the POS interface
+      t.text :pos_image #image for the POS interface
       t.integer :status, default: 0
 
       t.timestamps

@@ -23,7 +23,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 	end
 
-  def product_search
+  def search
     if params[:query].blank?
       @products = Product.all
     else
