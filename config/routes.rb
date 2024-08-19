@@ -21,13 +21,13 @@ Rails.application.routes.draw do
   get "pricing", to: "page#pricing"
   get "about", to: "page#about"
 
-  #create a namespace for admin
+  # create a namespace for admin
   namespace :admin do
     resources :products
     get "pos", to: "pos#new"
     get "product_search", to: "products#product_search"
 
-    resources :orders, only: [:new, :create, :update] do
+    resources :orders, only: [ :new, :create, :update ] do
       collection do
         post :save_as_draft
         get :load_draft

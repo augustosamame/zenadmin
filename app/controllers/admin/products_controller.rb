@@ -4,14 +4,14 @@ class Admin::ProductsController < Admin::AdminController
 	def index
     @object_options_array = [
       { event_name: "edit", label: "Editar", icon: "pencil-square" },
-      { event_name: "delete", label: "Eliminar", icon: "trash" },
+      { event_name: "delete", label: "Eliminar", icon: "trash" }
     ]
     respond_to do |format|
       format.html do
         @products = Product.all
           .joins(:warehouse_inventories)
           .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
-          .select('products.*, warehouse_inventories.stock')
+          .select("products.*, warehouse_inventories.stock")
         if @products.size > 2000
           @datatable_options = "server_side:true"
         end
@@ -37,7 +37,7 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   private
-    #TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
+    # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
     def datatable_json
       products = Product.all
 
@@ -48,16 +48,16 @@ class Admin::ProductsController < Admin::AdminController
 
       # Apply sorting
       if params[:order].present?
-        order_by = case params[:order]['0'][:column].to_i
-                  when 0 then 'name'
-                  when 1 then 'brand_id'
-                  when 2 then 'price_cents'
-                  when 3 then 'discounted_price_cents'
-                  when 4 then 'available_at'
-                  when 5 then 'status'
-                  else 'name'
-                  end
-        direction = params[:order]['0'][:dir] == 'desc' ? 'desc' : 'asc'
+        order_by = case params[:order]["0"][:column].to_i
+        when 0 then "name"
+        when 1 then "brand_id"
+        when 2 then "price_cents"
+        when 3 then "discounted_price_cents"
+        when 4 then "available_at"
+        when 5 then "status"
+        else "name"
+        end
+        direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
         products = products.order("#{order_by} #{direction}")
       end
 
@@ -74,10 +74,10 @@ class Admin::ProductsController < Admin::AdminController
             product_image_tag(product),
             product.name,
             number_to_currency(product.price_cents / 100.0),
-            product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : 'N/A',
-            product.available_at ? product.available_at.strftime("%b %d, %Y") : 'N/A',
-            product.status == 0 ? 'Active' : 'Inactive',
-            render_to_string(partial: 'admin/products/actions', formats: [:html], locals: { product: product, object_options_array: @object_options_array })
+            product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
+            product.available_at ? product.available_at.strftime("%b %d, %Y") : "N/A",
+            product.status == 0 ? "Active" : "Inactive",
+            render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, object_options_array: @object_options_array })
           ]
         end
       }
@@ -90,5 +90,4 @@ class Admin::ProductsController < Admin::AdminController
         "No Image" # Or an alternative placeholder
       end
     end
-
 end

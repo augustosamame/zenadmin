@@ -7,6 +7,6 @@ class CreateWarehouseInventories < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    add_index :warehouse_inventories, [:warehouse_id, :product_id], unique: true
+    add_index :warehouse_inventories, [ :warehouse_id, :product_id ], unique: true
   end
 end

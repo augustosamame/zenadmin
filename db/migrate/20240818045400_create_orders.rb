@@ -19,7 +19,7 @@ class CreateOrders < ActiveRecord::Migration[7.2]
       t.text :customer_note
       t.text :seller_note
       t.integer :active_invoice_id
-      t.boolean :invoice_id_required, default: false #dni or RUC required
+      t.boolean :invoice_id_required, default: false # dni or RUC required
       t.datetime :order_date
 
       t.timestamps

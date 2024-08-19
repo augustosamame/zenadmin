@@ -6,20 +6,20 @@ class ApplicationController < ActionController::Base
 
   def set_railsui_demo_links
     @railsui_demo_links = [
-      :integrations, 
-      :team, 
-      :billing, 
-      :notifications, 
-      :settings, 
-      :activity, 
-      :profile, 
-      :people, 
-      :calendar, 
-      :assignments, 
-      :message, 
-      :messages, 
-      :project, 
-      :projects, 
+      :integrations,
+      :team,
+      :billing,
+      :notifications,
+      :settings,
+      :activity,
+      :profile,
+      :people,
+      :calendar,
+      :assignments,
+      :message,
+      :messages,
+      :project,
+      :projects,
       :dashboard
     ]
   end

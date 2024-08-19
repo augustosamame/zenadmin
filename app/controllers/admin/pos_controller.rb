@@ -4,5 +4,4 @@ class Admin::PosController < Admin::AdminController
 	def new
     @order = Order.new
   end
-
 end
