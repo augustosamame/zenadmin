@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import axios from 'axios'
 
 export default class extends Controller {
   static targets = ['items', 'total']
@@ -11,9 +10,21 @@ export default class extends Controller {
   }
 
   checkForDraftOrder() {
-    const draftData = JSON.parse(sessionStorage.getItem('draftOrder') || '{}')
-    if (draftData && draftData.order_items_attributes && draftData.order_items_attributes.length > 0) {
-      this.showDraftButton()
+    const draftData = JSON.parse(sessionStorage.getItem('draftOrder') || '{}');
+
+    // Check if there are any items already in the list
+    const currentItemCount = this.itemsTarget.querySelectorAll('div.grid').length;
+    const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
+
+    console.log("Current Item Count:", currentItemCount);
+    console.log("Draft Item Count:", draftItemCount);
+    console.log("Draft Data:", draftData);
+
+    // Show the draft button only if there are no items in the list and draft data is available with items
+    if (currentItemCount === 0 && draftItemCount > 0) {
+      this.showDraftButton();
+    } else {
+      this.hideDraftButton();
     }
   }
 
@@ -29,8 +40,9 @@ export default class extends Controller {
       subtotalElement.textContent = `S/ ${newSubtotal}`
     } else {
       const itemElement = document.createElement('div')
-      itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start')
+      itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer')
       itemElement.setAttribute('data-item-name', product.name)
+      itemElement.setAttribute('data-action', 'click->order-items#selectItem')
 
       itemElement.innerHTML = `
         <div class="col-span-5">
@@ -41,7 +53,7 @@ export default class extends Controller {
           <span data-item-quantity="${product.quantity}">${product.quantity}</span>
         </div>
         <div class="col-span-1">
-          <span>S/ ${product.price.toFixed(2)}</span>
+          <span class="editable-price" contenteditable="false" data-action="input->order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
         </div>
         <div class="col-span-1">
           <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
@@ -52,6 +64,84 @@ export default class extends Controller {
 
     this.calculateTotal()
     this.saveDraft() // Automatically save the draft whenever an item is added
+  }
+
+  selectItem(event) {
+    // Clear any previously selected items
+    this.itemsTarget.querySelectorAll('div.grid').forEach(item => {
+      item.classList.remove('bg-blue-100')
+      item.querySelector('.editable-price').setAttribute('contenteditable', 'false')
+      item.querySelectorAll('.action-buttons').forEach(button => button.remove())
+    })
+
+    const selectedItem = event.currentTarget
+    selectedItem.classList.add('bg-blue-100')
+
+    // Make price editable
+    const priceElement = selectedItem.querySelector('.editable-price')
+    priceElement.setAttribute('contenteditable', 'true')
+    priceElement.focus()
+
+    // Add action buttons
+    const actionButtonsHTML = `
+      <div class="action-buttons flex justify-start space-x-2 col-span-1">
+        <button type="button" class="quantity-up bg-gray-200 px-2 py-1 rounded">▲</button>
+        <button type="button" class="quantity-down bg-gray-200 px-2 py-1 rounded">▼</button>
+        <button type="button" class="remove-item bg-red-200 px-2 py-1 rounded">✖</button>
+      </div>
+    `
+    selectedItem.insertAdjacentHTML('beforeend', actionButtonsHTML)
+
+    // Attach event listeners for the action buttons
+    selectedItem.querySelector('.quantity-up').addEventListener('click', this.incrementQuantity.bind(this))
+    selectedItem.querySelector('.quantity-down').addEventListener('click', this.decrementQuantity.bind(this))
+    selectedItem.querySelector('.remove-item').addEventListener('click', this.removeItem.bind(this))
+  }
+
+  updatePrice(event) {
+    const priceElement = event.currentTarget
+    const selectedItem = priceElement.closest('div.grid')
+    const quantity = parseInt(selectedItem.querySelector('[data-item-quantity]').textContent)
+    const price = parseFloat(priceElement.textContent.replace('S/ ', '').replace(',', '.')) || 0
+    selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`
+    this.calculateTotal()
+    this.saveDraft()
+  }
+
+  incrementQuantity(event) {
+    event.stopPropagation()
+    const selectedItem = event.currentTarget.closest('div.grid')
+    const quantityElement = selectedItem.querySelector('[data-item-quantity]')
+    const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''))
+    let quantity = parseInt(quantityElement.textContent)
+    quantity += 1
+    quantityElement.textContent = quantity
+    selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`
+    this.calculateTotal()
+    this.saveDraft()
+  }
+
+  decrementQuantity(event) {
+    event.stopPropagation()
+    const selectedItem = event.currentTarget.closest('div.grid')
+    const quantityElement = selectedItem.querySelector('[data-item-quantity]')
+    const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''))
+    let quantity = parseInt(quantityElement.textContent)
+    if (quantity > 1) {
+      quantity -= 1
+      quantityElement.textContent = quantity
+      selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`
+      this.calculateTotal()
+      this.saveDraft()
+    }
+  }
+
+  removeItem(event) {
+    event.stopPropagation()
+    const selectedItem = event.currentTarget.closest('div.grid')
+    selectedItem.remove()
+    this.calculateTotal()
+    this.saveDraft()
   }
 
   calculateTotal() {
@@ -66,11 +156,7 @@ export default class extends Controller {
   saveDraft() {
     const orderData = this.collectOrderData()
     sessionStorage.setItem('draftOrder', JSON.stringify(orderData))
-  }
-
-  completeOrder() {
-    const orderData = this.collectOrderData()
-    this.sendOrderData(orderData)
+    this.checkForDraftOrder()
   }
 
   loadDraft(event) {
@@ -101,7 +187,7 @@ export default class extends Controller {
       const name = item.querySelector('div.col-span-5 span.font-medium').textContent.trim()
       const sku = item.querySelector('div.col-span-5 span.text-sm').textContent.trim()
       const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim())
-      const price = parseFloat(item.querySelector('div.col-span-1:nth-child(3) span').textContent.replace('S/ ', ''))
+      const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''))
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''))
 
       orderItems.push({ name, sku, quantity, price, subtotal })
@@ -136,5 +222,10 @@ export default class extends Controller {
     draftButtonContainer.innerHTML = `
       <a href="#" class="p-4 bg-yellow-400 rounded btn dark:bg-yellow-500 block w-full text-center" data-action="click->order-items#loadDraft">Recuperar Borrador</a>
     `
+  }
+  hideDraftButton() {
+    console.log("Hiding draft button.");
+    const draftButtonContainer = document.getElementById('draft-button-container');
+    draftButtonContainer.innerHTML = ''; // Clear the button
   }
 }
