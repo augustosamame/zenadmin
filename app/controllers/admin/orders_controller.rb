@@ -5,26 +5,13 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def create
+    #TODO - Add validations for order creation for things that may have been changed in the frontend. Like max discount, etc. Maybe do this in the model?
     @order = Order.new(order_params)
     if @order.save
       session.delete(:draft_order) # Clear the draft after saving the order
       render json: { status: 'success', id: @order.id, message: 'Order created successfully.' }
     else
       render json: { status: 'error', errors: @order.errors.full_messages }
-    end
-  end
-
-  def save_as_draft
-    session[:draft_order] = order_params
-    render json: { status: 'success', message: 'Draft saved successfully.' }
-  end
-
-  def load_draft
-    @order_data = session[:draft_order] || {}
-    if @order_data.present?
-      render :new
-    else
-      redirect_to new_admin_order_path, alert: 'No draft order found.'
     end
   end
 

@@ -5,6 +5,9 @@ export default class extends Controller {
 
   connect() {
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
+    console.log("Max Discount Percentage:", this.maxDiscountPercentage);
+
     this.checkForDraftOrder()
     this.calculateTotal()
   }
@@ -15,10 +18,6 @@ export default class extends Controller {
     // Check if there are any items already in the list
     const currentItemCount = this.itemsTarget.querySelectorAll('div.grid').length;
     const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
-
-    console.log("Current Item Count:", currentItemCount);
-    console.log("Draft Item Count:", draftItemCount);
-    console.log("Draft Data:", draftData);
 
     // Show the draft button only if there are no items in the list and draft data is available with items
     if (currentItemCount === 0 && draftItemCount > 0) {
@@ -42,6 +41,7 @@ export default class extends Controller {
       const itemElement = document.createElement('div')
       itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer')
       itemElement.setAttribute('data-item-name', product.name)
+      itemElement.setAttribute('data-item-original-price', product.price);
       itemElement.setAttribute('data-action', 'click->order-items#selectItem')
 
       itemElement.innerHTML = `
@@ -53,7 +53,7 @@ export default class extends Controller {
           <span data-item-quantity="${product.quantity}">${product.quantity}</span>
         </div>
         <div class="col-span-1">
-          <span class="editable-price" contenteditable="false" data-action="input->order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
+          <span class="editable-price" contenteditable="false" data-action="blur->order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
         </div>
         <div class="col-span-1">
           <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
@@ -99,13 +99,32 @@ export default class extends Controller {
   }
 
   updatePrice(event) {
-    const priceElement = event.currentTarget
-    const selectedItem = priceElement.closest('div.grid')
-    const quantity = parseInt(selectedItem.querySelector('[data-item-quantity]').textContent)
-    const price = parseFloat(priceElement.textContent.replace('S/ ', '').replace(',', '.')) || 0
-    selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`
-    this.calculateTotal()
-    this.saveDraft()
+    const priceElement = event.currentTarget;
+    const itemElement = priceElement.closest('div.grid');
+    const originalPrice = parseFloat(itemElement.dataset.itemOriginalPrice);
+    console.log("Original Price:", originalPrice);
+    let newPrice = parseFloat(priceElement.textContent.replace('S/ ', ''));
+    console.log("New Price:", newPrice);
+
+    // Calculate the maximum allowed discount price
+    const maxDiscount = Math.ceil((originalPrice * (1 - this.maxDiscountPercentage / 100)) * 100) / 100;
+    console.log("Max Discount:", maxDiscount);
+
+    // If the new price is less than the maximum allowed discount price, reset it and show an alert
+    if (newPrice < maxDiscount) {
+      console.log("Price is less than max discount.", newPrice, maxDiscount);
+      newPrice = maxDiscount;
+      priceElement.textContent = `S/ ${newPrice.toFixed(2)}`;
+      alert(`El precio no puede ser menor que S/ ${newPrice.toFixed(2)}, que es el máximo descuento permitido.`);
+    }
+
+    // Update the subtotal
+    const quantity = parseInt(itemElement.querySelector('[data-item-quantity]').textContent);
+    const subtotalElement = itemElement.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(newPrice * quantity).toFixed(2)}`;
+
+    this.calculateTotal();
+    this.saveDraft(); // Save the draft again with the updated price
   }
 
   incrementQuantity(event) {
@@ -224,7 +243,6 @@ export default class extends Controller {
     `
   }
   hideDraftButton() {
-    console.log("Hiding draft button.");
     const draftButtonContainer = document.getElementById('draft-button-container');
     draftButtonContainer.innerHTML = ''; // Clear the button
   }
