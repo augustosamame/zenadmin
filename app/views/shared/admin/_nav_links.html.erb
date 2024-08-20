@@ -1,6 +1,16 @@
 <li>
   <%= nav_link_to "Tablero", send("admin_dashboard_path"), class: "nav-link" %>
 </li>
+<li data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Admin
+  </button>
+  <ul data-dropdown-target="menu" class="absolute hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+  </ul>
+</li>
 <li>
   <%= nav_link_to "Ventas", send("pos_admin_orders_path"), class: "nav-link" %>
 </li>
@@ -29,7 +39,7 @@
       <%= nav_link_to "Pricing", send("pricing_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
-      <%= nav_link_to "Abiut", send("about_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      <%= nav_link_to "About", send("about_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     
   </ul>

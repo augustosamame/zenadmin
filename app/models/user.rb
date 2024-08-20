@@ -7,17 +7,12 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
-  attr_writer :login
+  before_validation :set_login
 
   # Validations for email and phone number
   validates :email, presence: true, if: -> { login_type == "email" }
   validates :phone, presence: true, if: -> { login_type == "phone" }
   validates :login, presence: true, uniqueness: true
-
-  # Add a custom method to determine the login type
-  def login
-    @login || self.email || self.phone
-  end
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -27,9 +22,15 @@ class User < ApplicationRecord
 
   private
 
+  def set_login
+    self.login = self.email if login_type == "email"
+    self.login = self.phone if login_type == "phone"
+  end
+
   def login_type
     # Replace this with your actual global setting logic
     # For example, it could be an environment variable or a value stored in the database
-    Setting.login_type || "email"
+    # Setting.find_by(name: "login_type").get_value || "email"
+    Rails.application.config.global_settings[:login_type]
   end
 end

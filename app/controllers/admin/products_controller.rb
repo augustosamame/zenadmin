@@ -2,10 +2,6 @@ class Admin::ProductsController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
 	def index
-    @object_options_array = [
-      { event_name: "edit", label: "Editar", icon: "pencil-square" },
-      { event_name: "delete", label: "Eliminar", icon: "trash" }
-    ]
     respond_to do |format|
       format.html do
         @products = Product.all
@@ -81,7 +77,7 @@ class Admin::ProductsController < Admin::AdminController
             product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
             product.stock(@current_warehouse),
             product.status == 0 ? "Active" : "Inactive",
-            render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, object_options_array: @object_options_array })
+            render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, default_object_options_array: @default_object_options_array })
           ]
         end
       }

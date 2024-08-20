@@ -1,12 +1,12 @@
 class Setting < ApplicationRecord
   audited
 
-  enum status: { active: 0, inactive: 1 }
+  enum :status, { active: 0, inactive: 1 }
 
   validates :name, presence: true, uniqueness: true
   validates :localized_name, presence: true, uniqueness: true
 
-  enum data_type: { type_string: 0, type_integer: 1, type_float: 2, type_datetime: 3, type_boolean: 4, type_hash: 5 }
+  enum :data_type, { type_string: 0, type_integer: 1, type_float: 2, type_datetime: 3, type_boolean: 4, type_hash: 5 }
 
   def get_value
     case data_type

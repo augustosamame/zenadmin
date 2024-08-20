@@ -1,4 +1,4 @@
-class PageController < ApplicationController
+class Admin::PageController < Admin::AdminController
 	def integrations
 		render layout: "admin"
 	end

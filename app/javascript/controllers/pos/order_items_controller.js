@@ -1,16 +1,102 @@
 import { Controller } from '@hotwired/stimulus'
+import axios from 'axios'
 
 export default class extends Controller {
-  static targets = ['items', 'total']
+  static targets = [
+    'items',
+    'total',
+    'productGrid',
+    'paymentContainer',
+    'remainingAmount',
+    'paymentMethods',
+    'paymentList',
+    'remainingLabel',
+  ];
 
   connect() {
     console.log('Connected to the POS order items controller!')
+
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
-    console.log("Max Discount Percentage:", this.maxDiscountPercentage);
-
     this.checkForDraftOrder()
     this.calculateTotal()
+  }
+
+  payOrder() {
+    // Hide product grid and show payment methods
+    this.productGridTarget.classList.add('hidden');
+    this.paymentContainerTarget.classList.remove('hidden');
+
+    // Fetch payment methods
+    this.fetchPaymentMethods();
+  }
+
+  fetchPaymentMethods() {
+    axios.get('/admin/payment_methods', { headers: { 'Accept': 'application/json' } })
+      .then(response => {
+        const methods = response.data;
+        this.paymentMethodsTarget.innerHTML = '';
+
+        methods.forEach(method => {
+          const button = document.createElement('button');
+          button.classList.add('p-4', 'bg-gray-300', 'rounded', 'btn', 'dark:bg-gray-600');
+          button.textContent = method.description;
+          button.dataset.method = method.name;
+          button.dataset.description = method.description;
+          button.addEventListener('click', this.addPayment.bind(this));
+          this.paymentMethodsTarget.appendChild(button);
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching payment methods:', error);
+      });
+  }
+
+  addPayment(event) {
+    const method = event.currentTarget.dataset.description;
+    const remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
+    const paymentAmount = remaining > 0 ? remaining : 0;
+
+    // Create payment line
+    const paymentElement = document.createElement('div');
+    paymentElement.classList.add('flex', 'justify-between', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
+    paymentElement.innerHTML = `
+      <span>${method}</span>
+      <input type="number" class="text-right border-none focus:ring-0" value="${paymentAmount.toFixed(2)}" data-action="input->pos--order-items#updateRemaining">
+      <button type="button" class="text-red-500" data-action="click->pos--order-items#removePayment">✖</button>
+    `;
+
+    this.paymentListTarget.appendChild(paymentElement);
+    this.updateRemaining();
+  }
+
+  removePayment(event) {
+    const paymentElement = event.currentTarget.closest('div');
+    paymentElement.remove();
+    this.updateRemaining();
+  }
+
+  updateRemaining() {
+    let total = parseFloat(this.totalTarget.textContent.replace('S/', ''));
+    let payments = 0;
+
+    this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
+      payments += parseFloat(input.value);
+    });
+
+    const remaining = total - payments;
+    this.remainingAmountTarget.textContent = remaining >= 0 ? `S/ ${remaining.toFixed(2)}` : `Cambio: S/ ${(remaining * -1).toFixed(2)}`;
+  }
+
+  saveOrder() {
+    const orderData = this.collectOrderData();
+
+    this.sendOrderData(orderData);
+  }
+
+  cancelPayment() {
+    this.paymentContainerTarget.classList.add('hidden');
+    this.productGridTarget.classList.remove('hidden');
   }
 
   checkForDraftOrder() {
@@ -75,7 +161,7 @@ export default class extends Controller {
 
   selectItem(event) {
     // Clear any previously selected items
-    this.itemsTarget.querySelectorAll('div.grid').forEach(item => {
+    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
       item.classList.remove('bg-blue-100')
       item.querySelector('.editable-price').setAttribute('contenteditable', 'false')
       item.querySelectorAll('.action-buttons').forEach(button => button.remove())
@@ -107,7 +193,7 @@ export default class extends Controller {
 
   updatePrice(event) {
     const priceElement = event.currentTarget;
-    const itemElement = priceElement.closest('div.grid');
+    const itemElement = priceElement.closest('div.flex');
     const originalPrice = parseFloat(itemElement.dataset.itemOriginalPrice);
     console.log("Original Price:", originalPrice);
     let newPrice = parseFloat(priceElement.textContent.replace('S/ ', ''));
@@ -136,7 +222,7 @@ export default class extends Controller {
 
   incrementQuantity(event) {
     event.stopPropagation()
-    const selectedItem = event.currentTarget.closest('div.grid')
+    const selectedItem = event.currentTarget.closest('div.flex')
     const quantityElement = selectedItem.querySelector('[data-item-quantity]')
     const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''))
     let quantity = parseInt(quantityElement.textContent)
@@ -149,7 +235,7 @@ export default class extends Controller {
 
   decrementQuantity(event) {
     event.stopPropagation()
-    const selectedItem = event.currentTarget.closest('div.grid')
+    const selectedItem = event.currentTarget.closest('div.flex')
     const quantityElement = selectedItem.querySelector('[data-item-quantity]')
     const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''))
     let quantity = parseInt(quantityElement.textContent)
@@ -164,7 +250,7 @@ export default class extends Controller {
 
   removeItem(event) {
     event.stopPropagation()
-    const selectedItem = event.currentTarget.closest('div.grid')
+    const selectedItem = event.currentTarget.closest('div.flex')
     selectedItem.remove()
     this.calculateTotal()
     this.saveDraft()
@@ -172,7 +258,7 @@ export default class extends Controller {
 
   calculateTotal() {
     let total = 0
-    this.itemsTarget.querySelectorAll('div.grid').forEach(item => {
+    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''))
       total += subtotal
     })

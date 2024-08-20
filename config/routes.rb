@@ -7,21 +7,6 @@ Rails.application.routes.draw do
     mount Railsui::Engine, at: "/railsui"
   end
 
-  get "admin/integrations", to: "page#integrations"
-  get "admin/team", to: "page#team"
-  get "admin/billing", to: "page#billing"
-  get "admin/notifications", to: "page#notifications"
-  get "admin/settings", to: "page#settings"
-  get "admin/activity", to: "page#activity"
-  get "admin/profile", to: "page#profile"
-  get "admin/people", to: "page#people"
-  get "admin/calendar", to: "page#calendar"
-  get "admin/assignments", to: "page#assignments"
-  get "admin/message", to: "page#message"
-  get "admin/messages", to: "page#messages"
-  get "admin/project", to: "page#project"
-  get "admin/projects", to: "page#projects"
-  get "admin/dashboard", to: "page#dashboard"
   get "pricing", to: "page#pricing"
   get "about", to: "page#about"
 
@@ -41,6 +26,26 @@ Rails.application.routes.draw do
         get "pos"
       end
     end
+    resources :payment_methods
+
+    get "dashboard", to: "page#dashboard"
+    get "integrations", to: "page#integrations"
+    get "team", to: "page#team"
+    get "billing", to: "page#billing"
+    get "notifications", to: "page#notifications"
+    get "settings", to: "page#settings"
+    get "activity", to: "page#activity"
+    get "profile", to: "page#profile"
+    get "people", to: "page#people"
+    get "calendar", to: "page#calendar"
+    get "assignments", to: "page#assignments"
+    get "message", to: "page#message"
+    get "messages", to: "page#messages"
+    get "project", to: "page#project"
+    get "projects", to: "page#projects"
+
+    get 'edit_temp_password', to: 'users#edit_temp_password', as: :edit_temp_password
+    patch 'update_temp_password', to: 'users#update_temp_password', as: :update_temp_password
   end
 
 
@@ -49,7 +54,7 @@ Rails.application.routes.draw do
   # Visit the start page for Rails UI any time at /railsui/start
   root action: :dashboard, controller: "page"
 
-  devise_for :users
+  devise_for :users, skip: [:registrations]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

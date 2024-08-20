@@ -1,5 +1,5 @@
 <div class="flex items-center space-x-3">
-  <% object_options_array.each do |option| %>
+  <% default_object_options_array.each do |option| %>
     <button class="btn <%= option[:class] %>" data-action="<%= option[:event_name] %>">
       <%= icon(option[:icon]) %> <%= option[:label] %>
     </button>

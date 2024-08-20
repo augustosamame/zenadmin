@@ -1,0 +1,24 @@
+<% if Rails.env == "development" %>
+
+  <div class="container-fluid">
+    <p>
+      current_user:
+      <%= current_user.inspect %>
+    </p>
+    <p>
+      current_client:
+      <%= @current_warehouse.try(:name) %>
+    </p>
+    <br>
+      session_data:</br>
+      language: <%= session[:locale] %></br>
+      user_id_for_otp: <%= session[:user_id_for_otp] %></br>
+    </p>
+    <p>
+      request_data:
+      <%= "#{request.controller_class} / #{params}" %>
+    </p>
+
+  </div>
+
+<% end %>
