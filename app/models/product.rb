@@ -33,6 +33,11 @@ class Product < ApplicationRecord
     end
   end
 
+  def stock(warehouse)
+    inventory = WarehouseInventory.find_by(warehouse: warehouse, product: self)
+    inventory&.stock || 0
+  end
+
   def update_stock(warehouse, quantity)
     inventory = WarehouseInventory.find_or_create_by(warehouse: warehouse, product: self)
     inventory.update(stock: quantity)

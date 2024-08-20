@@ -52,6 +52,7 @@ gem "pg_search", "~> 2.3.7"
 gem "hashids"
 gem "aws-sdk-s3", "~> 1.158.0"
 gem "shrine", "~> 3.6.0"
+gem "marcel", "~> 1.0.4" # MIME type detection
 gem "ruby-vips", "~> 2.2.2"
 gem "streamio-ffmpeg", "~> 3.0.2"
 gem "rails_feather", "~> 0.1.0"

@@ -1,6 +1,7 @@
 class Media < ApplicationRecord
   belongs_to :mediable, polymorphic: true
-
+  include MediaUploader::Attachment(:file)
+  
   enum :media_type, {
     default_image: 0,
     image: 1,
@@ -11,8 +12,7 @@ class Media < ApplicationRecord
     # Add more media types as needed
   }
 
-  validates :file_path, presence: true
-  validates :media_type, presence: true
+  validates :file, presence: true
 
   scope :by_type, ->(type) { where(media_type: media_types[type]) }
   scope :ordered, -> { order(:position) }
@@ -22,5 +22,5 @@ class Media < ApplicationRecord
     media = mediable.media.by_type(media_type).first
     media || mediable.media.by_type(:default_image).first
   end
-  
+
 end

@@ -563,6 +563,7 @@ DEPENDENCIES
   jsonapi-serializer (~> 2.2.0)
   jwt (~> 2.8.2)
   kaminari (~> 1.2.2)
+  marcel (~> 1.0.4)
   money-rails (~> 1.15.0)
   pg (~> 1.1)
   pg_search (~> 2.3.7)

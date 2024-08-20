@@ -12,7 +12,8 @@ class Admin::ProductsController < Admin::AdminController
           .joins(:warehouse_inventories)
           .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
           .select("products.*, warehouse_inventories.stock")
-        if @products.size > 2000
+          #TODO improve HTML rendering when using server-side. It looks off due to margins and padding
+        if @products.size > 5
           @datatable_options = "server_side:true"
         end
       end
@@ -43,22 +44,25 @@ class Admin::ProductsController < Admin::AdminController
 
       # Apply search filter
       if params[:search][:value].present?
-        products = products.where("name ILIKE ? OR permalink ILIKE ?", "%#{params[:search][:value]}%", "%#{params[:search][:value]}%")
+        products = products.search_by_sku_and_name(params[:search][:value])
       end
 
       # Apply sorting
       if params[:order].present?
         order_by = case params[:order]["0"][:column].to_i
-        when 0 then "name"
-        when 1 then "brand_id"
-        when 2 then "price_cents"
-        when 3 then "discounted_price_cents"
-        when 4 then "available_at"
-        when 5 then "status"
+        when 0 then "sku"
+        when 2 then "name"
+        when 3 then "price_cents"
+        when 4 then "discounted_price_cents"
+        when 5
+          # For the stock column, join the warehouse_inventories table and order by stock
+          products = products.joins(:warehouse_inventories).where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
+          "warehouse_inventories.stock"
+        when 6 then "status"
         else "name"
         end
         direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
-        products = products.order("#{order_by} #{direction}")
+        products = products.reorder("#{order_by} #{direction}")
       end
 
       # Pagination
@@ -75,7 +79,7 @@ class Admin::ProductsController < Admin::AdminController
             product.name,
             number_to_currency(product.price_cents / 100.0),
             product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
-            product.available_at ? product.available_at.strftime("%b %d, %Y") : "N/A",
+            product.stock(@current_warehouse),
             product.status == 0 ? "Active" : "Inactive",
             render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, object_options_array: @object_options_array })
           ]
@@ -85,7 +89,7 @@ class Admin::ProductsController < Admin::AdminController
 
     def product_image_tag(product)
       if product.image.present?
-        ActionController::Base.helpers.image_tag(product.image, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
+        ActionController::Base.helpers.image_tag(product.image.file_url, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
       else
         "No Image" # Or an alternative placeholder
       end

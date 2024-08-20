@@ -1,4 +1,9 @@
+require 'sidekiq/web'
+
 Rails.application.routes.draw do
+
+  mount Sidekiq::Web => '/sidekiq'
+
   if Rails.env.development? || Rails.env.test?
     mount Railsui::Engine, at: "/railsui"
   end

@@ -15,17 +15,20 @@ export default class extends Controller {
 
     const tableElement = this.element.querySelector('table');
     const dateColumnIndex = this.element.dataset.datatableDateColumn;
+    const languageUrl = this.languageCdnValue || '/datatables/i18n/es-ES.json';
+
 
     const initialOptions = {
       stateSave: true,
       ordering: true,
       fixedHeader: true,
       responsive: true,
+      processing: true, // Show processing indicator only when server-side processing
       columnDefs: [
         // { className: 'dt-body-nowrap', targets: -1 },
       ],
       language: {
-        url: this.languageCdnValue,
+        url: languageUrl
       },
       pagingType: 'simple_numbers',
       pageLength: 10,             // Show 10 rows per page by default
@@ -44,9 +47,13 @@ export default class extends Controller {
 
     const allAdditionalOptions = this.optionsValue;
 
+    // Check if the table is set for server-side processing
     if (allAdditionalOptions.includes("server_side:true")) {
       initialOptions.serverSide = true;
-      initialOptions.ajax = "/admin/products.json";
+      initialOptions.ajax = {
+        url: "/admin/products.json",
+        type: "GET",
+      }
     }
 
     if (allAdditionalOptions.length > 0) {
@@ -90,6 +97,15 @@ export default class extends Controller {
         setTimeout(() => {
           this.applyPaginationStyles();
         }, 100);
+      });
+
+      $(tableElement).on('xhr.dt', () => {
+        console.log('xhr.dt event triggered');
+        
+        setTimeout(() => {
+          // Add Tailwind classes to the cells (required for JSON response)
+          this.applyCellTailwindClasses();
+        }, 50)
       });
 
       // Observe for the wrapper to be added to the DOM
@@ -197,6 +213,13 @@ export default class extends Controller {
 
     // Style the info text (new structure)
     $('.dt-info').addClass('text-sm text-slate-400 mt-2 sm:mt-0');
+  }
+
+  applyCellTailwindClasses() {
+    // Apply Tailwind classes to cells
+    $('.dtr-control').addClass('px-4 py-2');
+    $('td').addClass('px-4 py-2 text-gray-700 dark:text-gray-300');  // Add classes for all table cells
+    $('th').addClass('px-4 py-2 text-left border-b border-slate-300 dark:border-slate-600');
   }
 
   applyPaginationStyles() {

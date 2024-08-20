@@ -64,12 +64,12 @@
           <tr>
             <td class="px-4 py-2"><%= product.sku %></td>
             <td class="flex items-center px-4 py-2 space-x-3">
-              <%= image_tag product.image, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.image.present? %>
+              <%= image_tag product.image&.file_url, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
             </td>
             <td class="px-4 py-2"><%= product.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(product.price_cents / 100.0) %></td>
             <td class="px-4 py-2"><%= product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : 'N/A' %></td>
-            <td class="px-4 py-2"><%= product.stock %></td>
+            <td class="px-4 py-2"><%= product.stock(@current_warehouse) %></td>
             <td class="px-4 py-2"><%= product.status == 0 ? 'Active' : 'Inactive' %></td>
             <td class="px-4 py-2">
               <div data-controller="dropdown" class="relative">

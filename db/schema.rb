@@ -98,7 +98,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
   end
 
   create_table "media", force: :cascade do |t|
-    t.string "file_path", null: false
+    t.jsonb "file_data", null: false
     t.integer "media_type", default: 0
     t.string "mediable_type", null: false
     t.bigint "mediable_id", null: false
