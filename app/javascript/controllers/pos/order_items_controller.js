@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ['items', 'total']
 
   connect() {
+    console.log('Connected to the POS order items controller!')
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
     console.log("Max Discount Percentage:", this.maxDiscountPercentage);
@@ -28,9 +29,10 @@ export default class extends Controller {
   }
 
   addItem(product) {
-    const existingItem = this.itemsTarget.querySelector(`[data-item-name="${product.name}"]`)
+    const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.sku}"]`)
 
     if (existingItem) {
+      console.log("Existing Item:", existingItem);
       const quantityElement = existingItem.querySelector('[data-item-quantity]')
       const subtotalElement = existingItem.querySelector('[data-item-subtotal]')
       const newQuantity = parseInt(quantityElement.textContent) + product.quantity
@@ -38,24 +40,27 @@ export default class extends Controller {
       const newSubtotal = (newQuantity * product.price).toFixed(2)
       subtotalElement.textContent = `S/ ${newSubtotal}`
     } else {
+      console.log("New Item:", product);
       const itemElement = document.createElement('div')
       itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer')
       itemElement.setAttribute('data-item-name', product.name)
+      itemElement.setAttribute('data-item-sku', product.sku)
       itemElement.setAttribute('data-item-original-price', product.price);
       itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem')
+      console.log("Item Element:", itemElement);
 
       itemElement.innerHTML = `
-        <div class="col-span-5">
+        <div class="col-span-3">
           <span class="block font-medium">${product.name}</span>
           <span class="block text-sm text-gray-500">${product.sku}</span>
         </div>
         <div class="col-span-1">
           <span data-item-quantity="${product.quantity}">${product.quantity}</span>
         </div>
-        <div class="col-span-1">
+        <div class="col-span-2">
           <span class="editable-price" contenteditable="false" data-action="blur->pos--order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
         </div>
-        <div class="col-span-1">
+        <div class="col-span-2">
           <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
         </div>
       `
@@ -238,6 +243,7 @@ export default class extends Controller {
 
   showDraftButton() {
     const draftButtonContainer = document.getElementById('draft-button-container')
+    console.log("Draft Button Container:", draftButtonContainer);
     draftButtonContainer.innerHTML = `
       <a href="#" class="p-4 bg-yellow-400 rounded btn dark:bg-yellow-500 block w-full text-center" data-action="click->pos--order-items#loadDraft">Recuperar Borrador</a>
     `

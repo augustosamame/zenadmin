@@ -45,8 +45,11 @@ export default class extends Controller {
         </div>
         <span class="block text-sm">${product.sku}</span>
         <span class="block text-sm">${product.name}</span>
-        <span class="block text-sm text-gray-500">S/ ${product.price}</span>
-      `
+        <div class="flex justify-between text-sm text-gray-500">
+          <span>S/ ${product.price}</span>
+          <span>Stock: ${product.stock}</span>
+        </div>
+      `;
 
       productElement.addEventListener('click', () => this.addProductToOrder(product))
       this.productContainerTarget.appendChild(productElement)

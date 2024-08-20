@@ -4,24 +4,24 @@
 
 <div id="max-price-discount-percentage" data-value="<%= Rails.application.config.global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
 
-<div class="flex h-screen text-black bg-white dark:bg-black dark:text-white" data-controller="pos--order-items">
+<div class="flex h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--order-items">
   <!-- Left Section -->
-  <div class="w-2/3 p-4 bg-gray-100 dark:bg-gray-800">
-    <!-- Top Section: Order Items -->
-    <div class="flex flex-col p-4 mb-4 bg-white rounded shadow-md dark:bg-gray-700">
-      <div id="pos--order-items">
+  <div class="flex flex-col w-1/2 h-full p-4 bg-gray-100 dark:bg-gray-800">
+    <!-- Order List Section -->
+    <div class="flex flex-col flex-grow p-4 overflow-hidden bg-white rounded shadow-md dark:bg-gray-700">
+      <div id="pos--order-items" class="flex flex-col h-full">
         <!-- Column Titles -->
         <div class="grid grid-cols-8 gap-2 mb-2 font-bold">
-          <div class="col-span-5">Producto</div>
+          <div class="col-span-3">Producto</div>
           <div class="col-span-1">Cant</div>
-          <div class="col-span-1">Precio</div>
-          <div class="col-span-1">Subtotal</div>
+          <div class="col-span-2">Precio</div>
+          <div class="col-span-2">Subtotal</div>
         </div>
 
         <!-- Container for dynamically added items -->
-        <div data-pos--order-items-target="items" class="min-h-40"></div>
+        <div data-pos--order-items-target="items" class="flex-grow overflow-auto"></div>
 
-        <!-- Total -->
+        <!-- Total (Aligned at the Bottom) -->
         <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
           <span>Total:</span>
           <span data-pos--order-items-target="total">S/ 0.00</span>
@@ -29,52 +29,62 @@
       </div>
     </div>
 
-    <!-- Bottom Section: Buttons and Numeric Keypad -->
-    <div class="flex flex-col h-1/3">
-      <div class="flex justify-between mb-4">
+    <!-- Buttons Section -->
+    <div class="flex justify-between mt-4 mb-4">
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Comentarios</button>
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Cliente</button>
-      <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--order-items#completeOrder">Pagar</button>
       <div id="draft-button-container">
         <% if draft_order_present? %>
           <a href="#" class="block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500" data-action="click->pos--order-items#loadDraft">Recuperar Borrador</a>
         <% end %>
-      </div> <!-- Container for the "Recuperar Borrador" button -->
+      </div>
     </div>
+
+    <!-- Keypad and Payment Button Section -->
+    <div class="flex h-48">
+      <!-- Big Payment Button -->
+      <div class="flex items-center justify-center w-1/3 h-full">
+        <button type="button" class="flex items-center justify-center w-full h-full p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--order-items#completeOrder">
+          Pagar
+        </button>
+      </div>
+
       <!-- Numeric Keypad -->
-      <div id="keypad" data-controller="pos--keypad">
-        <div class="grid grid-cols-4 gap-2">
-          <button class="bg-white btn keypad-button dark:bg-gray-800">1</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">2</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">3</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">Cant</button>
+      <div class="flex-grow h-full">
+        <div id="keypad" data-controller="pos--keypad" class="h-full">
+          <div class="grid h-full grid-cols-4 gap-2">
+            <button class="bg-white btn keypad-button dark:bg-gray-800">1</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">2</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">3</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">Cant</button>
 
-          <button class="bg-white btn keypad-button dark:bg-gray-800">4</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">5</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">6</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">Descuento</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">4</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">5</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">6</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">Descuento</button>
 
-          <button class="bg-white btn keypad-button dark:bg-gray-800">7</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">8</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">9</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">Precio</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">7</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">8</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">9</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">Precio</button>
 
-          <button class="bg-white btn keypad-button dark:bg-gray-800">+/-</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">0</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">.</button>
-          <button class="bg-white btn keypad-button dark:bg-gray-800">C</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">+/-</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">0</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">.</button>
+            <button class="bg-white btn keypad-button dark:bg-gray-800">C</button>
+          </div>
         </div>
       </div>
     </div>
   </div>
 
   <!-- Right Section: Product Grid -->
-  <div class="w-1/3 p-4 bg-gray-200 dark:bg-gray-900">
+  <div class="w-1/2 p-4 overflow-y-auto bg-gray-200 dark:bg-gray-900">
     <div id="product-grid" data-controller="pos--product-grid">
       <!-- Search Bar -->
       <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
 
-      <div class="grid grid-cols-2 gap-4" data-pos--product-grid-target="productContainer">
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" data-pos--product-grid-target="productContainer">
         <!-- Products will be rendered here -->
       </div>
     </div>
