@@ -26,5 +26,4 @@ Rails.application.config.after_initialize do
   rescue ActiveRecord::NoDatabaseError, PG::ConnectionBad => e
     Rails.logger.warn "Database not available: #{e.message}. Skipping global settings load."
   end
-
 end

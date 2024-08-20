@@ -1,14 +1,14 @@
 class Media < ApplicationRecord
   belongs_to :mediable, polymorphic: true
   include MediaUploader::Attachment(:file)
-  
+
   enum :media_type, {
     default_image: 0,
     image: 1,
     video: 2,
     pos_image: 5,
     homepage_image: 4,
-    featured_homepage_image: 5,
+    featured_homepage_image: 5
     # Add more media types as needed
   }
 
@@ -22,5 +22,4 @@ class Media < ApplicationRecord
     media = mediable.media.by_type(media_type).first
     media || mediable.media.by_type(:default_image).first
   end
-
 end

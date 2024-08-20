@@ -8,19 +8,18 @@ class MediaUploader < Shrine
   end
 
   Attacher.validate do
-    validate_max_size 5.megabytes, message: 'is too large'
-    validate_mime_type_inclusion ['image/jpeg', 'image/png', 'image/gif']
+    validate_max_size 5.megabytes, message: "is too large"
+    validate_mime_type_inclusion [ "image/jpeg", "image/png", "image/gif" ]
   end
 
   # Process and generate thumbnails
   Attacher.derivatives do |original|
-
     vips = ImageProcessing::Vips.source(original)
 
-    { 
+    {
       large:  vips.resize_to_limit!(400, 400),
       small:  vips.resize_to_limit!(200, 200),
-      thumb:  vips.resize_to_limit!(50, 50),
+      thumb:  vips.resize_to_limit!(50, 50)
     }
   end
 

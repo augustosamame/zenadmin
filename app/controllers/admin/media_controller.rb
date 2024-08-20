@@ -12,7 +12,7 @@ class Admin::MediaController < Admin::AdminController
   def create
     @media = @mediable.media.new(media_params)
     if @media.save
-      redirect_to admin_mediable_media_path(@mediable), notice: 'Media was successfully uploaded.'
+      redirect_to admin_mediable_media_path(@mediable), notice: "Media was successfully uploaded."
     else
       render :new
     end
@@ -25,7 +25,7 @@ class Admin::MediaController < Admin::AdminController
   def update
     @media = @mediable.media.find(params[:id])
     if @media.update(media_params)
-      redirect_to admin_mediable_media_path(@mediable), notice: 'Media was successfully updated.'
+      redirect_to admin_mediable_media_path(@mediable), notice: "Media was successfully updated."
     else
       render :edit
     end
@@ -34,7 +34,7 @@ class Admin::MediaController < Admin::AdminController
   def destroy
     @media = @mediable.media.find(params[:id])
     @media.destroy
-    redirect_to admin_mediable_media_path(@mediable), notice: 'Media was successfully deleted.'
+    redirect_to admin_mediable_media_path(@mediable), notice: "Media was successfully deleted."
   end
 
   private

@@ -26,9 +26,9 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
 
-#product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
-#product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
-#product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)
+# product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
+# product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
+# product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)
 
 20.times do
   Product.transaction do
@@ -66,14 +66,13 @@ warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
     # Save both product and media together
     product.save!
     media.save!
-    
   end
 end
 
 
 # Associate the product with categories
-#product_1.product_categories << category_1
-#product_1.product_categories << category_2
+# product_1.product_categories << category_1
+# product_1.product_categories << category_2
 
 tag_1 = Tag.find_or_create_by!(name: 'Osos de Peluche')
 
@@ -87,4 +86,3 @@ PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
 PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectivo')
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
-
