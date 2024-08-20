@@ -34,7 +34,7 @@ class Admin::ProductsController < Admin::AdminController
         @products = []
       end
     end
-    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.image.file_url, price: (product.price_cents / 100), stock: product.stock(@current_warehouse) }}
+    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.image.file_url, price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
   end
 
   private
