@@ -14,13 +14,15 @@ export default class extends Controller {
   }
 
   checkForDraftOrder() {
+    console.log('Checking for draft order...')
     const draftData = JSON.parse(sessionStorage.getItem('draftOrder') || '{}');
+    console.log("Draft Data:", draftData);
 
-    // Check if there are any items already in the list
-    const currentItemCount = this.itemsTarget.querySelectorAll('div.grid').length;
+    const currentItemCount = this.itemsTarget.querySelectorAll('div.flex').length;
     const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
+    console.log("Current Item Count:", currentItemCount);
+    console.log("Draft Item Count:", draftItemCount);
 
-    // Show the draft button only if there are no items in the list and draft data is available with items
     if (currentItemCount === 0 && draftItemCount > 0) {
       this.showDraftButton();
     } else {
@@ -41,30 +43,30 @@ export default class extends Controller {
       subtotalElement.textContent = `S/ ${newSubtotal}`
     } else {
       console.log("New Item:", product);
-      const itemElement = document.createElement('div')
-      itemElement.classList.add('grid', 'grid-cols-8', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer')
-      itemElement.setAttribute('data-item-name', product.name)
-      itemElement.setAttribute('data-item-sku', product.sku)
+      const itemElement = document.createElement('div');
+      itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
+      itemElement.setAttribute('data-item-name', product.name);
+      itemElement.setAttribute('data-item-sku', product.sku);
       itemElement.setAttribute('data-item-original-price', product.price);
-      itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem')
-      console.log("Item Element:", itemElement);
+      itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
 
       itemElement.innerHTML = `
-        <div class="col-span-3">
+        <div class="flex-grow" style="flex-basis: 55%;">
           <span class="block font-medium">${product.name}</span>
           <span class="block text-sm text-gray-500">${product.sku}</span>
         </div>
-        <div class="col-span-1">
+        <div class="flex-grow" style="flex-basis: 15%;">
           <span data-item-quantity="${product.quantity}">${product.quantity}</span>
         </div>
-        <div class="col-span-2">
+        <div class="flex-grow" style="flex-basis: 15%;">
           <span class="editable-price" contenteditable="false" data-action="blur->pos--order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
         </div>
-        <div class="col-span-2">
+        <div class="flex-grow" style="flex-basis: 15%;">
           <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
         </div>
-      `
-      this.itemsTarget.appendChild(itemElement)
+      `;
+
+      this.itemsTarget.appendChild(itemElement);
     }
 
     this.calculateTotal()
@@ -178,6 +180,7 @@ export default class extends Controller {
   }
 
   saveDraft() {
+    console.log('Saving draft...')
     const orderData = this.collectOrderData()
     sessionStorage.setItem('draftOrder', JSON.stringify(orderData))
     this.checkForDraftOrder()
@@ -207,9 +210,9 @@ export default class extends Controller {
 
   collectOrderData() {
     const orderItems = []
-    this.itemsTarget.querySelectorAll('div.grid').forEach(item => {
-      const name = item.querySelector('div.col-span-5 span.font-medium').textContent.trim()
-      const sku = item.querySelector('div.col-span-5 span.text-sm').textContent.trim()
+    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+      const name = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim()
+      const sku = item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim()
       const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim())
       const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''))
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''))
