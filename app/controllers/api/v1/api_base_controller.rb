@@ -3,7 +3,7 @@ module Api::V1
     # protect_from_forgery with: :exception, unless: -> { request.format.json? }
     protect_from_forgery with: :null_session
     before_action :authenticate_user_with_token, unless: [ :devise_controller? ]
-    after_action :set_app_version_header
+    after_action :set_client_version_header
 
     def authenticate_user_with_token
       # TODO specif response if token is invalid to force app to relogin
@@ -73,8 +73,8 @@ module Api::V1
 
     private
 
-      def set_app_version_header
-        response.set_header("app-version", ENV["APP_VERSION"])
+      def set_client_version_header
+        response.set_header("client-version", ENV["CLIENT_VERSION"])
       end
   end
 end

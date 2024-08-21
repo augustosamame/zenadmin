@@ -5,12 +5,12 @@
 <div id="max-price-discount-percentage" data-value="<%= Rails.application.config.global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
 
 <!-- Container to adjust layout for mobile and desktop -->
-<div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--order-items">
+<div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="order-items payment">
 
   <!-- Product Grid Section (on top for mobile, on right for desktop) -->
-  <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto">
+  <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto" data-payment-target="productGrid">
 
-    <div id="product-grid" data-controller="pos--product-grid" data-pos--order-items-target="productGrid">
+    <div id="product-grid" data-controller="pos--product-grid">
       <!-- Search Bar -->
       <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
 
@@ -19,26 +19,26 @@
       </div>
     </div>
 
-    <div data-pos--order-items-target="paymentContainer" class="hidden">
+    <div data-controller="pos--payment" data-pos--payment-target="paymentContainer" class="hidden">
     
-      <div data-pos--order-items-target="paymentMethods">
+      <div data-pos--payment-target="paymentMethods">
         <!-- Buttons will be dynamically added here -->
       </div>
 
-      <div data-pos--order-items-target="paymentList" class="mt-4">
+      <div data-pos--payment-target="paymentList" class="mt-4">
         <!-- Payments will be listed here -->
       </div>
 
       <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
-        <span data-pos--order-items-target="remainingLabel">Remaining:</span>
-        <span data-pos--order-items-target="remainingAmount">S/ 0.00</span>
+        <span data-pos--payment-target="remainingLabel">Remaining:</span>
+        <span data-pos--payment-target="remainingAmount">S/ 0.00</span>
       </div>
 
       <div class="flex justify-between mt-4">
-        <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--order-items#saveOrder">
+        <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->payment#saveOrder">
           Crear Venta
         </button>
-        <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->pos--order-items#cancelPayment">
+        <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->payment#cancelPayment">
           Volver
         </button>
       </div>
@@ -52,14 +52,14 @@
     
     <!-- Order List Section -->
     <div class="flex flex-col flex-grow p-3 overflow-hidden bg-white rounded shadow-md min-h-56 dark:bg-gray-700">
-      <div id="pos--order-items" class="flex flex-col h-full">
+      <div id="pos--order-items" data-controller="pos--order-items" class="flex flex-col h-full">
         <!-- Column Titles -->
         <div class="flex gap-2 mb-2 font-bold">
-        <div class="flex-grow" style="flex-basis: 55%;">Producto</div>
-        <div class="flex-grow" style="flex-basis: 15%;">Cant</div>
-        <div class="flex-grow" style="flex-basis: 15%;">Precio</div>
-        <div class="flex-grow" style="flex-basis: 15%;">Subtotal</div>
-      </div>
+          <div class="flex-grow" style="flex-basis: 55%;">Producto</div>
+          <div class="flex-grow" style="flex-basis: 15%;">Cant</div>
+          <div class="flex-grow" style="flex-basis: 15%;">Precio</div>
+          <div class="flex-grow" style="flex-basis: 15%;">Subtotal</div>
+        </div>
 
         <!-- Container for dynamically added items -->
         <div data-pos--order-items-target="items" class="flex-grow overflow-auto"></div>
@@ -73,21 +73,22 @@
     </div>
 
     <!-- Buttons Section -->
-    <div class="flex justify-between mt-4 mb-4">
+    <div class="flex justify-between mt-4 mb-4" data-controller="pos--buttons">
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Comentarios</button>
       <button type="button" class="p-2 bg-gray-300 rounded btn dark:bg-gray-600">Cliente</button>
-      <div id="draft-button-container">
-        <% if draft_order_present? %>
-          <a href="#" class="block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500" data-action="click->pos--order-items#loadDraft">Recuperar Borrador</a>
-        <% end %>
+      <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer">
+        <a href="#" class="hidden block w-full p-4 text-center bg-yellow-400 rounded btn dark:bg-yellow-500"  data-action="click->pos--buttons#loadDraft">
+          Recuperar Borrador
+        </a>
       </div>
     </div>
+
 
     <!-- Keypad and Payment Button Section -->
     <div class="flex h-48">
       <!-- Big Payment Button -->
       <div class="flex items-center justify-center w-1/3 h-full">
-        <button type="button" class="flex items-center justify-center w-full h-full p-4 text-3xl text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--order-items#payOrder">
+        <button type="button" class="flex items-center justify-center w-full h-full p-4 text-3xl text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->payment#payOrder">
           Pagar
         </button>
       </div>
