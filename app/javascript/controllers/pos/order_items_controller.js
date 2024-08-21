@@ -1,5 +1,5 @@
 // app/javascript/controllers/order_items_controller.js
-import { Controller } from '@hotwired/stimulus'
+import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
   static targets = ['items', 'total'];
@@ -8,6 +8,15 @@ export default class extends Controller {
     console.log('Connected to OrderItemsController!', this.element);
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
+    this.selectedItem = null;
+    this.currentMode = 'quantity'; // Default mode is to update quantity
+    const quantityButton = document.getElementById('quantity-mode-button');
+    if (quantityButton) {
+      quantityButton.classList.add('bg-blue-100');
+      quantityButton.style.backgroundColor = '#bfdbfe'; // Ensure initial background color
+    }
+    this.isReplacingQuantity = false;
+    this.priceJustSelected = true;
     this.calculateTotal();
   }
 
@@ -18,9 +27,10 @@ export default class extends Controller {
       this.updateExistingItem(existingItem, product);
     } else {
       this.addNewItem(product);
+      this.selectItem({ currentTarget: this.itemsTarget.lastChild });
+      this.currentMode = 'quantity'; // Default to quantity mode
     }
 
-    // hide load draft button
     const buttonsElement = document.querySelector('[data-controller="pos--buttons"]');
     const buttonsController = this.application.getControllerForElementAndIdentifier(buttonsElement, 'pos--buttons');
     if (buttonsController) {
@@ -32,90 +42,184 @@ export default class extends Controller {
   }
 
   selectItem(event) {
+    const selectedItem = event.currentTarget;
+
     // Clear any previously selected items
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
       item.classList.remove('bg-blue-100');
-      item.querySelector('.editable-price').setAttribute('contenteditable', 'false');
-      item.querySelectorAll('.action-buttons').forEach(button => button.remove());
     });
 
-    const selectedItem = event.currentTarget;
-    selectedItem.classList.add('bg-blue-100');
-
-    // Make price editable
-    const priceElement = selectedItem.querySelector('.editable-price');
-    priceElement.setAttribute('contenteditable', 'true');
-    priceElement.focus();
-
-    // Add action buttons
-    const actionButtonsHTML = `
-      <div class="action-buttons flex justify-start space-x-2 col-span-1">
-        <button type="button" class="quantity-up bg-gray-200 px-2 py-1 rounded">▲</button>
-        <button type="button" class="quantity-down bg-gray-200 px-2 py-1 rounded">▼</button>
-        <button type="button" class="remove-item bg-red-200 px-2 py-1 rounded">✖</button>
-      </div>
-    `;
-    selectedItem.insertAdjacentHTML('beforeend', actionButtonsHTML);
-
-    // Attach event listeners for the action buttons
-    this.addActionButtonsEventListeners(selectedItem);
+    if (selectedItem) {
+      this.selectedItem = selectedItem;
+      this.isReplacingQuantity = true;
+      this.selectedItem.classList.add('bg-blue-100');
+    }
   }
 
-  updatePrice(event) {
-    const priceElement = event.currentTarget;
-    const itemElement = priceElement.closest('div.flex');
-    const originalPrice = parseFloat(itemElement.dataset.itemOriginalPrice);
-    let newPrice = parseFloat(priceElement.textContent.replace('S/ ', ''));
+  updateQuantity(value) {
+    if (!this.selectedItem) return;
 
-    // Ensure price doesn't go below allowed discount
-    const maxDiscount = Math.ceil((originalPrice * (1 - this.maxDiscountPercentage / 100)) * 100) / 100;
-    if (newPrice < maxDiscount) {
-      newPrice = maxDiscount;
-      priceElement.textContent = `S/ ${newPrice.toFixed(2)}`;
-      alert(`El precio no puede ser menor que S/ ${newPrice.toFixed(2)}, que es el máximo descuento permitido.`);
+    const quantityElement = this.selectedItem.querySelector('[data-item-quantity]');
+    let currentQuantity = quantityElement.textContent.trim();
+
+    // If the current quantity is '1' (default) and it's the first keypress, replace it with the new digit
+    if (currentQuantity === '1' && this.isFirstKeyPress) {
+      currentQuantity = value;
+      this.isFirstKeyPress = false; // Reset after the first keypress
+    } else {
+      // Append the new digit to the current quantity
+      currentQuantity += value;
     }
 
-    // Update the subtotal
-    const quantity = parseInt(itemElement.querySelector('[data-item-quantity]').textContent);
-    const subtotalElement = itemElement.querySelector('[data-item-subtotal]');
-    subtotalElement.textContent = `S/ ${(newPrice * quantity).toFixed(2)}`;
+    // Ensure no leading zeros are present (except when the result is 0)
+    currentQuantity = parseInt(currentQuantity, 10).toString();
+
+    quantityElement.textContent = currentQuantity;
+
+    // Update subtotal
+    const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
+    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
 
     this.calculateTotal();
     this.saveDraft();
   }
 
-  incrementQuantity(event) {
-    event.stopPropagation();
-    const selectedItem = event.currentTarget.closest('div.flex');
-    const quantityElement = selectedItem.querySelector('[data-item-quantity]');
-    const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
-    let quantity = parseInt(quantityElement.textContent);
-    quantity += 1;
-    quantityElement.textContent = quantity;
-    selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`;
+  selectItem(event) {
+    // Clear any previously selected items
+    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+      item.classList.remove('bg-blue-100');
+    });
+
+    this.selectedItem = event.currentTarget;
+    this.selectedItem.classList.add('bg-blue-100');
+
+    // Mark the first keypress
+    this.isFirstKeyPress = true;
+  }
+
+  updatePrice(value) {
+    if (!this.selectedItem) return;
+
+    const priceElement = this.selectedItem.querySelector('.editable-price');
+    let currentPrice = priceElement.textContent.replace('S/ ', '').trim();
+
+    // If the currentPrice is '0.00' or the price mode was just selected, replace the value
+    if (this.isReplacingQuantity || currentPrice === '0.00' || this.priceJustSelected) {
+      currentPrice = value;
+      this.priceJustSelected = false; // Reset after the first replacement
+    } else {
+      // Append the new digit to the current price
+      currentPrice += value;
+    }
+
+    const parsedPrice = parseFloat(currentPrice).toFixed(2);
+    priceElement.textContent = `S/ ${parsedPrice}`;
+
+    // Update subtotal
+    const quantity = parseInt(this.selectedItem.querySelector('[data-item-quantity]').textContent);
+    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(quantity * parsedPrice).toFixed(2)}`;
+
     this.calculateTotal();
     this.saveDraft();
   }
 
-  decrementQuantity(event) {
-    event.stopPropagation();
-    const selectedItem = event.currentTarget.closest('div.flex');
-    const quantityElement = selectedItem.querySelector('[data-item-quantity]');
-    const price = parseFloat(selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
-    let quantity = parseInt(quantityElement.textContent);
-    if (quantity > 1) {
-      quantity -= 1;
-      quantityElement.textContent = quantity;
-      selectedItem.querySelector('[data-item-subtotal]').textContent = `S/ ${(quantity * price).toFixed(2)}`;
+  updateSubtotal() {
+    const quantity = parseInt(this.selectedItem.querySelector('[data-item-quantity]').textContent);
+    const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
+    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(quantity * price).toFixed(2)}`;
+  }
+
+  removeItem() {
+    this.selectedItem.remove();
+    this.selectedItem = null;
+    this.calculateTotal();
+    this.saveDraft();
+  }
+
+  handleKeypadForPrice(digit) {
+    console.log('Digit:', digit);
+    const selectedItem = this.itemsTarget.querySelector('.bg-blue-100');
+    if (!selectedItem) return;
+
+    const priceElement = this.selectedItem.querySelector('.editable-price');
+    let currentPrice = priceElement.textContent.replace('S/', '').trim();
+
+    if (this.priceJustSelected || currentPrice === '0.00') {
+      currentPrice = digit;
+      this.priceJustSelected = false;
+    } else {
+      currentPrice += digit;
+      this.priceJustSelected = true;
+    }
+
+    // Ensure the price is valid and formatted correctly
+    if (!currentPrice.includes('.')) {
+      currentPrice = parseFloat(currentPrice).toFixed(2);
+    }
+
+    priceElement.textContent = `S/ ${currentPrice}`;
+    console.log('Current Price:', currentPrice);
+    console.log('About to calculate total:');
+    this.calculateTotal();
+    this.saveDraft(); // Save changes immediately
+  }
+
+  handleBackspaceForQuantity() {
+    if (!this.selectedItem) return;
+
+    const quantityElement = this.selectedItem.querySelector('[data-item-quantity]');
+    let currentQuantity = quantityElement.textContent.trim();
+
+    if (currentQuantity === '0') {
+      this.removeItemFromSelection(); // Remove item if quantity is already 0
+    } else {
+      if (currentQuantity.length > 1) {
+        currentQuantity = currentQuantity.slice(0, -1); // Remove the last digit
+      } else {
+        currentQuantity = '0'; // Set quantity to 0 if only one digit left
+      }
+      quantityElement.textContent = currentQuantity;
+
+      // Update subtotal
+      const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
+      const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+      subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
+
       this.calculateTotal();
       this.saveDraft();
     }
   }
 
-  removeItem(event) {
-    event.stopPropagation();
-    const selectedItem = event.currentTarget.closest('div.flex');
-    selectedItem.remove();
+  handleBackspaceForPrice() {
+    if (!this.selectedItem) return;
+
+    const priceElement = this.selectedItem.querySelector('.editable-price');
+    let currentPrice = priceElement.textContent.replace('S/ ', '').trim();
+
+    if (currentPrice.length > 1) {
+      currentPrice = currentPrice.slice(0, -1); // Remove the last digit
+    } else {
+      currentPrice = '0.00'; // Set to 0.00 if only one digit left
+    }
+
+    priceElement.textContent = `S/ ${parseFloat(currentPrice).toFixed(2)}`;
+
+    // Update subtotal
+    const quantity = parseInt(this.selectedItem.querySelector('[data-item-quantity]').textContent);
+    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(quantity * parseFloat(currentPrice)).toFixed(2)}`;
+
+    this.calculateTotal();
+    this.saveDraft();
+  }
+
+  removeItemFromSelection() {
+    if (!this.selectedItem) return;
+    this.selectedItem.remove();
+    this.selectedItem = null;
     this.calculateTotal();
     this.saveDraft();
   }
@@ -123,16 +227,16 @@ export default class extends Controller {
   calculateTotal() {
     let total = 0;
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+      console.log('inside calculateTotal, item:', item);
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
+      console.log('Subtotal:', subtotal);
       total += subtotal;
     });
     this.totalTarget.textContent = `S/ ${total.toFixed(2)}`;
   }
 
   saveDraft() {
-    console.log('Saving draft...');
     const orderData = this.collectOrderData();
-    console.log('Draft Order Data:', orderData);
     sessionStorage.setItem('draftOrder', JSON.stringify(orderData));
   }
 
@@ -154,7 +258,6 @@ export default class extends Controller {
     };
   }
 
-  // Additional helper methods for item updates
   updateExistingItem(existingItem, product) {
     const quantityElement = existingItem.querySelector('[data-item-quantity]');
     const subtotalElement = existingItem.querySelector('[data-item-subtotal]');
@@ -170,7 +273,7 @@ export default class extends Controller {
     itemElement.setAttribute('data-item-name', product.name);
     itemElement.setAttribute('data-item-sku', product.sku);
     itemElement.setAttribute('data-item-original-price', product.price);
-    itemElement.setAttribute('data-action', 'click->order-items#selectItem');
+    itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
 
     itemElement.innerHTML = `
       <div class="flex-grow" style="flex-basis: 55%;">
@@ -181,7 +284,7 @@ export default class extends Controller {
         <span data-item-quantity="${product.quantity}">${product.quantity}</span>
       </div>
       <div class="flex-grow" style="flex-basis: 15%;">
-        <span class="editable-price" contenteditable="false" data-action="blur->order-items#updatePrice">S/ ${product.price.toFixed(2)}</span>
+        <span class="editable-price">S/ ${product.price.toFixed(2)}</span>
       </div>
       <div class="flex-grow" style="flex-basis: 15%;">
         <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
@@ -189,16 +292,5 @@ export default class extends Controller {
     `;
 
     this.itemsTarget.appendChild(itemElement);
-  }
-
-  addDraftItem(item) { // This method is called from the Pos__ButtonsController when restoring a draft order
-    this.addNewItem(item);
-    this.calculateTotal();
-  }
-
-  addActionButtonsEventListeners(selectedItem) {
-    selectedItem.querySelector('.quantity-up').addEventListener('click', this.incrementQuantity.bind(this));
-    selectedItem.querySelector('.quantity-down').addEventListener('click', this.decrementQuantity.bind(this));
-    selectedItem.querySelector('.remove-item').addEventListener('click', this.removeItem.bind(this));
   }
 }
