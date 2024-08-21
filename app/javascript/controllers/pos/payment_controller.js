@@ -11,7 +11,8 @@ export default class extends Controller {
   payOrder() {
     console.log('Pay button clicked');
 
-    const totalAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
+    const orderItemsTotal = document.querySelector('[data-pos--order-items-target="total"]').textContent.trim();
+    const totalAmount = parseFloat(orderItemsTotal.replace('S/', ''));
     if (totalAmount === 0) {
       console.log('Cannot proceed to payment: Total is 0');
       return;
@@ -36,7 +37,7 @@ export default class extends Controller {
 
         methods.forEach(method => {
           const button = document.createElement('button');
-          button.classList.add('p-4', 'bg-gray-300', 'rounded', 'btn', 'dark:bg-gray-600');
+          button.classList.add('p-4', 'm-2', 'bg-gray-300', 'rounded', 'btn', 'dark:bg-gray-600');
           button.textContent = method.description;
           button.dataset.method = method.name;
           button.dataset.description = method.description;

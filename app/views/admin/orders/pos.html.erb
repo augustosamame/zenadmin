@@ -19,7 +19,7 @@
       </div>
     </div>
 
-    <div data-pos--payment-target="paymentContainer" class="hidden">
+    <div data-pos--payment-target="paymentContainer" class="flex flex-col hidden h-full">
     
       <div data-pos--payment-target="paymentMethods">
         <!-- Buttons will be dynamically added here -->
@@ -38,7 +38,7 @@
         <!-- Payments will be listed here -->
       </div>
 
-      <div class="flex justify-between mt-4">
+      <div class="flex justify-between mt-4 mt-auto">
         <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--payment#saveOrder">
           Crear Venta
         </button>
