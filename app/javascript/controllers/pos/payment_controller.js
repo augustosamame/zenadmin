@@ -52,16 +52,17 @@ export default class extends Controller {
 
   addPayment(event) {
     const method = event.currentTarget.dataset.description;
-    const totalAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
-    const remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
-    const paymentAmount = remaining > 0 ? remaining : totalAmount;
+    let remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
+
+    // If remaining is less than or equal to zero, set payment amount to 0
+    const paymentAmount = remaining > 0 ? remaining : 0;
 
     const paymentElement = document.createElement('div');
-    paymentElement.classList.add('flex', 'justify-between', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
+    paymentElement.classList.add('grid', 'grid-cols-[auto_1fr_auto]', 'gap-2', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
     paymentElement.innerHTML = `
-      <span>${method}</span>
-      <input type="number" class="text-right border-none focus:ring-0" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-      <button type="button" class="text-red-500" data-action="click->pos--payment#removePayment">✖</button>
+      <span class="self-center">${method}</span>
+      <input type="number" class="text-right border-none focus:ring-0 self-center" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+      <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
     `;
 
     this.paymentListTarget.appendChild(paymentElement);
