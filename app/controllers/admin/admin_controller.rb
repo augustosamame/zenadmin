@@ -17,7 +17,7 @@ class Admin::AdminController < ApplicationController
 
   def force_temp_password_change
     if current_user.require_password_change? && session[:admin_login_as_token].blank?
-      unless params[:controller] == 'admin/users' && ['edit_temp_password', 'update_temp_password'].include?(params[:action])
+      unless params[:controller] == "admin/users" && [ "edit_temp_password", "update_temp_password" ].include?(params[:action])
         redirect_to admin_edit_temp_password_path
       end
     end
@@ -30,8 +30,4 @@ class Admin::AdminController < ApplicationController
   end
 
   private
-
-
-  
-
 end

@@ -1,8 +1,5 @@
 class Admin::PaymentMethodsController < Admin::AdminController
-
-
   def index
-
     respond_to do |format|
       format.html do
         @payment_methods = PaymentMethod.all.active
@@ -27,7 +24,7 @@ class Admin::PaymentMethodsController < Admin::AdminController
     end
   end
 
-  
+
 
   private
 
