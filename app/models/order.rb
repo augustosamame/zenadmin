@@ -3,7 +3,7 @@ class Order < ApplicationRecord
 
   belongs_to :region
   belongs_to :user
-  belongs_to :seller, class_name: 'User'
+  belongs_to :seller, class_name: "User"
   belongs_to :location
 
   enum :stage, { draft: 0, confirmed: 1, shipped: 2, delivered: 3, cancelled: 4 }

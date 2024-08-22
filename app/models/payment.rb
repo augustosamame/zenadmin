@@ -1,6 +1,6 @@
 class Payment < ApplicationRecord
   include DefaultRegionable
-  PAYABLE = [:order]
+  PAYABLE = [ :order ]
 
   belongs_to :payment_method
   belongs_to :user
