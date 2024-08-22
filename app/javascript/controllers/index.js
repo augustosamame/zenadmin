@@ -31,6 +31,9 @@ application.register("nav", NavController)
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 
+import Pos__CommentModalController from "./pos/comment_modal_controller"
+application.register("pos--comment-modal", Pos__CommentModalController)
+
 import Pos__KeypadController from "./pos/keypad_controller"
 application.register("pos--keypad", Pos__KeypadController)
 

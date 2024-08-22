@@ -79,10 +79,13 @@
     <div data-controller="pos--buttons">
       <!-- Buttons Section -->
       <div class="grid grid-cols-3 gap-0 mt-4 mb-4">
-        <button type="button" class="flex items-center justify-center h-16 text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600">
-          <%= icon "chat-bubble-left-right", classes: "w-5 h-5 mr-2" %>
-          Comentarios
-        </button>
+        <div data-controller="pos--comment-modal" class="flex items-center justify-center h-16">
+          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--comment-modal#open">
+            <%= icon "chat-bubble-left-right", classes: "w-5 h-5 mr-2" %>
+            Comentarios
+          </button>
+          <%= render 'shared/admin/pos/comment_modal' %>
+        </div>
         
         <div data-controller="object-table-modal" class="flex items-center justify-center h-16">
           <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->object-table-modal#open">

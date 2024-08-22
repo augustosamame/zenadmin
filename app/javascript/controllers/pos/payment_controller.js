@@ -132,6 +132,7 @@ export default class extends Controller {
     });
 
     const selectedCustomerId = document.querySelector('[data-action="click->object-table-modal#open"]').dataset.selectedObjectId;
+    const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
 
     const orderData = {
       order: {
@@ -143,6 +144,7 @@ export default class extends Controller {
         shipping_price: 0,
         currency: 'PEN',
         payment_status: 'paid',
+        seller_note: comment,
         order_items_attributes: orderItemsAttributes,
         payments_attributes: payments
       }
