@@ -27,6 +27,8 @@ Rails.application.routes.draw do
       end
     end
     resources :payment_methods
+    resources :users
+    resources :customers, only: [ :index ]
 
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"

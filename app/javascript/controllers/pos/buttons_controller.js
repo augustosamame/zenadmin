@@ -4,6 +4,7 @@ export default class extends Controller {
   static targets = ['draftButtonContainer'];
 
   connect() {
+    console.log('Connected to the POS buttons controller!');
     this.checkForDraftOrder();
   }
 

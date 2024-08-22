@@ -33,4 +33,8 @@ class Order < ApplicationRecord
   def total_items_by_product_id(product_id)
     order_items.where(product_id: product_id).sum(:quantity)
   end
+
+  def customer
+    user
+  end
 end

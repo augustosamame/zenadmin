@@ -22,6 +22,9 @@ application.register("hello", HelloController)
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 
+import ObjectTableModalController from "./object_table_modal_controller"
+application.register("object-table-modal", ObjectTableModalController)
+
 import NavController from "./nav_controller"
 application.register("nav", NavController)
 

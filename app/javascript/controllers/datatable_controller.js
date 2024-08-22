@@ -58,26 +58,34 @@ export default class extends Controller {
 
     if (allAdditionalOptions.length > 0) {
       allAdditionalOptions.split(';').forEach(additionalOption => {
-        if (additionalOption.trim() === "select_single") {
-          initialOptions.select = { style: 'single', info: false };
-        } else if (additionalOption.trim() === "select_multi") {
-          initialOptions.select = { style: 'multi', info: false };
-        } else if (additionalOption.startsWith("sort_")) {
-          const parts = additionalOption.split("_");
-          const sortCol = parseInt(parts[1], 10);
-          const sortDir = parts[2];
-          initialOptions.order = [[sortCol, sortDir]];
-          initialOptions.stateSave = false;
-        } else {
-          let [key, value] = additionalOption.split(':');
-          key = key.trim();
-          value = value.trim();
-          if (value === "true") {
-            value = true;
-          } else if (value === "false") {
-            value = false;
+        if (additionalOption && additionalOption.trim()) { // Check if additionalOption is not empty or undefined
+          additionalOption = additionalOption.trim();
+
+          if (additionalOption === "no_buttons") {
+            initialOptions.layout.top2End.buttons = [];
+          } else if (additionalOption === "select_single") {
+            initialOptions.select = { style: 'single', info: false };
+          } else if (additionalOption === "select_multi") {
+            initialOptions.select = { style: 'multi', info: false };
+          } else if (additionalOption.startsWith("sort_")) {
+            const parts = additionalOption.split("_");
+            const sortCol = parseInt(parts[1], 10);
+            const sortDir = parts[2];
+            initialOptions.order = [[sortCol, sortDir]];
+            initialOptions.stateSave = false;
+          } else {
+            let [key, value] = additionalOption.split(':');
+            if (key && value) { // Check if both key and value are present
+              key = key.trim();
+              value = value.trim();
+              if (value === "true") {
+                value = true;
+              } else if (value === "false") {
+                value = false;
+              }
+              initialOptions[key] = value;
+            }
           }
-          initialOptions[key] = value;
         }
       });
     }

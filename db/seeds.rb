@@ -91,4 +91,21 @@ if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@edukai.org')
   User.create!(email: 'ecommerce@edukai.org', phone: "51900000000", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module") unless ecommerce_module_user_already_exists
 end
-User.create!(email: 'augusto@devtechperu.com', phone: "51986976377", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
+
+Role.find_or_create_by!(name: 'super_admin')
+Role.find_or_create_by!(name: 'admin')
+Role.find_or_create_by!(name: 'seller')
+Role.find_or_create_by!(name: 'customer')
+
+user1 = User.create!(email: 'augusto@devtechperu.com', phone: "51986976377", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
+user1.roles << Role.find_by(name: 'super_admin')
+
+user2 = User.create!(email: 'customer1@devtechperu.com', phone: "51986976378", require_password_change: false, password: "12345678", first_name: "Customer", last_name: "One")
+user2.roles << Role.find_by(name: 'customer')
+
+user3 = User.create!(email: 'seller1@devtechperu.com', phone: "51986976379", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "One")
+user3.roles << Role.find_by(name: 'seller')
+user4 = User.create!(email: 'seller2@devtechperu.com', phone: "51986976380", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Two")
+user4.roles << Role.find_by(name: 'seller')
+user5 = User.create!(email: 'seller3@devtechperu.com', phone: "51986976381", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Three")
+user5.roles << Role.find_by(name: 'seller')

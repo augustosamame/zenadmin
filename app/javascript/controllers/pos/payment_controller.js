@@ -131,11 +131,13 @@ export default class extends Controller {
       });
     });
 
+    const selectedCustomerId = document.querySelector('[data-controller="object-table-modal"]').dataset.selectedObjectId;
+
     const data = {
       order: {
         location_id: 1,
         stage: 'confirmed',
-        user_id: 1,
+        user_id: selectedCustomerId,
         total_price: parseFloat(this.totalTarget.textContent.replace('S/', '')),
         total_discount: 0,
         shipping_price: 0,

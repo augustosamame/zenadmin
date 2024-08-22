@@ -221,6 +221,33 @@ export default class extends Controller {
     this.totalTarget.textContent = `S/ ${total.toFixed(2)}`;
   }
 
+  addDraftItem(item) {
+    // Logic to add the draft item to the order
+    const itemElement = document.createElement('div');
+    itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
+    itemElement.setAttribute('data-item-name', item.name);
+    itemElement.setAttribute('data-item-sku', item.sku);
+    itemElement.setAttribute('data-item-original-price', item.price);
+    itemElement.setAttribute('data-item-quantity', item.quantity);
+    itemElement.innerHTML = `
+      <div class="flex-grow" style="flex-basis: 55%;">
+        <span class="block font-medium">${item.name}</span>
+        <span class="block text-sm text-gray-500">${item.sku}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span data-item-quantity="${item.quantity}">${item.quantity}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span class="editable-price">S/ ${item.price}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span data-item-subtotal>S/ ${(item.quantity * item.price).toFixed(2)}</span>
+      </div>
+    `;
+    this.itemsTarget.appendChild(itemElement);
+    this.calculateTotal();
+  }
+
   saveDraft() {
     const orderData = this.collectOrderData();
     sessionStorage.setItem('draftOrder', JSON.stringify(orderData));

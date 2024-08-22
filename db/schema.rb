@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_21_143117) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -79,6 +79,23 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_143117) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "customers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.integer "doc_type", default: 0
+    t.string "doc_id"
+    t.jsonb "avatar_data", null: false
+    t.integer "last_cart_id"
+    t.integer "pricelist_id"
+    t.integer "points_balance", default: 0
+    t.string "referral_code"
+    t.bigint "referrer_id"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["referrer_id"], name: "index_customers_on_referrer_id"
+    t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
   create_table "factory_factories", force: :cascade do |t|
@@ -383,6 +400,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_21_143117) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "customers", "users"
+  add_foreign_key "customers", "users", column: "referrer_id"
   add_foreign_key "factory_factories", "regions"
   add_foreign_key "locations", "regions"
   add_foreign_key "order_items", "orders"

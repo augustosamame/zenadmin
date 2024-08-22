@@ -2,22 +2,38 @@
 class User < ApplicationRecord
   has_person_name
   has_one_attached :avatar
+  has_many :user_roles
+  has_many :roles, through: :user_roles
+  has_one :customer, dependent: :destroy
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
-
-  before_validation :set_login
 
   # Validations for email and phone number
   validates :email, presence: true, if: -> { login_type == "email" }
   validates :phone, presence: true, if: -> { login_type == "phone" }
   validates :login, presence: true, uniqueness: true
 
+  scope :with_role, ->(role_name) { joins(:roles).where(roles: { name: role_name }) }
+
+  before_validation :set_login
+  after_save :ensure_customer_created
+
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
     login = conditions.delete(:login)
     where(conditions.to_h).where([ "login = :value", { value: login } ]).first
+  end
+
+  def name
+    "#{first_name} #{last_name}"
+  end
+
+  def ensure_customer_created
+    if roles.exists?(name: "customer") && customer.nil?
+      create_customer
+    end
   end
 
   private
