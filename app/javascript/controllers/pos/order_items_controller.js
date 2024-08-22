@@ -6,6 +6,9 @@ export default class extends Controller {
 
   connect() {
     console.log('Connected to OrderItemsController!', this.element);
+    // setup listeners for calls from other controllers
+    this.element.addEventListener('clear-order', this.clearOrder.bind(this));
+
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
     this.selectedItem = null;
@@ -309,6 +312,7 @@ export default class extends Controller {
   }
 
   clearOrder() {
+    console.log('Clearing order...');
     this.itemsTarget.innerHTML = '';
     this.selectedItem = null;
     this.calculateTotal();

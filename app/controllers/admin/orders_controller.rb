@@ -13,11 +13,11 @@ class Admin::OrdersController < Admin::AdminController
       if @order.origin == "pos"
         # POS context: current_user is the seller, user_id is provided
         @order.seller_id = current_user.id
-        @order.user_id = params[:order][:user_id]
+        @order.user_id ||= get_generic_customer_id
       elsif @order.origin == "ecommerce"
         # eCommerce context: current_user is the eCommerce store, user_id is not provided
         @order.user_id = current_user.id
-        @order.seller_id = find_ecommerce_store_seller_id
+        @order.seller_id = get_ecommerce_store_seller_id
       end
 
       if @order.save
@@ -47,9 +47,13 @@ class Admin::OrdersController < Admin::AdminController
     params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :discounted_price, :currency ], payments_attributes: [ :user_id, :payment_method_id, :amount, :currency, :payable_type ])
   end
 
-  def find_ecommerce_store_seller_id
+  def get_generic_customer_id
+    # Logic to find the generic customer (guest)
+    User.find_by!(email: "generic_customer@devtechperu.com").try(:id)
+  end
+
+  def get_ecommerce_store_seller_id
     # Logic to find the appropriate seller ID for the eCommerce store
-    # This could be a constant, a configuration, or a lookup in the database
-    User.find_by(email: "ecommerce@edukai.org").try(:id)
+    User.find_by!(email: "ecommerce@devtechperu.com").try(:id)
   end
 end

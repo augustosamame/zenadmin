@@ -131,9 +131,9 @@ export default class extends Controller {
       });
     });
 
-    const selectedCustomerId = document.querySelector('[data-controller="object-table-modal"]').dataset.selectedObjectId;
+    const selectedCustomerId = document.querySelector('[data-action="click->object-table-modal#open"]').dataset.selectedObjectId;
 
-    const data = {
+    const orderData = {
       order: {
         location_id: 1,
         stage: 'confirmed',
@@ -148,45 +148,79 @@ export default class extends Controller {
       }
     };
 
-    axios.post('/admin/orders', data, {
+    axios.post('/admin/orders', orderData, {
       headers: {
         'Accept': 'application/json',
         'X-CSRF-Token': this.csrfToken // Include the CSRF token here
-      } })
+      }
+    })
       .then(response => {
-        console.log('Order saved:', response.data);
-        // show a success message
         const title = 'Orden Creada';
-        const message = `La Orden #${response.data.id} se creó satisfactoriamente.`;
         const buttons = [
-          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' },
-          // { label: 'Confirm', classes: 'btn btn-secondary', action: 'click->your-controller#confirmAction' }
+          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
         ];
 
-        this.customModalController = this.application.getControllerForElementAndIdentifier(
-          document.querySelector('[data-controller="custom-modal"]'),
-          'custom-modal'
+        if (response.status !== 200) {
+          // Handle non-200 HTTP response
+          this.showErrorModal('Error', 'Hubo un error al guardar la orden. Por favor, inténtalo de nuevo.', buttons);
+          return;
+        }
+
+        if (response.data.status === 'error') {
+          // Handle application-level error
+          const errorMessage = response.data.errors.join(', ');
+          this.showErrorModal('Error', `Hubo un error al guardar la orden: ${errorMessage}`, buttons);
+          return;
+        }
+
+        // Handle success
+        const message = `La Orden #${response.data.id} se creó satisfactoriamente.`;
+        this.showSuccessModal(title, message, buttons);
+
+        // Dispatch an event to clear the order items
+        document.querySelector('[data-controller="pos--order-items"]').dispatchEvent(
+          new CustomEvent('clear-order', { bubbles: true })
         );
 
-        this.customModalController.openWithContent(title, message, buttons);
-        // Clear the order items and payment list
-        const orderItemsController = this.application.getControllerForElementAndIdentifier(
-          document.querySelector('[data-controller="pos--order-items"]'),
-          'pos--order-items'
+        // Dispatch an event to clear the selected user in the buttons controller
+        document.querySelector('[data-controller="pos--buttons"]').dispatchEvent(
+          new CustomEvent('clear-selected-user', { bubbles: true })
         );
-        if (orderItemsController) {
-          orderItemsController.clearOrder();
-        }
+
         this.paymentListTarget.innerHTML = '';
         this.paymentContainerTarget.classList.add('hidden');
         this.productGridTarget.classList.remove('hidden');
-        console.log('clearing order');
 
+        console.log('Order cleared after successful creation.');
       })
       .catch(error => {
         console.error('Error saving order:', error);
+        this.showErrorModal('Error', 'Hubo un error al guardar la orden. Por favor, inténtalo de nuevo.', [
+          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
+        ]);
       });
+  }
+  
+  // Helper methods for showing modals
+  showErrorModal(title, message, buttons) {
+    this.showModal(title, message, buttons);
+  }
 
+  showSuccessModal(title, message, buttons) {
+    this.showModal(title, message, buttons);
+  }
+
+  showModal(title, message, buttons) {
+    this.customModalController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="custom-modal"]'),
+      'custom-modal'
+    );
+
+    if (this.customModalController) {
+      this.customModalController.openWithContent(title, message, buttons);
+    } else {
+      console.error('CustomModalController not found!');
+    }
   }
 
   cancelPayment() {

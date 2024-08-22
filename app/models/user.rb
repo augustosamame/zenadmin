@@ -10,12 +10,16 @@ class User < ApplicationRecord
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable
 
+  enum :status, { active: 0, inactive: 1 }
+
   # Validations for email and phone number
   validates :email, presence: true, if: -> { login_type == "email" }
   validates :phone, presence: true, if: -> { login_type == "phone" }
   validates :login, presence: true, uniqueness: true
 
   scope :with_role, ->(role_name) { joins(:roles).where(roles: { name: role_name }) }
+
+  accepts_nested_attributes_for :customer, allow_destroy: true
 
   before_validation :set_login
   after_save :ensure_customer_created
@@ -33,6 +37,13 @@ class User < ApplicationRecord
   def ensure_customer_created
     if roles.exists?(name: "customer") && customer.nil?
       create_customer
+    end
+  end
+
+  def add_role(role_name)
+    role = Role.find_by(name: role_name)
+    unless self.roles.include?(role)
+      self.roles << role
     end
   end
 

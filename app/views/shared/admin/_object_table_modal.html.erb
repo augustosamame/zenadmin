@@ -1,0 +1,18 @@
+<div data-object-table-modal-target="container" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog">
+  <div class="relative w-full h-screen">
+    <div data-object-table-modal-target="content" class="hidden h-auto max-w-4xl p-4 mx-auto bg-white border rounded-lg shadow-xl border-slate-300/80 dark:bg-slate-800 dark:border-slate-600/80">
+      <div class="flex justify-between">
+        <h2 class="text-lg font-semibold text-center dark:text-slate-100">Selecciona a un Cliente</h2>
+        <button type="button" class="btn btn-primary" data-action="click->object-table-modal#showCreateForm">
+          Crear Cliente
+        </button>
+      </div>
+      <div id="object-table-datatable" class="mt-6">
+        <!-- The DataTable will be inserted here -->
+      </div>
+      <div class="flex justify-center mt-4 space-x-4">
+        <button type="button" class="btn btn-secondary" data-action="click->object-table-modal#close">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>

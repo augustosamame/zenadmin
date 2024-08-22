@@ -28,7 +28,9 @@ Rails.application.routes.draw do
     end
     resources :payment_methods
     resources :users
-    resources :customers, only: [ :index ]
+    resources :customers, only: [ :index, :create, :update, :destroy ]
+    post "pos_create_customer", to: "users#create_customer"
+    get "search_dni", to: "customers#search_dni"
 
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"

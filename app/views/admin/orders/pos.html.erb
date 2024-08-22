@@ -79,19 +79,21 @@
     <div data-controller="pos--buttons">
       <!-- Buttons Section -->
       <div class="grid grid-cols-3 gap-0 mt-4 mb-4">
-        <button type="button" class="flex items-center justify-center p-4 text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600">
+        <button type="button" class="flex items-center justify-center h-16 text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600">
           <%= icon "chat-bubble-left-right", classes: "w-5 h-5 mr-2" %>
           Comentarios
         </button>
-        <div data-controller="object-table-modal">
-          <button type="button" class="w-full p-4 text-black bg-white border rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400"
-            data-action="click->object-table-modal#open">
-            <%= icon "user", classes: "stroke-current w-4 h-4 text-slate-600 dark:text-slate-300" %> Cliente
+        
+        <div data-controller="object-table-modal" class="flex items-center justify-center h-16">
+          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->object-table-modal#open">
+            <%= icon "user", classes: "stroke-current w-4 h-4 text-slate-600 dark:text-slate-300 mr-2" %>
+            Cliente
           </button>
           <%= render 'shared/admin/object_table_modal' %>
         </div>
-        <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer" class="w-full">
-          <a href="#" class="flex items-center justify-center hidden w-full p-4 text-center text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600" data-action="click->pos--buttons#loadDraft">
+        
+        <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer" class="flex items-center justify-center h-16">
+          <a href="#" class="flex items-center justify-center w-full h-full text-center text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600" data-action="click->pos--buttons#loadDraft">
             <%= icon "document-arrow-up", classes: "w-5 h-5 mr-2" %>
             Recuperar Borrador
           </a>
