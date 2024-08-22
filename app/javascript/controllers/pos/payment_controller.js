@@ -6,6 +6,7 @@ export default class extends Controller {
 
   connect() {
     console.log('Connected to PaymentController!');
+    this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   }
 
   payOrder() {
@@ -41,6 +42,7 @@ export default class extends Controller {
           button.textContent = method.description;
           button.dataset.method = method.name;
           button.dataset.description = method.description;
+          button.dataset.id = method.id;
           button.addEventListener('click', this.addPayment.bind(this));
           this.paymentMethodsTarget.appendChild(button);
         });
@@ -52,6 +54,7 @@ export default class extends Controller {
 
   addPayment(event) {
     const method = event.currentTarget.dataset.description;
+    const methodId = event.currentTarget.dataset.id;
     let remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
 
     // If remaining is less than or equal to zero, set payment amount to 0
@@ -59,6 +62,7 @@ export default class extends Controller {
 
     const paymentElement = document.createElement('div');
     paymentElement.classList.add('grid', 'grid-cols-[auto_1fr_auto]', 'gap-2', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
+    paymentElement.dataset.methodId = methodId;
     paymentElement.innerHTML = `
       <span class="self-center">${method}</span>
       <input type="number" class="text-right border-none focus:ring-0 self-center" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
@@ -102,7 +106,85 @@ export default class extends Controller {
 
   saveOrder() {
     console.log('Saving order...');
-    this.dispatch('saveOrder', { detail: {} });
+    const orderItems = document.querySelectorAll('[data-pos--order-items-target="items"] div.flex');
+    console.log('Order Items:', orderItems);
+    const orderItemsAttributes = [];
+
+    orderItems.forEach(item => {
+      const quantity = item.querySelector('[data-item-quantity]').textContent.trim();
+      const price = item.querySelector('.editable-price').textContent.replace('S/ ', '').trim();
+
+      orderItemsAttributes.push({
+        product_id: item.dataset.productId, // Extract product ID
+        quantity: quantity, // Extract quantity
+        price: price
+      });
+    });
+
+    const payments = [];
+    this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
+      payments.push({
+        amount: input.value,
+        payment_method_id: input.closest('div').dataset.methodId,
+        user_id: 1,
+        payable_type: 'Order',
+      });
+    });
+
+    const data = {
+      order: {
+        location_id: 1,
+        stage: 'confirmed',
+        user_id: 1,
+        total_price: parseFloat(this.totalTarget.textContent.replace('S/', '')),
+        total_discount: 0,
+        shipping_price: 0,
+        currency: 'PEN',
+        payment_status: 'paid',
+        order_items_attributes: orderItemsAttributes,
+        payments_attributes: payments
+      }
+    };
+
+    axios.post('/admin/orders', data, {
+      headers: {
+        'Accept': 'application/json',
+        'X-CSRF-Token': this.csrfToken // Include the CSRF token here
+      } })
+      .then(response => {
+        console.log('Order saved:', response.data);
+        // show a success message
+        const title = 'Orden Creada';
+        const message = `La Orden #${response.data.id} se creó satisfactoriamente.`;
+        const buttons = [
+          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' },
+          // { label: 'Confirm', classes: 'btn btn-secondary', action: 'click->your-controller#confirmAction' }
+        ];
+
+        this.customModalController = this.application.getControllerForElementAndIdentifier(
+          document.querySelector('[data-controller="custom-modal"]'),
+          'custom-modal'
+        );
+
+        this.customModalController.openWithContent(title, message, buttons);
+        // Clear the order items and payment list
+        const orderItemsController = this.application.getControllerForElementAndIdentifier(
+          document.querySelector('[data-controller="pos--order-items"]'),
+          'pos--order-items'
+        );
+        if (orderItemsController) {
+          orderItemsController.clearOrder();
+        }
+        this.paymentListTarget.innerHTML = '';
+        this.paymentContainerTarget.classList.add('hidden');
+        this.productGridTarget.classList.remove('hidden');
+        console.log('clearing order');
+
+      })
+      .catch(error => {
+        console.error('Error saving order:', error);
+      });
+
   }
 
   cancelPayment() {

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_21_143117) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -136,6 +136,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
 
   create_table "orders", force: :cascade do |t|
     t.bigint "user_id", null: false
+    t.bigint "seller_id", null: false
     t.bigint "location_id", null: false
     t.bigint "region_id", null: false
     t.integer "order_recipient_id"
@@ -147,14 +148,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
     t.integer "shipping_address_id"
     t.integer "billing_address_id"
     t.boolean "coupon_applied", default: false
-    t.integer "stage", default: 0
-    t.integer "payment_status", default: 0
-    t.integer "status", default: 0
     t.text "customer_note"
     t.text "seller_note"
     t.integer "active_invoice_id"
     t.boolean "invoice_id_required", default: false
     t.datetime "order_date"
+    t.integer "origin", default: 0
+    t.integer "stage", default: 1
+    t.integer "payment_status", default: 0
+    t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
@@ -162,6 +164,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
     t.index ["location_id"], name: "index_orders_on_location_id"
     t.index ["order_date"], name: "index_orders_on_order_date"
     t.index ["region_id"], name: "index_orders_on_region_id"
+    t.index ["seller_id"], name: "index_orders_on_seller_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -171,6 +174,27 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "payments", force: :cascade do |t|
+    t.bigint "payment_method_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "region_id", null: false
+    t.string "payable_type", null: false
+    t.bigint "payable_id", null: false
+    t.integer "payment_request_id"
+    t.integer "processor_transacion_id"
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN"
+    t.datetime "payment_date", null: false
+    t.text "comment"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
+    t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
+    t.index ["region_id"], name: "index_payments_on_region_id"
+    t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
   create_table "product_categories", force: :cascade do |t|
@@ -368,6 +392,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_19_145703) do
   add_foreign_key "orders", "locations"
   add_foreign_key "orders", "regions"
   add_foreign_key "orders", "users"
+  add_foreign_key "orders", "users", column: "seller_id"
+  add_foreign_key "payments", "payment_methods"
+  add_foreign_key "payments", "regions"
+  add_foreign_key "payments", "users"
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"

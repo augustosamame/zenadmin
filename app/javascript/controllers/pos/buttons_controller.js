@@ -4,16 +4,12 @@ export default class extends Controller {
   static targets = ['draftButtonContainer'];
 
   connect() {
-    console.log('Connected to ButtonsController!', this.element);
     this.checkForDraftOrder();
   }
 
   showDraftButton() {
     // Show the anchor element inside the draftButtonContainer
-    console.log('Showing draft button...');
     const draftButton = this.draftButtonContainerTarget.querySelector('a');
-    console.log('Draft Button Container:', this.draftButtonContainerTarget);
-    console.log('Draft Button:', draftButton);
     if (draftButton) {
       draftButton.classList.remove('hidden');
     }
@@ -29,15 +25,11 @@ export default class extends Controller {
 
 
   checkForDraftOrder() {
-    console.log('Checking for draft order...');
     const draftData = JSON.parse(sessionStorage.getItem('draftOrder') || '{}');
-    console.log('Draft Data:', draftData);
 
     const currentItemCount = this.element.querySelectorAll('[data-pos--order-items-target="items"] div.flex').length;
     const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
-    console.log('Current Item Count:', currentItemCount);
-    console.log('Draft Item Count:', draftItemCount);
-
+    
     if (currentItemCount === 0 && draftItemCount > 0) {
       this.showDraftButton();
     } else {

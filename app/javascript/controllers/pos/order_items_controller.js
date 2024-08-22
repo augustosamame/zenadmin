@@ -41,19 +41,18 @@ export default class extends Controller {
     this.saveDraft();
   }
 
-  selectItem(event) {
-    const selectedItem = event.currentTarget;
 
+  selectItem(event) {
     // Clear any previously selected items
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
       item.classList.remove('bg-blue-100');
     });
 
-    if (selectedItem) {
-      this.selectedItem = selectedItem;
-      this.isReplacingQuantity = true;
-      this.selectedItem.classList.add('bg-blue-100');
-    }
+    this.selectedItem = event.currentTarget;
+    this.selectedItem.classList.add('bg-blue-100');
+
+    // Mark the first keypress
+    this.isFirstKeyPress = true;
   }
 
   updateQuantity(value) {
@@ -83,19 +82,6 @@ export default class extends Controller {
 
     this.calculateTotal();
     this.saveDraft();
-  }
-
-  selectItem(event) {
-    // Clear any previously selected items
-    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
-      item.classList.remove('bg-blue-100');
-    });
-
-    this.selectedItem = event.currentTarget;
-    this.selectedItem.classList.add('bg-blue-100');
-
-    // Mark the first keypress
-    this.isFirstKeyPress = true;
   }
 
   updatePrice(value) {
@@ -273,6 +259,7 @@ export default class extends Controller {
     itemElement.setAttribute('data-item-name', product.name);
     itemElement.setAttribute('data-item-sku', product.sku);
     itemElement.setAttribute('data-item-original-price', product.price);
+    itemElement.setAttribute('data-product-id', product.id);
     itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
 
     itemElement.innerHTML = `
@@ -292,5 +279,11 @@ export default class extends Controller {
     `;
 
     this.itemsTarget.appendChild(itemElement);
+  }
+
+  clearOrder() {
+    this.itemsTarget.innerHTML = '';
+    this.selectedItem = null;
+    this.calculateTotal();
   }
 }

@@ -2,6 +2,7 @@ class CreateOrders < ActiveRecord::Migration[7.2]
   def change
     create_table :orders do |t|
       t.references :user, null: false, foreign_key: true
+      t.references :seller, null: false, foreign_key: { to_table: :users }
       t.references :location, null: false, foreign_key: true
       t.references :region, null: false, foreign_key: true
       t.integer :order_recipient_id
@@ -13,14 +14,15 @@ class CreateOrders < ActiveRecord::Migration[7.2]
       t.integer :shipping_address_id
       t.integer :billing_address_id
       t.boolean :coupon_applied, default: false
-      t.integer :stage, default: 0
-      t.integer :payment_status, default: 0
-      t.integer :status, default: 0
       t.text :customer_note
       t.text :seller_note
       t.integer :active_invoice_id
       t.boolean :invoice_id_required, default: false # dni or RUC required
       t.datetime :order_date
+      t.integer :origin, default: 0
+      t.integer :stage, default: 1
+      t.integer :payment_status, default: 0
+      t.integer :status, default: 0
 
       t.timestamps
     end

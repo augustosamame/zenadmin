@@ -12,11 +12,11 @@ gem "puma", ">= 5.0"
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
 gem "turbo-rails"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
-gem "stimulus-rails"
+gem "stimulus-rails", "~> 1.3.4"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
 gem "jbuilder"
 # Use Redis adapter to run Action Cable in production
-gem "redis", ">= 4.0.1"
+gem "redis", ">= 5.3"
 
 # Use Kredis to get higher-level data types in Redis [https://github.com/rails/kredis]
 # gem "kredis"
@@ -50,7 +50,7 @@ gem "simple_form", "~> 5.3.1"
 gem "money-rails", "~> 1.15.0"
 gem "pg_search", "~> 2.3.7"
 gem "hashids"
-gem "aws-sdk-s3", "~> 1.158.0"
+gem "aws-sdk-s3", "~> 1.159.0"
 gem "shrine", "~> 3.6.0"
 gem "marcel", "~> 1.0.4" # MIME type detection
 gem "ruby-vips", "~> 2.2.2"

@@ -12,6 +12,7 @@ setting_2 = Setting.find_or_create_by!(name: 'track_inventory', data_type: "type
 setting_3 = Setting.find_or_create_by!(name: 'admin_2fa_required', data_type: "type_boolean", internal: false, localized_name: "Autenticación de 2 factores requerido para admin", boolean_value: false)
 setting_4 = Setting.find_or_create_by!(name: 'multi_region', data_type: "type_boolean", internal: true, localized_name: "Gestión de Múltiples Regiones", boolean_value: false)
 setting_5 = Setting.find_or_create_by!(name: 'max_price_discount_percentage', data_type: "type_integer", internal: false, localized_name: "Max % de descuento", integer_value: 10)
+setting_6 = Setting.find_or_create_by!(name: 'ecommerce_active', data_type: "type_boolean", internal: true, localized_name: "Módulo Ecommerce Activo", boolean_value: true)
 
 brand_1 = Brand.find_or_create_by!(name: 'Infanti')
 category_1 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche')
@@ -39,7 +40,6 @@ warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
       brand_id: Brand.all.sample.id, # Assuming you have some brands in your database
       description: Faker::Lorem.paragraph(sentence_count: 2),
       permalink: Faker::Internet.slug,
-      price_cents: Faker::Number.between(from: 1000, to: 100_000),
       discounted_price_cents: Faker::Number.between(from: 500, to: 90_000),
       meta_keywords: Faker::Lorem.words(number: 5).join(', '),
       meta_description: Faker::Lorem.sentence(word_count: 10),
@@ -49,9 +49,7 @@ warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
       product_order: Faker::Number.between(from: 1, to: 100),
       status: Faker::Number.between(from: 0, to: 1),
       weight: Faker::Number.decimal(l_digits: 2, r_digits: 2),
-      name: "Sample Product",  # Replace with your product attributes
       price_cents: Faker::Number.between(from: 1000, to: 10000),
-      description: "This is a sample product.",
       sourceable: vendor_1,
       brand: brand_1
     )
@@ -86,3 +84,11 @@ PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
 PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectivo')
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
+
+Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first)
+
+if setting_6.boolean_value == true
+  ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@edukai.org')
+  User.create!(email: 'ecommerce@edukai.org', phone: "51900000000", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module") unless ecommerce_module_user_already_exists
+end
+User.create!(email: 'augusto@devtechperu.com', phone: "51986976377", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")

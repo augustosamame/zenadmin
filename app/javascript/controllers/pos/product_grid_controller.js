@@ -18,7 +18,6 @@ export default class extends Controller {
   loadProducts(query = '') {
     axios.get('/admin/products/search', { params: { query: query } })
       .then(response => {
-        console.log('Qty of products fetched:', response.data.length)
         this.renderProducts(response.data)
       })
       .catch(error => {
@@ -68,7 +67,7 @@ export default class extends Controller {
 
     // Call the addItem method on the orderItemsController
     orderItemsController.addItem({
-      product_id: product.id,
+      id: product.id,
       sku: product.sku,
       name: product.name,
       price: product.price,

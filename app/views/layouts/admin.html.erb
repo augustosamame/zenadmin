@@ -22,6 +22,16 @@
 
   <%= yield %>
 
+  <div data-controller="custom-modal">
+    <div data-custom-modal-target="container" class="fixed inset-0 z-50 flex items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
+      <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
+        <div data-custom-modal-target="content">
+          <!-- Content will be inserted here dynamically -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <%= render 'shared/admin/debug_footer' %>
   <%= railsui_launcher if Rails.env.development? %>
 </body>
