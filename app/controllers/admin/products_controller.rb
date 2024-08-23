@@ -9,7 +9,7 @@ class Admin::ProductsController < Admin::AdminController
           .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
           .select("products.*, warehouse_inventories.stock")
         if @products.size > 5
-          @datatable_options = "server_side:true;resource_name:'products';"
+          @datatable_options = "server_side:true;resource_name:'Product';"
         end
       end
 
@@ -18,6 +18,40 @@ class Admin::ProductsController < Admin::AdminController
       end
     end
 	end
+
+  def new
+    @product = Product.new
+  end
+
+  def create
+    @product = Product.new(product_params)
+
+    if @product.save
+      respond_to do |format|
+        format.html { redirect_to admin_products_path, notice: 'Product was successfully created.' }
+        format.turbo_stream { redirect_to admin_products_path } # Ensure Turbo Stream compatibility
+      end
+    else
+      respond_to do |format|
+        format.html { render :new, status: :unprocessable_entity }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace('new_product', partial: 'admin/products/form', locals: { product: @product }) }
+      end
+    end
+  end
+
+  def edit
+    @product = Product.find(params[:id])
+  end
+
+  def update
+    @product = Product.find(params[:id])
+
+    if @product.update(product_params)
+      redirect_to admin_products_path, notice: "Product updated successfully."
+    else
+      render :edit
+    end
+  end
 
   def search
     if params[:query].blank?
@@ -29,10 +63,15 @@ class Admin::ProductsController < Admin::AdminController
         @products = []
       end
     end
-    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.image.file_url, price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
+    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product&.image&.file_url, price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
   end
 
   private
+
+    def product_params
+      params.require(:product).permit(:sku, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [], 
+      media_attributes: [:id, :file, :media_type, :_destroy])
+    end
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
     def datatable_json
       products = Product.all

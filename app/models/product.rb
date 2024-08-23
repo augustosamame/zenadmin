@@ -13,6 +13,8 @@ class Product < ApplicationRecord
   has_many :warehouse_inventories, dependent: :destroy
   has_many :warehouses, through: :warehouse_inventories
 
+  enum :status, { active: 0, inactive: 1 }
+
   validates :sku, presence: true
   validates :name, presence: true
   validates :description, presence: true
@@ -25,6 +27,12 @@ class Product < ApplicationRecord
   pg_search_scope :search_by_sku_and_name, against: [ :sku, :name ], using: {
       tsearch: { prefix: true }
   }
+
+  before_validation :set_permalink
+
+  def set_permalink
+    self.permalink = name.parameterize if permalink.blank?
+  end
 
   def add_tag(tag_name_or_object)
     tag = find_or_get_tag(tag_name_or_object)

@@ -4,6 +4,7 @@ module MediaAttachable
 
   included do
     has_many :media, as: :mediable, dependent: :destroy, class_name: "Media"
+    accepts_nested_attributes_for :media, allow_destroy: true
   end
 
   # Find the requested media type or fallback to the default_image

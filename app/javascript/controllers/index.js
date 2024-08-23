@@ -28,6 +28,9 @@ application.register("object-table-modal", ObjectTableModalController)
 import NavController from "./nav_controller"
 application.register("nav", NavController)
 
+import MediaUploadController from "./media_upload_controller"
+application.register("media-upload", MediaUploadController)
+
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 

@@ -49,12 +49,26 @@ export default class extends Controller {
 
     const resourceNameMatch = allAdditionalOptions.match(/resource_name:'([^']+)'/);
     const resourceName = resourceNameMatch ? resourceNameMatch[1] : null;
+    const resourceNamePlural = resourceName ? resourceName.toLowerCase() + 's' : null;
+
+    // Add custom "Crear" button if resourceName is provided
+    if (resourceName) {
+      const capitalizedResourceName = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+      const createButton = {
+        text: `Crear ${capitalizedResourceName}`,
+        action: () => {
+          window.location.href = `/admin/${resourceNamePlural}/new`;
+        },
+        className: 'dt-button bg-green-500 text-white hover:bg-green-400'
+      };
+      initialOptions.layout.top2Start.buttons.push(createButton);
+    }
 
     // Check if the table is set for server-side processing
     if (allAdditionalOptions.includes("server_side:true")) {
       initialOptions.serverSide = true;
       initialOptions.ajax = {
-        url: `/admin/${resourceName}.json`,
+        url: `/admin/${resourceNamePlural}.json`,
         type: "GET",
       }
     }

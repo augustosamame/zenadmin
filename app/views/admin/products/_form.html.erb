@@ -1,0 +1,68 @@
+<%= simple_form_for([:admin, @product]) do |form| %>
+  <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+    
+    <div>
+      <%= form.input :sku, label: "SKU", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :name, label: "Nombre", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <!-- Description Field -->
+    <div class="col-span-2">
+      <%= form.input :description, label: "Descripción", as: :text, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+    
+    <!-- Media Upload Section -->
+    <div class="col-span-2" data-controller="media-upload">
+      <h3 class="mb-4 text-lg font-semibold">Añadir Media</h3>
+      <div>
+        <!-- Ensure at least one media field is rendered -->
+        <%= form.simple_fields_for :media, @product.media.any? ? @product.media : @product.media.build do |media_form| %>
+          <div class="flex items-center mb-4">
+            <%= media_form.input :media_type, as: :select, collection: Media.media_types.keys.map { |type| [type.humanize, type] }, prompt: "Selecciona el tipo de media", input_html: { class: "form-select" }, label_html: { class: "form-label" } %>
+            <%= media_form.file_field :file, accept: "image/*,video/*", class: "form-input ml-4", data: { action: "media-upload#preview", media_upload_target: "fileInput" } %>
+          </div>
+          <!-- Preview Section -->
+          <div class="mb-4 media-preview" data-media-upload-target="previewContainer">
+            <!-- The preview will be rendered here via JavaScript -->
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div>
+      <%= form.input :price, label: "Precio", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :discounted_price, label: "Precio Descontado", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :permalink, label: "Permalink", input_html: { class: "form-input", readonly: true }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.association :brand, label: "Marca", prompt: "Selecciona la marca", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :status, label: "Estado", collection: Product.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.association :tags, label: "Etiquetas", as: :check_boxes, input_html: { class: "form-checkbox" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.association :product_categories, label: "Categorías", as: :check_boxes, input_html: { class: "form-checkbox" }, label_html: { class: "form-label" } %>
+    </div>
+  </div>
+
+  <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+    <%= form.button :submit, @product.new_record? ? "Crear Producto" : "Grabar Producto", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_products_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+  </div>
+<% end %>

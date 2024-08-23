@@ -6,7 +6,7 @@ class Admin::OrdersController < Admin::AdminController
       format.html do
         @orders = Order.includes([ :user ]).all
         if @orders.size > 5
-          @datatable_options = "server_side:true;resource_name:'orders';"
+          @datatable_options = "server_side:true;resource_name:'Order';"
         end
       end
 

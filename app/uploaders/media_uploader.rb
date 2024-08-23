@@ -24,10 +24,10 @@ class MediaUploader < Shrine
   end
 
   Shrine::Attacher.promote_block do
-    Shrine::PromoteJob.perform_async(self.class.name, record.class.name, record.id, name, file_data)
+    Shrine::PromoteJob.perform_async(self.class.name, record.class.name, record.id, name.to_s, file_data.to_json)
   end
 
   Shrine::Attacher.destroy_block do
-    Shrine::DestroyJob.perform_async(self.class.name, data)
+    Shrine::DestroyJob.perform_async(self.class.name, data.to_json)
   end
 end
