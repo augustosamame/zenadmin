@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_23_014609) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -61,7 +61,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_014609) do
     t.string "user_type"
     t.string "username"
     t.string "action"
-    t.text "audited_changes"
+    t.jsonb "audited_changes"
     t.integer "version", default: 0
     t.string "comment"
     t.string "remote_address"

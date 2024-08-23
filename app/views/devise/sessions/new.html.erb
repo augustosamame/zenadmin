@@ -9,7 +9,7 @@
   <%= form_for(resource, as: resource_name, url: session_path(resource_name), data: { turbo: false }) do |f| %>
 
     <div class="form-group">
-      <% if Rails.application.config.global_settings[:login_type] == "email" %>
+      <% if $global_settings[:login_type] == "email" %>
         <%= f.label "Correo", class: "form-label" %>
         <div class="relative">
           <%= f.text_field :login, autofocus: true, autocomplete: "email", class: "form-input focus:pl-10 peer transition", pattern: "[^@\s]+@[^@\s]+\.[^@\s]+", title: "Invalid email address" %>

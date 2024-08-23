@@ -1,5 +1,5 @@
 class Setting < ApplicationRecord
-  audited
+  audited_if_enabled
 
   enum :status, { active: 0, inactive: 1 }
 

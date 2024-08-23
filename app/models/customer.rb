@@ -1,4 +1,6 @@
 class Customer < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :user
   include MediaUploader::Attachment(:avatar)
 

@@ -1,4 +1,6 @@
 class Product < ApplicationRecord
+  audited_if_enabled
+
   include PgSearch::Model
   include MediaAttachable
 

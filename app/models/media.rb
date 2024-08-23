@@ -1,4 +1,6 @@
 class Media < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :mediable, polymorphic: true
   include MediaUploader::Attachment(:file)
 

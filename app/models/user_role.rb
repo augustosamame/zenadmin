@@ -1,4 +1,6 @@
 class UserRole < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :user
   belongs_to :role
 

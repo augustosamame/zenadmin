@@ -1,4 +1,6 @@
 class Commission < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :user
   belongs_to :order
   has_one :commission_payout, dependent: :destroy

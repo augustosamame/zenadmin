@@ -1,4 +1,6 @@
 class Payment < ApplicationRecord
+  audited_if_enabled
+
   include DefaultRegionable
   PAYABLE = [ :order ]
 

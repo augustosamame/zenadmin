@@ -1,4 +1,6 @@
 class Region < ApplicationRecord
+  audited_if_enabled
+
   has_many :locations
   has_many :orders
   has_many :suppliers
@@ -12,7 +14,7 @@ class Region < ApplicationRecord
 
   def self.default
     # Check if multi_region is false
-    if Rails.application.config.global_settings[:multi_region] == false
+    if $global_settings[:multi_region] == false
       # Find or create the default region
       find_or_create_by(name: "default")
     else

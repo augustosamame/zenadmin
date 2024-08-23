@@ -1,4 +1,6 @@
 class ProductCategory < ApplicationRecord
+  audited_if_enabled
+
   include MediaAttachable
 
   # Self-referential association for parent-child relationships (subcategories)

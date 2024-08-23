@@ -7,6 +7,7 @@ export default class extends Controller {
   connect() {
     console.log('Connected to PaymentController!');
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
+    this.canCreateUnpaidOrders = this.element.dataset.posCanCreateUnpaidOrders === 'true';
   }
 
   payOrder() {
@@ -106,8 +107,25 @@ export default class extends Controller {
 
   saveOrder() {
     console.log('Saving order...');
+
+    const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
+    let totalPayments = 0;
+
+    this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
+      totalPayments += parseFloat(input.value);
+    });
+
+    // If unpaid orders are not allowed and total payments don't match the order total, show an alert
+    if (!this.canCreateUnpaidOrders && totalPayments < totalOrderAmount) {
+      this.showErrorModal(
+        'Error',
+        'El monto total de los métodos de pago debe coincidir con el monto total del pedido.',
+        [{ label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }]
+      );
+      return;
+    }
+
     const orderItems = document.querySelectorAll('[data-pos--order-items-target="items"] div.flex');
-    console.log('Order Items:', orderItems);
     const orderItemsAttributes = [];
 
     orderItems.forEach(item => {

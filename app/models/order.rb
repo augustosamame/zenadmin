@@ -1,4 +1,6 @@
 class Order < ApplicationRecord
+  audited_if_enabled
+
   include DefaultRegionable
   include PgSearch::Model
 

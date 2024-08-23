@@ -1,4 +1,6 @@
 class WarehouseInventory < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :warehouse
   belongs_to :product
 

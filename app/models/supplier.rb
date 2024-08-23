@@ -1,4 +1,6 @@
 class Supplier < ApplicationRecord
+  audited_if_enabled
+
   include DefaultRegionable
 
   belongs_to :region

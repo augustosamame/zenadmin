@@ -1,5 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
+  audited_if_enabled
+
   has_person_name
   has_one_attached :avatar
   has_many :user_roles
@@ -62,6 +64,6 @@ class User < ApplicationRecord
     # Replace this with your actual global setting logic
     # For example, it could be an environment variable or a value stored in the database
     # Setting.find_by(name: "login_type").get_value || "email"
-    Rails.application.config.global_settings[:login_type]
+    $global_settings[:login_type]
   end
 end

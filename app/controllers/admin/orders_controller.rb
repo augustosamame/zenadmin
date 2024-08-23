@@ -59,6 +59,7 @@ class Admin::OrdersController < Admin::AdminController
 
   def pos
     @order = Order.new
+    @can_create_unpaid_orders = $global_settings[:pos_can_create_unpaid_orders]
   end
 
   private

@@ -1,4 +1,6 @@
 class CommissionPayout < ApplicationRecord
+  audited_if_enabled
+
   belongs_to :commission
   belongs_to :user
 
