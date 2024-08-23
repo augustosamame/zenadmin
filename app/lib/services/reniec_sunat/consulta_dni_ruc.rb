@@ -1,5 +1,3 @@
-# convert this command curl -H 'Accept: application/json' -H "Authorization: Bearer $TOKEN" https://api.apis.net.pe/v2/reniec/dni?numero=46027897 into httparty calls
-
 require "httparty"
 
 module Services

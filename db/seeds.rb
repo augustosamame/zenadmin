@@ -85,7 +85,7 @@ PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectiv
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 
-Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first)
+Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')

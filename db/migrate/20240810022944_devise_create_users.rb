@@ -21,6 +21,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       t.string :first_name
       t.string :last_name
       t.boolean :admin, default: false
+
+      t.integer :location_id
       t.integer :status, default: 0
 
       t.timestamps null: false

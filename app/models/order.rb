@@ -19,12 +19,21 @@ class Order < ApplicationRecord
   has_many :products, through: :order_items
   has_many :payments, as: :payable, dependent: :destroy
 
+  has_many :commissions, dependent: :destroy
+  has_many :commission_payouts, through: :commissions
+  has_many :sellers, through: :commissions, source: :user
+
+  # Update commissions when the order is marked as paid
+  after_commit :update_commissions_status, if: :paid?
+
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
   validates :currency, presence: true
 
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :payments, allow_destroy: true
+
+  attr_accessor :sellers_attributes
 
   def total_items
     order_items.sum(:quantity)
@@ -37,4 +46,10 @@ class Order < ApplicationRecord
   def customer
     user
   end
+
+  private
+
+    def update_commissions_status
+      commissions.status_order_unpaid.update_all(status: :status_order_paid)
+    end
 end

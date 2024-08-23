@@ -13,6 +13,11 @@ class Admin::UsersController < Admin::AdminController
     end
   end
 
+  def sellers
+    sellers = User.with_role("seller")
+    render json: sellers.map { |seller| { id: seller.id, name: seller.name } }
+  end
+
   private
 
   def user_params

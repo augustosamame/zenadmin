@@ -9,6 +9,8 @@ class Admin::AdminController < ApplicationController
   def set_current_objects
     session[:current_warehouse_id] ||= Warehouse.first.id
     @current_warehouse = Warehouse.find_by(id: session[:current_warehouse_id])
+    session[:current_location_id] ||= Location.first.id
+    @current_location = Location.find_by(id: session[:current_location_id])
     @default_object_options_array = [
       { event_name: "edit", label: "Editar", icon: "pencil-square" },
       { event_name: "delete", label: "Eliminar", icon: "trash" }

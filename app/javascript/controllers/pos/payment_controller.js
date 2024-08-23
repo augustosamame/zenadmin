@@ -133,10 +133,11 @@ export default class extends Controller {
 
     const selectedCustomerId = document.querySelector('[data-action="click->object-table-modal#open"]').dataset.selectedObjectId;
     const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
+    const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
+    const selectedSellers = JSON.parse(sellersButton.dataset.sellers || '[]');
 
     const orderData = {
       order: {
-        location_id: 1,
         stage: 'confirmed',
         user_id: selectedCustomerId,
         total_price: parseFloat(this.totalTarget.textContent.replace('S/', '')),
@@ -146,7 +147,8 @@ export default class extends Controller {
         payment_status: 'paid',
         seller_note: comment,
         order_items_attributes: orderItemsAttributes,
-        payments_attributes: payments
+        payments_attributes: payments,
+        sellers_attributes: selectedSellers
       }
     };
 

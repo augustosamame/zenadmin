@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_23_014609) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -81,6 +81,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "commission_payouts", force: :cascade do |t|
+    t.bigint "commission_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "amount_currency", default: "PEN"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["commission_id"], name: "index_commission_payouts_on_commission_id"
+    t.index ["user_id"], name: "index_commission_payouts_on_user_id"
+  end
+
+  create_table "commissions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "order_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN"
+    t.integer "percentage", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_commissions_on_order_id"
+    t.index ["user_id"], name: "index_commissions_on_user_id"
+  end
+
   create_table "customers", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.integer "doc_type", default: 0
@@ -107,8 +132,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
   end
 
   create_table "locations", force: :cascade do |t|
-    t.string "name"
     t.bigint "region_id", null: false
+    t.string "name"
+    t.string "address"
+    t.string "phone"
+    t.string "email"
+    t.string "latitude"
+    t.string "longitude"
+    t.decimal "seller_comission_percentage", precision: 5, scale: 2, default: "0.0"
+    t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["region_id"], name: "index_locations_on_region_id"
@@ -371,6 +403,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
     t.string "first_name"
     t.string "last_name"
     t.boolean "admin", default: false
+    t.integer "location_id"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -400,6 +433,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_22_041159) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "commission_payouts", "commissions"
+  add_foreign_key "commission_payouts", "users"
+  add_foreign_key "commissions", "orders"
+  add_foreign_key "commissions", "users"
   add_foreign_key "customers", "users"
   add_foreign_key "customers", "users", column: "referrer_id"
   add_foreign_key "factory_factories", "regions"

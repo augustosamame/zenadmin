@@ -14,10 +14,12 @@ class Admin::OrdersController < Admin::AdminController
         # POS context: current_user is the seller, user_id is provided
         @order.seller_id = current_user.id
         @order.user_id ||= get_generic_customer_id
+        @order.location_id = @current_location.id
       elsif @order.origin == "ecommerce"
         # eCommerce context: current_user is the eCommerce store, user_id is not provided
         @order.user_id = current_user.id
         @order.seller_id = get_ecommerce_store_seller_id
+        @order.location_id = @current_location.id
       end
 
       if @order.save
@@ -25,6 +27,9 @@ class Admin::OrdersController < Admin::AdminController
           order_params[:payments_attributes].each do |payment|
             @order.payments.create(payment.merge(payable: @order))
           end
+        end
+        if order_params[:sellers_attributes].present?
+          Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
         end
 
         session.delete(:draft_order)
@@ -44,7 +49,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
   def order_params
-    params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :discounted_price, :currency ], payments_attributes: [ :user_id, :payment_method_id, :amount, :currency, :payable_type ])
+    params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :discounted_price, :currency ], payments_attributes: [ :user_id, :payment_method_id, :amount, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ])
   end
 
   def get_generic_customer_id

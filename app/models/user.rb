@@ -5,6 +5,10 @@ class User < ApplicationRecord
   has_many :user_roles
   has_many :roles, through: :user_roles
   has_one :customer, dependent: :destroy
+  has_many :commissions, dependent: :destroy
+  has_many :commissioned_orders, through: :commissions, source: :order
+  belongs_to :location, optional: true
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,

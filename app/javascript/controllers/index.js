@@ -34,6 +34,9 @@ application.register("pos--buttons", Pos__ButtonsController)
 import Pos__CommentModalController from "./pos/comment_modal_controller"
 application.register("pos--comment-modal", Pos__CommentModalController)
 
+import Pos__SellersModalController from "./pos/sellers_modal_controller"
+application.register("pos--sellers-modal", Pos__SellersModalController)
+
 import Pos__KeypadController from "./pos/keypad_controller"
 application.register("pos--keypad", Pos__KeypadController)
 
