@@ -4,7 +4,7 @@ class Admin::ProductsController < Admin::AdminController
 	def index
     respond_to do |format|
       format.html do
-        @products = Product.includes([:media]).all
+        @products = Product.includes([ :media ]).all
           .joins(:warehouse_inventories)
           .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
           .select("products.*, warehouse_inventories.stock")
