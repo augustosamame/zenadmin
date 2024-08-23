@@ -7,7 +7,10 @@ class Admin::CustomersController < Admin::AdminController
   def search_dni
     response = Services::ReniecSunat::ConsultaDniRuc.consultar_dni(params[:numero])
     if response["nombres"].present?
-      render json: response
+      capitalized_response = response.transform_values do |value|
+        value.split.map(&:capitalize).join(' ') if value.is_a?(String)
+      end
+      render json: capitalized_response
     else
       render json: { error: "No se encontraron datos para el DNI ingresado" }
     end

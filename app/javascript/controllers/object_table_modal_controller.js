@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-  static targets = ['container', 'content', 'modalContainer'];
+  static targets = ['container', 'content', 'modalContainer', 'firstName', 'lastName'];
 
   connect() {
     console.log("ObjectTableModalController connected");
@@ -69,19 +69,31 @@ export default class extends Controller {
     event.preventDefault();
 
     const formHtml = `
-      <form id="new-customer-form">
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label for="document_id" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Document Id</label>
-            <input type="text" id="document_id" name="document_id" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
+    <form id="new-customer-form">
+      <div class="grid grid-cols-2 gap-4">
+        <div class="flex flex-row space-x-4">
+          <div class="flex flex-col w-1/2">
+            <label for="doc_type" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Document Type</label>
+            <select id="doc_type" name="doc_type" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
+              <option value="dni">DNI</option>
+              <option value="ce">Carnet De Extranjeria</option>
+              <option value="passport">Pasaporte</option>
+              <option value="other">Otros</option>
+            </select>
           </div>
-          <div>
+          <div class="flex flex-col w-1/2">
+            <label for="document_id" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Document Id</label>
+            <input type="text" id="document_id" name="document_id" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600" data-action="blur->object-table-modal#fetchCustomerData">
+
+          </div>
+        </div>
+        <div>
             <label for="first_name" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">First Name</label>
-            <input type="text" id="first_name" name="first_name" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
+            <input type="text" id="first_name" name="first_name" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600" data-object-table-modal-target="firstName">
           </div>
           <div>
             <label for="last_name" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Last Name</label>
-            <input type="text" id="last_name" name="last_name" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
+            <input type="text" id="last_name" name="last_name" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600" data-object-table-modal-target="lastName">
           </div>
           <div>
             <label for="phone" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
@@ -107,6 +119,62 @@ export default class extends Controller {
     this.addFormSubmitListener();
   }
 
+  handleDocTypeChange(event) {
+    // Reset fields when document type changes
+    this.clearCustomerFields();
+  }
+
+  clearCustomerFields() {
+    this.firstNameTarget.value = '';
+    this.lastNameTarget.value = '';
+  }
+
+  fetchCustomerData(event) {
+    const docType = this.contentTarget.querySelector('#doc_type').value;
+    const docId = event.target.value.trim();
+
+    if (docType === 'dni' && docId !== '') {
+      axios.get(`/admin/search_dni?numero=${docId}`, { headers: { 'Accept': 'application/json' } })
+        .then(response => {
+          if (response.data.error) {
+            // Show the default error dialog with the error content
+            this.showErrorDialog('Error', response.data.error);
+          } else {
+            const data = response.data;
+
+            // Map the JSON response to form fields and capitalize names
+            const firstName = data.nombres.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
+            const lastName = `${data.apellidoPaterno.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')} ${data.apellidoMaterno.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}`;
+
+            this.firstNameTarget.value = firstName;
+            this.lastNameTarget.value = lastName;
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching customer data:', error);
+          // Show a generic error dialog in case of a request failure
+          this.showErrorDialog('Error', 'Error al buscar datos de cliente. Por favor, inténtelo de nuevo.');
+        });
+    }
+  }
+
+  showErrorDialog(title, message) {
+    const buttons = [
+      { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
+    ];
+
+    this.customModalController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="custom-modal"]'),
+      'custom-modal'
+    );
+
+    if (this.customModalController) {
+      this.customModalController.openWithContent(title, message, buttons);
+    } else {
+      console.error('CustomModalController not found!');
+    }
+  }
+
   addFormSubmitListener() {
     const form = this.contentTarget.querySelector('#new-customer-form');
     form.addEventListener('submit', (event) => this.submitNewCustomerForm(event));
@@ -127,13 +195,13 @@ export default class extends Controller {
         phone: customerData.phone,
         birthdate: customerData.birthdate,
         customer_attributes: {
-          doc_type: 'dni', // Fixed value for doc_type
+          doc_type: customerData.doc_type, // Value from the dropdown
           doc_id: customerData.document_id // Document ID from the form
         }
       }
     };
 
-    axios.post('/admin/pos_create_customer', structuredData, { headers: { 'Accept': 'application/json', 'X-CSRF-Token': this.csrfToken }})
+    axios.post('/admin/pos_create_customer', structuredData, { headers: { 'Accept': 'application/json', 'X-CSRF-Token': this.csrfToken } })
       .then(response => {
         const customer = response.data;
 
