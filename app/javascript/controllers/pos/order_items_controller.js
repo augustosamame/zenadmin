@@ -259,13 +259,14 @@ export default class extends Controller {
   collectOrderData() {
     const orderItems = [];
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+      const id = item.dataset.productId;
       const name = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
       const sku = item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim();
       const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim());
       const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
 
-      orderItems.push({ name, sku, quantity, price, subtotal });
+      orderItems.push({ id, name, sku, quantity, price, subtotal });
     });
 
     return {

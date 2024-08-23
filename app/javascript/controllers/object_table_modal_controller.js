@@ -143,6 +143,7 @@ export default class extends Controller {
         ${clienteButton.querySelector('svg').outerHTML.replace('text-slate-600', 'text-white').replace('dark:text-slate-300', 'text-white mr-2')} ${customer.first_name} ${customer.last_name}
       `;
         clienteButton.classList.add('bg-blue-500', 'text-white');
+        clienteButton.classList.remove('bg-white');
 
         // Close the modal
         this.close(event);
@@ -170,6 +171,7 @@ export default class extends Controller {
       ${clienteButton.querySelector('svg').outerHTML.replace('text-slate-600', 'text-white').replace('dark:text-slate-300', 'text-white mr-2')} ${fullName}
     `;
     clienteButton.classList.add('bg-blue-500', 'text-white');
+    clienteButton.classList.remove('bg-white');
 
     // Close the modal
     this.close(event);

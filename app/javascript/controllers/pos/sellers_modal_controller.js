@@ -140,11 +140,14 @@ export default class extends Controller {
 
     // Store the sellers data in a data attribute or local storage
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
+    console.log('Sellers Button:', sellersButton);
     sellersButton.dataset.sellers = JSON.stringify(sellers);
     sellersButton.innerHTML = `
       ${sellersButton.querySelector('svg').outerHTML} ${sellers.length} Vendedor${sellers.length > 1 ? 'es' : ''} Seleccionado${sellers.length > 1 ? 's' : ''}
     `;
     sellersButton.classList.add('bg-blue-500', 'text-white');
+    sellersButton.classList.remove('bg-white');
+    console.log('Classes after update:', sellersButton.className);
 
     this.close();
   }
