@@ -21,7 +21,7 @@ Rails.application.routes.draw do
       resources :media, module: :admin
     end
 
-    resources :orders, only: [ :new, :create, :update ] do
+    resources :orders, only: [ :index, :new, :create, :update ] do
       collection do
         get "pos"
       end
@@ -57,7 +57,7 @@ Rails.application.routes.draw do
   # Inherits from Railsui::PageController#index
   # To overide, add your own page#index view or change to a new root
   # Visit the start page for Rails UI any time at /railsui/start
-  root action: :dashboard, controller: "page"
+  root action: :dashboard, controller: "admin/page"
 
   devise_for :users, skip: [ :registrations ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

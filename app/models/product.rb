@@ -17,6 +17,9 @@ class Product < ApplicationRecord
   validates :permalink, presence: true
   validates :price_cents, presence: true
 
+  monetize :price_cents, with_model_currency: :currency
+  monetize :discounted_price_cents, with_model_currency: :currency
+
   pg_search_scope :search_by_sku_and_name, against: [ :sku, :name ], using: {
       tsearch: { prefix: true }
   }

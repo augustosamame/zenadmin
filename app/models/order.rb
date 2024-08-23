@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   include DefaultRegionable
+  include PgSearch::Model
 
   belongs_to :region
   belongs_to :user
@@ -23,6 +24,8 @@ class Order < ApplicationRecord
   has_many :commission_payouts, through: :commissions
   has_many :sellers, through: :commissions, source: :user
 
+  before_create :set_defaults
+
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
 
@@ -32,6 +35,14 @@ class Order < ApplicationRecord
 
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :payments, allow_destroy: true
+
+  pg_search_scope :search_by_customer_name,
+                  associated_against: {
+                    user: [ :first_name, :last_name ] # Assuming the customer user has first_name and last_name fields
+                  },
+                  using: {
+                    tsearch: { prefix: true }
+                  }
 
   attr_accessor :sellers_attributes
 
@@ -45,6 +56,10 @@ class Order < ApplicationRecord
 
   def customer
     user
+  end
+
+  def set_defaults
+    order_date = Time.zone.now
   end
 
   private

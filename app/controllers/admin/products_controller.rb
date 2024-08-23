@@ -8,9 +8,8 @@ class Admin::ProductsController < Admin::AdminController
           .joins(:warehouse_inventories)
           .where(warehouse_inventories: { warehouse_id: @current_warehouse.id })
           .select("products.*, warehouse_inventories.stock")
-        # TODO improve HTML rendering when using server-side. It looks off due to margins and padding
         if @products.size > 5
-          @datatable_options = "server_side:true"
+          @datatable_options = "server_side:true;resource_name:'products';"
         end
       end
 

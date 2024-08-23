@@ -47,11 +47,14 @@ export default class extends Controller {
 
     const allAdditionalOptions = this.optionsValue;
 
+    const resourceNameMatch = allAdditionalOptions.match(/resource_name:'([^']+)'/);
+    const resourceName = resourceNameMatch ? resourceNameMatch[1] : null;
+
     // Check if the table is set for server-side processing
     if (allAdditionalOptions.includes("server_side:true")) {
       initialOptions.serverSide = true;
       initialOptions.ajax = {
-        url: "/admin/products.json",
+        url: `/admin/${resourceName}.json`,
         type: "GET",
       }
     }
