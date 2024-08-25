@@ -11,7 +11,7 @@ class Admin::ProductsController < Admin::AdminController
           .left_joins(:warehouse_inventories) # Use left_joins to include products without inventory
           .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
           .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock") # Coalesce to show 0 for products without stock
-        
+
         if @products.size > 5
           @datatable_options = "server_side:true;resource_name:'Product';"
         end
@@ -47,25 +47,23 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def edit
-
   end
 
   def update
-
     processed_params = preprocess_media_attributes(product_params)
 
     processed_params[:tag_ids] ||= []
     processed_params[:product_category_ids] ||= []
 
-    #TODO refactor
+    # TODO refactor
     # Identify which media are to be kept
-    #media_ids_to_keep = processed_params[:media_attributes].map { |media| media[:id].to_i }.compact
+    # media_ids_to_keep = processed_params[:media_attributes].map { |media| media[:id].to_i }.compact
     # Find media records that should be deleted
-    #media_to_delete = @product.media.where.not(id: media_ids_to_keep)
+    # media_to_delete = @product.media.where.not(id: media_ids_to_keep)
 
     if @product.update(processed_params)
       # Delete media that are no longer associated with the product
-      #media_to_delete.each(&:destroy)
+      # media_to_delete.each(&:destroy)
 
       redirect_to admin_products_path, notice: "Product updated successfully."
     else
@@ -77,10 +75,10 @@ class Admin::ProductsController < Admin::AdminController
     respond_to do |format|
       if @product.destroy
         format.html { redirect_to admin_products_path, notice: "Product was successfully destroyed." }
-        #format.turbo_stream { render turbo_stream: turbo_stream.remove(@product) } # Ensure Turbo doesn't re-trigger
+        # format.turbo_stream { render turbo_stream: turbo_stream.remove(@product) } # Ensure Turbo doesn't re-trigger
       else
         format.html { redirect_to admin_products_path, alert: "Product could not be deleted." }
-        #format.turbo_stream { render turbo_stream: turbo_stream.replace(@product, partial: 'product', locals: { product: @product }) }
+        # format.turbo_stream { render turbo_stream: turbo_stream.replace(@product, partial: 'product', locals: { product: @product }) }
       end
     end
   end

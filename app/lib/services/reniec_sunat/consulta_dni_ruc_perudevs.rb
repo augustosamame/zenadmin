@@ -13,7 +13,7 @@ module Services
 
       def self.consultar_ruc(numero)
         headers = {
-          "Accept" => "application-json",
+          "Accept" => "application-json"
         }
 
         response = get("/ruc?document=#{numero}&key=#{ENV["PERUDEVS_API_TOKEN"]}")
