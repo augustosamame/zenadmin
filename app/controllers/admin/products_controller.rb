@@ -66,7 +66,7 @@ class Admin::ProductsController < Admin::AdminController
         @products = []
       end
     end
-    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product&.image&.file_url, price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
+    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.smart_image(:small), price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
   end
 
   private
@@ -140,7 +140,7 @@ class Admin::ProductsController < Admin::AdminController
 
     def product_image_tag_thumb(product)
       if product.image.present?
-        ActionController::Base.helpers.image_tag(product.smart_thumb, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
+        ActionController::Base.helpers.image_tag(product.smart_image(:thumb), alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
       else
         "No Image" # Or an alternative placeholder
       end

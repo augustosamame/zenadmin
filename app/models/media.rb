@@ -31,11 +31,11 @@ class Media < ApplicationRecord
     media || mediable.media.by_type(:default_image).first
   end
 
-  def smart_thumb
+  def smart_image(size)
     if self.file_attacher.derivatives.empty?
       self.file_url
     else
-      self.file_url(:thumb)
+      self.file_url(size)
     end
   end
 end

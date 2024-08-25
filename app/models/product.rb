@@ -56,8 +56,8 @@ class Product < ApplicationRecord
     inventory.update(stock: quantity)
   end
 
-  def smart_thumb
-    self.media&.first&.smart_thumb
+  def smart_image(size)
+    self.media&.first&.smart_image(size)
   end
 
   private
