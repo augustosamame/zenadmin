@@ -22,13 +22,13 @@ class MediaUploader < Shrine
     }
   end
 
-  #Shrine::Attacher.promote_block do
+  # Shrine::Attacher.promote_block do
   #  Shrine::PromoteJob.perform_async(self.class.name, record.class.name, record.id, name.to_s, file_data.to_json)
-  #end
+  # end
 
-  #Shrine::Attacher.destroy_block do
+  # Shrine::Attacher.destroy_block do
   #  Shrine::DestroyJob.perform_async(self.class.name, data.to_json)
-  #end
+  # end
 
-  #not using backgrounding here as were promoting manually in the after_commit of the media record. That is handled via a sidekiq job
+  # not using backgrounding here as were promoting manually in the after_commit of the media record. That is handled via a sidekiq job
 end

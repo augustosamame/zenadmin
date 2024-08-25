@@ -19,16 +19,16 @@ Shrine.storages = {
   store_private: Shrine::Storage::S3.new(prefix: "private", **s3_options.merge(public: false))
 }
 
-Shrine.plugin :presign_endpoint, presign_options: -> (request) {
+Shrine.plugin :presign_endpoint, presign_options: ->(request) {
   Rails.logger.info "Presign request params: #{request.params.inspect}"
-  
+
   filename = request.params["filename"]
   extension = File.extname(filename)
 
   {
     content_disposition:    "inline; filename=\"#{filename}\"", # set download filename
     content_type:           request.params["type"], # set content type
-    content_length_range:   0..(10*1024*1024), # limit upload size to 10 MB
+    content_length_range:   0..(10*1024*1024) # limit upload size to 10 MB
   }
 }
 
@@ -44,4 +44,4 @@ Shrine.plugin :default_url
 Shrine.plugin :backgrounding
 Shrine.plugin :pretty_location
 
-#Shrine.plugin :default_url_options, store_public: { public: true }
+# Shrine.plugin :default_url_options, store_public: { public: true }

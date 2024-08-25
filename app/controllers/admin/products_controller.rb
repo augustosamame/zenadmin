@@ -24,7 +24,6 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def create
-
     processed_params = preprocess_media_attributes(product_params)
     # Necessary because the media attributes are not in a nested hash array
 
@@ -32,13 +31,13 @@ class Admin::ProductsController < Admin::AdminController
 
     if @product.save
       respond_to do |format|
-        format.html { redirect_to admin_products_path, notice: 'Product was successfully created.' }
+        format.html { redirect_to admin_products_path, notice: "Product was successfully created." }
         format.turbo_stream { redirect_to admin_products_path } # Ensure Turbo Stream compatibility
       end
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace('new_product', partial: 'admin/products/form', locals: { product: @product }) }
+        format.turbo_stream { render turbo_stream: turbo_stream.replace("new_product", partial: "admin/products/form", locals: { product: @product }) }
       end
     end
   end
@@ -73,17 +72,16 @@ class Admin::ProductsController < Admin::AdminController
   private
 
     def product_params
-      params.require(:product).permit(:sku, :file_data, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [], 
-      media_attributes: [:id, :file, :file_data, :media_type, :_destroy])
+      params.require(:product).permit(:sku, :file_data, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [],
+      media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ])
     end
 
     def preprocess_media_attributes(params)
-
       if params[:media_attributes].is_a?(ActionController::Parameters)
         # Transform the hash values into an array
         params[:media_attributes] = params[:media_attributes].values.map do |media_param|
           # Parse `file_data` from a JSON string to a Ruby hash
-          media_param['file_data'] = JSON.parse(media_param['file_data']) if media_param['file_data'].is_a?(String)
+          media_param["file_data"] = JSON.parse(media_param["file_data"]) if media_param["file_data"].is_a?(String)
           media_param
         end
       end

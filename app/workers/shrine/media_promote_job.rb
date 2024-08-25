@@ -10,5 +10,4 @@ class Shrine::MediaPromoteJob
       ) # Update the file_data without triggering callbacks
     end
   end
-
 end
