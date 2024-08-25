@@ -333,6 +333,17 @@
     preact "^10.5.13"
     promise-queue "^2.2.5"
 
+"@uppy/compressor@^2.0.1":
+  version "2.0.1"
+  resolved "https://registry.yarnpkg.com/@uppy/compressor/-/compressor-2.0.1.tgz#0c4b185e33019cc445fd18b3954c765bd6fd4763"
+  integrity sha512-UOpeigToa06LpwwPvLxIEMFmrt8g80N828OFhWxC9ZDJRKx0GiqKyh8smmQiRF09SkrXtuj2gA74rUESrrJKLA==
+  dependencies:
+    "@transloadit/prettier-bytes" "^0.3.4"
+    "@uppy/utils" "^6.0.1"
+    compressorjs "^1.2.1"
+    preact "^10.5.13"
+    promise-queue "^2.2.5"
+
 "@uppy/core@^3.13.1":
   version "3.13.1"
   resolved "https://registry.yarnpkg.com/@uppy/core/-/core-3.13.1.tgz#01b42684b5c08186033bb8c86bbfb5a1d8b5ae94"
@@ -471,6 +482,13 @@
     "@uppy/utils" "^5.9.0"
     preact "^10.5.13"
 
+"@uppy/locales@^4.0.3":
+  version "4.0.3"
+  resolved "https://registry.yarnpkg.com/@uppy/locales/-/locales-4.0.3.tgz#3179bf08ed9c1a22139f871ff5447588b1021b5f"
+  integrity sha512-nr/zJV1MsU4VSB3sXhFj+8kh7Rlnq/4G2MmXrNQfb5aEEAxHMpAFKQo0DAQuIyt2oJTKQyL07Ukdpyjm0Ox43Q==
+  dependencies:
+    "@uppy/utils" "^6.0.0"
+
 "@uppy/onedrive@^3.4.0":
   version "3.4.0"
   resolved "https://registry.yarnpkg.com/@uppy/onedrive/-/onedrive-3.4.0.tgz#7cff7a9dad8f3baa9acd403c131f6fb8b95ec988"
@@ -604,6 +622,14 @@
   version "5.9.0"
   resolved "https://registry.yarnpkg.com/@uppy/utils/-/utils-5.9.0.tgz#c88827f9678a53cd13c7cd2f51e7682efd060e7d"
   integrity sha512-9Ubddd3orCOLYjf0KobwgJ+aTrABSxk9t4X/QdM4qJHVZuMIftkaMplrViRUO+kvIBCXEZDIP2AmS060siDNGw==
+  dependencies:
+    lodash "^4.17.21"
+    preact "^10.5.13"
+
+"@uppy/utils@^6.0.0", "@uppy/utils@^6.0.1":
+  version "6.0.2"
+  resolved "https://registry.yarnpkg.com/@uppy/utils/-/utils-6.0.2.tgz#fc5e86fa58e952fb075ca4bc0523fb5e6aa44053"
+  integrity sha512-ZoNeAa1YTKSlcvXe1SP3POjzjRZ9jSojorbst03vwd1Ks9vHPGf6pne61DowTXHZ3HMj1vpcIaQ1VIEWeeADlA==
   dependencies:
     lodash "^4.17.21"
     preact "^10.5.13"

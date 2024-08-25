@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import Uppy from '@uppy/core';
 import Dashboard from '@uppy/dashboard';
-// import Spanish from '@uppy/locales/lib/es_MX';
+import Spanish from '@uppy/locales/lib/es_MX';
 import AwsS3 from '@uppy/aws-s3';
 import Compressor from '@uppy/compressor';
 
@@ -13,8 +13,8 @@ export default class extends Controller {
     console.log("Uppy initialized in Stimulus controller");
 
     this.uppy = new Uppy({
-      autoProceed: false,
-      //locale: Spanish,
+      autoProceed: true,
+      locale: Spanish,
       restrictions: {
         maxNumberOfFiles: 10,
         allowedFileTypes: ['image/*', 'video/*']
@@ -34,7 +34,14 @@ export default class extends Controller {
       proudlyDisplayPoweredByUppy: false
     });
 
-    // this.uppy.use(Compressor);
+    this.uppy.use(Compressor, {
+      locale: {
+        strings: {
+          compressingImages: 'Comprimiendo imágenes...',
+          compressedX: 'Ahorraste %{size} al comprimir imágenes',
+        },
+      },
+    });
 
     this.uppy.use(AwsS3, {
       getUploadParameters: (file) => {
