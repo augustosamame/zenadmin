@@ -56,6 +56,10 @@ class Product < ApplicationRecord
     inventory.update(stock: quantity)
   end
 
+  def smart_thumb
+    self.media&.first&.smart_thumb
+  end
+
   private
 
   def find_or_get_tag(tag_name_or_object)

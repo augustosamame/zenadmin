@@ -15,20 +15,10 @@
     </div>
     
     <!-- Media Upload Section -->
-    <div class="col-span-2" data-controller="media-upload">
+    <div class="col-span-2" data-controller="uppy-upload">
       <h3 class="mb-4 text-lg font-semibold">Añadir Media</h3>
-      <div>
-        <!-- Ensure at least one media field is rendered -->
-        <%= form.simple_fields_for :media, @product.media.any? ? @product.media : @product.media.build do |media_form| %>
-          <div class="flex items-center mb-4">
-            <%= media_form.input :media_type, as: :select, collection: Media.media_types.keys.map { |type| [type.humanize, type] }, prompt: "Selecciona el tipo de media", input_html: { class: "form-select" }, label_html: { class: "form-label" } %>
-            <%= media_form.file_field :file, accept: "image/*,video/*", class: "form-input ml-4", data: { action: "media-upload#preview", media_upload_target: "fileInput" } %>
-          </div>
-          <!-- Preview Section -->
-          <div class="mb-4 media-preview" data-media-upload-target="previewContainer">
-            <!-- The preview will be rendered here via JavaScript -->
-          </div>
-        <% end %>
+      <div data-uppy-upload-target="previewContainer">
+        <!-- Uppy Dashboard will be rendered here -->
       </div>
     </div>
 

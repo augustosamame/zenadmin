@@ -24,7 +24,11 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def create
-    @product = Product.new(product_params)
+
+    processed_params = preprocess_media_attributes(product_params)
+    # Necessary because the media attributes are not in a nested hash array
+
+    @product = Product.new(processed_params)
 
     if @product.save
       respond_to do |format|
@@ -69,9 +73,24 @@ class Admin::ProductsController < Admin::AdminController
   private
 
     def product_params
-      params.require(:product).permit(:sku, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [], 
-      media_attributes: [:id, :file, :media_type, :_destroy])
+      params.require(:product).permit(:sku, :file_data, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [], 
+      media_attributes: [:id, :file, :file_data, :media_type, :_destroy])
     end
+
+    def preprocess_media_attributes(params)
+
+      if params[:media_attributes].is_a?(ActionController::Parameters)
+        # Transform the hash values into an array
+        params[:media_attributes] = params[:media_attributes].values.map do |media_param|
+          # Parse `file_data` from a JSON string to a Ruby hash
+          media_param['file_data'] = JSON.parse(media_param['file_data']) if media_param['file_data'].is_a?(String)
+          media_param
+        end
+      end
+
+      params
+    end
+
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
     def datatable_json
       products = Product.all
@@ -109,7 +128,7 @@ class Admin::ProductsController < Admin::AdminController
         data: products.map do |product|
           [
             product.sku,
-            product_image_tag(product),
+            product_image_tag_thumb(product),
             product.name,
             number_to_currency(product.price_cents / 100.0),
             product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
@@ -121,9 +140,9 @@ class Admin::ProductsController < Admin::AdminController
       }
     end
 
-    def product_image_tag(product)
+    def product_image_tag_thumb(product)
       if product.image.present?
-        ActionController::Base.helpers.image_tag(product.image.file_url, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
+        ActionController::Base.helpers.image_tag(product.smart_thumb, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14")
       else
         "No Image" # Or an alternative placeholder
       end

@@ -12,7 +12,6 @@ class MediaUploader < Shrine
     validate_mime_type_inclusion [ "image/jpeg", "image/png", "image/gif" ]
   end
 
-  # Process and generate thumbnails
   Attacher.derivatives do |original|
     vips = ImageProcessing::Vips.source(original)
 
@@ -23,11 +22,13 @@ class MediaUploader < Shrine
     }
   end
 
-  Shrine::Attacher.promote_block do
-    Shrine::PromoteJob.perform_async(self.class.name, record.class.name, record.id, name.to_s, file_data.to_json)
-  end
+  #Shrine::Attacher.promote_block do
+  #  Shrine::PromoteJob.perform_async(self.class.name, record.class.name, record.id, name.to_s, file_data.to_json)
+  #end
 
-  Shrine::Attacher.destroy_block do
-    Shrine::DestroyJob.perform_async(self.class.name, data.to_json)
-  end
+  #Shrine::Attacher.destroy_block do
+  #  Shrine::DestroyJob.perform_async(self.class.name, data.to_json)
+  #end
+
+  #not using backgrounding here as were promoting manually in the after_commit of the media record. That is handled via a sidekiq job
 end

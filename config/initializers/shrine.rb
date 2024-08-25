@@ -1,5 +1,6 @@
 require "shrine"
 require "shrine/storage/s3"
+require "shrine/plugins/presign_endpoint"
 
 Shrine.logger = Rails.logger
 
@@ -11,12 +12,24 @@ s3_options = {
 }
 
 Shrine.storages = {
-  # TODO create lifecycle rule in prod S3 bucket to delete cache objects after 1 day
   cache: Shrine::Storage::S3.new(prefix: "cache", **s3_options), # temporary storage
   # Public storage (public read access)
-  store_public: Shrine::Storage::S3.new(prefix: "public", **s3_options),
+  store_public: Shrine::Storage::S3.new(prefix: "public", upload_options: { acl: nil }, **s3_options.merge(public: true)),
   # Private storage (requires signed URLs)
   store_private: Shrine::Storage::S3.new(prefix: "private", **s3_options.merge(public: false))
+}
+
+Shrine.plugin :presign_endpoint, presign_options: -> (request) {
+  Rails.logger.info "Presign request params: #{request.params.inspect}"
+  
+  filename = request.params["filename"]
+  extension = File.extname(filename)
+
+  {
+    content_disposition:    "inline; filename=\"#{filename}\"", # set download filename
+    content_type:           request.params["type"], # set content type
+    content_length_range:   0..(10*1024*1024), # limit upload size to 10 MB
+  }
 }
 
 Shrine.plugin :instrumentation, notifications: ActiveSupport::Notifications
@@ -30,3 +43,5 @@ Shrine.plugin :validation_helpers
 Shrine.plugin :default_url
 Shrine.plugin :backgrounding
 Shrine.plugin :pretty_location
+
+#Shrine.plugin :default_url_options, store_public: { public: true }

@@ -64,7 +64,7 @@
           <tr>
             <td class="px-4 py-2"><%= product.sku %></td>
             <td class="flex items-center px-4 py-2 space-x-3">
-              <%= image_tag product.image&.file_url, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
+              <%= image_tag product.smart_thumb, alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
             </td>
             <td class="px-4 py-2"><%= product.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(product.price) %></td>

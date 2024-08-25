@@ -31,6 +31,9 @@ application.register("nav", NavController)
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 
+import UppyUploadController from "./uppy_upload_controller"
+application.register("uppy-upload", UppyUploadController)
+
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 
