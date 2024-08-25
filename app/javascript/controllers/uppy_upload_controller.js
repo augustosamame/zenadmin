@@ -13,7 +13,7 @@ export default class extends Controller {
     console.log("Uppy initialized in Stimulus controller");
 
     this.uppy = new Uppy({
-      autoProceed: true,
+      autoProceed: false,
       locale: Spanish,
       restrictions: {
         maxNumberOfFiles: 10,
@@ -63,9 +63,33 @@ export default class extends Controller {
           });
       }
     });
+
+    this.loadExistingFiles().then(() => {
+      // Set autoProceed and update the state only after all files have been loaded
+
+      console.log('Setting autoProceed to true');
+      this.uppy.setOptions({ autoProceed: true });
+
+      this.uppy.getFiles().forEach(file => {
+        console.log('Setting progress for existing file:', file);
+        this.uppy.setFileState(file.id, {
+          progress: { uploadComplete: true, uploadStarted: true }
+        });
+      });
+
+      this.addRemoveButtons();
+
+    });
     
     this.uppy.on('complete', (result) => {
       console.log('Upload complete! We’ve uploaded these files:', result.successful);
+
+      // hide uppy button with class uppy-StatusBar-actionBtn--done
+      const uppyResetButton = document.querySelector('.uppy-StatusBar-actionBtn--done');
+      console.log('Uppy Reset Button:', uppyResetButton);
+      if (uppyResetButton) {
+        uppyResetButton.style.display = 'none';
+      }
 
       result.successful.forEach((file, index) => {
         const s3Key = file.meta['key'].startsWith('cache/') ? file.meta['key'].replace('cache/', '') : file.meta['key'];
@@ -83,7 +107,102 @@ export default class extends Controller {
         console.log('Shrine Object:', shrineObject);
 
         this.addUploadedFilesToForm(shrineObject, index);
+
       });
+
+      this.addRemoveButtons();
+
+    });
+
+    this.uppy.on('file-removed', () => {
+      console.log('File removed:', this.uppy.getFiles());
+      // set a timeout to re-add the remove buttons
+      setTimeout(() => {
+        this.addRemoveButtons();
+      }, 100);
+      
+    });
+  }
+
+  async loadExistingFiles() {
+    // Parse the existing files from the data attribute
+    let existingFiles;
+
+    console.log('Existing files:', this.element.dataset.existingFiles);
+
+    try {
+      existingFiles = JSON.parse(this.element.dataset.existingFiles || '[]');
+    } catch (error) {
+      console.error('Error parsing existing files:', error);
+      return;
+    }
+
+    const promises = existingFiles.map(file => {
+      console.log('Fetching blob for existing file:', file);
+
+      // Fetch the Blob data from S3 for each existing file
+      return fetch(`https://devtech-edukaierp-dev.s3.amazonaws.com/public/${file.id}`)
+        .then(response => response.blob())
+        .then(blob => {
+          console.log('Fetched blob:', blob);
+
+          this.uppy.addFile({
+            source: file.id,
+            name: file.metadata.filename,
+            type: blob.type,
+            data: blob,
+            meta: {
+              key: file.id,
+            }
+          });
+        })
+        .catch(error => {
+          console.error('Error fetching file from S3:', error);
+        });
+    });
+
+    // Wait for all files to be processed
+    await Promise.all(promises);
+  }
+
+  addRemoveButtons() {
+    console.log('Adding custom remove buttons');
+    // Add custom remove buttons for each file
+    this.uppy.getFiles().forEach(file => {
+      const fileId = file.id;
+      console.log('File ID:', fileId);
+      const fileElementId = `uppy_${fileId}`; // Match Uppy's ID format
+      const fileElement = document.getElementById(fileElementId);
+
+      if (fileElement) {
+        console.log('File element found:', fileElement);
+
+        // Find the specific container within the file element
+        const fileInfoAndButtonsContainer = fileElement.querySelector('.uppy-Dashboard-Item-fileInfoAndButtons');
+
+        if (fileInfoAndButtonsContainer) {
+          console.log('File info and buttons container found:', fileInfoAndButtonsContainer);
+
+          let existingRemoveButton = fileInfoAndButtonsContainer.querySelector('.custom-remove-button');
+
+          if (!existingRemoveButton) {
+          // Create a remove button with a trash icon
+          const removeButton = document.createElement('button');
+          removeButton.innerHTML = '🗑'; // Unicode trash bin icon
+          removeButton.className = 'block ml-auto text-lg text-red-500 bg-transparent border-none cursor-pointer custom-remove-button'; // Tailwind classes
+
+
+          console.log('Added Remove button:', removeButton);
+          removeButton.addEventListener('click', () => {
+            this.uppy.removeFile(fileId);
+            console.log('File removed:', file);
+          });
+
+          // Append the remove button to the fileInfoAndButtonsContainer
+          fileInfoAndButtonsContainer.appendChild(removeButton);
+          }
+        }
+      }
     });
   }
 

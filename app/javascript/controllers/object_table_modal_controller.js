@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-  static targets = ['container', 'content', 'modalContainer', 'firstName', 'lastName'];
+  static targets = ['container', 'content', 'modalContainer', 'firstName', 'lastName', 'birthDate'];
 
   connect() {
     console.log("ObjectTableModalController connected");
@@ -105,7 +105,7 @@ export default class extends Controller {
           </div>
           <div>
             <label for="birthdate" class="block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300">Birthdate</label>
-            <input type="date" id="birthdate" name="birthdate" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600">
+            <input type="date" id="birthdate" name="birthdate" class="block w-full p-2 border rounded-md dark:bg-slate-700 dark:text-slate-200 dark:border-slate-600" data-object-table-modal-target="birthDate">
           </div>
         </div>
         <div class="flex justify-end mt-4 space-x-4">
@@ -143,11 +143,13 @@ export default class extends Controller {
             const data = response.data;
 
             // Map the JSON response to form fields and capitalize names
-            const firstName = data.nombres.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ');
-            const lastName = `${data.apellidoPaterno.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')} ${data.apellidoMaterno.split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase()).join(' ')}`;
+            const firstName = data.nombres;
+            const lastName = `${data.apellido_paterno} ${data.apellido_materno}`;
+            const birthDate = data.fecha_nacimiento;
 
             this.firstNameTarget.value = firstName;
             this.lastNameTarget.value = lastName;
+            this.birthDateTarget.value = "04/01/1974".split('/').reverse().join('-');
           }
         })
         .catch(error => {

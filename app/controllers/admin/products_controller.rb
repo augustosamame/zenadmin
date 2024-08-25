@@ -49,7 +49,18 @@ class Admin::ProductsController < Admin::AdminController
   def update
     @product = Product.find(params[:id])
 
-    if @product.update(product_params)
+    processed_params = preprocess_media_attributes(product_params)
+
+    # Identify which media are to be kept
+    media_ids_to_keep = processed_params[:media_attributes].map { |media| media[:id].to_i }.compact
+
+    # Find media records that should be deleted
+    media_to_delete = @product.media.where.not(id: media_ids_to_keep)
+
+    if @product.update(processed_params)
+      # Delete media that are no longer associated with the product
+      media_to_delete.each(&:destroy)
+
       redirect_to admin_products_path, notice: "Product updated successfully."
     else
       render :edit

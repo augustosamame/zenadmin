@@ -15,7 +15,7 @@
     </div>
     
     <!-- Media Upload Section -->
-    <div class="col-span-2" data-controller="uppy-upload">
+    <div class="col-span-2" data-controller="uppy-upload" data-existing-files="<%= @product.media.map { |media| media.file }.to_json %>">
       <h3 class="mb-4 text-lg font-semibold">Añadir Media</h3>
       <div data-uppy-upload-target="previewContainer">
         <!-- Uppy Dashboard will be rendered here -->
