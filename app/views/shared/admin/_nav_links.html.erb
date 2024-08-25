@@ -8,7 +8,10 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Admin
   </button>
-  <ul data-dropdown-target="menu" class="absolute hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
     <li>
       <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -40,7 +43,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Others
   </button>
-  <ul data-dropdown-target="menu" class="absolute hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
     <% @railsui_demo_links.each do |link| %>
       <li>
         <%= nav_link_to link.to_s, send("admin_#{link.to_s}_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
