@@ -16,32 +16,29 @@ application.register("datatable", DatatableController)
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 
+import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
+application.register("object-actions-dropdown", ObjectActionsDropdownController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
-
-import ModalController from "./modal_controller"
-application.register("modal", ModalController)
-
-import ObjectTableModalController from "./object_table_modal_controller"
-application.register("object-table-modal", ObjectTableModalController)
-
-import NavController from "./nav_controller"
-application.register("nav", NavController)
 
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 
-import UppyUploadController from "./uppy_upload_controller"
-application.register("uppy-upload", UppyUploadController)
+import ModalController from "./modal_controller"
+application.register("modal", ModalController)
+
+import NavController from "./nav_controller"
+application.register("nav", NavController)
+
+import ObjectTableModalController from "./object_table_modal_controller"
+application.register("object-table-modal", ObjectTableModalController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 
 import Pos__CommentModalController from "./pos/comment_modal_controller"
 application.register("pos--comment-modal", Pos__CommentModalController)
-
-import Pos__SellersModalController from "./pos/sellers_modal_controller"
-application.register("pos--sellers-modal", Pos__SellersModalController)
 
 import Pos__KeypadController from "./pos/keypad_controller"
 application.register("pos--keypad", Pos__KeypadController)
@@ -55,8 +52,17 @@ application.register("pos--payment", Pos__PaymentController)
 import Pos__ProductGridController from "./pos/product_grid_controller"
 application.register("pos--product-grid", Pos__ProductGridController)
 
+import Pos__SellersModalController from "./pos/sellers_modal_controller"
+application.register("pos--sellers-modal", Pos__SellersModalController)
+
+import SelectController from "./select_controller"
+application.register("select", SelectController)
+
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
 
 import TooltipController from "./tooltip_controller"
 application.register("tooltip", TooltipController)
+
+import UppyUploadController from "./uppy_upload_controller"
+application.register("uppy-upload", UppyUploadController)

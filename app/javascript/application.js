@@ -7,5 +7,7 @@ import "./controllers"
 
 import "@hotwired/turbo-rails"
 
+import "tom-select"
+
 import "trix"
 import "@rails/actiontext"

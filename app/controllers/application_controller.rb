@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   helper Railsui::ThemeHelper
 
   before_action :configure_permitted_parameters, if: :devise_controller?
@@ -32,13 +33,23 @@ class ApplicationController < ActionController::Base
     end
   end
 
+  private
+
+    def render_not_found
+      if Rails.env.production?
+        render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+      else
+        raise
+      end
+    end
+
   protected
 
-  def configure_permitted_parameters
-    devise_parameter_sanitizer.permit(:sign_up, keys: [ :avatar, :name, :email, :phone ])
-    devise_parameter_sanitizer.permit(:account_update, keys: [ :avatar, :name ])
-  end
+    def configure_permitted_parameters
+      devise_parameter_sanitizer.permit(:sign_up, keys: [ :avatar, :name, :email, :phone ])
+      devise_parameter_sanitizer.permit(:account_update, keys: [ :avatar, :name ])
+    end
 
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  # allow_browser versions: :modern
+    # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
+    # allow_browser versions: :modern
 end

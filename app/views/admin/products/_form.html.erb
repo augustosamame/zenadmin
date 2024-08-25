@@ -31,10 +31,6 @@
     </div>
 
     <div>
-      <%= form.input :permalink, label: "Permalink", input_html: { class: "form-input", readonly: true }, label_html: { class: "form-label" } %>
-    </div>
-
-    <div>
       <%= form.association :brand, label: "Marca", prompt: "Selecciona la marca", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
     </div>
 
@@ -42,13 +38,38 @@
       <%= form.input :status, label: "Estado", collection: Product.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
     </div>
 
+    <!-- Tags Section with Tom Select -->
     <div>
-      <%= form.association :tags, label: "Etiquetas", as: :check_boxes, input_html: { class: "form-checkbox" }, label_html: { class: "form-label" } %>
+      <%= form.label :tag_ids, "Etiquetas", class: "form-label" %>
+        <select data-controller="select"
+              data-select-model-value="Tag"
+              data-select-multi-select-value="true"
+              data-select-placeholder-value="Selecciona una o más etiquetas"
+              name="product[tag_ids][]" 
+              id="product_tag_ids"
+              multiple="multiple">
+        <% Tag.all.each do |tag| %>
+          <option value="<%= tag.id %>" <%= 'selected' if @product.tags.include?(tag) %>><%= tag.name %></option>
+        <% end %>
+      </select>
     </div>
 
+    <!-- Product Categories Section with Tom Select -->
     <div>
-      <%= form.association :product_categories, label: "Categorías", as: :check_boxes, input_html: { class: "form-checkbox" }, label_html: { class: "form-label" } %>
+      <%= form.label :product_category_ids, "Categorías", class: "form-label" %>
+        <select data-controller="select"
+              data-select-model-value="ProductCategory"
+              data-select-multi-select-value="true"
+              data-select-placeholder-value="Selecciona una o más categorías"
+              name="product[product_category_ids][]"
+              id="product_product_category_ids"
+              multiple="multiple">
+        <% @product_categories.all.each do |category| %>
+          <option value="<%= category.id %>" <%= 'selected' if @product.product_categories.include?(category) %>><%= category.full_name %></option>
+        <% end %>
+      </select>
     </div>
+
   </div>
 
   <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">

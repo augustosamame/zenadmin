@@ -24,28 +24,22 @@ export default class extends Controller {
 
   handleAction(event) {
     event.preventDefault()
-    const objectId = event.currentTarget.dataset.objectId
-    const eventName = event.currentTarget.dataset.eventName
-
-    console.log(`${eventName} clicked for objectId:`, objectId)
 
     this.menuTarget.classList.add('hidden') // Hide the dropdown
 
     // Dispatch to the appropriate handler based on the event name
     if (this[eventName]) {
-      this[eventName](objectId)
+      this[eventName]()
     } else {
       console.warn(`No handler defined for event: ${eventName}`)
     }
   }
 
-  edit(objectId) {
-    console.log('Edit action for objectId:', objectId)
+  edit() {
     // Implement edit logic here
   }
 
-  delete(objectId) {
-    console.log('Delete action for objectId:', objectId)
+  message() {
     // Implement message logic here
   }
 
