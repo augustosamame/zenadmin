@@ -4,6 +4,7 @@ class CreateCustomers < ActiveRecord::Migration[7.2]
       t.references :user, null: false, foreign_key: true
       t.integer :doc_type, default: 0
       t.string :doc_id
+      t.datetime :birthdate
       t.jsonb :avatar_data
       t.integer :last_cart_id
       t.integer :pricelist_id

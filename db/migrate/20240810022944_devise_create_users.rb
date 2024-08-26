@@ -23,6 +23,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       t.boolean :admin, default: false
 
       t.integer :location_id
+      t.integer :warehouse_id
+      t.boolean :internal, default: false
       t.integer :status, default: 0
 
       t.timestamps null: false

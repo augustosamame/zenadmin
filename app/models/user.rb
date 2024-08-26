@@ -4,7 +4,7 @@ class User < ApplicationRecord
 
   has_person_name
   has_one_attached :avatar
-  has_many :user_roles
+  has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   has_one :customer, dependent: :destroy
   has_many :commissions, dependent: :destroy
@@ -28,7 +28,6 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :customer, allow_destroy: true
 
   before_validation :set_login
-  after_save :ensure_customer_created
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -38,12 +37,6 @@ class User < ApplicationRecord
 
   def name
     "#{first_name} #{last_name}"
-  end
-
-  def ensure_customer_created
-    if roles.exists?(name: "customer") && customer.nil?
-      create_customer
-    end
   end
 
   def add_role(role_name)

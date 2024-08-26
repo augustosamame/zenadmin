@@ -4,4 +4,5 @@ class Warehouse < ApplicationRecord
   include DefaultRegionable
 
   belongs_to :region
+  belongs_to :location, optional: true
 end

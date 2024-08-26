@@ -14,6 +14,8 @@ class Admin::ProductsController < Admin::AdminController
 
         if @products.size > 5
           @datatable_options = "server_side:true;resource_name:'Product';"
+        else
+          @datatable_options = "resource_name:'Product';"
         end
       end
 

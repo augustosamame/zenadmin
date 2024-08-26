@@ -27,13 +27,15 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory')
 supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
-warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
+location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
+
+warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", location_id: location_1.id)
 
 # product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
 # product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
 # product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)
 
-20.times do
+5.times do
   Product.transaction do
     # Create a new Product
     product = Product.new(
@@ -87,11 +89,9 @@ PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectiv
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 
-Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
-
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')
-  User.create!(email: 'ecommerce@devtechperu.com', phone: "900000000", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module") unless ecommerce_module_user_already_exists
+  User.create!(email: 'ecommerce@devtechperu.com', phone: "900000000", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module", internal: true) unless ecommerce_module_user_already_exists
 end
 
 Role.find_or_create_by!(name: 'super_admin')
@@ -102,15 +102,15 @@ Role.find_or_create_by!(name: 'customer')
 user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
 user1.add_role('super_admin')
 
-generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico")
+generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
 generic_customer.add_role('customer')
 
 user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", require_password_change: false, password: "12345678", first_name: "Customer", last_name: "One")
 user2.add_role('customer')
 
-user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "One")
+user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "One", location_id: location_1.id)
 user3.add_role('seller')
-user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Two")
+user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Two", location_id: location_1.id))
 user4.add_role('seller')
-user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Three")
+user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Three", location_id: location_1.id))
 user5.add_role('seller')

@@ -1,0 +1,50 @@
+<%= simple_form_for([:admin, @user]) do |form| %>
+  <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+    
+    <div>
+      <%= form.input :email, label: "Email", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :phone, label: "Móvil", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div class="col-span-2">
+      <%= form.input :first_name, label: "Nombres", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :last_name, label: "Apellidos", input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.association :location, label: "Locación", prompt: "Selecciona una locación (opcional)", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :status, label: "Estado", collection: User.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <!-- Tags Section with Tom Select -->
+    <div>
+      <%= form.label :role_ids, "Roles", class: "form-label" %>
+        <select data-controller="select"
+              data-select-model-value="Role"
+              data-select-multi-select-value="true"
+              data-select-placeholder-value="Selecciona uno o más roles"
+              name="user[role_ids][]" 
+              id="user_role_ids"
+              multiple="multiple">
+        <% Role.all.each do |role| %>
+          <option value="<%= role.id %>" <%= 'selected' if @user.roles.include?(role) %>><%= role.name %></option>
+        <% end %>
+      </select>
+    </div>
+
+  </div>
+
+  <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+    <%= form.button :submit, @user.new_record? ? "Crear Usuario" : "Grabar Usuario", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_users_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+  </div>
+<% end %>

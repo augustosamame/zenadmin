@@ -1,0 +1,12 @@
+<% content_for :body_classes, "text-slate-800 dark:bg-slate-900 dark:text-slate-100 bg-white" %>
+
+<%= render "shared/admin/nav", { header_title: "Editar Usuario" } %>
+
+<div class="container px-4 pb-24 mx-auto my-16">
+  <div class="max-w-4xl mx-auto">
+    <h1 class="mb-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Editar Usuario</h1>
+    <p class="mb-6 text-lg text-slate-500 dark:text-slate-400">Actualizar detalles de usuario.</p>
+
+    <%= render "form" %>
+  </div>
+</div>

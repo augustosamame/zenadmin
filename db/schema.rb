@@ -110,6 +110,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
     t.bigint "user_id", null: false
     t.integer "doc_type", default: 0
     t.string "doc_id"
+    t.datetime "birthdate"
     t.jsonb "avatar_data"
     t.integer "last_cart_id"
     t.integer "pricelist_id"
@@ -404,6 +405,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
     t.string "last_name"
     t.boolean "admin", default: false
     t.integer "location_id"
+    t.integer "warehouse_id"
+    t.boolean "internal", default: false
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -425,6 +428,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
 
   create_table "warehouses", force: :cascade do |t|
     t.string "name", null: false
+    t.integer "location_id"
     t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

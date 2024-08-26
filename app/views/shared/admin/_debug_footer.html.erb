@@ -6,7 +6,15 @@
       <%= current_user.inspect %>
     </p>
     <p>
-      current_client:
+      current_user_roles:
+      <%= current_user.roles.pluck(:name).to_s %>
+    </p>
+    <p>
+      current_location:
+      <%= @current_location.try(:name) %>
+    </p>
+    <p>
+      current_warehouse:
       <%= @current_warehouse.try(:name) %>
     </p>
     <br>

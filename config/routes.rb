@@ -30,7 +30,7 @@ Rails.application.routes.draw do
     resources :payment_methods
     resources :users
     get "sellers", to: "users#sellers"
-    resources :customers, only: [ :index, :create, :update, :destroy ]
+    resources :customers
     post "pos_create_customer", to: "users#create_customer"
     get "search_dni", to: "customers#search_dni"
 

@@ -123,16 +123,14 @@
           <% if respond_to?(:admin_settings_path) %>
             <li>
               <%= link_to admin_settings_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
-                <%= icon "cog-6-tooth", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                <span>Settings</span>
+                <%= icon "user", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                <span><%= current_user.name %></span>
               <% end %>
             </li>
-          <% end %>
-          <% if respond_to?(:admin_billing_path) %>
             <li>
-              <%= link_to admin_billing_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
-                <%= icon "banknotes", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                <span>Billing</span>
+              <%= link_to admin_settings_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
+                <%= icon "cog-6-tooth", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                <span>Settings</span>
               <% end %>
             </li>
           <% end %>

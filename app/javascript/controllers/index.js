@@ -10,14 +10,14 @@ application.register("combo-select", ComboSelectController)
 import CustomModalController from "./custom_modal_controller"
 application.register("custom-modal", CustomModalController)
 
+import CustomerFormController from "./customer_form_controller"
+application.register("customer-form", CustomerFormController)
+
 import DatatableController from "./datatable_controller"
 application.register("datatable", DatatableController)
 
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
-
-import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
-application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
@@ -30,6 +30,9 @@ application.register("modal", ModalController)
 
 import NavController from "./nav_controller"
 application.register("nav", NavController)
+
+import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
+application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
 import ObjectTableModalController from "./object_table_modal_controller"
 application.register("object-table-modal", ObjectTableModalController)
