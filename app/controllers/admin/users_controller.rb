@@ -4,7 +4,7 @@ class Admin::UsersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @users = User.includes([:location]).where(internal: false).where.not(id: Customer.pluck(:user_id))
+        @users = User.includes([ :location ]).where(internal: false).where.not(id: Customer.pluck(:user_id))
         @datatable_options = "resource_name:'User';"
       end
     end

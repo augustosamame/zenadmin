@@ -7,7 +7,7 @@ class Admin::AdminController < ApplicationController
   before_action :check_for_admin_login_as_token
 
   def set_current_objects
-    @current_location = Location.find_by(id: session[:current_location_id] || current_user&.location_id || Location.first.id) 
+    @current_location = Location.find_by(id: session[:current_location_id] || current_user&.location_id || Location.first.id)
     session[:current_location_id] = @current_location.id
     @current_warehouse = Warehouse.find_by(id: session[:current_warehouse_id] || current_user&.warehouse_id || @current_location&.warehouses&.first&.id)
     session[:current_warehouse_id] = @current_warehouse.id

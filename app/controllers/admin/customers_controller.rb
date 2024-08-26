@@ -1,14 +1,13 @@
 class Admin::CustomersController < Admin::AdminController
   def index
-    
     respond_to do |format|
       format.html do
-        @users = User.includes([:customer]).where(internal: false).with_role("customer")
+        @users = User.includes([ :customer ]).where(internal: false).with_role("customer")
         @datatable_options = "resource_name:'Customer';"
       end
       format.json do
         @customers = User.with_role("customer")
-        #query for customers modal in pos
+        # query for customers modal in pos
         render json: @customers.select(:id, :first_name, :last_name, :email, :phone)
       end
     end
@@ -38,7 +37,6 @@ class Admin::CustomersController < Admin::AdminController
   def edit
     @user = User.includes(:customer).find(params[:id])
     @customer = @user.customer || @user.build_customer
-
   end
 
   def update

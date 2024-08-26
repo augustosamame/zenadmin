@@ -11,7 +11,7 @@ class UserRole < ApplicationRecord
   private
 
     def create_customer_if_needed
-      if role.name == 'customer' && user.customer.nil?
+      if role.name == "customer" && user.customer.nil?
         user.create_customer
       end
     end
