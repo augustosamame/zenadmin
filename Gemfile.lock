@@ -219,10 +219,10 @@ GEM
     erubi (1.13.0)
     faker (3.4.2)
       i18n (>= 1.8.11, < 2)
-    faraday (2.10.1)
-      faraday-net_http (>= 2.0, < 3.2)
+    faraday (2.11.0)
+      faraday-net_http (>= 2.0, < 3.4)
       logger
-    faraday-net_http (3.1.1)
+    faraday-net_http (3.3.0)
       net-http
     ffi (1.17.0-aarch64-linux-gnu)
     ffi (1.17.0-arm-linux-gnu)
@@ -485,7 +485,7 @@ GEM
       actionpack (>= 6.0.0)
       activejob (>= 6.0.0)
       railties (>= 6.0.0)
-    twilio-ruby (7.2.3)
+    twilio-ruby (7.2.4)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -587,7 +587,7 @@ DEPENDENCIES
   streamio-ffmpeg (~> 3.0.2)
   translate_enum (~> 0.2.0)
   turbo-rails
-  twilio-ruby (~> 7.2.3)
+  twilio-ruby (~> 7.2.4)
   tzinfo-data
   web-console
   web-push (~> 3.0.1)
