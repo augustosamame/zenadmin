@@ -1,0 +1,41 @@
+<%= render "shared/admin/nav", { header_title: "Transferencias de Stock" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Número</th>
+          <th class="px-4 py-2 text-left">Usuario</th>
+          <th class="px-4 py-2 text-left">Origen</th>
+          <th class="px-4 py-2 text-left">Destino</th>
+          <th class="px-4 py-2 text-left">Total Productos</th>
+          <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Etapa</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @stock_transfers.each do |stock_transfer| %>
+          <tr>
+            <td class="px-4 py-2"><%= stock_transfer.id %></td>
+            <td class="px-4 py-2"><%= stock_transfer.user&.name %></td>
+            <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name %></td>
+            <td class="px-4 py-2"><%= stock_transfer.destination_warehouse&.name %></td>
+            <td class="px-4 py-2"><%= stock_transfer.total_products %></td>
+            <td class="px-4 py-2"><%= stock_transfer.transfer_date %></td>
+            <td class="px-4 py-2"><%= stock_transfer.stage %></td>
+            <td class="px-4 py-2"><%= stock_transfer.status %></td>
+            <td class="px-4 py-2">
+              <%= render partial: "admin/stock_transfers/actions", locals: { stock_transfer: stock_transfer, default_object_options_array: @default_object_options_array } %>
+              
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

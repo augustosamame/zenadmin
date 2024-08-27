@@ -49,7 +49,10 @@ export default class extends Controller {
 
     const resourceNameMatch = allAdditionalOptions.match(/resource_name:'([^']+)'/);
     const resourceName = resourceNameMatch ? resourceNameMatch[1] : null;
-    const resourceNamePlural = resourceName ? resourceName.toLowerCase() + 's' : null;
+    const snakeCaseName = resourceName.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
+    const resourceNamePlural = snakeCaseName.endsWith('s') ? snakeCaseName : snakeCaseName + 's';
+
+
 
     // Add custom "Crear" button if resourceName is provided
     if (resourceName) {

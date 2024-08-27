@@ -61,6 +61,9 @@ application.register("pos--sellers-modal", Pos__SellersModalController)
 import SelectController from "./select_controller"
 application.register("select", SelectController)
 
+import StockTransferFormController from "./stock_transfer_form_controller"
+application.register("stock-transfer-form", StockTransferFormController)
+
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
 

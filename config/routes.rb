@@ -33,6 +33,7 @@ Rails.application.routes.draw do
     resources :customers
     post "pos_create_customer", to: "users#create_customer"
     get "search_dni", to: "customers#search_dni"
+    resources :stock_transfers
 
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"

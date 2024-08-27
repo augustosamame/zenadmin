@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_26_185725) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -353,6 +353,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
     t.index ["name"], name: "index_settings_on_name", unique: true
   end
 
+  create_table "stock_transfer_lines", force: :cascade do |t|
+    t.bigint "stock_transfer_id", null: false
+    t.bigint "product_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_stock_transfer_lines_on_product_id"
+    t.index ["stock_transfer_id"], name: "index_stock_transfer_lines_on_stock_transfer_id"
+  end
+
+  create_table "stock_transfers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "origin_warehouse_id"
+    t.bigint "destination_warehouse_id"
+    t.datetime "transfer_date", null: false
+    t.text "comments"
+    t.integer "stage", default: 0
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
+    t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
+    t.index ["user_id"], name: "index_stock_transfers_on_user_id"
+  end
+
   create_table "suppliers", force: :cascade do |t|
     t.string "name", null: false
     t.string "sourceable_type"
@@ -464,6 +489,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_23_160738) do
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchases", "regions"
   add_foreign_key "purchases_vendors", "regions"
+  add_foreign_key "stock_transfer_lines", "products"
+  add_foreign_key "stock_transfer_lines", "stock_transfers"
+  add_foreign_key "stock_transfers", "users"
+  add_foreign_key "stock_transfers", "warehouses", column: "destination_warehouse_id"
+  add_foreign_key "stock_transfers", "warehouses", column: "origin_warehouse_id"
   add_foreign_key "suppliers", "regions"
   add_foreign_key "taggings", "products"
   add_foreign_key "taggings", "tags"

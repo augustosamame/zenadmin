@@ -57,7 +57,7 @@ gem "ruby-vips", "~> 2.2.2"
 gem "streamio-ffmpeg", "~> 3.0.2"
 gem "rails_feather", "~> 0.1.0"
 gem "country_select", "~> 9.0"
-gem "twilio-ruby", "~> 7.2.3"
+gem "twilio-ruby", "~> 7.2.4"
 gem "faker", "~> 3.4.2"
 gem "whenever", "~> 1.0.0", require: false
 gem "translate_enum", "~> 0.2.0"

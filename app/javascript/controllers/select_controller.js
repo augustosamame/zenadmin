@@ -9,6 +9,7 @@ export default class extends Controller {
   };
 
   connect() {
+    console.log("Select controller connected");
     this.initializeTomSelect();
   }
 
@@ -24,13 +25,24 @@ export default class extends Controller {
       searchField: "name"
     };
 
-    // Initialize Tom Select with the computed options
-    this.tomSelect = new TomSelect(this.element, options);
+    // Initialize Tom Select only if not already initialized
+    if (!this.element.tomSelect) {
+      this.tomSelect = new TomSelect(this.element, options);
+    }
   }
 
   disconnect() {
     if (this.tomSelect) {
       this.tomSelect.destroy();
+      this.tomSelect = null;
     }
+  }
+
+  refreshTomSelect() {
+    if (this.tomSelect) {
+      this.tomSelect.destroy();
+      this.tomSelect = null;
+    }
+    this.initializeTomSelect();
   }
 }
