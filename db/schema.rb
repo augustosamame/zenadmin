@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_26_185725) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -130,6 +130,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_26_185725) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["region_id"], name: "index_factory_factories_on_region_id"
+  end
+
+  create_table "in_transit_stocks", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "stock_transfer_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "quantity", null: false
+    t.bigint "origin_warehouse_id", null: false
+    t.bigint "destination_warehouse_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["destination_warehouse_id"], name: "index_in_transit_stocks_on_destination_warehouse_id"
+    t.index ["origin_warehouse_id"], name: "index_in_transit_stocks_on_origin_warehouse_id"
+    t.index ["product_id"], name: "index_in_transit_stocks_on_product_id"
+    t.index ["stock_transfer_id"], name: "index_in_transit_stocks_on_stock_transfer_id"
+    t.index ["user_id"], name: "index_in_transit_stocks_on_user_id"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -367,9 +383,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_26_185725) do
     t.bigint "user_id", null: false
     t.bigint "origin_warehouse_id"
     t.bigint "destination_warehouse_id"
+    t.string "guia"
     t.datetime "transfer_date", null: false
     t.text "comments"
-    t.integer "stage", default: 0
+    t.string "stage", default: "pending"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -469,6 +486,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_26_185725) do
   add_foreign_key "customers", "users"
   add_foreign_key "customers", "users", column: "referrer_id"
   add_foreign_key "factory_factories", "regions"
+  add_foreign_key "in_transit_stocks", "products"
+  add_foreign_key "in_transit_stocks", "stock_transfers"
+  add_foreign_key "in_transit_stocks", "users"
+  add_foreign_key "in_transit_stocks", "warehouses", column: "destination_warehouse_id"
+  add_foreign_key "in_transit_stocks", "warehouses", column: "origin_warehouse_id"
   add_foreign_key "locations", "regions"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"

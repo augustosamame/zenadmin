@@ -69,6 +69,7 @@ gem "rack-cors", "~> 2.0.2", require: "rack/cors"
 gem "geocoder", "~> 1.8.3"
 gem "kaminari", "~> 1.2.2"
 gem "web-push", "~> 3.0.1"
+gem "aasm", "~> 5.5.0"
 
 
 group :development, :test do

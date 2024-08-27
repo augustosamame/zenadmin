@@ -4,6 +4,14 @@ class WarehouseInventory < ApplicationRecord
   belongs_to :warehouse
   belongs_to :product
 
-  validates :stock, numericality: { greater_than_or_equal_to: 0 }
+  validate :stock_numericality_based_on_settings
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "should have a unique product stock record" }
+
+  private
+
+    def stock_numericality_based_on_settings
+      unless $global_settings[:negative_stocks_allowed]
+        errors.add(:stock, "El stock resultante debe ser igual o mayor que 0") if stock < 0
+      end
+    end
 end

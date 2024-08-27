@@ -2,7 +2,7 @@ class Admin::ProductsController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
   before_action :set_product, only: %i[edit update destroy]
-  before_action :set_product_categories, only: %i[new edit]
+  before_action :set_product_categories, only: %i[new edit create update]
 
 	def index
     respond_to do |format|
@@ -105,7 +105,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def set_product_categories
-      @product_categories = ProductCategory.includes(:parent).all
+      @product_categories ||= ProductCategory.includes(:parent).all
     end
 
     def product_params

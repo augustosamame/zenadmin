@@ -15,6 +15,8 @@ setting_5 = Setting.find_or_create_by!(name: 'max_price_discount_percentage', da
 setting_6 = Setting.find_or_create_by!(name: 'ecommerce_active', data_type: "type_boolean", internal: true, localized_name: "Módulo Ecommerce Activo", boolean_value: true)
 setting_7 = Setting.find_or_create_by!(name: 'pos_can_create_unpaid_orders', data_type: "type_boolean", internal: true, localized_name: "POS puede crear ventas impagas", boolean_value: false)
 setting_8 = Setting.find_or_create_by!(name: 'audited_active', data_type: "type_boolean", internal: true, localized_name: "Se generan tablas de auditoría", boolean_value: true)
+setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_type: "type_boolean", internal: true, localized_name: "Se permiten stocks negativos", boolean_value: true)
+setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
 
 brand_1 = Brand.find_or_create_by!(name: 'Infanti')
 category_1 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche')
@@ -29,7 +31,8 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 
 location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
 
-warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", location_id: location_1.id)
+warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
+warehouse_2 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id)
 
 # product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
 # product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
@@ -78,9 +81,12 @@ end
 
 tag_1 = Tag.find_or_create_by!(name: 'Osos de Peluche')
 
-Product.all.each do |product|
-  WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
-end
+# Product.all.each do |product|
+#  WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
+# end
+# Product.all.each do |product|
+#  WarehouseInventory.create!(product: product, warehouse: warehouse_2, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
+# end
 
 PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarjeta de Crédito / Débito')
 PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')

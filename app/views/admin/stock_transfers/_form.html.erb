@@ -1,36 +1,43 @@
 <%= simple_form_for([:admin, @stock_transfer], html: { data: { controller: "stock-transfer-form", action: "submit->stock-transfer-form#submitForm", "stock-transfer-form-target" => "form" } }) do |form| %>
   <!-- Header Section -->
   <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-x-16 sm:gap-y-10">
+    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
       <!-- Origin Warehouse -->
       <div>
-        <%= form.label :origin_warehouse_id, "Origin Warehouse", class: "form-label" %>
-        <%= form.collection_select :origin_warehouse_id, Warehouse.all, :id, :name, { include_blank: 'None (Initial Inventory)' }, class: "form-input" %>
+        <%= form.label :origin_warehouse_id, "Almacén de Origen", class: "form-label" %>
+        <%= form.collection_select :origin_warehouse_id, Warehouse.all, :id, :name, { include_blank: 'Ninguno (Inventario Inicial)' }, class: "form-input" %>
       </div>
 
       <!-- Destination Warehouse -->
       <div>
-        <%= form.label :destination_warehouse_id, "Destination Warehouse", class: "form-label" %>
+        <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
         <%= form.collection_select :destination_warehouse_id, Warehouse.all, :id, :name, {}, class: "form-input" %>
+      </div>
+    </div>
+
+    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+      <div>
+        <%= form.label :guia, "Número de Guía", class: "form-label" %>
+        <%= form.text_field :guia, class: "form-input" %>
       </div>
 
       <!-- Transfer Date -->
       <div>
-        <%= form.label :transfer_date, "Date of Transfer", class: "form-label" %>
+        <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
         <%= form.datetime_local_field :transfer_date, class: "form-input" %>
       </div>
     </div>
 
     <!-- Comments Field -->
     <div class="mt-4">
-      <%= form.label :comments, "Comments", class: "form-label" %>
+      <%= form.label :comments, "Comentarios", class: "form-label" %>
       <%= form.text_area :comments, class: "form-input" %>
     </div>
   </div>
 
   <!-- Products Section -->
     <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-      <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Products</h3>
+      <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
       <div id="stock-transfer-form-lines" data-stock-transfer-form-target="lines">
         <%= form.simple_fields_for :stock_transfer_lines do |line_form| %>
           <%= render 'stock_transfer_line_fields', f: line_form %>
@@ -39,7 +46,7 @@
 
       <!-- Add Product Button -->
       <div class="flex justify-end mt-4">
-        <button type="button" class="btn btn-secondary" data-action="click->stock-transfer-form#addProduct">Add Product</button>
+        <button type="button" class="btn btn-secondary" data-action="click->stock-transfer-form#addProduct">Agregar Producto</button>
       </div>
     </div>
 

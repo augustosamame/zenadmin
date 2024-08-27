@@ -9,6 +9,9 @@
             data-select-placeholder-value="Selecciona un producto"
             name="<%= f.object_name %>[product_id]" 
             class="form-input">
+      <!-- Placeholder Option -->
+      <option value="" <%= 'selected' if f.object.product_id.blank? %>>Selecciona un producto</option>
+      
       <% Product.all.each do |product| %>
         <option value="<%= product.id %>" <%= 'selected' if f.object.product_id == product.id %>><%= product.name %></option>
       <% end %>

@@ -10,7 +10,9 @@ Rails.application.config.after_initialize do
     :max_price_discount_percentage,
     :ecommerce_active,
     :pos_can_create_unpaid_orders,
-    :audited_active
+    :audited_active,
+    :negative_stocks_allowed,
+    :stock_transfers_have_in_transit_step
   ]
 
   def load_global_settings

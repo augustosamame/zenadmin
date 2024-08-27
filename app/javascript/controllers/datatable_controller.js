@@ -43,6 +43,7 @@ export default class extends Controller {
           ]
         }
       },
+      order: []
     };
 
     const allAdditionalOptions = this.optionsValue;

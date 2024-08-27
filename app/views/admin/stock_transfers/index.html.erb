@@ -8,6 +8,7 @@
       <thead>
         <tr>
           <th class="px-4 py-2 text-left">Número</th>
+          <th class="px-4 py-2 text-left">Guía</th>
           <th class="px-4 py-2 text-left">Usuario</th>
           <th class="px-4 py-2 text-left">Origen</th>
           <th class="px-4 py-2 text-left">Destino</th>
@@ -15,6 +16,7 @@
           <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Etapa</th>
           <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Entrega</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
       </thead>
@@ -22,13 +24,25 @@
         <% @stock_transfers.each do |stock_transfer| %>
           <tr>
             <td class="px-4 py-2"><%= stock_transfer.id %></td>
+            <td class="px-4 py-2"><%= stock_transfer.guia %></td>
             <td class="px-4 py-2"><%= stock_transfer.user&.name %></td>
-            <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name %></td>
+            <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name || "Inventario Inicial" %></td>
             <td class="px-4 py-2"><%= stock_transfer.destination_warehouse&.name %></td>
             <td class="px-4 py-2"><%= stock_transfer.total_products %></td>
-            <td class="px-4 py-2"><%= stock_transfer.transfer_date %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, stock_transfer.transfer_date) %></td>
             <td class="px-4 py-2"><%= stock_transfer.stage %></td>
             <td class="px-4 py-2"><%= stock_transfer.status %></td>
+            <td>
+              <% if stock_transfer.pending? %>
+                <% if $global_settings[:stock_transfers_have_in_transit_step] %>
+                  <%= link_to 'Entregar a Transportista', set_to_in_transit_admin_stock_transfer_path(stock_transfer), data: { turbo_method: :patch }, remote: true, class: 'btn btn-secondary' %>
+                <% else %>
+                  <%= link_to 'Entregar a Destino', set_to_complete_admin_stock_transfer_path(stock_transfer), data: { turbo_method: :patch }, remote: true, class: 'btn btn-primary' %>
+                <% end %>
+              <% elsif stock_transfer.in_transit? %>
+                <%= link_to 'Entregar a Destino', set_to_complete_admin_stock_transfer_path(stock_transfer), data: { turbo_method: :patch }, remote: true, class: 'btn btn-primary' %>
+              <% end %>
+            </td>
             <td class="px-4 py-2">
               <%= render partial: "admin/stock_transfers/actions", locals: { stock_transfer: stock_transfer, default_object_options_array: @default_object_options_array } %>
               
