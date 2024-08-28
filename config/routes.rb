@@ -35,7 +35,7 @@ Rails.application.routes.draw do
     get "search_dni", to: "customers#search_dni"
 
     resources :warehouses
-    patch '/set_current_warehouse', to: 'warehouses#set_current_warehouse'
+    patch "/set_current_warehouse", to: "warehouses#set_current_warehouse"
 
     resources :stock_transfers do
       member do
@@ -50,7 +50,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :cashier_transactions, only: [:new, :create]
+    resources :cashier_transactions, only: [ :new, :create ]
 
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"

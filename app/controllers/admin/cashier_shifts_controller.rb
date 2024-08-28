@@ -1,8 +1,8 @@
 class Admin::CashierShiftsController < Admin::AdminController
-  before_action :set_cashier_shift, only: [:show, :edit, :update, :close]
+  before_action :set_cashier_shift, only: [ :show, :edit, :update, :close ]
 
   def index
-    @cashier_shifts = CashierShift.includes([:opened_by, :closed_by, :cashier]).order(id: :desc)
+    @cashier_shifts = CashierShift.includes([ :opened_by, :closed_by, :cashier ]).order(id: :desc)
     @first_shift = @cashier_shifts.first
     @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name} - #{@first_shift.cashier.name}" : "Turnos de Caja"
   end
@@ -18,7 +18,7 @@ class Admin::CashierShiftsController < Admin::AdminController
     @cashier_shift.total_sales_cents = 0
     @cashier_shift.date = Date.current
     if @cashier_shift.save
-      redirect_to admin_cashier_shifts_path, notice: 'Cashier shift opened successfully.'
+      redirect_to admin_cashier_shifts_path, notice: "Cashier shift opened successfully."
     else
       render :new, status: :unprocessable_entity
     end
@@ -29,15 +29,13 @@ class Admin::CashierShiftsController < Admin::AdminController
   end
 
   def edit
-
   end
 
   def update
-    
     if @cashier_shift.update(cashier_shift_params)
-      redirect_to admin_cashier_shift_path(@cashier_shift), notice: 'Turno de caja actualizado exitosamente.'
+      redirect_to admin_cashier_shift_path(@cashier_shift), notice: "Turno de caja actualizado exitosamente."
     else
-      flash.now[:alert] = 'Error al actualizar el turno de caja.'
+      flash.now[:alert] = "Error al actualizar el turno de caja."
       render :edit, status: :unprocessable_entity
     end
   end
@@ -46,12 +44,12 @@ class Admin::CashierShiftsController < Admin::AdminController
     if @cashier_shift.open?
       result = Services::Sales::CashierTransactionService.new(@cashier_shift).close_shift(current_user)
       if result[:success]
-        redirect_to admin_cashier_shift_path(@cashier_shift), notice: 'Turno de caja cerrado exitosamente.'
+        redirect_to admin_cashier_shift_path(@cashier_shift), notice: "Turno de caja cerrado exitosamente."
       else
         redirect_to admin_cashier_shift_path(@cashier_shift), alert: result[:error]
       end
     else
-      redirect_to admin_cashier_shift_path(@cashier_shift), alert: 'Este turno de caja ya está cerrado.'
+      redirect_to admin_cashier_shift_path(@cashier_shift), alert: "Este turno de caja ya está cerrado."
     end
   end
 
@@ -65,4 +63,3 @@ class Admin::CashierShiftsController < Admin::AdminController
     params.require(:cashier_shift).permit(:cashier_id, :opened_at, :closed_at, :total_sales_cents, :opened_by, :closed_by, :status)
   end
 end
-

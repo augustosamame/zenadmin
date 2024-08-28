@@ -1,5 +1,4 @@
 class Admin::WarehousesController < Admin::AdminController
-
   def set_current_warehouse
     warehouse_id = params[:id]
 
@@ -11,5 +10,4 @@ class Admin::WarehousesController < Admin::AdminController
       render json: { success: false, message: "Warehouse not found" }, status: :not_found
     end
   end
-  
 end

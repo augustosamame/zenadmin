@@ -11,13 +11,12 @@ class CashierTransaction < ApplicationRecord
 
   def amount_for_balance
     case transactable_type
-    when 'CashInflow'
+    when "CashInflow"
       amount_cents
-    when 'CashOutflow'
+    when "CashOutflow"
       -amount_cents
     else
       amount_cents # For payments and other types, assume positive
     end
   end
-
 end

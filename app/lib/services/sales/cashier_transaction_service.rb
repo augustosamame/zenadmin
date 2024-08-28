@@ -1,12 +1,11 @@
 module Services
   module Sales
-
     class CashierTransactionService
       def initialize(cashier_shift)
         @cashier_shift = cashier_shift
       end
 
-      #payment does not need a method to add a payment, it is already done in the payment service
+      # payment does not need a method to add a payment, it is already done in the payment service
 
       def add_cash_inflow(amount_cents, received_by, comment = nil)
         cash_inflow = CashInflow.create!(
@@ -52,8 +51,6 @@ module Services
         # Calculate the total balance by summing all transactions' impact on balance
         @cashier_shift.cashier_transactions.sum(&:amount_for_balance)
       end
-
     end
-    
   end
 end

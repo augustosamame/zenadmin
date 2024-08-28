@@ -1,16 +1,15 @@
 class Admin::CashierTransactionsController < Admin::AdminController
-  before_action :initialize_cashier_transaction, only: [:new, :create]
-  before_action :build_transactable, only: [:new, :create]
+  before_action :initialize_cashier_transaction, only: [ :new, :create ]
+  before_action :build_transactable, only: [ :new, :create ]
 
   def new
-    
   end
 
   def create
     @cashier_transaction.cashier_shift = @current_cashier_shift
 
     if @cashier_transaction.save
-      redirect_to admin_cashier_shift_path(@cashier_transaction.cashier_shift), notice: 'Transaction successfully created.'
+      redirect_to admin_cashier_shift_path(@cashier_transaction.cashier_shift), notice: "Transaction successfully created."
     else
       render :new, status: :unprocessable_entity
     end

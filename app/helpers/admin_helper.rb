@@ -1,5 +1,4 @@
 module AdminHelper
-
   def draft_order_present?
     session[:draft_order].present?
   end
@@ -50,15 +49,14 @@ module AdminHelper
 
   def transaction_type_color(transaction)
     case transaction.transactable_type
-    when 'CashInflow'
-      'bg-green-100 text-green-800'
-    when 'CashOutflow'
-      'bg-red-100 text-red-800'
-    when 'Payment'
-      'bg-blue-100 text-blue-800'
+    when "CashInflow"
+      "bg-green-100 text-green-800"
+    when "CashOutflow"
+      "bg-red-100 text-red-800"
+    when "Payment"
+      "bg-blue-100 text-blue-800"
     else
-      'bg-gray-100 text-gray-800'
+      "bg-gray-100 text-gray-800"
     end
   end
-
 end

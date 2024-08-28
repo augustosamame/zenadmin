@@ -5,7 +5,7 @@ class CreatePayments < ActiveRecord::Migration[7.2]
       t.references :user, null: false, foreign_key: true
       t.references :region, null: false, foreign_key: true
       t.references :payable, polymorphic: true, null: false
-      t.references :cashier_shift, null:false, foreign_key: true
+      t.references :cashier_shift, null: false, foreign_key: true
       t.integer :payment_request_id
       t.integer :processor_transacion_id
       t.integer :amount_cents, null: false
