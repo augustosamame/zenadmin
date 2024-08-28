@@ -6,4 +6,5 @@ class Location < ApplicationRecord
   belongs_to :region
   has_many :warehouses
   has_many :users
+  has_many :cashiers
 end

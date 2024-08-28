@@ -8,6 +8,8 @@ class Payment < ApplicationRecord
   belongs_to :user
   belongs_to :region
   belongs_to :payable, polymorphic: true, autosave: true, required: true
+  belongs_to :cashier_shift
+  has_one :cashier_transaction, as: :transactable, dependent: :destroy
 
   enum :status, { pending: 0, paid: 1, partially_paid: 2, cancelled: 3 }
 
@@ -17,6 +19,8 @@ class Payment < ApplicationRecord
   validates :payable, presence: true
 
   before_validation :set_payment_date
+
+  after_create :create_cashier_transaction
 
   def set_payment_date
     self.payment_date = Time.zone.now if self.payment_date.nil?
@@ -41,4 +45,15 @@ class Payment < ApplicationRecord
     payment.status = :pending
     payment.save
   end
+
+  private
+
+    def create_cashier_transaction
+      CashierTransaction.create!(
+        cashier_shift: cashier_shift,
+        transactable: self,
+        transaction_type: :payment,
+        amount_cents: amount_cents
+      )
+    end
 end

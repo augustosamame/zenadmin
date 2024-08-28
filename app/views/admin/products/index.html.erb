@@ -1,4 +1,5 @@
 <%= render "shared/admin/nav", { header_title: "Productos - #{@current_warehouse&.name}" } do %>
+  <%= render_select_warehouse_dropdown(current_user) %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 

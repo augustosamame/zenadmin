@@ -37,10 +37,10 @@ class Admin::OrdersController < Admin::AdminController
         @order.location_id = @current_location.id
       end
 
-      if @order.save
+      if @order.save!
         if order_params[:payments_attributes]
           order_params[:payments_attributes].each do |payment|
-            @order.payments.create(payment.merge(payable: @order))
+            @order.payments.create!(payment.merge(payable: @order, cashier_shift: @current_cashier_shift))
           end
         end
         if order_params[:sellers_attributes].present?

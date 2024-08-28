@@ -1,5 +1,6 @@
 module Services
   module Sales
+
     class OrderCommissionService
       def initialize(order)
         @order = order
@@ -29,5 +30,6 @@ module Services
         end
       end
     end
+    
   end
 end

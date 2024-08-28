@@ -37,6 +37,9 @@ application.register("object-actions-dropdown", ObjectActionsDropdownController)
 import ObjectTableModalController from "./object_table_modal_controller"
 application.register("object-table-modal", ObjectTableModalController)
 
+import Inventory__SelectWarehouseController from "./inventory/select_warehouse_controller"
+application.register("inventory--select-warehouse", Inventory__SelectWarehouseController)
+
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 

@@ -81,6 +81,72 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "cash_inflows", force: :cascade do |t|
+    t.bigint "cashier_shift_id", null: false
+    t.bigint "received_by_id", null: false
+    t.text "description", null: false
+    t.integer "cash_inflow_type", default: 0, null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cashier_shift_id"], name: "index_cash_inflows_on_cashier_shift_id"
+    t.index ["received_by_id"], name: "index_cash_inflows_on_received_by_id"
+  end
+
+  create_table "cash_outflows", force: :cascade do |t|
+    t.bigint "cashier_shift_id", null: false
+    t.bigint "paid_to_id", null: false
+    t.text "description", null: false
+    t.integer "cash_outflow_type", default: 0, null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cashier_shift_id"], name: "index_cash_outflows_on_cashier_shift_id"
+    t.index ["paid_to_id"], name: "index_cash_outflows_on_paid_to_id"
+  end
+
+  create_table "cashier_shifts", force: :cascade do |t|
+    t.bigint "cashier_id", null: false
+    t.date "date", null: false
+    t.integer "total_sales_cents"
+    t.datetime "opened_at", null: false
+    t.datetime "closed_at"
+    t.bigint "opened_by_id", null: false
+    t.bigint "closed_by_id"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cashier_id"], name: "index_cashier_shifts_on_cashier_id"
+    t.index ["closed_by_id"], name: "index_cashier_shifts_on_closed_by_id"
+    t.index ["opened_by_id"], name: "index_cashier_shifts_on_opened_by_id"
+  end
+
+  create_table "cashier_transactions", force: :cascade do |t|
+    t.bigint "cashier_shift_id", null: false
+    t.string "transactable_type", null: false
+    t.bigint "transactable_id", null: false
+    t.integer "transaction_type", default: 0, null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cashier_shift_id"], name: "index_cashier_transactions_on_cashier_shift_id"
+    t.index ["transactable_type", "transactable_id"], name: "index_cashier_transactions_on_transactable"
+  end
+
+  create_table "cashiers", force: :cascade do |t|
+    t.bigint "location_id", null: false
+    t.string "name", default: "Caja Principal", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_cashiers_on_location_id"
+  end
+
   create_table "commission_payouts", force: :cascade do |t|
     t.bigint "commission_id", null: false
     t.bigint "user_id", null: false
@@ -248,6 +314,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
     t.bigint "region_id", null: false
     t.string "payable_type", null: false
     t.bigint "payable_id", null: false
+    t.bigint "cashier_shift_id", null: false
     t.integer "payment_request_id"
     t.integer "processor_transacion_id"
     t.integer "amount_cents", null: false
@@ -257,6 +324,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
     t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
     t.index ["region_id"], name: "index_payments_on_region_id"
@@ -479,6 +547,15 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "cash_inflows", "cashier_shifts"
+  add_foreign_key "cash_inflows", "users", column: "received_by_id"
+  add_foreign_key "cash_outflows", "cashier_shifts"
+  add_foreign_key "cash_outflows", "users", column: "paid_to_id"
+  add_foreign_key "cashier_shifts", "cashiers"
+  add_foreign_key "cashier_shifts", "users", column: "closed_by_id"
+  add_foreign_key "cashier_shifts", "users", column: "opened_by_id"
+  add_foreign_key "cashier_transactions", "cashier_shifts"
+  add_foreign_key "cashiers", "locations"
   add_foreign_key "commission_payouts", "commissions"
   add_foreign_key "commission_payouts", "users"
   add_foreign_key "commissions", "orders"
@@ -500,6 +577,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
   add_foreign_key "orders", "regions"
   add_foreign_key "orders", "users"
   add_foreign_key "orders", "users", column: "seller_id"
+  add_foreign_key "payments", "cashier_shifts"
   add_foreign_key "payments", "payment_methods"
   add_foreign_key "payments", "regions"
   add_foreign_key "payments", "users"

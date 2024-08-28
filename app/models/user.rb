@@ -46,6 +46,14 @@ class User < ApplicationRecord
     end
   end
 
+  def has_role?(role_name)
+    self.roles.where(name: role_name).any?
+  end
+
+  def has_any_role?(*role_names)
+    self.roles.where(name: role_names).any?
+  end
+
   private
 
   def set_login

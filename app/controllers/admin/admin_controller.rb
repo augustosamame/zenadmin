@@ -1,5 +1,6 @@
 class Admin::AdminController < ApplicationController
 	layout "admin"
+  helper :admin
 
   before_action :authenticate_user!, unless: :devise_controller?
   before_action :set_current_objects
@@ -11,6 +12,9 @@ class Admin::AdminController < ApplicationController
     session[:current_location_id] = @current_location.id
     @current_warehouse = Warehouse.find_by(id: session[:current_warehouse_id] || current_user&.warehouse_id || @current_location&.warehouses&.first&.id)
     session[:current_warehouse_id] = @current_warehouse.id
+    current_cashier = Cashier.find_by(id: session[:current_cashier_id])
+    @current_cashier = current_cashier || @current_location&.cashiers&.first
+    @current_cashier_shift = @current_cashier&.current_shift(current_user)
     @default_object_options_array = [
       { event_name: "edit", label: "Editar", icon: "pencil-square" },
       { event_name: "delete", label: "Eliminar", icon: "trash" }

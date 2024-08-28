@@ -34,6 +34,8 @@ location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.fi
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
 warehouse_2 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id)
 
+cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
+
 # product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
 # product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
 # product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)

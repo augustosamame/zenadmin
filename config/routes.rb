@@ -33,6 +33,10 @@ Rails.application.routes.draw do
     resources :customers
     post "pos_create_customer", to: "users#create_customer"
     get "search_dni", to: "customers#search_dni"
+
+    resources :warehouses
+    patch '/set_current_warehouse', to: 'warehouses#set_current_warehouse'
+
     resources :stock_transfers do
       member do
         patch :set_to_in_transit
