@@ -1,0 +1,21 @@
+<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <%= simple_form_for([:admin, @cashier_shift], html: { class: "space-y-4" }) do |f| %>
+    <%= render 'shared/form_errors', model: @cashier_shift %>
+
+    <div>
+      <%= f.input :cashier_id, collection: Cashier.all, label: "Cajero", input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+
+    <div>
+      <%= f.input :opened_at, as: :string, label: "Hora de Inicio", input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+
+    <% if @cashier_shift.persisted? %>
+      <div>
+        <%= f.input :closed_at, as: :string, label: "Hora de Cierre", input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+      </div>
+    <% end %>
+
+    <%= f.button :submit, @cashier_shift.persisted? ? 'Actualizar Turno de Caja' : 'Abrir Turno de Caja', class: "btn btn-primary" %>
+  <% end %>
+</div>

@@ -17,10 +17,19 @@
       current_warehouse:
       <%= @current_warehouse.try(:name) %>
     </p>
+    <p>
+      current_cashier:
+      <%= @current_cashier.try(:name) %>
+    </p>
+    <p>
+      current_cashier_shift status:
+      <%= @current_cashier_shift.try(:status) %>
+    </p>
     <br>
       session_data:</br>
       language: <%= session[:locale] %></br>
       user_id_for_otp: <%= session[:user_id_for_otp] %></br>
+      previous_url: <%= session[:previous_url] %>
     </p>
     <p>
       request_data:

@@ -1,7 +1,7 @@
 module Services
   module Sales
 
-    class CashierShiftTransactionService
+    class CashierTransactionService
       def initialize(cashier_shift)
         @cashier_shift = cashier_shift
       end

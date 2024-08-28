@@ -26,6 +26,10 @@ class Payment < ApplicationRecord
     self.payment_date = Time.zone.now if self.payment_date.nil?
   end
 
+  def description
+    "Pago de #{payable_type.underscore.humanize} #{payable_id}"
+  end
+
   def payable_attributes=(attributes)
     if PAYABLE.include?(payable_type.underscore.to_sym)
       self.payable ||= self.payable_type.constantize.new
@@ -52,8 +56,8 @@ class Payment < ApplicationRecord
       CashierTransaction.create!(
         cashier_shift: cashier_shift,
         transactable: self,
-        transaction_type: :payment,
-        amount_cents: amount_cents
+        amount_cents: amount_cents,
+        payment_method: payment_method
       )
     end
 end

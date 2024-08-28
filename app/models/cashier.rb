@@ -4,7 +4,7 @@ class Cashier < ApplicationRecord
 
   enum :status, { active: 0, inactive: 1 }
 
-  def current_shift(current_user)
+  def old_current_shift(current_user)
     open_shift = cashier_shifts.find_or_initialize_by(status: :open)
     if open_shift.new_record?
       open_shift.assign_attributes(
@@ -16,5 +16,9 @@ class Cashier < ApplicationRecord
       open_shift.save
     end
     open_shift
+  end
+
+  def current_shift(current_user)
+    cashier_shifts.last
   end
 end

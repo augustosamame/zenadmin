@@ -54,6 +54,10 @@ class User < ApplicationRecord
     self.roles.where(name: role_names).any?
   end
 
+  def any_admin?
+    self.roles.where(name: ["admin", "super_admin"]).any?
+  end
+
   private
 
   def set_login

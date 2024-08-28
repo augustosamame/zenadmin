@@ -1,0 +1,34 @@
+<%= simple_form_for([:admin, @cashier_transaction], html: { class: "space-y-4" }) do |f| %>
+  <%= render 'shared/form_errors', model: @cashier_transaction %>
+  <%= hidden_field_tag :transactable_type, params[:transactable_type] %>
+
+  <div>
+    <div class="relative mt-1 rounded-md shadow-sm">
+      <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+        <span class="text-gray-500 sm:text-sm">S/</span>
+      </div>
+      <%= f.input_field :amount, as: :numeric, step: 1, class: "mt-1 block w-full pl-7 pr-12 sm:text-sm border-gray-300 rounded-md", placeholder: "0.00" %>
+    </div>
+  </div>
+
+  <%= f.association :payment_method, 
+                    collection: PaymentMethod.all, 
+                    prompt: "Selecciona el tipo de transacción", 
+                    input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, 
+                    label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+
+
+  <% if params[:transactable_type] == 'CashInflow' %>
+    <%= simple_fields_for @cashier_transaction.transactable do |inflow_fields| %>
+      <%= inflow_fields.input :received_by_id, collection: User.all, label: 'Recibido por', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+      <%= inflow_fields.input :description, as: :text, label: 'Descripción', input_html: { class: "mt-1 block w-full sm:text-sm border-gray-300 rounded-md", rows: 3 }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    <% end %>
+  <% elsif params[:transactable_type] == 'CashOutflow' %>
+    <%= simple_fields_for @cashier_transaction.transactable do |outflow_fields| %>
+      <%= outflow_fields.input :paid_to_id, collection: User.all, label: 'Pagado a', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+      <%= outflow_fields.input :description, as: :text, label: 'Descripción', input_html: { class: "mt-1 block w-full sm:text-sm border-gray-300 rounded-md", rows: 3 }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    <% end %>
+  <% end %>
+
+  <%= f.button :submit, 'Guardar Transacción', class: "btn btn-primary" %>
+<% end %>

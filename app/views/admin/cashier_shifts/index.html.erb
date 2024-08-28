@@ -1,0 +1,40 @@
+<%= render "shared/admin/nav", { header_title: @header_title } do %>
+  <%= link_to 'Abrir Nuevo Turno', new_admin_cashier_shift_path, class: 'btn btn-primary' %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <!-- <th class="px-4 py-2 text-left">Cajero</th> -->
+          <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Hora de Inicio</th>
+          <th class="px-4 py-2 text-left">Abierto Por</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Hora de Cierre</th>
+          <th class="px-4 py-2 text-left">Cerrado Por</th>
+          <th class="px-4 py-2 text-left">Balance Total</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @cashier_shifts.each do |cashier_shift| %>
+          <tr>
+            <!-- <td class="px-4 py-2"><%= cashier_shift.cashier.name %></td> -->
+            <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.date, false) %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.opened_at) %></td>
+            <td class="px-4 py-2"><%= cashier_shift.opened_by&.name %></td>
+            <td class="px-4 py-2"><%= cashier_shift.status %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.closed_at) %></td>
+            <td class="px-4 py-2"><%= cashier_shift.closed_by&.name %></td>
+            <td class="px-4 py-2"><%= humanized_money_with_symbol cashier_shift.total_balance %></td>
+            <td class="px-4 py-2">
+              <%= link_to 'Ver', admin_cashier_shift_path(cashier_shift), class: 'btn btn-secondary' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -149,6 +149,11 @@
   <div class="<%= local_assigns[:header_title].present? ? 'container mx-auto pt-6' : 'container mx-auto' %>">
     <div class="relative flex flex-wrap items-center justify-between">
       <% if local_assigns[:header_title].present? %>
+        <% if local_assigns[:back_icon] %>
+          <%= link_to request.referer, class: "text-white hover:text-primary-500" do %>
+            <%= icon "arrow-left-circle", classes: "w-8 h-8 mr-4" %>
+          <% end %>
+        <% end %>
         <h1 class="flex-1 text-3xl font-extrabold tracking-tight text-white md:text-4xl dark:text-slate-100">
           <%= local_assigns[:header_title] %>
         </h1>

@@ -1,21 +1,23 @@
 class CashierTransaction < ApplicationRecord
   belongs_to :cashier_shift
   belongs_to :transactable, polymorphic: true
+  belongs_to :payment_method
 
-  enum :transaction_type, { payment: 0, cash_inflow: 1, cash_outflow: 2 }
+  accepts_nested_attributes_for :transactable, allow_destroy: true
 
-  validates :transaction_type, presence: true
   validates :amount_cents, numericality: { greater_than_or_equal_to: 0 }
 
-  # Calculate the total impact of a transaction on the cashier's balance
+  monetize :amount_cents, with_model_currency: :currency
+
   def amount_for_balance
-    case transaction_type
-    when 'cash_inflow'
+    case transactable_type
+    when 'CashInflow'
       amount_cents
-    when 'cash_outflow'
+    when 'CashOutflow'
       -amount_cents
     else
       amount_cents # For payments and other types, assume positive
     end
   end
+
 end

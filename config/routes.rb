@@ -44,6 +44,14 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :cashier_shifts do
+      member do
+        patch :close
+      end
+    end
+
+    resources :cashier_transactions, only: [:new, :create]
+
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"

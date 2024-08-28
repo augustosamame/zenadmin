@@ -129,12 +129,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
     t.bigint "cashier_shift_id", null: false
     t.string "transactable_type", null: false
     t.bigint "transactable_id", null: false
-    t.integer "transaction_type", default: 0, null: false
+    t.bigint "payment_method_id"
     t.integer "amount_cents", null: false
     t.string "currency", default: "PEN", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cashier_shift_id"], name: "index_cashier_transactions_on_cashier_shift_id"
+    t.index ["payment_method_id"], name: "index_cashier_transactions_on_payment_method_id"
     t.index ["transactable_type", "transactable_id"], name: "index_cashier_transactions_on_transactable"
   end
 
@@ -555,6 +556,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
   add_foreign_key "cashier_shifts", "users", column: "closed_by_id"
   add_foreign_key "cashier_shifts", "users", column: "opened_by_id"
   add_foreign_key "cashier_transactions", "cashier_shifts"
+  add_foreign_key "cashier_transactions", "payment_methods"
   add_foreign_key "cashiers", "locations"
   add_foreign_key "commission_payouts", "commissions"
   add_foreign_key "commission_payouts", "users"

@@ -14,6 +14,15 @@ class CashierShift < ApplicationRecord
   validates :status, presence: true
   validates :total_sales_cents, numericality: { greater_than_or_equal_to: 0 }
 
+  before_create :check_if_shift_is_open
+
+  def check_if_shift_is_open
+    if cashier.cashier_shifts.open.exists?
+      errors.add(:base, "Ya hay un turno de caja abierto para este cajero: #{cashier.name}.")
+      throw(:abort)
+    end
+  end
+
   def total_balance
     total_payments = Money.new(payments.sum(:amount_cents), 'PEN')
     total_inflows = Money.new(cash_inflows.sum(:amount_cents), 'PEN')

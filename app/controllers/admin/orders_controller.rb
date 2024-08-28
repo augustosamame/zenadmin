@@ -60,6 +60,9 @@ class Admin::OrdersController < Admin::AdminController
   def pos
     @order = Order.new
     @can_create_unpaid_orders = $global_settings[:pos_can_create_unpaid_orders]
+    if @current_cashier_shift.blank? || @current_cashier_shift.status == "closed"
+      redirect_to admin_cashier_shifts_path, alert: "El turno de caja está cerrado."
+    end
   end
 
   private
