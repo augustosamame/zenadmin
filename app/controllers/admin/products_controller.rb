@@ -7,12 +7,14 @@ class Admin::ProductsController < Admin::AdminController
 	def index
     respond_to do |format|
       format.html do
-        @products = Product.includes(:media)
-          .left_joins(:warehouse_inventories) # Use left_joins to include products without inventory
-          .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
-          .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock") # Coalesce to show 0 for products without stock
+        @products = Product
+        .includes(:media, :warehouse_inventories)
+        .left_joins(:warehouse_inventories) # Ensures products without inventory are included
+        .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
+        .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock") # Use SQL to fetch stock in one go
 
-        if @products.size > 5
+
+        if @products.size > 1000
           @datatable_options = "server_side:true;resource_name:'Product';"
         else
           @datatable_options = "resource_name:'Product';"

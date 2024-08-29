@@ -30,10 +30,11 @@
             <td class="px-4 py-2"><%= product.discounted_price_cents ? number_to_currency(product.discounted_price, unit: 'S/') : 'N/A' %></td>
             <td class="px-4 py-2"><%= product.stock(@current_warehouse) %></td>
             <td class="px-4 py-2"><%= product.status == 0 ? 'Active' : 'Inactive' %></td>
+
             <td class="px-4 py-2">
-              <%= render partial: "admin/products/actions", locals: { product: product, default_object_options_array: @default_object_options_array } %>
-              
+              <%= render "admin/products/actions", product: product %>
             </td>
+            
           </tr>
         <% end %>
       </tbody>

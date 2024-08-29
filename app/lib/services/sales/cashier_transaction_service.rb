@@ -45,7 +45,11 @@ module Services
               )
             end
           end
+          { success: true }
         end
+      rescue => e
+        Rails.logger.error("Failed to close cashier shift: #{e.message}")
+        { success: false, error: "Error al abrir un nuevo turno de caja" }
       end
 
       def close_shift(closed_by_user)

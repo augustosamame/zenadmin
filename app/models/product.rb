@@ -51,7 +51,7 @@ class Product < ApplicationRecord
   end
 
   def stock(warehouse)
-    inventory = WarehouseInventory.find_by(warehouse: warehouse, product: self)
+    inventory = warehouse_inventories.find { |wi| wi.warehouse_id == warehouse.id }
     inventory&.stock || 0
   end
 
