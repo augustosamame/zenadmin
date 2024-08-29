@@ -10,9 +10,11 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_29_050621) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_trgm"
   enable_extension "plpgsql"
+  enable_extension "unaccent"
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -390,7 +392,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_050621) do
     t.decimal "weight", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_products_on_name"
+    t.index ["product_order"], name: "index_products_on_product_order"
+    t.index ["sku"], name: "index_products_on_sku", unique: true
     t.index ["sourceable_type", "sourceable_id"], name: "index_products_on_sourceable"
+    t.index ["status"], name: "index_products_on_status"
   end
 
   create_table "purchases_purchase_lines", force: :cascade do |t|
@@ -536,8 +542,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_050621) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email"
+    t.index ["internal"], name: "index_users_on_internal"
+    t.index ["location_id"], name: "index_users_on_location_id"
     t.index ["login"], name: "index_users_on_login", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["status"], name: "index_users_on_status"
+    t.index ["warehouse_id"], name: "index_users_on_warehouse_id"
   end
 
   create_table "warehouse_inventories", force: :cascade do |t|

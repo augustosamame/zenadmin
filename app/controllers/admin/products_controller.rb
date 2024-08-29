@@ -94,7 +94,7 @@ class Admin::ProductsController < Admin::AdminController
 
   def search
     if params[:query].blank?
-      @products = Product.all
+      @products = Product.active.all
     else
       if params[:query].length <= 50
         @products = Product.search_by_sku_and_name(params[:query])

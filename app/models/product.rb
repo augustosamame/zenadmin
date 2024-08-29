@@ -29,7 +29,12 @@ class Product < ApplicationRecord
   monetize :discounted_price_cents, with_model_currency: :currency
 
   pg_search_scope :search_by_sku_and_name, against: [ :sku, :name ], using: {
-      tsearch: { prefix: true }
+      tsearch: { prefix: true, any_word: true },
+      trigram: { threshold: 0.1 }
+  }, ignoring: :accents
+
+  scope :tagged_with, ->(tag_name) {
+    joins(:tags).where(tags: { name: tag_name })
   }
 
   before_validation :set_permalink
@@ -48,6 +53,12 @@ class Product < ApplicationRecord
     else
       raise ActiveRecord::RecordNotFound, "Tag with name '#{tag_name_or_object}' not found"
     end
+  end
+
+  # Check if the product is tagged with a tag
+  def tagged_with?(tag_name_or_object)
+    tag = find_or_get_tag(tag_name_or_object)
+    self.tags.exists?(tag.id)
   end
 
   def stock(warehouse)

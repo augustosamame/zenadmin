@@ -19,6 +19,7 @@ setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_typ
 setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
 
 brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
+brand_2 = Brand.find_or_create_by!(name: 'Otros')
 category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
 category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
 
