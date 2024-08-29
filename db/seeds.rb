@@ -18,9 +18,9 @@ setting_8 = Setting.find_or_create_by!(name: 'audited_active', data_type: "type_
 setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_type: "type_boolean", internal: true, localized_name: "Se permiten stocks negativos", boolean_value: true)
 setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
 
-brand_1 = Brand.find_or_create_by!(name: 'Infanti')
-category_1 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche')
-category_2 = ProductCategory.find_or_create_by!(name: 'Osos de Peluche Gigantes', parent: category_1)
+brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
+category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
+category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
 
 vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti')
 vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price')
@@ -81,7 +81,7 @@ end
 # product_1.product_categories << category_1
 # product_1.product_categories << category_2
 
-tag_1 = Tag.find_or_create_by!(name: 'Osos de Peluche')
+tag_1 = Tag.find_or_create_by!(name: 'Nuevas Fragancias')
 
 # Product.all.each do |product|
 #  WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
@@ -113,12 +113,12 @@ user1.add_role('super_admin')
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
 generic_customer.add_role('customer')
 
-user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", require_password_change: false, password: "12345678", first_name: "Customer", last_name: "One")
+user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Samamé")
 user2.add_role('customer')
 
-user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "One", location_id: location_1.id)
+user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", require_password_change: false, password: "12345678", first_name: "Maria", last_name: "Angeles", location_id: location_1.id)
 user3.add_role('seller')
-user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Two", location_id: location_1.id)
+user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", require_password_change: false, password: "12345678", first_name: "Patricia", last_name: "Artieda", location_id: location_1.id)
 user4.add_role('seller')
-user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Seller", last_name: "Three", location_id: location_1.id)
+user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
 user5.add_role('seller')

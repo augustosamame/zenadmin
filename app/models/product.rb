@@ -13,6 +13,10 @@ class Product < ApplicationRecord
   has_many :warehouse_inventories, dependent: :destroy
   has_many :warehouses, through: :warehouse_inventories
 
+  has_many :combo_products_as_product_1, class_name: 'ComboProduct', foreign_key: 'product_1_id'
+  has_many :combo_products_as_product_2, class_name: 'ComboProduct', foreign_key: 'product_2_id'
+
+
   enum :status, { active: 0, inactive: 1 }
 
   validates :sku, presence: true

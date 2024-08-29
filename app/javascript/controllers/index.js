@@ -4,14 +4,17 @@
 
 import { application } from "./application"
 
+import CloseCashierModalController from "./close_cashier_modal_controller"
+application.register("close-cashier-modal", CloseCashierModalController)
+
+import ComboProductNormalPriceController from "./combo_product_normal_price_controller"
+application.register("combo-product-normal-price", ComboProductNormalPriceController)
+
 import ComboSelectController from "./combo_select_controller"
 application.register("combo-select", ComboSelectController)
 
 import CustomModalController from "./custom_modal_controller"
 application.register("custom-modal", CustomModalController)
-
-import CloseCashierModalController from "./close_cashier_modal_controller"
-application.register("close-cashier-modal", CloseCashierModalController)
 
 import CustomerFormController from "./customer_form_controller"
 application.register("customer-form", CustomerFormController)
@@ -24,6 +27,9 @@ application.register("dropdown", DropdownController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
+
+import Inventory__SelectWarehouseController from "./inventory/select_warehouse_controller"
+application.register("inventory--select-warehouse", Inventory__SelectWarehouseController)
 
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
@@ -39,9 +45,6 @@ application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
 import ObjectTableModalController from "./object_table_modal_controller"
 application.register("object-table-modal", ObjectTableModalController)
-
-import Inventory__SelectWarehouseController from "./inventory/select_warehouse_controller"
-application.register("inventory--select-warehouse", Inventory__SelectWarehouseController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)

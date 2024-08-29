@@ -25,6 +25,11 @@ class Admin::ProductsController < Admin::AdminController
     end
   end
 
+  def combo_products_show
+    @product = Product.select(:id, :name, :price_cents).find(params[:id])
+    render json: @product
+  end
+
   def new
     @product = Product.new
   end

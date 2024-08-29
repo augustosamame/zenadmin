@@ -1,0 +1,62 @@
+<%= simple_form_for [:admin, @combo_product], html: { class: "space-y-4", data: { controller: "combo-product-normal-price", combo_product_normal_price_products_value: Product.all.to_json(only: [:id, :price]) } } do |f| %>
+  <%= render 'shared/form_errors', model: @combo_product %>
+
+  <div>
+    <%= f.input :name, input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :product_1_id, "Producto 1", class: "form-label" %>
+      <select data-combo-product-normal-price-target="product1" data-action="change->combo-product-normal-price#calculateNormalPrice"
+              data-controller="select"
+              data-select-model-value="Product"
+              data-select-multi-select-value="false"
+              data-select-placeholder-value="Selecciona uno o más productos"
+              name="combo_product[product_1_id]" 
+              id="combo_product_product_1_id"
+              class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      >
+        <% Product.all.each do |product| %>
+          <option value="<%= product.id %>" <%= 'selected' if @combo_product.product_1_id == product.id %>><%= product.name %></option>
+        <% end %>
+      </select>
+    </div>
+    <div>
+      <%= f.input :qty_1, input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", data: { combo_product_normal_price_target: "qty1", action: "input->combo-product-normal-price#calculateNormalPrice" } }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :product_2_id, "Producto 2", class: "form-label" %>
+      <select data-combo-product-normal-price-target="product2" data-action="change->combo-product-normal-price#calculateNormalPrice"
+              data-controller="select"
+              data-select-model-value="Product"
+              data-select-multi-select-value="false"
+              data-select-placeholder-value="Selecciona uno o más productos"
+              name="combo_product[product_2_id]" 
+              id="combo_product_product_2_id"
+              class="block w-full px-3 py-2 mt-1 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+      >
+        <% Product.all.each do |product| %>
+          <option value="<%= product.id %>" <%= 'selected' if @combo_product.product_2_id == product.id %>><%= product.name %></option>
+        <% end %>
+      </select>
+    </div>
+    <div>
+      <%= f.input :qty_2, input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", data: { combo_product_normal_price_target: "qty2", action: "input->combo-product-normal-price#calculateNormalPrice" } }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.input :normal_price, input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", data: { combo_product_normal_price_target: "normalPrice" } }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+    <div>
+      <%= f.input :price, input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    </div>
+  </div>
+
+  <%= f.submit 'Create Combo Product', class: "btn btn-primary" %>
+<% end %>

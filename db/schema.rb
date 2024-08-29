@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_29_050621) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -146,6 +146,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_27_023602) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["location_id"], name: "index_cashiers_on_location_id"
+  end
+
+  create_table "combo_products", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "product_1_id", null: false
+    t.integer "product_2_id", null: false
+    t.integer "qty_1", null: false
+    t.integer "qty_2", null: false
+    t.integer "normal_price_cents", null: false
+    t.integer "price_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "commission_payouts", force: :cascade do |t|

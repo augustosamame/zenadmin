@@ -16,6 +16,7 @@ Rails.application.routes.draw do
     resources :products do
       resources :media, module: :admin
       get "search", on: :collection
+      get "combo_products_show", on: :member
     end
 
     resources :product_categories do
@@ -44,6 +45,8 @@ Rails.application.routes.draw do
       end
     end
     resources :in_transit_stocks
+
+    resources :combo_products
 
     resources :cashier_shifts do
       member do
