@@ -35,7 +35,7 @@ export default class extends Controller {
 
   buildTable(customers) {
     return `
-      <div data-controller="datatable" data-datatable-options-value="no_buttons">
+      <div data-controller="datatable" data-datatable-options-value="no_buttons;resource_name:'Customer';create_button:false;">
         <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
           <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
             <thead>

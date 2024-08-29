@@ -109,6 +109,13 @@
             Caja
           <% end %>
         </div>
+
+        <div>
+          <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+            <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+            Comisiones
+          <% end %>
+        </div>
         
         <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer" class="flex items-center justify-center h-16">
           <a href="#" class="flex items-center justify-center w-full h-full text-center text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600" data-action="click->pos--buttons#loadDraft">

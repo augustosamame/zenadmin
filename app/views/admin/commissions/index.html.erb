@@ -1,0 +1,60 @@
+<%= render "shared/admin/nav", { header_title: "Comisiones #{@current_location&.name} - #{@current_location&.seller_comission_percentage}%" } do %>
+<% end %>
+
+<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
+    <div>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Desde</p>
+      <%= simple_form_for :filter, url: admin_commissions_path, method: :get, html: { class: 'mt-1' } do |f| %>
+        <%= f.input :from_date, as: :string, label: false, input_html: { class: 'text-lg font-semibold', placeholder: 'YYYY-MM-DD' } %>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Hasta</p>
+      <%= f.input :to_date, as: :string, label: false, input_html: { class: 'text-lg font-semibold', placeholder: 'YYYY-MM-DD' } %>
+    </div>
+    <div>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Comisiones Pagadas</p>
+      <%= f.input :status_paid_out, as: :boolean, label: false, input_html: { class: 'text-lg font-semibold' } %>
+    </div>
+    <div class="col-span-3">
+      <%= f.submit 'Filtrar', class: 'btn btn-primary' %>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <!-- <th class="px-4 py-2 text-left">Cajero</th> -->
+          <th class="px-4 py-2 text-left">Vendedor</th>
+          <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Venta</th>
+          <th class="px-4 py-2 text-left">Monto de Venta</th>
+          <th class="px-4 py-2 text-left">Porcentaje</th>
+          <th class="px-4 py-2 text-left">Comisión</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @commissions.each do |commission| %>
+          <tr>
+            <td class="px-4 py-2"><%= commission.user.name %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, commission.created_at, false) %></td>
+            <td class="px-4 py-2"><%= commission.order.id %></td>
+            <td class="px-4 py-2"><%= humanized_money_with_symbol(commission.order.total_price - commission.order.total_discount) %></td>
+            <td class="px-4 py-2"><%= commission.percentage %>%</td>
+            <td class="px-4 py-2"><%= humanized_money_with_symbol commission.amount %></td>
+            <td class="px-4 py-2"><%= commission.status %></td>
+            <td class="px-4 py-2">
+              <%= link_to 'Ver', admin_commission_path(commission), class: 'btn btn-secondary' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

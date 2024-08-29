@@ -53,10 +53,8 @@ export default class extends Controller {
     const snakeCaseName = resourceName.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
     const resourceNamePlural = snakeCaseName.endsWith('s') ? snakeCaseName : snakeCaseName + 's';
 
-
-
-    // Add custom "Crear" button if resourceName is provided
-    if (resourceName) {
+    // Add custom "Crear" button if resourceName is provided and create_button is not false
+    if (resourceName && !allAdditionalOptions.includes("create_button:false")) {
       const capitalizedResourceName = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
       const createButton = {
         text: `Crear ${capitalizedResourceName}`,
@@ -96,7 +94,7 @@ export default class extends Controller {
             initialOptions.stateSave = false;
           } else {
             let [key, value] = additionalOption.split(':');
-            if (key && value) { // Check if both key and value are present
+            if (key && value) {
               key = key.trim();
               value = value.trim();
               if (value === "true") {
@@ -120,7 +118,6 @@ export default class extends Controller {
 
       // Listen for the DataTable's draw event to reapply classes
       $(tableElement).on('draw.dt', () => {
-        // console.log('draw.dt event triggered');
         this.applyTailwindClasses();
 
         setTimeout(() => {
@@ -132,7 +129,6 @@ export default class extends Controller {
         console.log('xhr.dt event triggered');
         
         setTimeout(() => {
-          // Add Tailwind classes to the cells (required for JSON response)
           this.applyCellTailwindClasses();
         }, 50)
       });
@@ -156,14 +152,13 @@ export default class extends Controller {
               } catch (error) {
                 console.error('Error during setTimeout or applying classes:', error);
               }
-              observer.disconnect(); // Stop observing once the wrapper is found
+              observer.disconnect();
             }
           });
         }
       });
     });
 
-    // Observe the parent element of where the wrapper will be added
     observer.observe(document.body, { childList: true, subtree: true });
   }
 
@@ -175,34 +170,27 @@ export default class extends Controller {
         const observer = new MutationObserver((mutations) => {
           mutations.forEach((mutation) => {
             if (mutation.type === 'childList') {
-              // console.log('Pagination changed or elements added/removed');
-              this.applyPaginationStyles(); // Reapply pagination styles when pagination is updated
+              this.applyPaginationStyles();
             }
           });
         });
 
-        // Observe both direct children and deeper nested changes
         observer.observe(paginationContainer, {
-          childList: true, // Detect when children are added or removed
-          subtree: true    // Include all descendant nodes
+          childList: true,
+          subtree: true
         });
-
-        // console.log('Observer attached to pagination container');
       } else {
         console.log('Pagination container not found');
       }
-    }, 200); // Delay to ensure the DOM elements are available
+    }, 200);
   }
 
   applyTailwindClasses() {
-    // Apply pagination styles initially
     this.applyPaginationStyles();
 
-    // common dt classes that will be converted to Tailwind classes
     $('.dt-button')
       .addClass('rounded-md px-4 py-2 bg-primary-500 text-white border-primary-500 hover:text-primary-300 transition duration-200');
 
-    // Add Tailwind classes to the layout rows
     $('.dt-layout-row').addClass('flex flex-col mt-2 pt-2 sm:flex-row justify-between');
 
     const tableHeaders = document.querySelectorAll('#datatable-element th');
@@ -210,20 +198,19 @@ export default class extends Controller {
       th.classList.add('px-4', 'py-2', 'text-left', 'border-b', 'border-slate-300', 'dark:border-slate-600');
     });
 
-    // Style dt-length to ensure label, select, and text are side by side
     const dtLength = document.querySelector('.dt-length');
     if (dtLength) {
-      dtLength.classList.add('flex', 'items-center', 'space-x-2'); // Use flexbox to align items horizontally
+      dtLength.classList.add('flex', 'items-center', 'space-x-2');
 
       const label = dtLength.querySelector('label');
       const select = dtLength.querySelector('select');
 
       if (label) {
-        label.classList.add('flex', 'items-center', 'space-x-2'); // Ensure the label and its children are aligned
+        label.classList.add('flex', 'items-center', 'space-x-2');
       }
 
       if (select) {
-        select.classList.add('ml-2', 'mr-2', 'form-select', 'block', 'w-full', 'lg:w-24', 'mt-2', 'sm:mt-0', 'rounded-md', 'border-slate-300', 'focus:border-primary-500', 'focus:ring-primary-500', 'min-w-[70px]'); // Add margin between select and the preceding text
+        select.classList.add('ml-2', 'mr-2', 'form-select', 'block', 'w-full', 'lg:w-24', 'mt-2', 'sm:mt-0', 'rounded-md', 'border-slate-300', 'focus:border-primary-500', 'focus:ring-primary-500', 'min-w-[70px]');
       }
     }
 
@@ -240,20 +227,16 @@ export default class extends Controller {
         .attr('placeholder', 'Texto a Buscar...');
     }
 
-    // Style the info text (new structure)
     $('.dt-info').addClass('text-sm text-slate-400 mt-2 sm:mt-0');
   }
 
   applyCellTailwindClasses() {
-    // Apply Tailwind classes to cells
     $('.dtr-control').addClass('px-4 py-2');
-    $('td').addClass('px-4 py-2 text-gray-700 dark:text-gray-300');  // Add classes for all table cells
+    $('td').addClass('px-4 py-2 text-gray-700 dark:text-gray-300');
     $('th').addClass('px-4 py-2 text-left border-b border-slate-300 dark:border-slate-600');
   }
 
   applyPaginationStyles() {
-    // console.log('Applying pagination styles');
-    // Apply custom styles to pagination buttons
     $('.dt-paging-button')
       .addClass('px-4 py-2 rounded-md text-white-700 hover:text-primary-500 transition duration-200');
     $('.dt-paging-button.current')

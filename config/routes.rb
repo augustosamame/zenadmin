@@ -51,6 +51,7 @@ Rails.application.routes.draw do
     end
 
     resources :cashier_transactions, only: [ :new, :create ]
+    resources :commissions, only: [ :index, :show ]
 
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"

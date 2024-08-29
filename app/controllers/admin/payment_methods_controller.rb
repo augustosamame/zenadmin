@@ -1,5 +1,6 @@
 class Admin::PaymentMethodsController < Admin::AdminController
   def index
+    @datatable_options = "resource_name:'PaymentMethod';create_button:false;"
     respond_to do |format|
       format.html do
         @payment_methods = PaymentMethod.all.active
