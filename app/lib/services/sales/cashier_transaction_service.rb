@@ -45,7 +45,6 @@ module Services
               )
             end
           end
-
         end
       end
 
