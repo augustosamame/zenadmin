@@ -1,4 +1,4 @@
-require 'csv'
+require "csv"
 
 module Services
   module Products
@@ -45,7 +45,7 @@ module Services
             discounted_price_cents: 4000,
             sku: sku,
             brand_id: brand_id,
-            product_categories: [product_category]
+            product_categories: [ product_category ]
           )
 
           product.add_tag(tag1_name) if tag1_name.present?
@@ -55,7 +55,7 @@ module Services
 
       def generate_sku(product_category_name, index)
         category_code = product_category_name[0, 3].upcase
-        id_code = index.to_s.rjust(5, '0')
+        id_code = index.to_s.rjust(5, "0")
         "#{category_code}#{id_code}"
       end
     end
