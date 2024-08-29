@@ -1,6 +1,6 @@
 <% if Rails.env == "development" %>
 
-  <div class="container-fluid">
+  <div class="mt-[200px] mx-5 container-fluid">
     <p>
       current_user:
       <%= current_user.inspect %>
@@ -22,6 +22,8 @@
       <%= @current_cashier.try(:name) %>
     </p>
     <p>
+      current_cashier_shift id:
+      <%= @current_cashier_shift.try(:id) %>
       current_cashier_shift status:
       <%= @current_cashier_shift.try(:status) %>
     </p>
@@ -29,7 +31,6 @@
       session_data:</br>
       language: <%= session[:locale] %></br>
       user_id_for_otp: <%= session[:user_id_for_otp] %></br>
-      previous_url: <%= session[:previous_url] %>
     </p>
     <p>
       request_data:

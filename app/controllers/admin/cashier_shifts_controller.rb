@@ -18,8 +18,18 @@ class Admin::CashierShiftsController < Admin::AdminController
     @cashier_shift.total_sales_cents = 0
     @cashier_shift.date = Date.current
     if @cashier_shift.save
-      redirect_to admin_cashier_shifts_path, notice: "Cashier shift opened successfully."
+      if @cashier_shift.open? 
+        result = Services::Sales::CashierTransactionService.new(@cashier_shift).open_shift(current_user)
+        if result[:success]
+          redirect_to admin_cashier_shifts_path, notice: "Turno de caja abierto exitosamente."
+        else
+          redirect_to admin_cashier_shifts_path, alert: result[:error]
+        end
+      else
+        redirect_to admin_cashier_shifts_path, notice: "Turno de caja abierto exitosamente."
+      end
     else
+      flash.now[:alert] = "Error al abrir el turno de caja."
       render :new, status: :unprocessable_entity
     end
   end

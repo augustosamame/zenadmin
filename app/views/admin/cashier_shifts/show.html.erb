@@ -1,18 +1,56 @@
-<%= render "shared/admin/nav", { header_title: "Detalles del Turno de Caja", back_icon: true } do %>
+
+<%= render "shared/admin/nav", { header_title: "Detalles de Caja", back_icon: true } do %>
   <% if current_user.any_admin? %>
     <%= link_to 'Editar', edit_admin_cashier_shift_path(@cashier_shift), class: 'btn btn-secondary mr-2' %>
   <% end %>
   <% if @cashier_shift.open? %>
     <%= link_to 'Agregar Entrada de Dinero', new_admin_cashier_transaction_path(@cashier_shift, transactable_type: 'CashInflow'), class: 'btn btn-secondary mr-2' %>
     <%= link_to 'Agregar Salida de Dinero', new_admin_cashier_transaction_path(@cashier_shift, transactable_type: 'CashOutflow'), class: 'btn btn-secondary mr-2' %>
-    <%= button_to 'Cierre de Caja', close_admin_cashier_shift_path(@cashier_shift), method: :patch, class: 'btn btn-primary', data: { confirm: '¿Estás seguro de que quieres cerrar este turno?' } %>
+
+    <div data-controller="close-cashier-modal">
+      <!-- Button to trigger modal -->
+      <button type="button" class="btn btn-primary" data-action="click->close-cashier-modal#open" data-close-cashier-modal-content-id="closeCashierShiftModal">
+        Cierre de Caja
+      </button>
+
+      <!-- Modal container -->
+      <div data-close-cashier-modal-target="container" class="fixed inset-0 z-50 flex items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
+        <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
+          <div data-close-cashier-modal-target="content">
+            <!-- Content will be inserted here dynamically -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Template for modal content -->
+      <template data-close-cashier-modal-target="template" data-close-cashier-modal-content-id="closeCashierShiftModal">
+        <div class="mt-3 text-center">
+          <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Confirmar Cierre de Caja</h3>
+          <div class="py-3 mt-2 px-7">
+            <p class="text-sm text-gray-500 dark:text-gray-400">
+              ¿Estás seguro de que quieres cerrar este turno de caja? Esta acción no se puede deshacer.
+            </p>
+          </div>
+          <div class="items-center px-4 py-3">
+            <%= form_with url: close_admin_cashier_shift_path(@cashier_shift), method: :patch, local: true do |form| %>
+              <%= form.submit 'Confirmar Cierre', class: 'btn btn-primary mx-2' %>
+            <% end %>
+            
+            <button class="mx-2 mt-3 btn btn-secondary" data-action="click->close-cashier-modal#close">
+              Cancelar
+            </button>
+          </div>
+        </div>
+      </template>
+    </div>
+    
   <% end %>
 <% end %>
 
 <div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
   <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
     <div>
-      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">ID del Turno</p>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Código del Turno</p>
       <p class="mt-1 text-lg font-semibold"><%= @cashier_shift.id %></p>
     </div>
     <div>
@@ -39,6 +77,18 @@
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Balance Total</p>
       <p class="mt-1 text-lg font-semibold"><%= humanized_money_with_symbol @cashier_shift.total_balance %></p>
     </div>
+
+    <div class="col-span-3">
+      <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Balance por Método de Pago</p>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        <% @cashier_shift.cashier_transactions.includes([:payment_method]).group_by(&:payment_method).each do |payment_method, transactions| %>
+          <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= payment_method&.description || 'Sin método' %></p>
+            <p class="text-lg font-semibold"><%= humanized_money_with_symbol transactions.sum(&:amount) %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
   </div>
 
   <h2 class="mb-4 text-xl font-semibold">Movimientos de Caja</h2>
@@ -47,30 +97,31 @@
       <thead class="bg-gray-50 dark:bg-gray-700">
         <tr>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha y Hora</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Descripción</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha y Hora</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Medio de Pago</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
         <% @cashier_shift.cashier_transactions.includes([:transactable, :payment_method]).order(created_at: :asc).each do |transaction| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= transaction.id %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= friendly_date(current_user, transaction.created_at) %></td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= transaction_type_color(transaction) %>">
                 <%= transaction.transactable_type.demodulize.underscore.humanize %>
               </span>
             </td>
+            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.payment_method&.description %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= humanized_money_with_symbol transaction.amount %></td>
 
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.payment_method&.name %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= friendly_date(current_user, transaction.created_at) %></td>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
 </div>
+

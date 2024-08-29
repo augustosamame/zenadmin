@@ -10,6 +10,9 @@ application.register("combo-select", ComboSelectController)
 import CustomModalController from "./custom_modal_controller"
 application.register("custom-modal", CustomModalController)
 
+import CloseCashierModalController from "./close_cashier_modal_controller"
+application.register("close-cashier-modal", CloseCashierModalController)
+
 import CustomerFormController from "./customer_form_controller"
 application.register("customer-form", CustomerFormController)
 
