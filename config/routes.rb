@@ -43,6 +43,7 @@ Rails.application.routes.draw do
         patch :set_to_complete
       end
     end
+    resources :in_transit_stocks
 
     resources :cashier_shifts do
       member do
