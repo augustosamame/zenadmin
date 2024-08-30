@@ -7,14 +7,14 @@ module Services
         @file_path = file_path
       end
 
-      def call
-        create_product_categories_and_tags
-        create_products
+      def call_jardin_del_zen_import
+        create_product_categories_and_tags_and_products
       end
 
       private
 
-      def create_product_categories_and_tags
+      def create_product_categories_and_tags_and_products
+
         CSV.foreach(@file_path, headers: true) do |row|
           product_category_name = row[0]
           tag1_name = row[2]
@@ -24,9 +24,7 @@ module Services
           Tag.find_or_create_by!(name: tag1_name) if tag1_name.present?
           Tag.find_or_create_by!(name: tag2_name) if tag2_name.present?
         end
-      end
 
-      def create_products
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
           product_category_name = row[0]
           product_name = row[1]
@@ -58,6 +56,7 @@ module Services
         id_code = index.to_s.rjust(5, "0")
         "#{category_code}#{id_code}"
       end
+      
     end
   end
 end

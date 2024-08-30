@@ -173,7 +173,7 @@ export default class extends Controller {
     axios.post('/admin/orders', orderData, {
       headers: {
         'Accept': 'application/json',
-        'X-CSRF-Token': this.csrfToken // Include the CSRF token here
+        'X-CSRF-Token': this.csrfToken
       }
     })
       .then(response => {
