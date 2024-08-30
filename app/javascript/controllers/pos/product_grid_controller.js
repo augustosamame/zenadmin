@@ -42,7 +42,7 @@ export default class extends Controller {
         <div class="flex justify-center">
           <img src="${product.image}" alt="${product.name}" class="object-cover h-24 w-24 mb-2">
         </div>
-        <span class="block text-sm">${product.sku}</span>
+        <span class="block text-sm">${product.custom_id}</span>
         <span class="block text-sm">${product.name}</span>
         <div class="flex justify-between text-sm text-gray-500">
           <span>S/ ${product.price}</span>
@@ -68,7 +68,7 @@ export default class extends Controller {
     // Call the addItem method on the orderItemsController
     orderItemsController.addItem({
       id: product.id,
-      sku: product.sku,
+      custom_id: product.custom_id,
       name: product.name,
       price: product.price,
       quantity: 1

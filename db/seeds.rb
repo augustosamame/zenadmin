@@ -17,6 +17,17 @@ setting_7 = Setting.find_or_create_by!(name: 'pos_can_create_unpaid_orders', dat
 setting_8 = Setting.find_or_create_by!(name: 'audited_active', data_type: "type_boolean", internal: true, localized_name: "Se generan tablas de auditoría", boolean_value: true)
 setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_type: "type_boolean", internal: true, localized_name: "Se permiten stocks negativos", boolean_value: true)
 setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
+setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfers', data_type: "type_boolean", internal: true, localized_name: "Mostrar gúias de remisión SUNAT en transferencias de stock", boolean_value: false)
+
+CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'VEN', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: 'PUR', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :product, prefix: 'PRO', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :order, prefix: 'ORD', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :cash_inflow, prefix: 'CIN', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: 'COU', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :payment, prefix: 'PAY', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: 'INT', length: 5, next_number: 1, status: :active)
 
 brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
 brand_2 = Brand.find_or_create_by!(name: 'Otros')
@@ -37,15 +48,11 @@ warehouse_2 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", locati
 
 cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
 
-# product_1 = Product.find_or_create_by!(sku: "OSO0001", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con corazón', description: 'Oso de Peluche con corazón', permalink: 'oso-de-peluche-con-corazon', price_cents: 4000, sourceable: vendor_1, brand: brand_1)
-# product_2 = Product.find_or_create_by!(sku: "OSO0002", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche rosado', description: 'Oso de Peluche rosado', permalink: 'oso-de-peluche-rosado', price_cents: 8000, sourceable: vendor_1, brand: brand_1)
-# product_3 = Product.find_or_create_by!(sku: "OSO0003", image: Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ]), name: 'Oso de Peluche con rosas', description: 'Oso de Peluche con rosas', permalink: 'oso-de-peluche-con-rosas', price_cents: 2500, sourceable: vendor_1, brand: brand_1)
-
-5.times do
+3.times do
   Product.transaction do
     # Create a new Product
     product = Product.new(
-      sku: Faker::Alphanumeric.alpha(number: 10),
+      custom_id: Faker::Alphanumeric.alpha(number: 10),
       name: Faker::Commerce.product_name,
       brand_id: Brand.all.sample.id, # Assuming you have some brands in your database
       description: Faker::Lorem.paragraph(sentence_count: 2),
@@ -57,7 +64,7 @@ cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: loca
       available_at: Faker::Date.between(from: 2.days.ago, to: Date.today),
       deleted_at: nil, # or `Faker::Date.between(from: 1.year.ago, to: 1.day.ago)` if you want some deleted products
       product_order: Faker::Number.between(from: 1, to: 100),
-      status: Faker::Number.between(from: 0, to: 1),
+      status: "active",
       weight: Faker::Number.decimal(l_digits: 2, r_digits: 2),
       price_cents: Faker::Number.between(from: 1000, to: 10000),
       sourceable: vendor_1,
@@ -123,3 +130,5 @@ user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", requi
 user4.add_role('seller')
 user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
 user5.add_role('seller')
+
+Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

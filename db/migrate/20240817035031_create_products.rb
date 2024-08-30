@@ -1,7 +1,7 @@
 class CreateProducts < ActiveRecord::Migration[7.2]
   def change
     create_table :products do |t|
-      t.string :sku, null: false
+      t.string :custom_id, null: false
       t.string :name, null: false
       t.integer :brand_id
       t.text :description, null: false
@@ -12,6 +12,7 @@ class CreateProducts < ActiveRecord::Migration[7.2]
       t.text :meta_keywords
       t.text :meta_description
       t.boolean :stockable, default: true
+      t.boolean :is_test_product, default: false
       t.datetime :available_at
       t.datetime :deleted_at
       t.integer :product_order, default: 0
@@ -21,9 +22,10 @@ class CreateProducts < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :products, :sku, unique: true
+    add_index :products, :custom_id, unique: true
     add_index :products, :name
     add_index :products, :status
     add_index :products, :product_order
+    add_index :products, :is_test_product
   end
 end

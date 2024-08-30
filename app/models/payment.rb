@@ -2,6 +2,7 @@ class Payment < ApplicationRecord
   audited_if_enabled
 
   include DefaultRegionable
+  include CustomNumberable
   PAYABLE = [ :order ]
 
   belongs_to :payment_method

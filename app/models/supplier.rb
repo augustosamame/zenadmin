@@ -2,6 +2,7 @@ class Supplier < ApplicationRecord
   audited_if_enabled
 
   include DefaultRegionable
+  include CustomNumberable
 
   belongs_to :region
   belongs_to :sourceable, polymorphic: true

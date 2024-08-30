@@ -14,7 +14,6 @@ module Services
       private
 
       def create_product_categories_and_tags_and_products
-
         CSV.foreach(@file_path, headers: true) do |row|
           product_category_name = row[0]
           tag1_name = row[2]
@@ -33,15 +32,15 @@ module Services
           brand_id = row[4]
 
           product_category = ProductCategory.find_by(name: product_category_name)
-          sku = generate_sku(product_category_name, index)
+          #custom_id = generate_custom_id(product_category_name, index)
 
           product = Product.create!(
-            name: product_name,
+            name: product_name.downcase.capitalize,
             description: "Description for #{product_name}",
             permalink: product_name.parameterize,
             price_cents: 5000,
             discounted_price_cents: 4000,
-            sku: sku,
+            #custom_id: custom_id,
             brand_id: brand_id,
             product_categories: [ product_category ]
           )
@@ -51,12 +50,11 @@ module Services
         end
       end
 
-      def generate_sku(product_category_name, index)
-        category_code = product_category_name[0, 3].upcase
-        id_code = index.to_s.rjust(5, "0")
-        "#{category_code}#{id_code}"
-      end
-      
+      #def generate_custom_id(product_category_name, index)
+      #  category_code = product_category_name[0, 3].upcase
+      #  id_code = index.to_s.rjust(5, "0")
+      #  "#{category_code}#{id_code}"
+      #end
     end
   end
 end

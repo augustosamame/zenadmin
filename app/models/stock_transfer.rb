@@ -1,6 +1,7 @@
 # app/models/stock_transfer.rb
 class StockTransfer < ApplicationRecord
   include AASM
+  include CustomNumberable
 
   belongs_to :user
   belongs_to :origin_warehouse, class_name: "Warehouse", optional: true
@@ -9,6 +10,7 @@ class StockTransfer < ApplicationRecord
   has_many :products, through: :stock_transfer_lines
 
   enum :status, { active: 0, inactive: 1 }
+  enum :adjustment_type, { merma: 0, pérdida_o_robo: 1, venta_incorrecta: 2, otros: 3 }
 
   aasm column: "stage" do
     state :pending, initial: true

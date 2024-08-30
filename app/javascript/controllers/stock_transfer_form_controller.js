@@ -8,6 +8,13 @@ export default class extends Controller {
     console.log("Stock transfer controller connected")
   }
 
+  toggleAdjustmentType(event) {
+    console.log("Toggling adjustment type field...");
+    event.preventDefault();
+    const adjustmentTypeField = document.getElementById("adjustment-type-field");
+    adjustmentTypeField.classList.toggle("hidden");
+  }
+
   addProduct(event) {
     event.preventDefault()
 

@@ -24,7 +24,7 @@ export default class extends Controller {
   }
 
   addItem(product) {
-    const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.sku}"]`);
+    const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.custom_id}"]`);
 
     if (existingItem) {
       this.updateExistingItem(existingItem, product);
@@ -229,13 +229,13 @@ export default class extends Controller {
     const itemElement = document.createElement('div');
     itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
     itemElement.setAttribute('data-item-name', item.name);
-    itemElement.setAttribute('data-item-sku', item.sku);
+    itemElement.setAttribute('data-item-sku', item.custom_id);
     itemElement.setAttribute('data-item-original-price', item.price);
     itemElement.setAttribute('data-item-quantity', item.quantity);
     itemElement.innerHTML = `
       <div class="flex-grow" style="flex-basis: 55%;">
         <span class="block font-medium">${item.name}</span>
-        <span class="block text-sm text-gray-500">${item.sku}</span>
+        <span class="block text-sm text-gray-500">${item.custom_id}</span>
       </div>
       <div class="flex-grow" style="flex-basis: 15%;">
         <span data-item-quantity="${item.quantity}">${item.quantity}</span>
@@ -261,12 +261,12 @@ export default class extends Controller {
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
       const id = item.dataset.productId;
       const name = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
-      const sku = item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim();
+      const custom_id = item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim();
       const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim());
       const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
 
-      orderItems.push({ id, name, sku, quantity, price, subtotal });
+      orderItems.push({ id, name, custom_id, quantity, price, subtotal });
     });
 
     return {
@@ -288,7 +288,7 @@ export default class extends Controller {
     const itemElement = document.createElement('div');
     itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
     itemElement.setAttribute('data-item-name', product.name);
-    itemElement.setAttribute('data-item-sku', product.sku);
+    itemElement.setAttribute('data-item-sku', product.custom_id);
     itemElement.setAttribute('data-item-original-price', product.price);
     itemElement.setAttribute('data-product-id', product.id);
     itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
@@ -296,7 +296,7 @@ export default class extends Controller {
     itemElement.innerHTML = `
       <div class="flex-grow" style="flex-basis: 55%;">
         <span class="block font-medium">${product.name}</span>
-        <span class="block text-sm text-gray-500">${product.sku}</span>
+        <span class="block text-sm text-gray-500">${product.custom_id}</span>
       </div>
       <div class="flex-grow" style="flex-basis: 15%;">
         <span data-item-quantity="${product.quantity}">${product.quantity}</span>

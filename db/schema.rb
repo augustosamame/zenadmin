@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
+ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -86,6 +86,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
   create_table "cash_inflows", force: :cascade do |t|
     t.bigint "cashier_shift_id", null: false
     t.bigint "received_by_id", null: false
+    t.string "custom_id", null: false
     t.text "description", null: false
     t.integer "cash_inflow_type", default: 0, null: false
     t.integer "amount_cents", null: false
@@ -93,13 +94,16 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cash_inflow_type"], name: "index_cash_inflows_on_cash_inflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_inflows_on_cashier_shift_id"
+    t.index ["custom_id"], name: "index_cash_inflows_on_custom_id", unique: true
     t.index ["received_by_id"], name: "index_cash_inflows_on_received_by_id"
   end
 
   create_table "cash_outflows", force: :cascade do |t|
     t.bigint "cashier_shift_id", null: false
     t.bigint "paid_to_id", null: false
+    t.string "custom_id", null: false
     t.text "description", null: false
     t.integer "cash_outflow_type", default: 0, null: false
     t.integer "amount_cents", null: false
@@ -107,7 +111,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["cash_outflow_type"], name: "index_cash_outflows_on_cash_outflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_outflows_on_cashier_shift_id"
+    t.index ["custom_id"], name: "index_cash_outflows_on_custom_id", unique: true
     t.index ["paid_to_id"], name: "index_cash_outflows_on_paid_to_id"
   end
 
@@ -187,6 +193,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_commissions_on_order_id"
     t.index ["user_id"], name: "index_commissions_on_user_id"
+  end
+
+  create_table "custom_numberings", force: :cascade do |t|
+    t.integer "record_type", default: 0, null: false
+    t.string "prefix", default: "", null: false
+    t.integer "next_number", default: 1, null: false
+    t.integer "length", default: 5, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["record_type", "prefix"], name: "index_custom_numberings_on_record_type_and_prefix", unique: true
   end
 
   create_table "customers", force: :cascade do |t|
@@ -288,6 +305,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.bigint "seller_id", null: false
     t.bigint "location_id", null: false
     t.bigint "region_id", null: false
+    t.string "custom_id", null: false
     t.integer "order_recipient_id"
     t.integer "total_price_cents"
     t.integer "total_discount_cents"
@@ -310,6 +328,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.datetime "updated_at", null: false
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
+    t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
     t.index ["location_id"], name: "index_orders_on_location_id"
     t.index ["order_date"], name: "index_orders_on_order_date"
     t.index ["region_id"], name: "index_orders_on_region_id"
@@ -332,6 +351,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.string "payable_type", null: false
     t.bigint "payable_id", null: false
     t.bigint "cashier_shift_id", null: false
+    t.string "custom_id", null: false
     t.integer "payment_request_id"
     t.integer "processor_transacion_id"
     t.integer "amount_cents", null: false
@@ -342,9 +362,13 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
+    t.index ["custom_id"], name: "index_payments_on_custom_id", unique: true
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
+    t.index ["payment_date"], name: "index_payments_on_payment_date"
     t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
+    t.index ["payment_request_id"], name: "index_payments_on_payment_request_id"
     t.index ["region_id"], name: "index_payments_on_region_id"
+    t.index ["status"], name: "index_payments_on_status"
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
@@ -373,7 +397,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
   end
 
   create_table "products", force: :cascade do |t|
-    t.string "sku", null: false
+    t.string "custom_id", null: false
     t.string "name", null: false
     t.integer "brand_id"
     t.text "description", null: false
@@ -385,6 +409,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.text "meta_keywords"
     t.text "meta_description"
     t.boolean "stockable", default: true
+    t.boolean "is_test_product", default: false
     t.datetime "available_at"
     t.datetime "deleted_at"
     t.integer "product_order", default: 0
@@ -392,9 +417,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.decimal "weight", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
+    t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"
     t.index ["product_order"], name: "index_products_on_product_order"
-    t.index ["sku"], name: "index_products_on_sku", unique: true
     t.index ["sourceable_type", "sourceable_id"], name: "index_products_on_sourceable"
     t.index ["status"], name: "index_products_on_status"
   end
@@ -413,18 +439,22 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
   create_table "purchases_purchases", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "region_id", null: false
+    t.string "custom_id", null: false
     t.datetime "purchase_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_purchases_purchases_on_custom_id", unique: true
     t.index ["region_id"], name: "index_purchases_purchases_on_region_id"
     t.index ["vendor_id"], name: "index_purchases_purchases_on_vendor_id"
   end
 
   create_table "purchases_vendors", force: :cascade do |t|
     t.string "name", null: false
+    t.string "custom_id", null: false
     t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_purchases_vendors_on_custom_id", unique: true
     t.index ["region_id"], name: "index_purchases_vendors_on_region_id"
   end
 
@@ -472,25 +502,34 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_29_215045) do
     t.bigint "user_id", null: false
     t.bigint "origin_warehouse_id"
     t.bigint "destination_warehouse_id"
+    t.string "custom_id", null: false
     t.string "guia"
     t.datetime "transfer_date", null: false
     t.text "comments"
+    t.boolean "is_adjustment", default: false
+    t.integer "adjustment_type", default: 0
     t.string "stage", default: "pending"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
+    t.index ["stage"], name: "index_stock_transfers_on_stage"
+    t.index ["status"], name: "index_stock_transfers_on_status"
+    t.index ["transfer_date"], name: "index_stock_transfers_on_transfer_date"
     t.index ["user_id"], name: "index_stock_transfers_on_user_id"
   end
 
   create_table "suppliers", force: :cascade do |t|
     t.string "name", null: false
+    t.string "custom_id", null: false
     t.string "sourceable_type"
     t.bigint "sourceable_id"
     t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_suppliers_on_custom_id", unique: true
     t.index ["region_id"], name: "index_suppliers_on_region_id"
     t.index ["sourceable_type", "sourceable_id"], name: "index_suppliers_on_sourceable"
   end

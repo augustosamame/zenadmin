@@ -3,6 +3,7 @@ class Product < ApplicationRecord
 
   include PgSearch::Model
   include MediaAttachable
+  include CustomNumberable
 
   belongs_to :brand
   belongs_to :sourceable, polymorphic: true, optional: true
@@ -19,7 +20,7 @@ class Product < ApplicationRecord
 
   enum :status, { active: 0, inactive: 1 }
 
-  validates :sku, presence: true
+  validates :custom_id, presence: true
   validates :name, presence: true
   validates :description, presence: true
   validates :permalink, presence: true
@@ -28,7 +29,7 @@ class Product < ApplicationRecord
   monetize :price_cents, with_model_currency: :currency
   monetize :discounted_price_cents, with_model_currency: :currency
 
-  pg_search_scope :search_by_sku_and_name, against: [ :sku, :name ], using: {
+  pg_search_scope :search_by_custom_id_and_name, against: [ :custom_id, :name ], using: {
       tsearch: { prefix: true, any_word: true },
       trigram: { threshold: 0.1 }
   }, ignoring: :accents
@@ -36,6 +37,8 @@ class Product < ApplicationRecord
   scope :tagged_with, ->(tag_name) {
     joins(:tags).where(tags: { name: tag_name })
   }
+
+  scope :without_tests, -> { where(is_test_product: false) }
 
   before_validation :set_permalink
 

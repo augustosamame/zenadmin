@@ -13,6 +13,7 @@ export default class extends Controller {
 
   toggle(event) {
     event.stopPropagation()
+    this.closeOtherDropdowns()
     this.menuTarget.classList.toggle('hidden')
   }
 
@@ -20,6 +21,14 @@ export default class extends Controller {
     if (!this.element.contains(event.target)) {
       this.menuTarget.classList.add('hidden')
     }
+  }
+
+  closeOtherDropdowns() {
+    document.querySelectorAll('[data-controller="dropdown"]').forEach((dropdown) => {
+      if (dropdown !== this.element) {
+        dropdown.querySelector('[data-dropdown-target="menu"]').classList.add('hidden')
+      }
+    })
   }
 
   handleAction(event) {

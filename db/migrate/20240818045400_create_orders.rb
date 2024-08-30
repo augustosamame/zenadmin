@@ -1,10 +1,11 @@
 class CreateOrders < ActiveRecord::Migration[7.2]
   def change
     create_table :orders do |t|
-      t.references :user, null: false, foreign_key: true
-      t.references :seller, null: false, foreign_key: { to_table: :users }
-      t.references :location, null: false, foreign_key: true
-      t.references :region, null: false, foreign_key: true
+      t.references :user, null: false, foreign_key: true, index: true
+      t.references :seller, null: false, foreign_key: { to_table: :users }, index: true
+      t.references :location, null: false, foreign_key: true, index: true
+      t.references :region, null: false, foreign_key: true, index: true
+      t.string :custom_id, null: false
       t.integer :order_recipient_id
       t.integer :total_price_cents
       t.integer :total_discount_cents
@@ -26,6 +27,8 @@ class CreateOrders < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
+
+    add_index :orders, :custom_id, unique: true
     add_index :orders, :active_invoice_id, unique: true
     add_index :orders, :cart_id
     add_index :orders, :order_date

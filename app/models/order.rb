@@ -2,6 +2,7 @@ class Order < ApplicationRecord
   audited_if_enabled
 
   include DefaultRegionable
+  include CustomNumberable
   include PgSearch::Model
 
   belongs_to :region

@@ -1,4 +1,6 @@
 class CashInflow < ApplicationRecord
+  include CustomNumberable
+  
   belongs_to :cashier_shift
   belongs_to :received_by, class_name: "User" # User who receives the cash
   has_one :cashier_transaction, as: :transactable, dependent: :destroy

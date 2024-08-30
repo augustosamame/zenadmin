@@ -1,5 +1,6 @@
 class Purchases::Purchase < ApplicationRecord
   include DefaultRegionable
+  include CustomNumberable
 
   belongs_to :region
   belongs_to :user

@@ -7,8 +7,10 @@
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
-          <th class="px-4 py-2 text-left">Número</th>
-          <th class="px-4 py-2 text-left">Guía</th>
+          <th class="px-4 py-2 text-left">Código</th>
+          <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+            <th class="px-4 py-2 text-left">Guía</th>
+          <% end %>
           <th class="px-4 py-2 text-left">Usuario</th>
           <th class="px-4 py-2 text-left">Origen</th>
           <th class="px-4 py-2 text-left">Destino</th>
@@ -23,8 +25,10 @@
       <tbody>
         <% @stock_transfers.each do |stock_transfer| %>
           <tr>
-            <td class="px-4 py-2"><%= stock_transfer.id %></td>
-            <td class="px-4 py-2"><%= stock_transfer.guia %></td>
+            <td class="px-4 py-2"><%= stock_transfer.custom_id %></td>
+            <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+              <td class="px-4 py-2"><%= stock_transfer.guia %></td>
+            <% end %>
             <td class="px-4 py-2"><%= stock_transfer.user&.name %></td>
             <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name || "Inventario Inicial" %></td>
             <td class="px-4 py-2"><%= stock_transfer.destination_warehouse&.name %></td>

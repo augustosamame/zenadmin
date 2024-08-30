@@ -4,14 +4,14 @@ class Admin::ProductsController < Admin::AdminController
   before_action :set_product, only: %i[edit update destroy]
   before_action :set_product_categories, only: %i[new edit create update]
 
-	def index
+  def index
     respond_to do |format|
       format.html do
         @products = Product
         .includes(:media, :warehouse_inventories)
         .left_joins(:warehouse_inventories) # Ensures products without inventory are included
         .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
-        .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock") # Use SQL to fetch stock in one go
+        .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc) # Use SQL to fetch stock in one go
 
 
         if @products.size > 1000
@@ -94,15 +94,15 @@ class Admin::ProductsController < Admin::AdminController
 
   def search
     if params[:query].blank?
-      @products = Product.active.includes(:warehouse_inventories).all
+      @products = Product.active.without_tests.includes(:warehouse_inventories).all
     else
       if params[:query].length <= 50
-        @products = Product.search_by_sku_and_name(params[:query])
+        @products = Product.active.without_tests.search_by_custom_id_and_name(params[:query])
       else
         @products = []
       end
     end
-    render json: @products.map { |product| { id: product.id, sku: product.sku, name: product.name, image: product.smart_image(:small), price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
+    render json: @products.map { |product| { id: product.id, custom_id: product.custom_id, name: product.name, image: product.smart_image(:small), price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
   end
 
   private
@@ -116,7 +116,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def product_params
-      params.require(:product).permit(:sku, :file_data, :name, :description, :permalink, :price, :discounted_price, :brand_id, :status, tag_ids: [], product_category_ids: [],
+      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, tag_ids: [], product_category_ids: [],
       media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ])
     end
 
@@ -139,13 +139,13 @@ class Admin::ProductsController < Admin::AdminController
 
       # Apply search filter
       if params[:search][:value].present?
-        products = products.search_by_sku_and_name(params[:search][:value])
+        products = products.search_by_custom_id_and_name(params[:search][:value])
       end
 
       # Apply sorting
       if params[:order].present?
         order_by = case params[:order]["0"][:column].to_i
-        when 0 then "sku"
+        when 0 then "custom_id"
         when 2 then "name"
         when 3 then "price_cents"
         when 4 then "discounted_price_cents"
@@ -169,7 +169,7 @@ class Admin::ProductsController < Admin::AdminController
         recordsFiltered: products.total_count,
         data: products.map do |product|
           [
-            product.sku,
+            product.custom_id,
             product_image_tag_thumb(product),
             product.name,
             number_to_currency(product.price_cents / 100.0),

@@ -1,10 +1,6 @@
 <%= simple_form_for([:admin, @product]) do |form| %>
   <%= render 'shared/form_errors', model: @product %>
   <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
-    
-    <div>
-      <%= form.input :sku, label: "SKU", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
-    </div>
 
     <div>
       <%= form.input :name, label: "Nombre", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
@@ -33,6 +29,10 @@
 
     <div>
       <%= form.association :brand, label: "Marca", prompt: "Selecciona la marca", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
+      <%= form.input :is_test_product, as: :boolean, label: "Producto de Testeo", input_html: { class: "form-checkbox mr-2" }, label_html: { class: "form-label" } %>
     </div>
 
     <div>
