@@ -43,7 +43,7 @@ Rails.application.routes.draw do
     get "inventory", to: "inventory/inventory#show"
 
     namespace :inventory do
-      resources :periodic_inventories, only: [:index, :new, :create, :show]
+      resources :periodic_inventories, only: [ :index, :new, :create, :show ]
     end
 
     resources :stock_transfers do

@@ -1,7 +1,6 @@
 module Services
   module Inventory
     class PeriodicInventoryService
-
       def initialize(periodic_inventory)
         @periodic_inventory = periodic_inventory
       end
@@ -16,7 +15,6 @@ module Services
 
         # Create inventory lines for each product in the warehouse
         warehouse.warehouse_inventories.each do |inventory|
-
           @periodic_inventory.periodic_inventory_lines.create!(
             product: inventory.product,
             stock: inventory.stock
@@ -39,7 +37,6 @@ module Services
       def self.create_manual_snapshot(warehouse:, user:, stock_transfer_ids: [])
         self.create_snapshot(warehouse: warehouse, user: user, inventory_type: :manual, stock_transfer_ids: stock_transfer_ids)
       end
-
     end
   end
 end

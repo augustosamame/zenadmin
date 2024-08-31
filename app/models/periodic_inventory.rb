@@ -15,5 +15,4 @@ class PeriodicInventory < ApplicationRecord
   def total_products
     periodic_inventory_lines.sum(:quantity)
   end
-
 end

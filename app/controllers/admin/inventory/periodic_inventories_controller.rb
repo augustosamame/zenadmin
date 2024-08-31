@@ -1,5 +1,4 @@
 class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
-
   def index
     @warehouse = @current_warehouse
     @periodic_inventories = PeriodicInventory.all.includes(:warehouse, :user).order(id: :desc)
@@ -13,7 +12,6 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
   end
 
   def new
-
     if params[:warehouse_id].present?
       @warehouse = Warehouse.find(params[:warehouse_id])
     else
@@ -27,7 +25,6 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc) # Use SQL to fetch stock in one go
 
     @datatable_options = "server_side:false;resource_name:'StockTransfer';sort_7_asc;no_buttons;create_button:false;"
-
   end
 
   def create
@@ -38,12 +35,12 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     else
       message = "Se han creado #{results[:differences_count]} transferencias de inventario"
     end
-    
+
     stock_transfers = []
 
     differences.each do |difference|
       stock_adjustment = difference[:stock_qty] - difference[:actual_qty]
-      if stock_adjustment > 0 #missing stock
+      if stock_adjustment > 0 # missing stock
         stock_transfer = StockTransfer.create!(
           user_id: current_user.id,
           comments: "Ajuste de inventario",
@@ -66,7 +63,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
 
         stock_transfers << stock_transfer
       else
-        #extra stock
+        # extra stock
         stock_transfer = StockTransfer.create!(
           user_id: current_user.id,
           comments: "Ajuste de inventario",
@@ -77,7 +74,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           transfer_date: Time.now,
           destination_warehouse_id: difference[:warehouse_id],
           stock_transfer_lines_attributes: [
-            { 
+            {
               product_id: difference[:product_id],
               quantity: stock_adjustment.abs
             }
@@ -89,12 +86,10 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
 
         stock_transfers << stock_transfer
       end
-      
     end
 
     Services::Inventory::PeriodicInventoryService.create_manual_snapshot(warehouse: @current_warehouse, user: current_user, stock_transfer_ids: stock_transfers.pluck(:id))
 
-    render partial: 'admin/inventory/periodic_inventories/stock_adjustments', locals: { stock_transfers: stock_transfers, message: message }
+    render partial: "admin/inventory/periodic_inventories/stock_adjustments", locals: { stock_transfers: stock_transfers, message: message }
   end
-
 end
