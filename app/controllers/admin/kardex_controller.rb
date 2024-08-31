@@ -8,7 +8,7 @@ class Admin::KardexController < Admin::AdminController
     if params[:warehouse_id].present?
       @warehouse = Warehouse.find(params[:warehouse_id])
     end
-end
+  end
 
   def fetch_kardex_movements
     product = Product.find(params[:product_id])
@@ -16,18 +16,18 @@ end
     # Fetch stock transfers and orders related to the product
     stock_transfers = product.stock_transfer_lines
                             .joins(:stock_transfer)
-                            .includes(stock_transfer: [:origin_warehouse, :destination_warehouse])
-                            .where(stock_transfers: { stage: 'complete' })
-                            .where('stock_transfers.origin_warehouse_id = ? OR stock_transfers.destination_warehouse_id = ?', selected_warehouse.id, selected_warehouse.id)
+                            .includes(stock_transfer: [ :origin_warehouse, :destination_warehouse ])
+                            .where(stock_transfers: { stage: "complete" })
+                            .where("stock_transfers.origin_warehouse_id = ? OR stock_transfers.destination_warehouse_id = ?", selected_warehouse.id, selected_warehouse.id)
                             .order(:created_at)
 
     orders = OrderItem
       .joins(order: { location: :warehouses }) # Join order_items to orders, then to locations, then to warehouses
       .where(product_id: product.id) # Filter by the product_id
       .where(warehouses: { id: selected_warehouse.id }) # Filter to include only matching warehouse
-      .where('warehouses.id = (SELECT id FROM warehouses WHERE warehouses.location_id = locations.id ORDER BY warehouses.created_at LIMIT 1)') # Ensure it's the first warehouse
+      .where("warehouses.id = (SELECT id FROM warehouses WHERE warehouses.location_id = locations.id ORDER BY warehouses.created_at LIMIT 1)") # Ensure it's the first warehouse
       .includes(:order) # Eager load orders to prevent N+1 queries
-      .order('order_items.created_at') # Order the results by order_items' creation date
+      .order("order_items.created_at") # Order the results by order_items' creation date
 
     # Combine and sort movements by creation date
     movements = (stock_transfers + orders).sort_by(&:created_at)
@@ -74,12 +74,11 @@ end
 
       movement_hash
     end
-    
+
     # Respond with Turbo Stream or HTML
     respond_to do |format|
       format.turbo_stream
-      #format.html { render partial: 'admin/kardex/kardex_table', locals: { movements: @movements } }
+      # format.html { render partial: 'admin/kardex/kardex_table', locals: { movements: @movements } }
     end
   end
-  
 end

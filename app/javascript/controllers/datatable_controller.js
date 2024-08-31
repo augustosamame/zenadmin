@@ -7,6 +7,7 @@ export default class extends Controller {
   }
 
   connect() {
+    console.log('datatable controller connected');
     if (typeof $.fn.dataTable.moment === 'function') {
       $.fn.dataTable.moment('DD/MM/YYYY | HH:mm');
     } else {
@@ -48,7 +49,14 @@ export default class extends Controller {
 
     const allAdditionalOptions = this.optionsValue;
 
+    console.log('allAdditionalOptions', allAdditionalOptions);
+
     const resourceNameMatch = allAdditionalOptions.match(/resource_name:'([^']+)'/);
+    if (!resourceNameMatch) {
+      console.error('Error: resource_name option is missing.');
+      return;
+    }
+
     const resourceName = resourceNameMatch ? resourceNameMatch[1] : null;
     const snakeCaseName = resourceName.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
     const resourceNamePlural = snakeCaseName.endsWith('s') ? snakeCaseName : snakeCaseName + 's';

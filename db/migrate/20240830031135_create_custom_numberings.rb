@@ -10,6 +10,6 @@ class CreateCustomNumberings < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :custom_numberings, [:record_type, :prefix], unique: true
+    add_index :custom_numberings, [ :record_type, :prefix ], unique: true
   end
 end

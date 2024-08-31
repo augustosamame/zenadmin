@@ -32,7 +32,7 @@ module Services
           brand_id = row[4]
 
           product_category = ProductCategory.find_by(name: product_category_name)
-          #custom_id = generate_custom_id(product_category_name, index)
+          # custom_id = generate_custom_id(product_category_name, index)
 
           product = Product.create!(
             name: product_name.downcase.capitalize,
@@ -40,7 +40,7 @@ module Services
             permalink: product_name.parameterize,
             price_cents: 5000,
             discounted_price_cents: 4000,
-            #custom_id: custom_id,
+            # custom_id: custom_id,
             brand_id: brand_id,
             product_categories: [ product_category ]
           )
@@ -50,11 +50,11 @@ module Services
         end
       end
 
-      #def generate_custom_id(product_category_name, index)
+      # def generate_custom_id(product_category_name, index)
       #  category_code = product_category_name[0, 3].upcase
       #  id_code = index.to_s.rjust(5, "0")
       #  "#{category_code}#{id_code}"
-      #end
+      # end
     end
   end
 end

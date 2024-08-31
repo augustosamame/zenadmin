@@ -4,7 +4,7 @@ module Services
       def initialize(order)
         @order = order
       end
-   
+
       def update_inventory
         warehouse = @order.location.warehouses.first
         @order.order_items.each do |order_item|
@@ -16,8 +16,6 @@ module Services
           end
         end
       end
-
-      
     end
   end
 end

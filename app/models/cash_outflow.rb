@@ -1,6 +1,6 @@
 class CashOutflow < ApplicationRecord
   include CustomNumberable
-  
+
   belongs_to :cashier_shift
   belongs_to :paid_to, class_name: "User" # User who received the cash outflow
   has_one :cashier_transaction, as: :transactable, dependent: :destroy

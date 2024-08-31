@@ -20,7 +20,7 @@ class CustomNumbering < ApplicationRecord
 
   # Convert the model name to the record type taking into account namespaced models
   def self.record_type_for_model(model_name)
-    model_name.underscore.gsub('/', '_').to_sym
+    model_name.underscore.gsub("/", "_").to_sym
   end
 
   private
