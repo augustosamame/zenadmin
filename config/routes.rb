@@ -40,6 +40,11 @@ Rails.application.routes.draw do
 
     resources :warehouses
     patch "/set_current_warehouse", to: "warehouses#set_current_warehouse"
+    get "inventory", to: "inventory/inventory#show"
+
+    namespace :inventory do
+      resources :periodic_inventories, only: [:index, :new, :create, :show]
+    end
 
     resources :stock_transfers do
       member do

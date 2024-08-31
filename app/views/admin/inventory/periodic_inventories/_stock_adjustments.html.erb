@@ -1,0 +1,31 @@
+<div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="px-4 py-4">
+    <h1 class="px-4 py-4 text-lg font-bold">Resultados del procesamiento de inventario físico</h1>
+  </div>
+  <table class="min-w-full bg-white dark:bg-slate-800">
+    <thead>
+      <tr>
+        <th class="px-4 py-2 text-left">Producto</th>
+        <th class="px-4 py-2 text-left">Almacén Origen</th>
+        <th class="px-4 py-2 text-left">Almacén Destino</th>
+        <th class="px-4 py-2 text-left">Cantidad Ajustada</th>
+        <th class="px-4 py-2 text-left">Tipo de Ajuste</th>
+        <th class="px-4 py-2 text-left">Comentarios</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% stock_transfers.each do |stock_transfer| %>
+        <% stock_transfer.stock_transfer_lines.each do |line| %>
+          <tr>
+            <td class="px-4 py-2"><%= line.product.name %></td>
+            <td class="px-4 py-2"><%= stock_transfer.origin_warehouse_id ? Warehouse.find(stock_transfer.origin_warehouse_id).name : 'N/A' %></td>
+            <td class="px-4 py-2"><%= stock_transfer.destination_warehouse_id ? Warehouse.find(stock_transfer.destination_warehouse_id).name : 'N/A' %></td>
+            <td class="px-4 py-2"><%= line.quantity %></td>
+            <td class="px-4 py-2"><%= stock_transfer.adjustment_type.humanize %></td>
+            <td class="px-4 py-2"><%= stock_transfer.comments %></td>
+          </tr>
+        <% end %>
+      <% end %>
+    </tbody>
+  </table>
+</div>

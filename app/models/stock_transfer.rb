@@ -5,7 +5,8 @@ class StockTransfer < ApplicationRecord
 
   belongs_to :user
   belongs_to :origin_warehouse, class_name: "Warehouse", optional: true
-  belongs_to :destination_warehouse, class_name: "Warehouse"
+  belongs_to :destination_warehouse, class_name: "Warehouse", optional: true
+  belongs_to :periodic_inventory, class_name: "PeriodicInventory", optional: true
   has_many :stock_transfer_lines, dependent: :destroy
   has_many :products, through: :stock_transfer_lines
 
@@ -29,7 +30,6 @@ class StockTransfer < ApplicationRecord
 
   accepts_nested_attributes_for :stock_transfer_lines, allow_destroy: true
 
-  validates :destination_warehouse, presence: true
   validate :different_warehouses
 
   before_destroy :check_if_can_be_destroyed

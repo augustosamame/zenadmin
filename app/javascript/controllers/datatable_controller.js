@@ -59,11 +59,14 @@ export default class extends Controller {
 
     const resourceName = resourceNameMatch ? resourceNameMatch[1] : null;
     const snakeCaseName = resourceName.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
-    const resourceNamePlural = snakeCaseName.endsWith('s') ? snakeCaseName : snakeCaseName + 's';
+    let resourceNamePlural = snakeCaseName.endsWith('s') ? snakeCaseName : snakeCaseName + 's';
 
     // Add custom "Crear" button if resourceName is provided and create_button is not false
     if (resourceName && !allAdditionalOptions.includes("create_button:false")) {
       const capitalizedResourceName = resourceName.charAt(0).toUpperCase() + resourceName.slice(1);
+      if (resourceNamePlural === 'periodic_inventorys') {
+        resourceNamePlural = 'inventory/periodic_inventories';
+      }
       const createButton = {
         text: `Crear ${capitalizedResourceName}`,
         action: () => {
@@ -72,6 +75,10 @@ export default class extends Controller {
         className: 'dt-button bg-green-500 text-white hover:bg-green-400'
       };
       initialOptions.layout.top2Start.buttons.push(createButton);
+    }
+
+    if (allAdditionalOptions.includes("paging:false")) {
+      initialOptions.paging = false;
     }
 
     // Check if the table is set for server-side processing

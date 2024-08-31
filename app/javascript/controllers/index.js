@@ -28,11 +28,14 @@ application.register("dropdown", DropdownController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import Inventory__KardexController from "./inventory/kardex_controller"
+application.register("inventory--kardex", Inventory__KardexController)
+
 import Inventory__SelectWarehouseController from "./inventory/select_warehouse_controller"
 application.register("inventory--select-warehouse", Inventory__SelectWarehouseController)
 
-import Inventory__KardexController from "./inventory/kardex_controller"
-application.register("inventory--kardex", Inventory__KardexController)
+import InventoryController from "./inventory_controller"
+application.register("inventory", InventoryController)
 
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)

@@ -372,6 +372,33 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
     t.index ["user_id"], name: "index_payments_on_user_id"
   end
 
+  create_table "periodic_inventories", force: :cascade do |t|
+    t.bigint "warehouse_id", null: false
+    t.bigint "user_id", null: false
+    t.datetime "snapshot_date", null: false
+    t.integer "inventory_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["inventory_type"], name: "index_periodic_inventories_on_inventory_type"
+    t.index ["snapshot_date"], name: "index_periodic_inventories_on_snapshot_date"
+    t.index ["status"], name: "index_periodic_inventories_on_status"
+    t.index ["user_id"], name: "index_periodic_inventories_on_user_id"
+    t.index ["warehouse_id"], name: "index_periodic_inventories_on_warehouse_id"
+  end
+
+  create_table "periodic_inventory_lines", force: :cascade do |t|
+    t.bigint "periodic_inventory_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "stock", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["periodic_inventory_id"], name: "index_periodic_inventory_lines_on_periodic_inventory_id"
+    t.index ["product_id"], name: "index_periodic_inventory_lines_on_product_id"
+    t.index ["status"], name: "index_periodic_inventory_lines_on_status"
+  end
+
   create_table "product_categories", force: :cascade do |t|
     t.string "name", null: false
     t.bigint "parent_id"
@@ -508,6 +535,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
     t.text "comments"
     t.boolean "is_adjustment", default: false
     t.integer "adjustment_type", default: 0
+    t.bigint "periodic_inventory_id"
     t.string "stage", default: "pending"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
@@ -515,6 +543,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
     t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
+    t.index ["periodic_inventory_id"], name: "index_stock_transfers_on_periodic_inventory_id"
     t.index ["stage"], name: "index_stock_transfers_on_stage"
     t.index ["status"], name: "index_stock_transfers_on_status"
     t.index ["transfer_date"], name: "index_stock_transfers_on_transfer_date"
@@ -646,6 +675,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
   add_foreign_key "payments", "payment_methods"
   add_foreign_key "payments", "regions"
   add_foreign_key "payments", "users"
+  add_foreign_key "periodic_inventories", "users"
+  add_foreign_key "periodic_inventories", "warehouses"
+  add_foreign_key "periodic_inventory_lines", "periodic_inventories"
+  add_foreign_key "periodic_inventory_lines", "products"
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"
@@ -656,6 +689,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
   add_foreign_key "purchases_vendors", "regions"
   add_foreign_key "stock_transfer_lines", "products"
   add_foreign_key "stock_transfer_lines", "stock_transfers"
+  add_foreign_key "stock_transfers", "periodic_inventories"
   add_foreign_key "stock_transfers", "users"
   add_foreign_key "stock_transfers", "warehouses", column: "destination_warehouse_id"
   add_foreign_key "stock_transfers", "warehouses", column: "origin_warehouse_id"

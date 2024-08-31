@@ -10,6 +10,7 @@ class CreateStockTransfers < ActiveRecord::Migration[7.2]
       t.text :comments
       t.boolean :is_adjustment, default: false
       t.integer :adjustment_type, default: 0
+      t.references :periodic_inventory, null: true, foreign_key: { to_table: :periodic_inventories }, index: true
       t.string :stage, default: 'pending'
       t.integer :status, default: 0
 

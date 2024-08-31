@@ -1,0 +1,59 @@
+<%= render "shared/admin/nav", { header_title: "Productos - #{@warehouse&.name}" } do %>
+  <%= render_select_warehouse_dropdown(current_user) %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div id="inventory-results" class="mt-6"></div>
+
+<div class="px-4 mb-16" data-controller="datatable inventory" data-datatable-options-value="<%= @datatable_options %>" data-warehouse-id="<%= @warehouse.id %>">
+  <div class="flex justify-end mb-4">
+    <button class="px-4 py-2 mr-[30px] text-white bg-blue-500 rounded" data-action="click->inventory#processInventory" data-inventory-target="processButton">Procesar Diferencias</button>
+  </div>
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Codigo</th>
+          <th class="px-4 py-2 text-left">Imagen</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Precio</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Stock</th>
+          <th class="px-4 py-2 text-left">Acción</th>
+          <th class="px-4 py-2 text-left">Físico</th>
+          <th class="px-4 py-2 text-left">Ajuste</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr data-product-id="<%= product.id %>" data-inventory-target="row">
+            <td class="px-4 py-2"><%= product.custom_id %></td>
+            <td class="flex items-center px-4 py-2 space-x-3">
+              <%= image_tag product.smart_image(:thumb), alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
+            </td>
+            <td class="px-4 py-2"><%= product.name %></td>
+            <td class="px-4 py-2"><%= number_to_currency(product.price, unit: 'S/') %></td>
+            <td class="px-4 py-2"><%= product.status %></td>
+            <td class="px-4 py-2" data-inventory-target="stock"><%= product.stock(@warehouse) %></td>
+
+            <td class="px-4 py-2">
+              <button class="p-2 text-white bg-green-500 rounded-full" data-action="click->inventory#matchStock" data-inventory-target="matchButton">
+                <i class="fas fa-check"></i>
+              </button>
+            </td>
+            <td class="px-4 py-2">
+              <input type="number" class="block w-20 rounded-md form-input border-slate-300 focus:border-primary-500 focus:ring-primary-500" placeholder="" data-inventory-target="actualStock" value="<%= product.stock(@warehouse).zero? ? 0 : '' %>" data-action="input->inventory#checkStock">
+            </td>
+            <td class="px-4 py-2">
+              <select class="hidden block w-full rounded-md form-select border-slate-300 focus:border-primary-500 focus:ring-primary-500" data-inventory-target="adjustmentType">
+                <% StockTransfer.adjustment_types.keys.each do |key| %>
+                  <option value="<%= key %>"><%= key.humanize %></option>
+                <% end %>
+              </select>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
