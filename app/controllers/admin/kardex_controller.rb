@@ -68,8 +68,13 @@ class Admin::KardexController < Admin::AdminController
         movement_hash[:origin_warehouse_name] = movement.order.location.warehouses.first.name
       else
         movement_hash[:custom_id] = movement.stock_transfer.custom_id
-        movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
-        movement_hash[:destination_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+        if movement.stock_transfer.origin_warehouse_id == selected_warehouse.id
+          movement_hash[:origin_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+          movement_hash[:destination_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+        else
+          movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+          movement_hash[:destination_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+        end
       end
 
       movement_hash

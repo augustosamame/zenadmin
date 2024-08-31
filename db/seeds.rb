@@ -44,7 +44,9 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
 location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
-warehouse_2 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id)
+warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi")
+warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa")
+warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id)
 
 cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
 
