@@ -1,0 +1,36 @@
+<div id="kardex-table" data-inventory--kardex-target="table">
+  <table class="min-w-full divide-y divide-gray-200">
+    <thead class="bg-gray-50">
+      <tr>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Hora</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Código Mov</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Origen</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Destino</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Ingreso</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Salida</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Stock</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-gray-200">
+      <% movements.each do |movement| %>
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].to_date %></td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].strftime("%H:%M") %></td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:type] == "OrderItem" ? 'Order' : 'Stock Transfer' %></td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:custom_id] %></td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <%= movement[:type] == "OrderItem" ? movement[:origin_warehouse_name] : (movement[:qty_out] > 0 ? movement[:destination_warehouse_name] : movement[:origin_warehouse_name]) %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <%= movement[:type] == "OrderItem" ? movement[:customer_name] : (movement[:qty_out] > 0 ? movement[:origin_warehouse_name] : movement[:destination_warehouse_name]) %>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:qty_in] %></td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:qty_out] %></td>
+          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:final_stock] %></td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+</div>  

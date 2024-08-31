@@ -13,7 +13,10 @@ class Product < ApplicationRecord
   has_many :purchase_lines, class_name: "Purchases::PurchaseLine"
   has_many :warehouse_inventories, dependent: :destroy
   has_many :warehouses, through: :warehouse_inventories
-
+  has_many :stock_transfer_lines
+  has_many :stock_transfers, through: :stock_transfer_lines
+  has_many :order_items
+  has_many :orders, through: :order_items
   has_many :combo_products_as_product_1, class_name: "ComboProduct", foreign_key: "product_1_id"
   has_many :combo_products_as_product_2, class_name: "ComboProduct", foreign_key: "product_2_id"
 

@@ -31,6 +31,9 @@ application.register("hello", HelloController)
 import Inventory__SelectWarehouseController from "./inventory/select_warehouse_controller"
 application.register("inventory--select-warehouse", Inventory__SelectWarehouseController)
 
+import Inventory__KardexController from "./inventory/kardex_controller"
+application.register("inventory--kardex", Inventory__KardexController)
+
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 

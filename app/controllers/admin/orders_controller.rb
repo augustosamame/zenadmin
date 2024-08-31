@@ -48,6 +48,7 @@ class Admin::OrdersController < Admin::AdminController
         if order_params[:sellers_attributes].present?
           Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
         end
+        Services::Inventory::OrderItemService.new(@order).update_inventory
 
         session.delete(:draft_order)
         render json: { status: "success", id: @order.id, message: "Order created successfully." }
