@@ -185,6 +185,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
   create_table "commissions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "order_id", null: false
+    t.integer "sale_amount_cents", null: false
     t.integer "amount_cents", null: false
     t.string "currency", default: "PEN"
     t.integer "percentage", null: false

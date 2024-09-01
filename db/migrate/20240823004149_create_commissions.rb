@@ -3,6 +3,7 @@ class CreateCommissions < ActiveRecord::Migration[7.2]
     create_table :commissions do |t|
       t.references :user, null: false, foreign_key: true
       t.references :order, null: false, foreign_key: true
+      t.integer :sale_amount_cents, null: false
       t.integer :amount_cents, null: false
       t.string :currency, default: "PEN"
       t.integer :percentage, null: false

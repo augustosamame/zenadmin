@@ -31,9 +31,12 @@
           <!-- <th class="px-4 py-2 text-left">Cajero</th> -->
           <th class="px-4 py-2 text-left">Vendedor</th>
           <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Tienda</th>
+          <th class="px-4 py-2 text-left">Comisión Tda</th>
           <th class="px-4 py-2 text-left">Venta</th>
           <th class="px-4 py-2 text-left">Monto de Venta</th>
-          <th class="px-4 py-2 text-left">Porcentaje</th>
+          <th class="px-4 py-2 text-left">Porc</th>
+          <th class="px-4 py-2 text-left">Venta Comisionable</th>
           <th class="px-4 py-2 text-left">Comisión</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Acciones</th>
@@ -44,9 +47,12 @@
           <tr>
             <td class="px-4 py-2"><%= commission.user.name %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, commission.created_at, false) %></td>
-            <td class="px-4 py-2"><%= commission.order.id %></td>
+            <td class="px-4 py-2"><%= commission.order.location.name %></td>
+            <td class="px-4 py-2"><%= commission.order.location.seller_comission_percentage %>%</td>
+            <td class="px-4 py-2"><%= commission.order.custom_id %></td>
             <td class="px-4 py-2"><%= humanized_money_with_symbol(commission.order.total_price - commission.order.total_discount) %></td>
             <td class="px-4 py-2"><%= commission.percentage %>%</td>
+            <td class="px-4 py-2"><%= (commission.order.total_price - commission.order.total_discount) * commission.percentage / 100 %></td>
             <td class="px-4 py-2"><%= humanized_money_with_symbol commission.amount %></td>
             <td class="px-4 py-2"><%= commission.status %></td>
             <td class="px-4 py-2">

@@ -29,24 +29,26 @@ CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: 'COU', le
 CustomNumbering.find_or_create_by!(record_type: :payment, prefix: 'PAY', length: 5, next_number: 1, status: :active)
 CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: 'INT', length: 5, next_number: 1, status: :active)
 
+region_default = Region.find_or_create_by!(name: 'default')
+
 brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
 brand_2 = Brand.find_or_create_by!(name: 'Otros')
 category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
 category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
 
-vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti')
-vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price')
-factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory')
+vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti', region: region_default)
+vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price', region: region_default)
+factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory', region: region_default)
 
-supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1)
-supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1)
+supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1, region: region_default)
+supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, region: region_default)
 
-location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: Region.first, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
+location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
 
-warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal")
-warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi")
-warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa")
-warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id)
+warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default )
+warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
+warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default )
+warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id, region: region_default)
 
 cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
 
@@ -109,7 +111,7 @@ PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')
-  User.create!(email: 'ecommerce@devtechperu.com', phone: "900000000", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module", internal: true) unless ecommerce_module_user_already_exists
+  User.create!(email: 'ecommerce@devtechperu.com', phone: "900000000", login: "ecommerce@devtechperu.com", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module", internal: true) unless ecommerce_module_user_already_exists
 end
 
 Role.find_or_create_by!(name: 'super_admin')
@@ -117,20 +119,20 @@ Role.find_or_create_by!(name: 'admin')
 Role.find_or_create_by!(name: 'seller')
 Role.find_or_create_by!(name: 'customer')
 
-user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
+user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
 user1.add_role('super_admin')
 
-generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
+generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
 generic_customer.add_role('customer')
 
-user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Samamé")
+user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", login: "customer1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Samamé")
 user2.add_role('customer')
 
-user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", require_password_change: false, password: "12345678", first_name: "Maria", last_name: "Angeles", location_id: location_1.id)
+user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", login: "seller1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Maria", last_name: "Angeles", location_id: location_1.id)
 user3.add_role('seller')
-user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", require_password_change: false, password: "12345678", first_name: "Patricia", last_name: "Artieda", location_id: location_1.id)
+user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", login: "seller2@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Patricia", last_name: "Artieda", location_id: location_1.id)
 user4.add_role('seller')
-user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
+user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", login: "seller3@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
 user5.add_role('seller')
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import
