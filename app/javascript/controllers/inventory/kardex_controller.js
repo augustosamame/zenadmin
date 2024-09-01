@@ -22,7 +22,7 @@ export default class extends Controller {
     const warehouseId = this.warehouseSelectTarget.value
 
     if (productId) {
-      const url = new URL('/admin/fetch_kardex_movements', window.location.origin)
+      const url = new URL('/admin/inventory/fetch_kardex_movements', window.location.origin)
       url.searchParams.append('product_id', productId)
       if (warehouseId) {
         url.searchParams.append('warehouse_id', warehouseId)

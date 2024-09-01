@@ -1,0 +1,3 @@
+<%= turbo_stream.replace "kardex-table" do %>
+  <%= render partial: 'admin/inventory/kardex/kardex_table', locals: { movements: @movements } %>
+<% end %>

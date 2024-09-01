@@ -1,6 +1,6 @@
 <%= render "shared/admin/nav", { header_title: "Kardex de Producto#{ current_user.any_admin? ? '' : ' Almacén - ' + current_warehouse.name }", back_icon: true } %>
 
-<%= simple_form_for :kardex, url: admin_fetch_kardex_movements_path, method: :get, html: { data: { controller: "inventory--kardex" } } do |f| %>
+<%= simple_form_for :kardex, url: admin_inventory_fetch_kardex_movements_path, method: :get, html: { data: { controller: "inventory--kardex" } } do |f| %>
 
   <div class="flex space-x-4">
     <div class="p-6 mb-4 w-96">

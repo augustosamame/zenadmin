@@ -19,9 +19,6 @@ Rails.application.routes.draw do
       get "combo_products_show", on: :member
     end
 
-    get "kardex", to: "kardex#show"
-    get "fetch_kardex_movements", to: "kardex#fetch_kardex_movements"
-
     resources :product_categories do
       resources :media, module: :admin
     end
@@ -43,6 +40,8 @@ Rails.application.routes.draw do
     get "inventory", to: "inventory/inventory#show"
 
     namespace :inventory do
+      get "kardex", to: "kardex#show"
+      get "fetch_kardex_movements", to: "kardex#fetch_kardex_movements"
       resources :periodic_inventories, only: [ :index, :new, :create, :show ]
     end
 

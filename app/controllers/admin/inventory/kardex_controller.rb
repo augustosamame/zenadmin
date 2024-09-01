@@ -1,4 +1,4 @@
-class Admin::KardexController < Admin::AdminController
+class Admin::Inventory::KardexController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
   def show
@@ -83,7 +83,7 @@ class Admin::KardexController < Admin::AdminController
     # Respond with Turbo Stream or HTML
     respond_to do |format|
       format.turbo_stream
-      # format.html { render partial: 'admin/kardex/kardex_table', locals: { movements: @movements } }
+      # format.html { render partial: 'admin/inventorykardex/kardex_table', locals: { movements: @movements } }
     end
   end
 end
