@@ -1,0 +1,22 @@
+<%= render "shared/admin/nav", { header_title: "New Seller Biweekly Sales Target" } do %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">
+          Crear Nueva Meta Quincenal por Vendedor
+        </h3>
+        <p class="max-w-2xl mt-1 text-sm text-gray-500">
+          Establece una nueva meta para un vendedor.
+        </p>
+      </div>
+      <div class="px-4 py-5 border-t border-gray-200 sm:p-0">
+        <div class="sm:px-6 sm:py-5">
+          <%= render 'form', seller_biweekly_sales_target: @seller_biweekly_sales_target %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -82,6 +82,9 @@ application.register("pos--sellers-modal", Pos__SellersModalController)
 import SelectController from "./select_controller"
 application.register("select", SelectController)
 
+import SellerBiweeklySalesTargetFormController from "./seller_biweekly_sales_target_form_controller"
+application.register("seller-biweekly-sales-target-form", SellerBiweeklySalesTargetFormController)
+
 import StockTransferFormController from "./stock_transfer_form_controller"
 application.register("stock-transfer-form", StockTransferFormController)
 

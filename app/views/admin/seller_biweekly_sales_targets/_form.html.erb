@@ -1,0 +1,99 @@
+<%= simple_form_for [:admin, @seller_biweekly_sales_target], html: { class: 'space-y-8', data: { controller: 'seller-biweekly-sales-target-form' } } do |f| %>
+  <%= f.error_notification %>
+
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">
+        Selección de Vendedor y Período
+      </h3>
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <%= f.association :seller,
+                            label: 'Vendedor',
+                            collection: User.with_role(:seller), 
+                            prompt: "Selecciona un Vendedor", 
+                            input_html: { 
+                              class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                              data: { 'seller-biweekly-sales-target-form-target': 'sellerSelect' }
+                            },
+                            label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.input :year_month_period, 
+                      label: 'Período',
+                      input_html: { 
+                        value: SellerBiweeklySalesTarget.generate_year_month_period(Date.current),
+                        readonly: true,
+                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                      },
+                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8 overflow-hidden shadow bg-gray-50 sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">
+        Datos de Referencia
+      </h3>
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <%= f.input :reference_periods,
+                      label: 'Número de períodos anteriores a mostrar',
+                      input_html: { 
+                        value: 2,
+                        type: 'number',
+                        min: 1,
+                        max: 5,
+                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                        data: { 'seller-biweekly-sales-target-form-target': 'referencePeriods' }
+                      },
+                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+        </div>
+      </div>
+      <div class="mt-4" data-seller-biweekly-sales-target-form-target="referenceData">
+        <!-- Reference data will be dynamically inserted here -->
+      </div>
+    </div>
+  </div>
+
+  <div class="mt-8 overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">
+        Información de Meta
+      </h3>
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <%= f.input :sales_target_cents, 
+                      label: 'Meta', 
+                      input_html: { 
+                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                        data: { 'seller-biweekly-sales-target-form-target': 'salesTarget' }
+                      },
+                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= f.input :target_commission, 
+                      label: 'Comisión por Meta (%)', 
+                      input_html: { 
+                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                        data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
+                      },
+                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%= f.input :status, as: :hidden, input_html: { value: 'pending' } %>
+
+  <div class="pt-5">
+    <div class="flex justify-end">
+      <%= link_to "Cancelar", admin_seller_biweekly_sales_targets_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      <%= f.button :submit, "Grabar", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    </div>
+  </div>
+<% end %>

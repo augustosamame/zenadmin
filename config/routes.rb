@@ -41,6 +41,11 @@ Rails.application.routes.draw do
       end
     end
     resources :commission_ranges
+    resources :seller_biweekly_sales_targets do
+      collection do
+        get "seller_data"
+      end
+    end
 
     resources :warehouses
     patch "/set_current_warehouse", to: "warehouses#set_current_warehouse"

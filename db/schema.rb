@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_01_070002) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_02_182820) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -512,6 +512,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_01_070002) do
     t.index ["name"], name: "index_roles_on_name", unique: true
   end
 
+  create_table "seller_biweekly_sales_targets", force: :cascade do |t|
+    t.bigint "seller_id", null: false
+    t.bigint "user_id", null: false
+    t.string "year_month_period"
+    t.integer "sales_target_cents", null: false
+    t.decimal "target_commission", precision: 5, scale: 2, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["seller_id", "year_month_period"], name: "index_targets_on_seller_id_and_year_month_period", unique: true
+    t.index ["seller_id"], name: "index_seller_biweekly_sales_targets_on_seller_id"
+    t.index ["user_id"], name: "index_seller_biweekly_sales_targets_on_user_id"
+  end
+
   create_table "settings", force: :cascade do |t|
     t.string "name", null: false
     t.string "localized_name", null: false
@@ -703,6 +717,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_01_070002) do
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchases", "regions"
   add_foreign_key "purchases_vendors", "regions"
+  add_foreign_key "seller_biweekly_sales_targets", "users"
+  add_foreign_key "seller_biweekly_sales_targets", "users", column: "seller_id"
   add_foreign_key "stock_transfer_lines", "products"
   add_foreign_key "stock_transfer_lines", "stock_transfers"
   add_foreign_key "stock_transfers", "periodic_inventories"

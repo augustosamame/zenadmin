@@ -1,0 +1,45 @@
+<%= render "shared/admin/nav", { header_title: "Seller Biweekly Sales Target Details" } do %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto sm:px-6 lg:px-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">
+          Meta Quincenal por Vendedor
+        </h3>
+        <p class="max-w-2xl mt-1 text-sm text-gray-500">
+          Detalles de la meta de <%= @seller_biweekly_sales_target.seller.full_name %>.
+        </p>
+      </div>
+      <div class="border-t border-gray-200">
+        <dl>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Vendedor</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @seller_biweekly_sales_target.seller.name %></dd>
+          </div>
+          <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Período</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @seller_biweekly_sales_target.year_month_period %></dd>
+          </div>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Meta</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_currency(@seller_biweekly_sales_target.sales_target_cents / 100.0) %></dd>
+          </div>
+          <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Comisión por Meta</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_percentage(@seller_biweekly_sales_target.target_commission, precision: 2) %></dd>
+          </div>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Estado</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @seller_biweekly_sales_target.status.titleize %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    <div class="flex justify-end mt-5 space-x-3">
+      <%= link_to "Edit", edit_admin_seller_biweekly_sales_target_path(@seller_biweekly_sales_target), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      <%= link_to "Back to List", admin_seller_biweekly_sales_targets_path, class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    </div>
+  </div>
+</div>
