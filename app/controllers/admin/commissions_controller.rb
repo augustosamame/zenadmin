@@ -1,13 +1,15 @@
 class Admin::CommissionsController < Admin::AdminController
   def index
-    @from_date = params[:filter][:from_date] if params[:filter].present?
-    @to_date = params[:filter][:to_date] if params[:filter].present?
-    @status_paid_out = params[:filter][:status_paid_out] if params[:filter].present?
+    @location = params[:location_id].present? ? Location.find(params[:location_id]) : @current_location
+    @seller = User.find(params[:seller_id]) if params[:seller_id].present?
+    @date_range = (params[:from_date].present? && params[:to_date].present?) ? (params[:from_date].to_date..params[:to_date].to_date) : nil
 
-    @commissions = Commission.includes([ :user, :order ])
-    @commissions = @commissions.where("created_at >= ?", @from_date) if @from_date.present?
-    @commissions = @commissions.where("created_at <= ?", @to_date) if @to_date.present?
-    @commissions = @commissions.where(status: "status_paid_out") if @status_paid_out.present?
+    sales_search_service = Services::Queries::SalesSearchService.new(location: @location, seller: @seller, date_range: @date_range)
+    @sales_on_month_for_location = sales_search_service.sales_on_month_for_location
+
+    Services::Sales::OrderCommissionService.recalculate_commissions
+
+    @commissions = Commission.includes([ :user, :order ]).all
 
     @datatable_options = "resource_name:'Commission';create_button:false;sort_2_desc;"
 

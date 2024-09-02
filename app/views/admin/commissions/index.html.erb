@@ -44,7 +44,7 @@
       </thead>
       <tbody>
         <% @commissions.each do |commission| %>
-          <% seller_commission_percentage = CommissionRange.find_commission_for_sales(sales_on_month_for_location, location: @order.location)&.commission_percentage || 0 %>
+          <% seller_commission_percentage = CommissionRange.find_commission_for_sales(@sales_on_month_for_location, commission.order.location)&.commission_percentage || 0 %>
           <tr>
             <td class="px-4 py-2"><%= commission.user.name %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, commission.created_at, false) %></td>

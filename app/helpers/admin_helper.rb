@@ -61,6 +61,6 @@ module AdminHelper
   end
 
   def seller_comission_percentage(location)
-    CommissionRange.find_commission_for_sales(location.sales_on_month, location)&.commission_percentage || 0
+    CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: location).sales_on_month_for_location, location)&.commission_percentage || 0
   end
 end

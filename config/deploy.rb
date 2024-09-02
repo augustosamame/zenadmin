@@ -1,0 +1,60 @@
+# config valid for current version and patch releases of Capistrano
+lock "~> 3.19.1"
+
+set :application, "rails_app"
+set :repo_url, "git@bitbucket.org:augustosamame/zenadmin.git"
+
+# Default branch is :master
+set :branch, "main"
+
+set :user, "deploy"
+set :deploy_to, "/home/deploy/rails_app"
+
+set :rails_env, "production"
+set :linked_files, %w[.env config/master.key]
+
+# Default value for :pty is false
+# set :pty, true
+
+# Default value for :linked_files is []
+append :linked_files, "config/master.key", ".env", "config/puma/production.rb"
+
+# Default value for linked_dirs is []
+append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "public/uploads", "vendor", "storage"
+
+# Default value for default_env is {}
+# set :default_env, { path: "/opt/ruby/bin:$PATH" }
+set :env_file, ".env"
+
+set :bundle_flags, ""
+
+
+# Default value for keep_releases is 5
+set :keep_releases, 3
+
+set :puma_user, fetch(:user)
+set :puma_enable_socket_service, true
+set :puma_service_unit_name, "puma.service"
+set :puma_systemctl_user, :system # when the puma.service is of type system
+
+set :sidekiq_service_unit_name, "sidekiq.service"
+set :sidekiq_service_unit_user, :system
+
+set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb package.json yarn.lock]
+
+set :whenever_environment, -> { fetch(:rails_env) }
+set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
+
+# Uncomment the following to require manually verifying the host key before first deploy.
+# checks if master.key is present in shared/config folder. If it's not, it copies it over
+namespace :deploy do
+  namespace :check do
+    before :linked_files, :set_master_key do
+      on roles(:app) do
+        unless test("[ -f #{shared_path}/config/master.key ]")
+          upload! "config/master.key", "#{shared_path}/config/master.key"
+        end
+      end
+    end
+  end
+end

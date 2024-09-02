@@ -17,10 +17,6 @@ class Location < ApplicationRecord
 
   enum :status, [ :active, :inactive ]
 
-  def sales_on_month
-    self.orders.active.where(order_date: Time.now.beginning_of_month..Time.now.end_of_month).sum(:total_price_cents)
-  end
-
   def sales_on_month_by_seller
     self.orders.active.where(order_date: Time.now.beginning_of_month..Time.now.end_of_month).group(:seller_id).sum(:total_price_cents)
   end
