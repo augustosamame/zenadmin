@@ -59,4 +59,8 @@ module AdminHelper
       "bg-gray-100 text-gray-800"
     end
   end
+
+  def seller_comission_percentage(location)
+    CommissionRange.find_commission_for_sales(location.sales_on_month, location)&.commission_percentage || 0
+  end
 end

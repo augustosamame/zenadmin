@@ -1,0 +1,7 @@
+<!-- app/views/commission_ranges/edit.html.erb -->
+<%= render "shared/admin/nav", { header_title: "Editar Rango de Comisión" } do %>
+<% end %>
+
+<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <%= render 'form', commission_range: @commission_range, location: @location %>
+</div>

@@ -8,7 +8,6 @@ class CreateLocations < ActiveRecord::Migration[7.2]
       t.string :email
       t.string :latitude
       t.string :longitude
-      t.decimal :seller_comission_percentage, precision: 5, scale: 2, default: 0.0
       t.integer :status, default: 0
       t.timestamps
     end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_01_070002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -182,6 +182,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
     t.index ["user_id"], name: "index_commission_payouts_on_user_id"
   end
 
+  create_table "commission_ranges", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.decimal "min_sales", precision: 10, scale: 2, null: false
+    t.decimal "max_sales", precision: 10, scale: 2
+    t.decimal "commission_percentage", precision: 5, scale: 2, null: false
+    t.bigint "location_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_commission_ranges_on_location_id"
+    t.index ["max_sales"], name: "index_commission_ranges_on_max_sales"
+    t.index ["min_sales"], name: "index_commission_ranges_on_min_sales"
+    t.index ["user_id"], name: "index_commission_ranges_on_user_id"
+  end
+
   create_table "commissions", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "order_id", null: false
@@ -257,7 +271,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
     t.string "email"
     t.string "latitude"
     t.string "longitude"
-    t.decimal "seller_comission_percentage", precision: 5, scale: 2, default: "0.0"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -653,6 +666,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_08_30_031135) do
   add_foreign_key "cashiers", "locations"
   add_foreign_key "commission_payouts", "commissions"
   add_foreign_key "commission_payouts", "users"
+  add_foreign_key "commission_ranges", "locations"
+  add_foreign_key "commission_ranges", "users"
   add_foreign_key "commissions", "orders"
   add_foreign_key "commissions", "users"
   add_foreign_key "customers", "users"

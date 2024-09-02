@@ -1,0 +1,29 @@
+<div id="commission-ranges-table" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Localización</th>
+          <th class="px-4 py-2 text-left">Ventas Mínimas</th>
+          <th class="px-4 py-2 text-left">Ventas Máximas</th>
+          <th class="px-4 py-2 text-left">Porcentaje de Comisión</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @commission_ranges.each do |commission_range| %>
+          <tr>
+            <td class="px-4 py-2"><%= commission_range.location.name %></td>
+            <td class="px-4 py-2"><%= commission_range.min_sales %></td>
+            <td class="px-4 py-2"><%= commission_range.max_sales || 'Infinity' %></td>
+            <td class="px-4 py-2"><%= commission_range.commission_percentage %> %</td>
+            <td class="px-4 py-2">
+              <%= link_to 'Editar', edit_admin_commission_range_path(commission_range), class: 'btn btn-secondary' %>
+              <%= link_to 'Eliminar', admin_commission_range_path(commission_range), method: :delete, data: { turbo_confirm: '¿Estás seguro?' }, class: 'btn btn-danger', data: { turbo_method: :delete } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

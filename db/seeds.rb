@@ -17,7 +17,7 @@ setting_7 = Setting.find_or_create_by!(name: 'pos_can_create_unpaid_orders', dat
 setting_8 = Setting.find_or_create_by!(name: 'audited_active', data_type: "type_boolean", internal: true, localized_name: "Se generan tablas de auditoría", boolean_value: true)
 setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_type: "type_boolean", internal: true, localized_name: "Se permiten stocks negativos", boolean_value: true)
 setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
-setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfers', data_type: "type_boolean", internal: true, localized_name: "Mostrar gúias de remisión SUNAT en transferencias de stock", boolean_value: false)
+setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfers', data_type: "type_boolean", internal: true, localized_name: "Mostrar guías de remisión SUNAT en transferencias de stock", boolean_value: false)
 
 CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'VEN', length: 5, next_number: 1, status: :active)
 CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 5, next_number: 1, status: :active)
@@ -43,7 +43,7 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory', region: re
 supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1, region: region_default)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, region: region_default)
 
-location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', seller_comission_percentage: 5.0)
+location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default)
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
@@ -121,6 +121,10 @@ Role.find_or_create_by!(name: 'customer')
 
 user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
 user1.add_role('super_admin')
+
+CommissionRange.find_or_create_by!(user: user1, min_sales: 0, max_sales: 2000, commission_percentage: 2, location: location_1)
+CommissionRange.find_or_create_by!(user: user1, min_sales: 2000, max_sales: 5000, commission_percentage: 3, location: location_1)
+CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_percentage: 4, location: location_1)
 
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
 generic_customer.add_role('customer')

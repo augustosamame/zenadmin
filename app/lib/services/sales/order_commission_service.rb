@@ -14,11 +14,14 @@ module Services
         sellers = sellers_hash
 
         sellers.each do |seller_data|
+
+          seller_comission_percentage = CommissionRange.find_commission_for_sales(@order.location.sales_on_month, @order.location)&.commission_percentage || 0
+
           seller_id = seller_data[:user_id] || seller_data[:id]
           percentage = seller_data[:percentage]
           seller = User.find(seller_id)
           sale_amount = @order.total_price_cents * (percentage.to_f / 100)
-          amount = ((@order.total_price_cents * (percentage.to_f / 100) * (@order.location.seller_comission_percentage / 100))/1.18).round
+          amount = ((@order.total_price_cents * (percentage.to_f / 100) * (seller_comission_percentage / 100))/1.18).round
 
           Commission.create!(
             user: seller,

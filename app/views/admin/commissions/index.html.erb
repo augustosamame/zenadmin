@@ -1,4 +1,4 @@
-<%= render "shared/admin/nav", { header_title: "Comisiones #{@current_location&.name} - #{@current_location&.seller_comission_percentage}%" } do %>
+<%= render "shared/admin/nav", { header_title: "Comisiones #{@current_location&.name} - #{seller_comission_percentage(@current_location)}%" } do %>
 <% end %>
 
 <div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
@@ -44,11 +44,12 @@
       </thead>
       <tbody>
         <% @commissions.each do |commission| %>
+          <% seller_commission_percentage = CommissionRange.find_commission_for_sales(sales_on_month_for_location, location: @order.location)&.commission_percentage || 0 %>
           <tr>
             <td class="px-4 py-2"><%= commission.user.name %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, commission.created_at, false) %></td>
             <td class="px-4 py-2"><%= commission.order.location.name %></td>
-            <td class="px-4 py-2"><%= commission.order.location.seller_comission_percentage %>%</td>
+            <td class="px-4 py-2"><%= seller_comission_percentage(commission.order.location) %>%</td>
             <td class="px-4 py-2"><%= commission.order.custom_id %></td>
             <td class="px-4 py-2"><%= humanized_money_with_symbol(commission.order.total_price - commission.order.total_discount) %></td>
             <td class="px-4 py-2"><%= commission.percentage %>%</td>

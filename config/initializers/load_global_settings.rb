@@ -13,7 +13,7 @@ Rails.application.config.after_initialize do
     { name: :audited_active, default: true, data_type: "type_boolean", localized_name: "Se generan tablas de auditoría", internal: true },
     { name: :negative_stocks_allowed, default: true, data_type: "type_boolean", localized_name: "Se permiten stocks negativos", internal: true },
     { name: :stock_transfers_have_in_transit_step, default: true, data_type: "type_boolean", localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", internal: true },
-    { name: :show_sunat_guia_for_stock_transfers, default: false, data_type: "type_boolean", localized_name: "Mostrar gúias de remisión SUNAT en transferencias de stock", internal: true }
+    { name: :show_sunat_guia_for_stock_transfers, default: false, data_type: "type_boolean", localized_name: "Mostrar guías de remisión SUNAT en transferencias de stock", internal: true }
   ]
 
   def load_global_settings

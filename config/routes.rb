@@ -35,6 +35,13 @@ Rails.application.routes.draw do
     post "pos_create_customer", to: "users#create_customer"
     get "search_dni", to: "customers#search_dni"
 
+    resources :locations do
+      member do
+        get :commission_ranges
+      end
+    end
+    resources :commission_ranges
+
     resources :warehouses
     patch "/set_current_warehouse", to: "warehouses#set_current_warehouse"
     get "inventory", to: "inventory/inventory#show"

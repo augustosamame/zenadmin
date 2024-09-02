@@ -31,6 +31,6 @@ class CreateOrders < ActiveRecord::Migration[7.2]
     add_index :orders, :custom_id, unique: true
     add_index :orders, :active_invoice_id, unique: true
     add_index :orders, :cart_id
-    add_index :orders, :order_date
+    add_index :orders, [:location_id, :status, :order_date, :seller_id]
   end
 end

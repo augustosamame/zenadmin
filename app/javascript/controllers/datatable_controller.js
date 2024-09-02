@@ -105,7 +105,12 @@ export default class extends Controller {
             const parts = additionalOption.split("_");
             const sortCol = parseInt(parts[1], 10);
             const sortDir = parts[2];
-            initialOptions.order = [[sortCol, sortDir]];
+
+            // Ensure `initialOptions.order` is an array and add sorting options
+            if (!initialOptions.order) {
+              initialOptions.order = [];
+            }
+            initialOptions.order.push([sortCol, sortDir]);
             initialOptions.stateSave = false;
           } else {
             let [key, value] = additionalOption.split(':');
