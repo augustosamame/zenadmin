@@ -2,7 +2,7 @@
 lock "~> 3.19.1"
 
 set :application, "rails_app"
-set :repo_url, "git@bitbucket.org:augustosamame/zenadmin.git"
+set :repo_url, "git@github.com:augustosamame/zenadmin.git"
 
 # Default branch is :master
 set :branch, "main"
@@ -11,7 +11,7 @@ set :user, "deploy"
 set :deploy_to, "/home/deploy/rails_app"
 
 set :rails_env, "production"
-set :linked_files, %w[.env config/master.key]
+set :linked_files, fetch(:linked_files, []).push(".env", "config/master.key", "config/database.yml")
 
 # Default value for :pty is false
 # set :pty, true
@@ -27,7 +27,7 @@ append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/syst
 set :env_file, ".env"
 
 set :bundle_flags, ""
-
+set :bundle_jobs, 1
 
 # Default value for keep_releases is 5
 set :keep_releases, 3
@@ -57,4 +57,19 @@ namespace :deploy do
       end
     end
   end
+end
+
+namespace :deploy do
+  desc "Create database if it does not exist"
+  task :db_create do
+    on roles(:db) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :bundle, "exec rake db:create"
+        end
+      end
+    end
+  end
+
+  before "deploy:migrate", "deploy:db_create"
 end

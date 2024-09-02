@@ -37,7 +37,7 @@ Shrine.plugin :activerecord           # loads Active Record integration
 Shrine.plugin :cached_attachment_data # enables retaining cached file across form redisplays
 Shrine.plugin :restore_cached_data
 Shrine.plugin :derivatives, create_on_promote: true
-Shrine.plugin :processing
+# Shrine.plugin :processing # deprecated in v3
 Shrine.plugin :determine_mime_type, analyzer: :marcel
 Shrine.plugin :validation_helpers
 Shrine.plugin :default_url

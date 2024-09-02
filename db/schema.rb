@@ -343,8 +343,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_01_070002) do
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
+    t.index ["location_id", "status", "order_date", "seller_id"], name: "idx_on_location_id_status_order_date_seller_id_3f1145d763"
     t.index ["location_id"], name: "index_orders_on_location_id"
-    t.index ["order_date"], name: "index_orders_on_order_date"
     t.index ["region_id"], name: "index_orders_on_region_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
     t.index ["user_id"], name: "index_orders_on_user_id"

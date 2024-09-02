@@ -43,7 +43,7 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory', region: re
 supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1, region: region_default)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, region: region_default)
 
-location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
+location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, email: "jockeyplaza@devtechperu.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default)
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
