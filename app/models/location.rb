@@ -13,19 +13,15 @@ class Location < ApplicationRecord
   validates :name, presence: true
   validates :email, presence: true
 
+  after_create :create_warehouse_and_cashier
+
   accepts_nested_attributes_for :commission_ranges, reject_if: :all_blank, allow_destroy: true
 
   enum :status, [ :active, :inactive ]
 
-  def sales_on_month_by_seller
-    self.orders.active.where(order_date: Time.now.beginning_of_month..Time.now.end_of_month).group(:seller_id).sum(:total_price_cents)
-  end
-
-  def sales_on_year
-    self.orders.active.where(order_date: Time.now.beginning_of_year..Time.now.end_of_year).sum(:total_price_cents)
-  end
-
-  def sales_on_year_by_seller
-    self.orders.active.where(order_date: Time.now.beginning_of_year..Time.now.end_of_year).group(:seller_id).sum(:total_price_cents)
+  def create_warehouse_and_cashier
+    Warehouse.create!(name: "Almacén #{self.name}", location: self)
+    Cashier.create!(name: "Caja Ventas #{self.name}", location: self)
+    Cashier.create!(name: "Caja Chica #{self.name}", location: self)
   end
 end

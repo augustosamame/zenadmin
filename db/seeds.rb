@@ -45,6 +45,29 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 
 location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, email: "jockeyplaza@devtechperu.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
+location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: region_default, email: "sanmiguel@devtechperu.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
+
+location_3 = Location.find_or_create_by!(name: 'La Rambla Brasil', region: region_default, email: "laramblabrasil@devtechperu.com", address: 'Av Brasil S/N, Breña', phone: '900000008')
+
+Role.find_or_create_by!(name: 'super_admin')
+Role.find_or_create_by!(name: 'admin')
+Role.find_or_create_by!(name: 'seller')
+Role.find_or_create_by!(name: 'supervisor')
+Role.find_or_create_by!(name: 'warehouse_manager')
+Role.find_or_create_by!(name: 'customer')
+
+storeuser1 = User.create!(email: 'jockeyplaza@devtechperu.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza")
+storeuser1.add_role('seller')
+
+storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel")
+storeuser2.add_role('seller')
+
+storeuser3 = User.create!(email: 'laramblabrasil@devtechperu.com', phone: "986976313", location_id: location_3.id, login: "laramblabrasil@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "La Rambla Brasil")
+storeuser3.add_role('seller')
+
+supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
+supervisor_1.add_role('supervisor')
+
 warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default)
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
@@ -113,11 +136,6 @@ if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')
   User.create!(email: 'ecommerce@devtechperu.com', phone: "900000000", login: "ecommerce@devtechperu.com", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module", internal: true) unless ecommerce_module_user_already_exists
 end
-
-Role.find_or_create_by!(name: 'super_admin')
-Role.find_or_create_by!(name: 'admin')
-Role.find_or_create_by!(name: 'seller')
-Role.find_or_create_by!(name: 'customer')
 
 user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
 user1.add_role('super_admin')

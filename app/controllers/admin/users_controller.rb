@@ -60,7 +60,11 @@ class Admin::UsersController < Admin::AdminController
 
   def sellers
     sellers = User.with_role("seller").where(location_id: params[:location_id] || @current_location&.id)
-    render json: sellers.map { |seller| { id: seller.id, name: seller.name } }
+    supervisors = User.with_role("supervisor")
+
+    users = (sellers + supervisors).uniq
+
+    render json: users.map { |user| { id: user.id, name: user.name } }
   end
 
   private
