@@ -15,7 +15,7 @@ class Location < ApplicationRecord
 
   accepts_nested_attributes_for :commission_ranges, reject_if: :all_blank, allow_destroy: true
 
-  enum :status, [:active, :inactive]
+  enum :status, [ :active, :inactive ]
 
   def sales_on_month
     self.orders.active.where(order_date: Time.now.beginning_of_month..Time.now.end_of_month).sum(:total_price_cents)

@@ -1,5 +1,4 @@
 class Admin::CommissionRangesController < Admin::AdminController
-
   before_action :set_commission_range, only: [ :edit, :update, :destroy ]
 
   def index
@@ -9,7 +8,7 @@ class Admin::CommissionRangesController < Admin::AdminController
     else
       @commission_ranges = CommissionRange.all.includes(:location)
     end
-    
+
     @datatable_options = "resource_name:'CommissionRange';create_button:true;sort_0_asc;sort_1_asc;"
 
     respond_to do |format|
@@ -54,5 +53,4 @@ class Admin::CommissionRangesController < Admin::AdminController
   def commission_range_params
     params.require(:commission_range).permit(:start_amount, :end_amount, :commission_percentage)
   end
-
 end

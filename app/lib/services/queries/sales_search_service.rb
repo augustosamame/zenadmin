@@ -4,5 +4,4 @@ class SalesSearchService
     @seller = seller
     @date_range = date_range || (Time.now.beginning_of_month..Time.now.end_of_month) # Default to current month
   end
-
 end

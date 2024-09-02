@@ -49,6 +49,6 @@ class Admin::LocationsController < Admin::AdminController
   end
 
   def location_params
-    params.require(:location).permit(:name, :address, :phone, :email, :description, :latitude, :longitude, :status, commission_ranges_attributes: [:id, :_destroy, :min_sales, :max_sales, :commission_percentage, :location_id, :user_id])
+    params.require(:location).permit(:name, :address, :phone, :email, :description, :latitude, :longitude, :status, commission_ranges_attributes: [ :id, :_destroy, :min_sales, :max_sales, :commission_percentage, :location_id, :user_id ])
   end
 end
