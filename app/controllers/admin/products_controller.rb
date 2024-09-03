@@ -15,9 +15,9 @@ class Admin::ProductsController < Admin::AdminController
 
 
         if @products.size > 1000
-          @datatable_options = "server_side:true;resource_name:'Product';"
+          @datatable_options = "server_side:true;resource_name:'Product';sort_0_asc;"
         else
-          @datatable_options = "resource_name:'Product';"
+          @datatable_options = "resource_name:'Product';sort_0_asc;"
         end
       end
 
@@ -176,7 +176,7 @@ class Admin::ProductsController < Admin::AdminController
             product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
             product.stock(@current_warehouse),
             product.status == 0 ? "Active" : "Inactive",
-            render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, default_object_options_array: @default_object_options_array })
+            render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, warehouse: @current_warehouse, default_object_options_array: @default_object_options_array })
           ]
         end
       }
