@@ -25,6 +25,7 @@ module Services
         end
 
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
+          break if index > 10
           product_category_name = row[0]
           product_name = row[1]
           tag1_name = row[2]
@@ -34,7 +35,7 @@ module Services
           product_category = ProductCategory.find_by(name: product_category_name)
           # custom_id = generate_custom_id(product_category_name, index)
 
-          product = Product.create!(
+          product = Product.new(
             name: product_name.downcase.capitalize,
             description: "Description for #{product_name}",
             permalink: product_name.parameterize,
@@ -44,6 +45,16 @@ module Services
             brand_id: brand_id,
             product_categories: [ product_category ]
           )
+
+          media = Media.new(
+            file: URI.open(Faker::LoremFlickr.image(size: "300x300", search_terms: [ "product" ])),  # Replace with your S3 URL
+            media_type: :default_image,  # Or any other media_type
+            mediable: product
+          )
+
+          # Save both product and media together
+          product.save!
+          media.save!
 
           product.add_tag(tag1_name) if tag1_name.present?
           product.add_tag(tag2_name) if tag2_name.present?

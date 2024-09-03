@@ -51,7 +51,7 @@ class Order < ApplicationRecord
                     tsearch: { prefix: true }
                   }
 
-  attr_accessor :sellers_attributes
+  attr_accessor :sellers_attributes, :invoice_series_comprobante_type
 
   def total_items
     order_items.sum(:quantity)

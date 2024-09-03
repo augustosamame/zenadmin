@@ -1,0 +1,16 @@
+<%= simple_form_for [:admin, @invoicer], html: { class: 'space-y-6' } do |f| %>
+  <%= f.error_notification class: 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative' %>
+
+  <%= f.input :name, label: 'Nombre', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :razon_social, label: 'Razón Social', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :ruc, label: 'RUC', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :tipo_ruc, label: 'Tipo de RUC', collection: Invoicer.tipo_rucs.keys.map { |tipo| [tipo.titleize, tipo] }, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' } %>
+  <%= f.input :einvoice_integrator, label: 'Integrador de Facturación Electrónica', collection: Invoicer.einvoice_integrators.keys.map { |integrator| [integrator.titleize, integrator] }, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' } %>
+  <%= f.input :einvoice_url, label: 'URL de Facturación Electrónica', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :einvoice_api_key, label: 'API Key de Facturación Electrónica', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :einvoice_api_secret, label: 'API Secret de Facturación Electrónica', input_html: { class: 'mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md' } %>
+  <%= f.input :default, label: 'Por Defecto', input_html: { class: 'h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded' } %>
+  <%= f.input :status, label: 'Estado', collection: Invoicer.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' } %>
+
+  <%= f.button :submit, class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>

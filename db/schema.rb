@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_02_182820) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -261,6 +261,49 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_182820) do
     t.index ["product_id"], name: "index_in_transit_stocks_on_product_id"
     t.index ["stock_transfer_id"], name: "index_in_transit_stocks_on_stock_transfer_id"
     t.index ["user_id"], name: "index_in_transit_stocks_on_user_id"
+  end
+
+  create_table "invoice_series", force: :cascade do |t|
+    t.bigint "invoicer_id", null: false
+    t.integer "comprobante_type", null: false
+    t.string "prefix", null: false
+    t.integer "next_number", null: false
+    t.integer "status", default: 0, null: false
+    t.text "comments"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoicer_id"], name: "index_invoice_series_on_invoicer_id"
+  end
+
+  create_table "invoice_series_mappings", force: :cascade do |t|
+    t.bigint "invoice_series_id", null: false
+    t.bigint "location_id", null: false
+    t.bigint "payment_method_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_series_id"], name: "index_invoice_series_mappings_on_invoice_series_id"
+    t.index ["location_id"], name: "index_invoice_series_mappings_on_location_id"
+    t.index ["payment_method_id"], name: "index_invoice_series_mappings_on_payment_method_id"
+  end
+
+  create_table "invoicers", force: :cascade do |t|
+    t.bigint "region_id", null: false
+    t.string "name", null: false
+    t.string "razon_social", null: false
+    t.string "ruc", null: false
+    t.integer "tipo_ruc", default: 0, null: false
+    t.integer "einvoice_integrator", default: 0, null: false
+    t.string "einvoice_url", null: false
+    t.string "einvoice_api_key"
+    t.string "einvoice_api_secret"
+    t.boolean "default", default: false, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["default"], name: "index_invoicers_on_default", unique: true
+    t.index ["name"], name: "index_invoicers_on_name", unique: true
+    t.index ["region_id"], name: "index_invoicers_on_region_id"
+    t.index ["ruc"], name: "index_invoicers_on_ruc", unique: true
   end
 
   create_table "locations", force: :cascade do |t|
@@ -692,6 +735,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_02_182820) do
   add_foreign_key "in_transit_stocks", "users"
   add_foreign_key "in_transit_stocks", "warehouses", column: "destination_warehouse_id"
   add_foreign_key "in_transit_stocks", "warehouses", column: "origin_warehouse_id"
+  add_foreign_key "invoice_series", "invoicers"
+  add_foreign_key "invoice_series_mappings", "invoice_series"
+  add_foreign_key "invoice_series_mappings", "locations"
+  add_foreign_key "invoice_series_mappings", "payment_methods"
+  add_foreign_key "invoicers", "regions"
   add_foreign_key "locations", "regions"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"

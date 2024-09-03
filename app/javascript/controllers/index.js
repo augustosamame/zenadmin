@@ -43,6 +43,9 @@ application.register("inventory--select-warehouse", Inventory__SelectWarehouseCo
 import InventoryController from "./inventory_controller"
 application.register("inventory", InventoryController)
 
+import InvoiceSeriesMappingController from "./invoice_series_mapping_controller"
+application.register("invoice-series-mapping", InvoiceSeriesMappingController)
+
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 

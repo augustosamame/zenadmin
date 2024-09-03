@@ -76,6 +76,12 @@ Rails.application.routes.draw do
     resources :cashier_transactions, only: [ :new, :create ]
     resources :commissions, only: [ :index, :show ]
 
+    resources :invoicers do
+      get "invoice_series", on: :member
+    end
+    resources :invoice_series
+    resources :invoice_series_mappings
+
     get "dashboard", to: "page#dashboard"
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"

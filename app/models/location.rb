@@ -1,8 +1,7 @@
 class Location < ApplicationRecord
   audited_if_enabled
-  include TranslateEnum
-
   include DefaultRegionable
+  include TranslateEnum
 
   belongs_to :region
   has_many :warehouses

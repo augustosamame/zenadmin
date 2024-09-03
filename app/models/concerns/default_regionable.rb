@@ -8,7 +8,7 @@ module DefaultRegionable
   private
 
   def assign_default_region
-    if $global_settings[:multi_region] == false
+    if !$global_settings[:multi_region]
       self.region ||= Region.default
     else
       # Handle cases where multi-region is true, or provide a fallback

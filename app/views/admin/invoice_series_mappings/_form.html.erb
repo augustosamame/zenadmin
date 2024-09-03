@@ -1,0 +1,17 @@
+# app/views/admin/invoice_series_mappings/_form.html.erb
+
+<%= simple_form_for [:admin, @invoice_series_mapping], html: { class: 'space-y-6', data: { controller: 'invoice-series-mapping' } } do |f| %>
+  <%= f.error_notification class: 'bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative' %>
+
+  <%= f.association :location, label: 'Ubicación', collection: @locations, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' } %>
+  
+  <%= f.association :invoicer, label: 'Emisor de Factura', collection: @invoicers, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', data: { invoice_series_mapping_target: 'invoicer', action: 'change->invoice-series-mapping#updateInvoiceSeries' } } %>
+  
+  <%= f.association :invoice_series, label: 'Serie de Factura', collection: [], input_html: { class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm', data: { invoice_series_mapping_target: 'invoiceSeries' } } %>
+
+  <% if Setting.find_by(name: 'multiple_invoicers_based_on_location_and_payment_method')&.boolean_value %>
+    <%= f.association :payment_method, label: 'Método de Pago', collection: @payment_methods, input_html: { class: 'mt-1 block w-full py-2 px-3 border border-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm' } %>
+  <% end %>
+
+  <%= f.button :submit, class: 'inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>

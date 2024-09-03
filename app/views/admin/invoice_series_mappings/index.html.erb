@@ -1,0 +1,34 @@
+<div class="container px-4 mx-auto sm:px-6 lg:px-8">
+  <h1 class="mb-6 text-2xl font-semibold">Mapeos de Series de Comprobantes</h1>
+
+  <%= link_to 'Nuevo Mapeo', new_admin_invoice_series_mapping_path, class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
+
+  <div class="mt-8">
+    <table class="min-w-full divide-y divide-gray-200" data-controller="datatable">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tienda</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Razón Social</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Serie</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método de Pago</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @invoice_series_mappings.each do |mapping| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.location.name %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.invoice_series.invoicer.name %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.invoice_series.prefix %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.payment_method&.name || 'N/A' %></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= link_to 'Ver', admin_invoice_series_mapping_path(mapping), class: 'text-indigo-600 hover:text-indigo-900' %>
+              <%= link_to 'Editar', edit_admin_invoice_series_mapping_path(mapping), class: 'ml-2 text-indigo-600 hover:text-indigo-900' %>
+              <%= link_to 'Eliminar', admin_invoice_series_mapping_path(mapping), method: :delete, data: { confirm: '¿Estás seguro?' }, class: 'ml-2 text-red-600 hover:text-red-900' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
