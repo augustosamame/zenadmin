@@ -40,7 +40,7 @@
     <div class="grid items-center grid-cols-1 gap-6 mt-4 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
       <!-- Status -->
       <div>
-        <%= form.input :status, label: "Estado", collection: Location.statuses.keys, input_html: { class: "form-input" } %>
+        <%= form.input :status, label: "Estado", collection: Location.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, input_html: { class: "form-input" } %>
       </div>
     </div>
   </div>

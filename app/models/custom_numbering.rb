@@ -1,6 +1,9 @@
 class CustomNumbering < ApplicationRecord
+  include TranslateEnum
+
   enum :record_type, { purchases_vendor: 0, supplier: 1, purchase: 2, product: 3, order: 4, cash_inflow: 5, cash_outflow: 6, payment: 7, stock_transfer: 8 }, prefix: :numbering
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
 
   validates :record_type, presence: true
   validates :prefix, presence: true

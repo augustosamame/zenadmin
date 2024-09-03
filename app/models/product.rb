@@ -1,5 +1,6 @@
 class Product < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   include PgSearch::Model
   include MediaAttachable
@@ -22,6 +23,7 @@ class Product < ApplicationRecord
 
 
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
 
   validates :custom_id, presence: true
   validates :name, presence: true

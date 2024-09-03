@@ -2,7 +2,7 @@
 <div class="flex items-center mb-4 space-x-4 nested-fields" data-target="stock-transfer-form.line">
   <!-- Product Field -->
   <div class="flex-1">
-    <%= f.label :product_id, "Product", class: "form-label" %>
+    <%= f.label :product_id, "Producto", class: "form-label" %>
     <select data-controller="select"
             data-select-model-value="Product"
             data-select-multi-select-value="false"
@@ -20,7 +20,7 @@
 
   <!-- Quantity Field -->
   <div class="flex-1">
-    <%= f.label :quantity, "Quantity", class: "form-label" %>
+    <%= f.label :quantity, "Cantidad", class: "form-label" %>
     <%= f.number_field :quantity, class: "form-input", step: 1 %>
   </div>
 

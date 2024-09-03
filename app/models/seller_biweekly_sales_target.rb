@@ -1,4 +1,6 @@
 class SellerBiweeklySalesTarget < ApplicationRecord
+  include TranslateEnum
+
   belongs_to :seller, class_name: "User"
   belongs_to :user
 
@@ -7,6 +9,7 @@ class SellerBiweeklySalesTarget < ApplicationRecord
   validates :target_commission, presence: true, numericality: { greater_or_equal_to: 0, less_than_or_equal_to: 100 }
 
   enum :status, { pending: 0, completed: 1, inactive: 2 }
+  translate_enum :status
 
   scope :for_seller, ->(seller_id) { where(seller_id: seller_id) }
   scope :for_period, ->(year_month_period) { where(year_month_period: year_month_period) }

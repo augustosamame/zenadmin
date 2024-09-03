@@ -1,4 +1,7 @@
 class PeriodicInventory < ApplicationRecord
+  audited_if_enabled
+  include TranslateEnum
+
   belongs_to :warehouse
   belongs_to :user
   has_many :periodic_inventory_lines, dependent: :destroy
@@ -6,7 +9,9 @@ class PeriodicInventory < ApplicationRecord
   has_many :products, through: :periodic_inventory_lines
 
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
   enum :inventory_type, { manual: 0, automatic: 1 }
+  translate_enum :inventory_type
 
   validates :snapshot_date, presence: true
 

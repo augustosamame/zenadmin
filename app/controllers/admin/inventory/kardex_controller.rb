@@ -7,6 +7,8 @@ class Admin::Inventory::KardexController < Admin::AdminController
     end
     if params[:warehouse_id].present?
       @warehouse = Warehouse.find(params[:warehouse_id])
+    else
+      @warehouse = @current_warehouse
     end
   end
 

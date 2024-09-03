@@ -1,8 +1,11 @@
 class Cashier < ApplicationRecord
+  include TranslateEnum
+
   belongs_to :location
   has_many :cashier_shifts
 
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
 
   def old_current_shift(current_user)
     open_shift = cashier_shifts.find_or_initialize_by(status: :open)

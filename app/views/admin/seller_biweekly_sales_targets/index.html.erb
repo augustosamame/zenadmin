@@ -17,11 +17,11 @@
       <tbody>
         <% @seller_biweekly_sales_targets.each do |target| %>
           <tr>
-            <td><%= target.seller.full_name %></td>
+            <td><%= target.seller.name %></td>
             <td><%= target.year_month_period %></td>
             <td><%= number_to_currency(target.sales_target_cents / 100.0) %></td>
             <td><%= number_to_percentage(target.target_commission, precision: 2) %></td>
-            <td><%= target.status.titleize %></td>
+            <td><%= target.translated_status.titleize %></td>
             <td>
               <%= link_to "View", admin_seller_biweekly_sales_target_path(target), class: "text-indigo-600 hover:text-indigo-900" %>
               <%= link_to "Edit", edit_admin_seller_biweekly_sales_target_path(target), class: "text-indigo-600 hover:text-indigo-900 ml-2" %>

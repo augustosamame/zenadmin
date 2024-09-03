@@ -1,5 +1,6 @@
 class Payment < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   include DefaultRegionable
   include CustomNumberable
@@ -13,6 +14,7 @@ class Payment < ApplicationRecord
   has_one :cashier_transaction, as: :transactable, dependent: :destroy
 
   enum :status, { pending: 0, paid: 1, partially_paid: 2, cancelled: 3 }
+  translate_enum :status
 
   monetize :amount_cents, with_model_currency: :currency
 

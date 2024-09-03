@@ -1,6 +1,6 @@
 class Media < ApplicationRecord
   audited_if_enabled
-
+  include TranslateEnum
   belongs_to :mediable, polymorphic: true
   include MediaUploader::Attachment(:file)
 
@@ -13,6 +13,7 @@ class Media < ApplicationRecord
     featured_homepage_image: 5
     # Add more media types as needed
   }
+  translate_enum :media_type
 
   validates :file, presence: true
 

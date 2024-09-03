@@ -18,6 +18,8 @@ setting_8 = Setting.find_or_create_by!(name: 'audited_active', data_type: "type_
 setting_9 = Setting.find_or_create_by!(name: 'negative_stocks_allowed', data_type: "type_boolean", internal: true, localized_name: "Se permiten stocks negativos", boolean_value: true)
 setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_step', data_type: "type_boolean", internal: true, localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", boolean_value: true)
 setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfers', data_type: "type_boolean", internal: true, localized_name: "Mostrar guías de remisión SUNAT en transferencias de stock", boolean_value: false)
+setting_11 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda", boolean_value: false)
+setting_12 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda y por medio de pago", boolean_value: true)
 
 CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'VEN', length: 5, next_number: 1, status: :active)
 CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 5, next_number: 1, status: :active)
@@ -56,13 +58,13 @@ Role.find_or_create_by!(name: 'supervisor')
 Role.find_or_create_by!(name: 'warehouse_manager')
 Role.find_or_create_by!(name: 'customer')
 
-storeuser1 = User.create!(email: 'jockeyplaza@devtechperu.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza")
+storeuser1 = User.create!(email: 'jockeyplaza@devtechperu.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
 storeuser1.add_role('seller')
 
-storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel")
+storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
 storeuser2.add_role('seller')
 
-storeuser3 = User.create!(email: 'laramblabrasil@devtechperu.com', phone: "986976313", location_id: location_3.id, login: "laramblabrasil@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "La Rambla Brasil")
+storeuser3 = User.create!(email: 'laramblabrasil@devtechperu.com', phone: "986976313", location_id: location_3.id, login: "laramblabrasil@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "La Rambla Brasil", internal: true)
 storeuser3.add_role('seller')
 
 supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
@@ -131,6 +133,7 @@ PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
 PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectivo')
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
+PaymentMethod.find_or_create_by!(name: 'miles', description: 'Millas')
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')

@@ -2,6 +2,7 @@
 class StockTransfer < ApplicationRecord
   include AASM
   include CustomNumberable
+  include TranslateEnum
 
   belongs_to :user
   belongs_to :origin_warehouse, class_name: "Warehouse", optional: true
@@ -11,7 +12,9 @@ class StockTransfer < ApplicationRecord
   has_many :products, through: :stock_transfer_lines
 
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
   enum :adjustment_type, { merma: 0, pérdida_o_robo: 1, venta_incorrecta: 2, otros: 3 }
+  translate_enum :adjustment_type
 
   aasm column: "stage" do
     state :pending, initial: true

@@ -11,11 +11,12 @@
     </div>
   </div>
 
-  <%= f.association :payment_method, 
-                    collection: PaymentMethod.all, 
-                    prompt: "Selecciona el tipo de transacción", 
-                    input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, 
-                    label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+  <%= f.input :payment_method_id, 
+              label: 'Método de Pago',
+              collection: PaymentMethod.all.map { |pm| [pm.description, pm.id] }, 
+              prompt: "Selecciona el tipo de transacción", 
+              input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", data: { controller: "tom-select" } }, 
+              label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
 
 
   <% if params[:transactable_type] == 'CashInflow' %>

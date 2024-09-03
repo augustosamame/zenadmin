@@ -1,5 +1,6 @@
 class Location < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   include DefaultRegionable
 
@@ -18,6 +19,7 @@ class Location < ApplicationRecord
   accepts_nested_attributes_for :commission_ranges, reject_if: :all_blank, allow_destroy: true
 
   enum :status, [ :active, :inactive ]
+  translate_enum :status
 
   def create_warehouse_and_cashier
     Warehouse.create!(name: "Almacén #{self.name}", location: self)

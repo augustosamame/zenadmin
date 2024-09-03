@@ -4,8 +4,21 @@ class Admin::UsersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @users = User.includes([ :location ]).where(internal: false).where.not(id: Customer.pluck(:user_id))
-        @datatable_options = "resource_name:'User';"
+        # @users = User.includes([ :location ]).where(internal: false).where.not(id: Customer.pluck(:user_id))
+        non_internal_users = User.includes(:location, :roles)
+                         .where(internal: false)
+                         .where.not(id: Customer.pluck(:user_id))
+
+        # Fetch internal users with seller role
+        internal_sellers = User.includes(:location, :roles)
+                       .where(internal: true)
+                       .joins(:roles)
+                       .where(roles: { name: "seller" })
+                       .where.not(id: Customer.pluck(:user_id))
+
+        # Combine the results
+        @users = (non_internal_users + internal_sellers).uniq
+        @datatable_options = "resource_name:'User';sort_0_desc;"
       end
     end
   end
@@ -59,7 +72,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def sellers
-    sellers = User.with_role("seller").where(location_id: params[:location_id] || @current_location&.id)
+    sellers = User.with_role("seller").where(internal: false, location_id: params[:location_id] || @current_location&.id)
     supervisors = User.with_role("supervisor")
 
     users = (sellers + supervisors).uniq

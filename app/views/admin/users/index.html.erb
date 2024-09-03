@@ -11,7 +11,7 @@
           <th class="px-4 py-2 text-left">Nombre</th>
           <th class="px-4 py-2 text-left">Email</th>
           <th class="px-4 py-2 text-left">Móvil</th>
-          <th class="px-4 py-2 text-left">Locación</th>
+          <th class="px-4 py-2 text-left">Tienda</th>
           <th class="px-4 py-2 text-left">Roles</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Acciones</th>
@@ -26,7 +26,7 @@
             <td class="px-4 py-2"><%= user.phone %></td>
             <td class="px-4 py-2"><%= user.location&.name %></td>
             <td class="px-4 py-2"><%= user.roles&.pluck(:name)&.to_s %></td>
-            <td class="px-4 py-2"><%= user.status %></td>
+            <td class="px-4 py-2"><%= user.translated_status %></td>
             <td class="px-4 py-2">
               <%= render partial: "admin/users/actions", locals: { user: user, default_object_options_array: @default_object_options_array } %>
               

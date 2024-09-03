@@ -1,4 +1,6 @@
 class CashierShift < ApplicationRecord
+  include TranslateEnum
+
   belongs_to :cashier
   belongs_to :opened_by, class_name: "User"
   belongs_to :closed_by, class_name: "User", optional: true
@@ -9,6 +11,7 @@ class CashierShift < ApplicationRecord
   has_many :cash_outflows, through: :cashier_transactions, source: :transactable, source_type: "CashOutflow"
 
   enum :status, { open: 0, closed: 1 }
+  translate_enum :status
 
   validates :date, presence: true
   validates :status, presence: true

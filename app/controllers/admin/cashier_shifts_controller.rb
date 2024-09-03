@@ -2,7 +2,7 @@ class Admin::CashierShiftsController < Admin::AdminController
   before_action :set_cashier_shift, only: [ :show, :edit, :update, :close ]
 
   def index
-    @cashier_shifts = CashierShift.includes([ :opened_by, :closed_by, :cashier ]).order(id: :desc)
+    @cashier_shifts = CashierShift.includes([ :opened_by, :closed_by, :cashier ]).where(cashier_id: @current_cashier.id).order(id: :desc)
     @first_shift = @cashier_shifts.first
     @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name} - #{@first_shift.cashier.name}" : "Turnos de Caja"
     @datatable_options = "resource_name:'CashierShift';"

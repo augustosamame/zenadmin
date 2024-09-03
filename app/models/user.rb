@@ -1,6 +1,7 @@
 # app/models/user.rb
 class User < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   has_person_name
   has_one_attached :avatar
@@ -17,7 +18,7 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable
 
   enum :status, { active: 0, inactive: 1 }
-
+  translate_enum :status
   # Validations for email and phone number
   validates :email, presence: true, if: -> { login_type == "email" }
   validates :phone, presence: true, if: -> { login_type == "phone" }

@@ -44,6 +44,7 @@ module EdukaiErp
     #
     config.time_zone = "America/Lima" # e.g., 'America/New_York'
     config.active_record.default_timezone = :utc
+    config.i18n.default_locale = :es
     # config.eager_load_paths << Rails.root.join("extras")
 
     # Don't generate system test files.

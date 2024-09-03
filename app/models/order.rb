@@ -1,5 +1,6 @@
 class Order < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   include DefaultRegionable
   include CustomNumberable
@@ -11,9 +12,12 @@ class Order < ApplicationRecord
   belongs_to :location
 
   enum :stage, { draft: 0, confirmed: 1, shipped: 2, delivered: 3, cancelled: 4 }
+  translate_enum :stage
   enum :payment_status, { unpaid: 0, paid: 1, partially_paid: 2 }
+  translate_enum :payment_status
   enum :origin, { pos: 0, ecommerce: 1 }
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
 
   monetize :total_price_cents, with_model_currency: :currency
   monetize :total_discount_cents, with_model_currency: :currency

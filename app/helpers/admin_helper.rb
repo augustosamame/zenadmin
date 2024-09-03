@@ -60,6 +60,19 @@ module AdminHelper
     end
   end
 
+  def friendly_transactable_type(transaction)
+    case transaction.transactable_type
+    when "Payment"
+      "Pago por Venta"
+    when "CashInflow"
+      "Entrada de Caja"
+    when "CashOutflow"
+      "Salida de Caja"
+    else
+      "Transacción"
+    end
+  end
+
   def seller_comission_percentage(location)
     CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: location).sales_on_month_for_location, location)&.commission_percentage || 0
   end

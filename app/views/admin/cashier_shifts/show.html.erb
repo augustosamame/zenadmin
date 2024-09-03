@@ -111,7 +111,7 @@
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= friendly_date(current_user, transaction.created_at) %></td>
             <td class="px-6 py-4 whitespace-nowrap">
               <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= transaction_type_color(transaction) %>">
-                <%= transaction.transactable_type.demodulize.underscore.humanize %>
+                <%= friendly_transactable_type(transaction) %>
               </span>
             </td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>

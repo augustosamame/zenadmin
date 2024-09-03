@@ -1,0 +1,134 @@
+# Files in the config/locales directory are used for internationalization and
+# are automatically loaded by Rails. If you want to use locales other than
+# English, add the necessary files in this directory.
+#
+# To use the locales, use `I18n.t`:
+#
+#     I18n.t "hello"
+#
+# In views, this is aliased to just `t`:
+#
+#     <%= t("hello") %>
+#
+# To use a different locale, set it with `I18n.locale`:
+#
+#     I18n.locale = :es
+#
+# This would use the information in config/locales/es.yml.
+#
+# To learn more about the API, please read the Rails Internationalization guide
+# at https://guides.rubyonrails.org/i18n.html.
+#
+# Be aware that YAML interprets the following case-insensitive strings as
+# booleans: `true`, `false`, `on`, `off`, `yes`, `no`. Therefore, these strings
+# must be quoted to be interpreted as strings. For example:
+#
+#     en:
+#       "yes": yup
+#       enabled: "ON"
+
+es:
+  cash_inflow: Ingreso a Caja
+  cash_outflow: Salida de Caja
+  activerecord:
+    attributes:
+      seller_biweekly_sales_target:
+        status_list:
+          pending: Pendiente
+          completed: Completado
+          inactive: Inactivo
+      brand:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      cashier_shift:
+        status_list:
+          open: Abierta
+          closed: Cerrada
+      cashier:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      commission_payout:
+        status_list:
+          pending: Pendiente
+          completed: Completado
+      commission:
+        status_list:
+          status_order_unpaid: Venta no pagada
+          status_order_paid: Comisión pendiente de pago
+          status_paid_out: Comisión pagada
+      custom_numbering:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      customer:
+        doc_type_list:
+          dni: DNI
+          ce: C.E.
+          passport: Pasaporte
+          other: Otro
+      location:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      media:
+        media_type_list:
+          default_image: Imagen por defecto
+          image: Imagen
+          video: Video
+          pos_image: Imagen POS
+          homepage_image: Imagen de la página principal
+          featured_homepage_image: Imagen destacada de la página principal
+      order:
+        stage_list:
+          draft: Borrador
+          confirmed: Confirmado
+          shipped: Enviado
+          delivered: Entregado
+          cancelled: Cancelado
+        payment_status_list:
+          unpaid: No pagado
+          paid: Pagado
+          partially_paid: Parcialmente pagado
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      payment_method:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      payment:
+        status_list:
+          pending: Pendiente
+          paid: Pagado
+          partially_paid: Parcialmente pagado
+          cancelled: Cancelado
+      periodic_inventory:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+        inventory_type_list:
+          manual: Manual
+          automatic: Automático
+      product:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      stock_transfer:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+        adjustment_type_list:
+          merma: Merma
+          pérdida_o_robo: Pérdida o Robo
+          venta_incorrecta: Venta incorrecta
+          otros: Otros
+      tag:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+      user:
+        status_list:
+          active: Activo
+          inactive: Inactivo

@@ -1,45 +1,36 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["table", "productSelect", "warehouseSelect"]
+  static targets = ["warehouseSelect", "productSelect", "movementsContainer"]
 
   connect() {
-    console.log("KardexController connected")
-    if (this.tableTarget) {
-      console.log("Table target exists")
-    }
-    // Automatically fetch movements if both product and warehouse are preselected
-    if (this.productSelectTarget.value && this.warehouseSelectTarget.value) {
+    if (this.hasWarehouseSelectTarget) {
       this.fetchMovements()
     }
   }
 
-  //check if table target exists
-
-
   fetchMovements() {
     const productId = this.productSelectTarget.value
-    const warehouseId = this.warehouseSelectTarget.value
+    const warehouseId = this.hasWarehouseSelectTarget ? this.warehouseSelectTarget.value : null
 
-    if (productId) {
-      const url = new URL('/admin/inventory/fetch_kardex_movements', window.location.origin)
-      url.searchParams.append('product_id', productId)
-      if (warehouseId) {
-        url.searchParams.append('warehouse_id', warehouseId)
-      }
+    if (!productId) return
 
-      console.log("Fetching movements for product:", productId, "and warehouse:", warehouseId)
+    console.log('url', this.movementsContainerTarget.dataset.url)
+    const url = new URL(this.movementsContainerTarget.dataset.url, window.location.origin)
 
-      fetch(url, {
-        headers: {
-          Accept: "text/vnd.turbo-stream.html"
-        }
-      })
-        .then(response => response.text())
-        .then(html => {
-          this.tableTarget.innerHTML = html
-        })
-        .catch(error => console.error('Error fetching movements:', error))
+    url.searchParams.set("product_id", productId)
+    if (warehouseId) {
+      url.searchParams.set("warehouse_id", warehouseId)
     }
+
+    fetch(url, {
+      headers: {
+        "Accept": "text/vnd.turbo-stream.html"
+      }
+    })
+      .then(response => response.text())
+      .then(html => {
+        Turbo.renderStreamMessage(html)
+      })
   }
 }

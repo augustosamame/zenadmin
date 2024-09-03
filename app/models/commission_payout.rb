@@ -1,5 +1,6 @@
 class CommissionPayout < ApplicationRecord
   audited_if_enabled
+  include TranslateEnum
 
   belongs_to :commission
   belongs_to :user
@@ -7,6 +8,7 @@ class CommissionPayout < ApplicationRecord
   monetize :amount_cents, with_model_currency: :currency
 
   enum :status, { pending: 0, completed: 1 }
+  translate_enum :status
 
   validates :amount_cents, presence: true
 
