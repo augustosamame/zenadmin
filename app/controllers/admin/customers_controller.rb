@@ -95,13 +95,21 @@ class Admin::CustomersController < Admin::AdminController
     end
   end
 
+  def search_ruc
+    response = Services::ReniecSunat::ConsultaDniRucPerudevs.consultar_ruc(params[:numero])
+    if response["mensaje"] && response["mensaje"] == "Encontrado" && response["resultado"].present?
+      capitalized_response = response["resultado"].transform_values do |value|
+        value.split.map(&:capitalize).join(" ") if value.is_a?(String)
+      end
+      render json: capitalized_response
+    else
+      render json: { error: "No se encontraron datos para el RUC ingresado" }
+    end
+  end
+
   private
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [:id, :doc_type, :doc_id, :birthdate, :_destroy])
-    end
-
-    def customer_params
-      params.require(:user).require(:customer_attributes).permit(:doc_type, :doc_id, :birthdate)
+      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [:id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :_destroy])
     end
 end

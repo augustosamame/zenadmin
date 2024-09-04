@@ -11,6 +11,10 @@ class CreateCustomers < ActiveRecord::Migration[7.2]
       t.integer :points_balance, default: 0
       t.string :referral_code
       t.references :referrer, foreign_key: { to_table: :users }, null: true
+      t.boolean :wants_factura, default: false
+      t.string :factura_ruc
+      t.string :factura_razon_social
+      t.string :factura_direccion
       t.integer :status, default: 0
 
       t.timestamps

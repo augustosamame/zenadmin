@@ -232,6 +232,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
     t.integer "points_balance", default: 0
     t.string "referral_code"
     t.bigint "referrer_id"
+    t.boolean "wants_factura", default: false
+    t.string "factura_ruc"
+    t.string "factura_razon_social"
+    t.string "factura_direccion"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
