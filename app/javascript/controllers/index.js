@@ -58,8 +58,8 @@ application.register("nav", NavController)
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
-import ObjectTableModalController from "./object_table_modal_controller"
-application.register("object-table-modal", ObjectTableModalController)
+import CustomerTableModalController from "./customer_table_modal_controller"
+application.register("customer-table-modal", CustomerTableModalController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)

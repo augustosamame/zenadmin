@@ -149,7 +149,7 @@ export default class extends Controller {
       });
     });
 
-    const selectedCustomerId = document.querySelector('[data-action="click->object-table-modal#open"]').dataset.selectedObjectId;
+    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
     const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
     const selectedSellers = JSON.parse(sellersButton.dataset.sellers || '[]');

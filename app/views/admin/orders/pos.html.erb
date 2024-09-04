@@ -87,12 +87,12 @@
           <%= render 'shared/admin/pos/comment_modal' %>
         </div>
         
-        <div data-controller="object-table-modal" class="flex items-center justify-center h-16">
-          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->object-table-modal#open">
+        <div data-controller="customer-table-modal" class="flex items-center justify-center h-16">
+          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->customer-table-modal#open">
             <%= icon "user", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
             Cliente
           </button>
-          <%= render 'shared/admin/object_table_modal' %>
+          <%= render 'shared/admin/customer_table_modal' %>
         </div>
 
         <div data-controller="pos--sellers-modal">

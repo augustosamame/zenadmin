@@ -60,7 +60,7 @@ export default class extends Controller {
   clearSelectedUser() {
     console.log('Clearing selected user...');
 
-    const clienteButton = document.querySelector('[data-action="click->object-table-modal#open"]');
+    const clienteButton = document.querySelector('[data-action="click->customer-table-modal#open"]');
 
     const originalIcon = `
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" aria-hidden="true" role="img" aria-labelledby="aflku4s3u7inp91d48twlttjbap2mjj9" class="stroke-current w-4 h-4 text-slate-600 dark:text-slate-300 mr-2">
