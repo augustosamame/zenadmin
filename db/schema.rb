@@ -279,6 +279,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
     t.bigint "invoice_series_id", null: false
     t.bigint "location_id", null: false
     t.bigint "payment_method_id", null: false
+    t.boolean "default", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["invoice_series_id"], name: "index_invoice_series_mappings_on_invoice_series_id"
@@ -293,7 +294,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
     t.string "ruc", null: false
     t.integer "tipo_ruc", default: 0, null: false
     t.integer "einvoice_integrator", default: 0, null: false
-    t.string "einvoice_url", null: false
+    t.string "einvoice_url"
     t.string "einvoice_api_key"
     t.string "einvoice_api_secret"
     t.boolean "default", default: false, null: false

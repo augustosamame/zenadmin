@@ -7,7 +7,7 @@ class CreateInvoicers < ActiveRecord::Migration[7.2]
       t.string :ruc, null: false
       t.integer :tipo_ruc, null: false, default: 0
       t.integer :einvoice_integrator, null: false, default: 0
-      t.string :einvoice_url, null: false
+      t.string :einvoice_url
       t.string :einvoice_api_key
       t.string :einvoice_api_secret
       t.boolean :default, null: false, default: false

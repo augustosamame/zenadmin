@@ -1,30 +1,46 @@
-<div class="container px-4 mx-auto sm:px-6 lg:px-8">
-  <h1 class="mb-6 text-2xl font-semibold">Mapeos de Series de Comprobantes</h1>
+<%= render "shared/admin/nav", { header_title: "Mapeos de Series de Comprobantes" } do %>
+  <%= link_to 'Nuevo Mapeo', new_admin_invoice_series_mapping_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>
 
-  <%= link_to 'Nuevo Mapeo', new_admin_invoice_series_mapping_path, class: 'bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded' %>
-
-  <div class="mt-8">
-    <table class="min-w-full divide-y divide-gray-200" data-controller="datatable">
-      <thead class="bg-gray-50">
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
         <tr>
-          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tienda</th>
-          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Razón Social</th>
-          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Serie</th>
-          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método de Pago</th>
-          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
+          <th class="px-4 py-2 text-left">Tienda</th>
+          <th class="px-4 py-2 text-left">Razón Social</th>
+          <th class="px-4 py-2 text-left">Serie</th>
+          <th class="px-4 py-2 text-left">Método de Pago</th>
+          <th class="px-4 py-2 text-left">Por defecto</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
       </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
+      <tbody>
         <% @invoice_series_mappings.each do |mapping| %>
           <tr>
-            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.location.name %></td>
-            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.invoice_series.invoicer.name %></td>
-            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.invoice_series.prefix %></td>
-            <td class="px-6 py-4 whitespace-nowrap"><%= mapping.payment_method&.name || 'N/A' %></td>
-            <td class="px-6 py-4 whitespace-nowrap">
-              <%= link_to 'Ver', admin_invoice_series_mapping_path(mapping), class: 'text-indigo-600 hover:text-indigo-900' %>
-              <%= link_to 'Editar', edit_admin_invoice_series_mapping_path(mapping), class: 'ml-2 text-indigo-600 hover:text-indigo-900' %>
-              <%= link_to 'Eliminar', admin_invoice_series_mapping_path(mapping), method: :delete, data: { confirm: '¿Estás seguro?' }, class: 'ml-2 text-red-600 hover:text-red-900' %>
+            <td class="px-4 py-2"><%= mapping.location.name %></td>
+            <td class="px-4 py-2"><%= mapping.invoice_series.invoicer.name %></td>
+            <td class="px-4 py-2"><%= mapping.invoice_series.prefix %></td>
+            <td class="px-4 py-2"><%= mapping.payment_method&.name || 'N/A' %></td>
+            <td class="px-4 py-2"><%= mapping.default ? 'Sí' : 'No' %></td>
+            <td class="px-4 py-2">
+              <div data-controller="dropdown" class="relative">
+                <button data-action="click->dropdown#toggle click@window->dropdown#hide"
+                  class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
+                    <%= icon "cog-6-tooth", classes: "w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                </button>
+                <ul data-dropdown-target="menu"
+                  class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
+                  <% @default_object_options_array.each do |option| %>
+                    <li>
+                      <%= link_to "#", data: { action: "click->dropdown#handleAction", object_id: mapping.id, event_name: option[:event_name] }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+                        <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                        <span><%= option[:label] %></span>
+                      <% end %>
+                    </li>
+                  <% end %>
+                </ul>
+              </div>
             </td>
           </tr>
         <% end %>

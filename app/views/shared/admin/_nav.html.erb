@@ -112,6 +112,9 @@
           class="box-content flex-shrink-0 w-12 h-12 transition duration-200 ease-in-out rounded-full appearance-none lg:w-10 lg:h-10 focus:ring-slate-200/90 hover:ring-slate-200/90 ring-2 ring-transparent dark:focus:ring-primary-400 dark:hover:ring-slate-500">
           <%= image_tag demo_avatar_url, class: "lg:w-10 w-12 lg:h-10 h-12 rounded-full flex-shrink-0 select-none", alt: "John Smith" %>
         </button>
+        <div class="flex items-center ml-2">
+          <span class="text-white cursor-pointer" data-action="click->dropdown#toggle click@window->dropdown#hide" data-dropdown-target="trigger"><%= current_user.name %></span>
+        </div>
         <ul data-dropdown-target="menu"
           class="hidden transition transform origin-top-right absolute right-0 md:top-12 top-20 bg-white rounded-lg shadow-xl shadow-slate-900/10 border border-slate-200 md:w-[200px] w-full z-50 py-2 dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 md:text-sm text-base font-medium text-slate-600 dark:text-slate-200"
           data-transition-enter-active="transition ease-out duration-300"
@@ -124,13 +127,13 @@
             <li>
               <%= link_to admin_settings_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
                 <%= icon "user", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                <span><%= current_user.name %></span>
+                <span>Perfil</span>
               <% end %>
             </li>
             <li>
               <%= link_to admin_settings_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
                 <%= icon "cog-6-tooth", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                <span>Settings</span>
+                <span>Configuración</span>
               <% end %>
             </li>
           <% end %>
@@ -138,7 +141,7 @@
             <li>
               <%= button_to destroy_user_session_path, method: :delete, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
                 <%= icon "arrow-right-on-rectangle", classes: "flex-shrink-0 stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                <span>Sign out</span>
+                <span>Cerrar Sesión</span>
               <% end %>
             </li>
           <% end %>

@@ -147,6 +147,12 @@ CommissionRange.find_or_create_by!(user: user1, min_sales: 0, max_sales: 2000, c
 CommissionRange.find_or_create_by!(user: user1, min_sales: 2000, max_sales: 5000, commission_percentage: 3, location: location_1)
 CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_percentage: 4, location: location_1)
 
+useradmin1 = User.create!(email: 'aalvarino@aromaterapia.com.pe', phone: "986976366", login: "aalvarino@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Alicia", last_name: "Alvarino")
+useradmin1.add_role('super_admin')
+
+useradmin2 = User.create!(email: 'ventas@aromaterapia.com.pe', phone: "986976367", login: "ventas@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Sasha", last_name: "Admin")
+useradmin2.add_role('super_admin')
+
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: true)
 generic_customer.add_role('customer')
 
@@ -159,5 +165,16 @@ user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", login
 user4.add_role('seller')
 user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", login: "seller3@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
 user5.add_role('seller')
+
+invoicer1 = Invoicer.find_or_create_by!(name: 'Jardin del Zen', razon_social: 'Jardin del Zen SAC', ruc: '20603897968', tipo_ruc: 'RUC', default: true, region: region_default)
+invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20603897965', tipo_ruc: 'RUC', region: region_default)
+invoicer3 = Invoicer.find_or_create_by!(name: 'Alicia Alvarino Garland', razon_social: 'Alicia Alvarino Garland', ruc: '20603897964', tipo_ruc: 'RUS', region: region_default)
+invoicer4 = Invoicer.find_or_create_by!(name: 'Maria Isabel Garland', razon_social: 'Maria Isabel Garland', ruc: '20603897963', tipo_ruc: 'RUS', region: region_default)
+
+InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F01', next_number: 1)
+InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B01', next_number: 1)
+
+InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'factura', prefix: 'F02', next_number: 1)
+InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'boleta', prefix: 'B02', next_number: 1)
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

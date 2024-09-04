@@ -1,5 +1,8 @@
+<%= render "shared/admin/nav", { header_title: "Nuevo Mapeo de Comprobante" } do %>
+  <%= link_to 'Volver a Mapeo de Comprobantes', admin_invoice_series_mappings_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>
+
 <div class="container px-4 mx-auto sm:px-6 lg:px-8">
-  <h1 class="mb-6 text-2xl font-semibold">Nuevo Mapeo de Serie de Comprobante</h1>
 
   <%= render 'form', invoice_series_mapping: @invoice_series_mapping %>
 

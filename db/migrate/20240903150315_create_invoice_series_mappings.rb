@@ -4,6 +4,7 @@ class CreateInvoiceSeriesMappings < ActiveRecord::Migration[7.2]
       t.references :invoice_series, null: false, foreign_key: true
       t.references :location, null: false, foreign_key: true
       t.references :payment_method, null: false, foreign_key: true
+      t.boolean :default, default: false
 
       t.timestamps
     end
