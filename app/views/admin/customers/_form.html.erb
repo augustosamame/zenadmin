@@ -1,105 +1,107 @@
-<%= simple_form_for([:admin, @user], html: { data: { controller: "customer-form" } }) do |form| %>
-  <%= render 'shared/form_errors', model: @user %>
-  <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+<div id="switchable-container" class="my-6">
+  <%= simple_form_for([:admin, @user], url: @user.persisted? ? admin_customer_path(@user) : admin_customers_path, html: { data: { controller: "customer-form", customer_form_target: "form", customer_form_in_modal_value: local_assigns[:in_modal] || false, turbo_frame: "switchable-container" } }) do |form| %>
+    <%= render 'shared/form_errors', model: @user %>
+    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
 
-    <%# Fields for associated Customer record %>
-    <%= form.simple_fields_for :customer do |customer_form| %>
-      <div class="col-span-2">
-        <!-- Use a flex container to display items side by side -->
-        <div class="flex space-x-4">
+      <%# Fields for associated Customer record %>
+      <%= form.simple_fields_for :customer do |customer_form| %>
+        <div class="col-span-2">
+          <!-- Use a flex container to display items side by side -->
+          <div class="flex space-x-4">
+            
+            <!-- Input for doc_type -->
+            <div class="flex-1">
+              <%= customer_form.input :doc_type, 
+                label: "Tipo de Doc", 
+                collection: Customer.doc_types.keys.map { |doc_type| [doc_type.titleize, doc_type] }, 
+                input_html: { 
+                  class: "form-input", 
+                  data: { action: "customer-form#handleDocTypeChange", customer_form_target: "docType" } 
+                }, 
+                label_html: { class: "form-label" } %>
+            </div>
+
+            <!-- Input for doc_id -->
+            <div class="flex-1">
+              <%= customer_form.input :doc_id, 
+                label: "Número de Documento", 
+                input_html: { 
+                  class: "form-input", 
+                  data: { action: "blur->customer-form#fetchCustomerData", customer_form_target: "docId" } 
+                }, 
+                label_html: { class: "form-label" } %>
+            </div>
+
+            <!-- Input for birthdate -->
+            <div class="flex-1">
+              <%= customer_form.input :birthdate, 
+                as: :string,
+                label: "Fecha de Nacimiento", 
+                input_html: { 
+                  class: "form-input", 
+                  data: { customer_form_target: "birthDate" } 
+                }, 
+                label_html: { class: "form-label" } %>
+            </div>
           
-          <!-- Input for doc_type -->
-          <div class="flex-1">
-            <%= customer_form.input :doc_type, 
-              label: "Tipo de Doc", 
-              collection: Customer.doc_types.keys.map { |doc_type| [doc_type.titleize, doc_type] }, 
-              input_html: { 
-                class: "form-input", 
-                data: { action: "customer-form#handleDocTypeChange", customer_form_target: "docType" } 
-              }, 
-              label_html: { class: "form-label" } %>
           </div>
+        </div>
+      <% end %>
 
-          <!-- Input for doc_id -->
-          <div class="flex-1">
-            <%= customer_form.input :doc_id, 
-              label: "Número de Documento", 
-              input_html: { 
-                class: "form-input", 
-                data: { action: "blur->customer-form#fetchCustomerData", customer_form_target: "docId" } 
-              }, 
-              label_html: { class: "form-label" } %>
-          </div>
+      <div class="flex col-span-2 space-x-4">
+        <div class="flex-1">
+          <%= form.input :first_name, 
+            label: "Nombres", 
+            input_html: { 
+              class: "form-input", 
+              data: { customer_form_target: "firstName" } 
+            }, 
+            label_html: { class: "form-label" } %>
+        </div>
 
-          <!-- Input for birthdate -->
-          <div class="flex-1">
-            <%= customer_form.input :birthdate, 
-              as: :string,
-              label: "Fecha de Nacimiento", 
-              input_html: { 
-                class: "form-input", 
-                data: { customer_form_target: "birthDate" } 
-              }, 
-              label_html: { class: "form-label" } %>
-          </div>
-        
+        <div class="flex-1">
+          <%= form.input :last_name, 
+            label: "Apellidos", 
+            input_html: { 
+              step: 1, 
+              class: "form-input", 
+              data: { customer_form_target: "lastName" }
+            }, 
+            label_html: { class: "form-label" } %>
         </div>
       </div>
-    <% end %>
 
-    <div class="flex col-span-2 space-x-4">
-      <div class="flex-1">
-        <%= form.input :first_name, 
-          label: "Nombres", 
-          input_html: { 
-            class: "form-input", 
-            data: { customer_form_target: "firstName" } 
-          }, 
-          label_html: { class: "form-label" } %>
+      <div class="flex col-span-2 space-x-4">
+        <div class="flex-1">
+          <%= form.input :email, 
+            label: "Correo Electrónico", 
+            input_html: { class: "form-input" }, 
+            label_html: { class: "form-label" } %>
+        </div>
+
+        <div class="flex-1">
+          <%= form.input :phone, 
+            label: "Teléfono Móvil", 
+            input_html: { class: "form-input" }, 
+            label_html: { class: "form-label" } %>
+        </div>
       </div>
 
-      <div class="flex-1">
-        <%= form.input :last_name, 
-          label: "Apellidos", 
-          input_html: { 
-            step: 1, 
-            class: "form-input", 
-            data: { customer_form_target: "lastName" }
-          }, 
-          label_html: { class: "form-label" } %>
-      </div>
+      <% if @user.persisted? %>
+        <div>
+          <%= form.input :status, 
+            label: "Estado", 
+            collection: User.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, 
+            input_html: { class: "form-input" }, 
+            label_html: { class: "form-label" } %>
+        </div>
+      <% end %>
+
     </div>
 
-    <div class="flex col-span-2 space-x-4">
-      <div class="flex-1">
-        <%= form.input :email, 
-          label: "Correo Electrónico", 
-          input_html: { class: "form-input" }, 
-          label_html: { class: "form-label" } %>
-      </div>
-
-      <div class="flex-1">
-        <%= form.input :phone, 
-          label: "Teléfono Móvil", 
-          input_html: { class: "form-input" }, 
-          label_html: { class: "form-label" } %>
-      </div>
+    <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+      <%= form.submit @user.new_record? ? "Crear Usuario" : "Grabar Usuario", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", admin_customers_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400", data: { action: "click->customer-form#cancel" } %>
     </div>
-
-    <% if @user.persisted? %>
-      <div>
-        <%= form.input :status, 
-          label: "Estado", 
-          collection: User.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, 
-          input_html: { class: "form-input" }, 
-          label_html: { class: "form-label" } %>
-      </div>
-    <% end %>
-
-  </div>
-
-  <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
-    <%= form.button :submit, @user.new_record? ? "Crear Usuario" : "Grabar Usuario", class: "btn btn-primary" %>
-    <%= link_to "Cancelar", admin_customers_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
-  </div>
-<% end %>
+  <% end %>
+</div>

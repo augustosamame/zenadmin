@@ -1,0 +1,32 @@
+<div id="switchable-container" class="my-6">
+  <div data-controller="datatable" data-datatable-options-value="no_buttons;resource_name:'Customer';create_button:false;sort_0_desc;hide_0;">
+    <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+      <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left">Id</th>
+            <th class="px-4 py-2 text-left">Nombres</th>
+            <th class="px-4 py-2 text-left">Apellidos</th>
+            <th class="px-4 py-2 text-left">Correo</th>
+            <th class="px-4 py-2 text-left">Teléfono</th>
+            <th class="px-4 py-2 text-left">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% customers.each do |customer| %>
+            <tr data-object-id="<%= customer.id %>" data-action="click->customer-table-modal#selectObject">
+              <td class="px-4 py-2"><%= customer.user.id %></td>
+              <td class="px-4 py-2"><%= customer.user.first_name %></td>
+              <td class="px-4 py-2"><%= customer.user.last_name %></td>
+              <td class="px-4 py-2"><%= customer.user.email %></td>
+              <td class="px-4 py-2"><%= customer.user.phone %></td>
+              <td class="px-4 py-2">
+                <button class="btn btn-primary">Seleccionar</button>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

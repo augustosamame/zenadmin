@@ -29,6 +29,7 @@ class User < ApplicationRecord
   accepts_nested_attributes_for :customer, allow_destroy: true
 
   before_validation :set_login
+  before_validation :set_user_email, on: :create
 
   def self.find_for_database_authentication(warden_conditions)
     conditions = warden_conditions.dup
@@ -38,6 +39,14 @@ class User < ApplicationRecord
 
   def name
     "#{first_name} #{last_name}"
+  end
+
+  def set_user_email
+    if self.customer.present? && login_type == "email"
+      generated_email = "#{self.customer.doc_id || rand(10000000)}@sincorreo.com"
+      self.email = generated_email
+      self.login = generated_email
+    end
   end
 
   def add_role(role_name)

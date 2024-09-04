@@ -25,6 +25,9 @@ application.register("custom-modal", CustomModalController)
 import CustomerFormController from "./customer_form_controller"
 application.register("customer-form", CustomerFormController)
 
+import CustomerTableModalController from "./customer_table_modal_controller"
+application.register("customer-table-modal", CustomerTableModalController)
+
 import DatatableController from "./datatable_controller"
 application.register("datatable", DatatableController)
 
@@ -57,9 +60,6 @@ application.register("nav", NavController)
 
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
-
-import CustomerTableModalController from "./customer_table_modal_controller"
-application.register("customer-table-modal", CustomerTableModalController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)

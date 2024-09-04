@@ -49,7 +49,6 @@ export default class extends Controller {
       fixedHeader: true,
       responsive: true,
       processing: true,
-      columnDefs: [],
       language: { url: languageUrl },
       pagingType: 'simple_numbers',
       pageLength: 10,
@@ -124,6 +123,8 @@ export default class extends Controller {
       options.select = { style: 'single', info: false };
     } else if (option === "select_multi") {
       options.select = { style: 'multi', info: false };
+    } else if (option.startsWith("hide_0")) {
+      options.columnDefs = [ { target: 0, visible: false } ];
     } else if (option.startsWith("sort_")) {
       this.parseSortOption(option, options);
     } else {
