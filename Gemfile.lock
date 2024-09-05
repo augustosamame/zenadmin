@@ -412,7 +412,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rollbar (3.5.2)
+    rollbar (3.6.0)
     rubocop (1.66.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -577,7 +577,7 @@ DEPENDENCIES
   rails_feather (~> 0.1.0)
   railsui!
   redis (>= 5.3)
-  rollbar (~> 3.5.2)
+  rollbar (~> 3.6.0)
   rubocop (~> 1.66.1)
   rubocop-rails-omakase
   ruby-vips (~> 2.2.2)
