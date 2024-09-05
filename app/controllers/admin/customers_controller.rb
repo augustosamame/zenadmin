@@ -60,6 +60,11 @@ class Admin::CustomersController < Admin::AdminController
     end
   end
 
+  def show
+    @customer = Customer.find(params[:id])
+    render json: @customer
+  end
+
   def edit
     @user = User.includes(:customer).find(params[:id])
     @customer = @user.customer || @user.build_customer

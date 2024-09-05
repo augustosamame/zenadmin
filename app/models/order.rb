@@ -31,6 +31,8 @@ class Order < ApplicationRecord
   has_many :commission_payouts, through: :commissions
   has_many :sellers, through: :commissions, source: :user
 
+  has_many :invoices, dependent: :destroy
+
   before_create :set_defaults
 
   # Update commissions when the order is marked as paid
@@ -67,6 +69,14 @@ class Order < ApplicationRecord
 
   def set_defaults
     order_date = Time.zone.now
+  end
+
+  def determine_order_invoices_matrix
+    Services::Sales::OrderInvoiceService.new(self).determine_order_invoices_matrix
+  end
+
+  def last_issued_invoice_urls
+    self.invoices.where(status: "issued").pluck(:custom_id, :invoice_url)
   end
 
   private

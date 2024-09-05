@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import axios from 'axios'
 
 export default class extends Controller {
-  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total'];
+  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'rucSection', 'ruc', 'razonSocial', 'direccion'];
 
   connect() {
     console.log('Connected to PaymentController!');
@@ -10,8 +10,35 @@ export default class extends Controller {
     this.canCreateUnpaidOrders = this.element.dataset.posCanCreateUnpaidOrders === 'true';
   }
 
+  getRucData(customerId) {
+    return axios.get(`/admin/customers/${customerId}`, { headers: { 'Accept': 'application/json' } })
+      .then(response => {
+        console.log('customer data response:', response.data);
+        return response.data;
+      })
+      .catch(error => {
+        console.error('Error fetching RUC data:', error);
+        return null;
+      });
+  }
+
   payOrder() {
     console.log('Pay button clicked');
+    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    const selectedRuc = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedRuc;
+    if (selectedRuc && selectedRuc.trim() !== '') {
+      this.getRucData(selectedCustomerId)
+        .then(ruc_data => {
+          console.log('response', ruc_data);
+          this.rucSectionTarget.classList.remove('hidden');
+          this.rucTarget.textContent = `RUC: ${selectedRuc}`;
+          this.razonSocialTarget.textContent = `Razón Social: ${ruc_data.factura_razon_social}`;
+          this.direccionTarget.textContent = `Dirección: ${ruc_data.factura_direccion}`;
+        })
+        .catch(error => {
+          console.error('Error fetching RUC data:', error);
+        });
+    }
 
     const orderItemsTotal = document.querySelector('[data-pos--order-items-target="total"]').textContent.trim();
     const totalAmount = parseFloat(orderItemsTotal.replace('S/', ''));
@@ -39,7 +66,17 @@ export default class extends Controller {
 
         methods.forEach(method => {
           const button = document.createElement('button');
-          button.classList.add('p-4', 'm-2', 'bg-gray-300', 'rounded', 'btn', 'dark:bg-gray-600');
+          button.classList.add(
+            'px-4', 'py-2', 'm-2',
+            'bg-white', 'hover:bg-gray-100',
+            'text-blue-600', 'font-semibold',
+            'border', 'border-blue-600',
+            'rounded-lg', 'shadow-sm',
+            'transition', 'duration-300', 'ease-in-out',
+            'focus:outline-none', 'focus:ring-2', 'focus:ring-blue-500', 'focus:ring-opacity-50',
+            'dark:bg-gray-800', 'dark:text-blue-400', 'dark:border-blue-400',
+            'dark:hover:bg-gray-700'
+          );
           button.textContent = method.description;
           button.dataset.method = method.name;
           button.dataset.description = method.description;
@@ -125,6 +162,12 @@ export default class extends Controller {
       return;
     }
 
+    const rucCheckbox = document.querySelector('#confirm-factura');
+    console.log(rucCheckbox);
+    const isRucChecked = rucCheckbox ? rucCheckbox.checked : false;
+    console.log(isRucChecked);
+
+
     const orderItems = document.querySelectorAll('[data-pos--order-items-target="items"] div.flex');
     const orderItemsAttributes = [];
 
@@ -135,14 +178,16 @@ export default class extends Controller {
       orderItemsAttributes.push({
         product_id: item.dataset.productId, // Extract product ID
         quantity: quantity, // Extract quantity
-        price: price
+        price_cents: parseInt(price * 100, 10),
+        discounted_price_cents: 0,
+        currency: 'PEN',
       });
     });
 
     const payments = [];
     this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
       payments.push({
-        amount: input.value,
+        amount_cents: parseInt(input.value * 100, 10),
         payment_method_id: input.closest('div').dataset.methodId,
         user_id: 1,
         payable_type: 'Order',
@@ -162,6 +207,7 @@ export default class extends Controller {
         total_discount: 0,
         shipping_price: 0,
         currency: 'PEN',
+        wants_factura: isRucChecked,
         payment_status: 'paid',
         seller_note: comment,
         order_items_attributes: orderItemsAttributes,

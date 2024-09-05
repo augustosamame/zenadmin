@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -305,10 +305,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["default"], name: "index_invoicers_on_default", unique: true
     t.index ["name"], name: "index_invoicers_on_name", unique: true
     t.index ["region_id"], name: "index_invoicers_on_region_id"
     t.index ["ruc"], name: "index_invoicers_on_ruc", unique: true
+  end
+
+  create_table "invoices", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.bigint "invoice_series_id", null: false
+    t.bigint "payment_method_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.string "custom_id", null: false
+    t.integer "invoice_type", default: 0, null: false
+    t.integer "sunat_status", default: 0, null: false
+    t.text "invoice_sunat_sent_text"
+    t.text "invoice_sunat_response"
+    t.text "invoice_url"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_id", "invoice_type"], name: "index_invoices_on_custom_id_and_invoice_type", unique: true
+    t.index ["invoice_series_id"], name: "index_invoices_on_invoice_series_id"
+    t.index ["order_id"], name: "index_invoices_on_order_id"
+    t.index ["payment_method_id"], name: "index_invoices_on_payment_method_id"
+    t.index ["sunat_status"], name: "index_invoices_on_sunat_status"
   end
 
   create_table "locations", force: :cascade do |t|
@@ -379,6 +400,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
     t.boolean "coupon_applied", default: false
     t.text "customer_note"
     t.text "seller_note"
+    t.boolean "wants_factura", default: false
     t.integer "active_invoice_id"
     t.boolean "invoice_id_required", default: false
     t.datetime "order_date"
@@ -745,6 +767,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_03_150315) do
   add_foreign_key "invoice_series_mappings", "locations"
   add_foreign_key "invoice_series_mappings", "payment_methods"
   add_foreign_key "invoicers", "regions"
+  add_foreign_key "invoices", "invoice_series"
+  add_foreign_key "invoices", "orders"
+  add_foreign_key "invoices", "payment_methods"
   add_foreign_key "locations", "regions"
   add_foreign_key "order_items", "orders"
   add_foreign_key "order_items", "products"

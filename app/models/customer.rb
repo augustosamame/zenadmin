@@ -5,7 +5,7 @@ class Customer < ApplicationRecord
   belongs_to :user
   include MediaUploader::Attachment(:avatar)
 
-  enum :doc_type, { dni: 0, ce: 1, passport: 2, other: 3 }
+  enum :doc_type, { dni: 1, ce: 4, passport: 7 }
   translate_enum :doc_type
 
   before_validation :set_consumer_password, on: :create

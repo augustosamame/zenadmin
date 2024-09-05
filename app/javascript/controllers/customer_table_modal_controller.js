@@ -122,11 +122,13 @@ export default class extends Controller {
     const objectId = selectedRow.dataset.objectId;
     const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
     const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
-    const fullName = `${firstName} ${lastName}`;
+    const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
+    const fullName = ruc ? `${firstName} ${lastName} - RUC: ${ruc}` : `${firstName} ${lastName}`;
 
     // Update the Cliente button
     const clienteButton = document.querySelector('[data-action="click->customer-table-modal#open"]');
     clienteButton.dataset.selectedObjectId = objectId;
+    clienteButton.dataset.selectedRuc = ruc;
 
     // Keep the existing icon and update the text
     clienteButton.innerHTML = `

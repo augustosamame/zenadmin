@@ -26,7 +26,11 @@
             <td class="px-4 py-2"><%= order.customer&.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(order.total_price, unit: 'S/') %></td>
             <td class="px-4 py-2"><%= number_to_currency(order.total_discount, unit: 'S/') %></td>
-            <td class="px-4 py-2"><%= order.active_invoice_id %></td>
+            <td class="px-4 py-2">
+              <% order.last_issued_invoice_urls.each do |label, url| %>
+                <a href="<%= url %>" target="_blank" class="text-blue-500 hover:underline"><%= label %></a><br>
+              <% end %>
+            </td>
             <td class="px-4 py-2"><%= order.translated_payment_status %></td>
             <td class="px-4 py-2"><%= order.translated_status %></td>
             <td class="px-4 py-2">

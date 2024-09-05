@@ -38,7 +38,7 @@ gem "railsui", github: "getrailsui/railsui", branch: "main"
 gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"
 gem "audited", "~> 5.7.0"
-gem "sidekiq", "~> 7.3.1"
+gem "sidekiq", "~> 7.3.2"
 gem "dotenv-rails", "~> 3.1.2", require: "dotenv/load"
 gem "cssbundling-rails", "~> 1.4.1"
 gem "jsbundling-rails", "~> 1.3.1"
@@ -81,7 +81,7 @@ group :development, :test do
   gem "brakeman", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
-  gem "rubocop", require: false
+  gem "rubocop", "~> 1.66.1", require: false
   gem "rubocop-rails-omakase", require: false
 end
 

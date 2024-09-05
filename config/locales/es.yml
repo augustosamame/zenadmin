@@ -67,7 +67,6 @@ es:
           dni: DNI
           ce: C.E.
           passport: Pasaporte
-          other: Otro
       location:
         status_list:
           active: Activo

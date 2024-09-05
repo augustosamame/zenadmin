@@ -2,7 +2,7 @@ class CreateCustomers < ActiveRecord::Migration[7.2]
   def change
     create_table :customers do |t|
       t.references :user, null: false, foreign_key: true
-      t.integer :doc_type, default: 0
+      t.integer :doc_type, default: 1
       t.string :doc_id
       t.datetime :birthdate
       t.jsonb :avatar_data

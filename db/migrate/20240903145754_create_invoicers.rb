@@ -18,6 +18,5 @@ class CreateInvoicers < ActiveRecord::Migration[7.2]
 
     add_index :invoicers, :name, unique: true
     add_index :invoicers, :ruc, unique: true
-    add_index :invoicers, :default, unique: true
   end
 end

@@ -6,9 +6,9 @@ class Admin::OrdersController < Admin::AdminController
       format.html do
         @orders = Order.includes([ :user ]).all
         if @orders.size > 50
-          @datatable_options = "server_side:true;resource_name:'Order';create_button:false;"
+          @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
         else
-          @datatable_options = "server_side:false;resource_name:'Order';create_button:false;"
+          @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;"
         end
       end
 
@@ -30,7 +30,7 @@ class Admin::OrdersController < Admin::AdminController
       if @order.origin == "pos"
         # POS context: current_user is the seller, user_id is provided
         @order.seller_id = current_user.id
-        @order.user_id ||= get_generic_customer_id
+        @order.user_id = Customer.find(@order.user_id)&.user_id ||= Customer.find(get_generic_customer_id).user_id
         @order.location_id = @current_location.id
       elsif @order.origin == "ecommerce"
         # eCommerce context: current_user is the eCommerce store, user_id is not provided
@@ -49,14 +49,17 @@ class Admin::OrdersController < Admin::AdminController
           Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
         end
         Services::Inventory::OrderItemService.new(@order).update_inventory
+        GenerateEinvoice.perform_async(@order.id)
 
         session.delete(:draft_order)
         render json: { status: "success", id: @order.id, message: "Order created successfully." }
       else
+        Rails.logger.info("Error creating order: #{@order.errors.full_messages}")
         render json: { status: "error", errors: @order.errors.full_messages }
       end
     end
     rescue ActiveRecord::Rollback => e
+      Rails.logger.info("Error creating order in rollback: #{@order.errors.full_messages}")
       render json: { status: "error", errors: e.message }
   end
 
@@ -71,7 +74,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :discounted_price, :currency ], payments_attributes: [ :user_id, :payment_method_id, :amount, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ])
     end
 
     def get_generic_customer_id

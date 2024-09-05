@@ -123,8 +123,8 @@ export default class extends Controller {
       options.select = { style: 'single', info: false };
     } else if (option === "select_multi") {
       options.select = { style: 'multi', info: false };
-    } else if (option.startsWith("hide_0")) {
-      options.columnDefs = [ { target: 0, visible: false } ];
+    } else if (option.startsWith("hide_")) {
+      this.parseHideOption(option, options);
     } else if (option.startsWith("sort_")) {
       this.parseSortOption(option, options);
     } else {
@@ -140,6 +140,12 @@ export default class extends Controller {
     if (!options.order) options.order = [];
     options.order.push([parseInt(col, 10), dir]);
     options.stateSave = false;
+  }
+
+  parseHideOption(option, options) {
+    const [, col] = option.split("_");
+    if (!options.columnDefs) options.columnDefs = [];
+    options.columnDefs.push({ target: parseInt(col, 10), visible: false });
   }
 
   parseValue(value) {
@@ -227,7 +233,7 @@ export default class extends Controller {
     const searchInput = $('.dt-search input');
     if (searchInput.length > 0) {
       searchInput.addClass('form-input block w-full lg:w-64 mt-2 sm:mt-0 rounded-md border-slate-300 focus:border-primary-500 focus:ring-primary-500 max-w-[200px]')
-        .attr('placeholder', 'Texto a Buscar...');
+        .attr('placeholder', 'Nombre, DNI o Móvil...');
     }
   }
 

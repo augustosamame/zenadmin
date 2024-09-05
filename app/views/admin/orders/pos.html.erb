@@ -38,13 +38,27 @@
         <!-- Payments will be listed here -->
       </div>
 
-      <div class="flex justify-between mt-4 mt-auto">
-        <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--payment#saveOrder">
-          Crear Venta
-        </button>
-        <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->pos--payment#cancelPayment">
-          Volver
-        </button>
+      <div class="mt-auto">
+        <div data-pos--payment-target="rucSection" class="hidden mb-4">
+          <div class="flex items-center mt-2">
+            <input type="checkbox" id="confirm-factura" class="mr-2" checked>
+            <label for="confirm-factura" class="text-base">Emitir factura</label>
+          </div>
+          <div class="flex flex-col pt-4 text-base border-t dark:border-gray-600">
+            <span data-pos--payment-target="ruc">RUC: </span>
+            <span data-pos--payment-target="razonSocial">Razón Social: </span>
+            <span data-pos--payment-target="direccion">Dirección: </span>
+          </div>
+        </div>
+
+        <div class="flex justify-between mt-4">
+          <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--payment#saveOrder">
+            Crear Venta
+          </button>
+          <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->pos--payment#cancelPayment">
+            Volver
+          </button>
+        </div>
       </div>
 
     </div>
@@ -103,14 +117,21 @@
           <%= render 'shared/admin/pos/sellers_modal' %>
         </div>
 
-        <div>
+        <div class="flex items-center justify-center h-16">
           <%= link_to admin_cashier_shift_path(@current_cashier_shift), class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
             <%= icon "currency-dollar", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
             Caja
           <% end %>
         </div>
 
-        <div>
+        <div class="flex items-center justify-center h-16">
+          <%= link_to admin_orders_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+            <%= icon "sparkles", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+            Ventas
+          <% end %>
+        </div>
+
+        <div class="flex items-center justify-center h-16">
           <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
             <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
             Comisiones
