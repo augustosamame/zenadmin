@@ -45,7 +45,7 @@ gem "jsbundling-rails", "~> 1.3.1"
 gem "devise", "~> 4.9.4"
 gem "devise-i18n", "~> 1.12.1"
 gem "httparty", "~> 0.22.0"
-gem "rollbar", "~> 3.5.2"
+gem "rollbar", "~> 3.6.0"
 gem "simple_form", "~> 5.3.1"
 gem "money-rails", "~> 1.15.0"
 gem "pg_search", "~> 2.3.7"
@@ -78,7 +78,7 @@ group :development, :test do
   gem "debug", platforms: %i[ mri ], require: "debug/prelude"
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
+  gem "brakeman", "~> 6.2.1", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop", "~> 1.66.1", require: false

@@ -144,7 +144,7 @@ GEM
     bindex (0.8.1)
     bootsnap (1.18.4)
       msgpack (~> 1.2)
-    brakeman (6.1.2)
+    brakeman (6.2.1)
       racc
     builder (3.3.0)
     bullet (7.2.0)
@@ -412,7 +412,7 @@ GEM
     responders (3.1.1)
       actionpack (>= 5.2)
       railties (>= 5.2)
-    rollbar (3.5.2)
+    rollbar (3.6.0)
     rubocop (1.66.1)
       json (~> 2.3)
       language_server-protocol (>= 3.17.0)
@@ -535,7 +535,7 @@ DEPENDENCIES
   aws-sdk-s3 (~> 1.159.0)
   bootsnap
   bootstrap-generators!
-  brakeman
+  brakeman (~> 6.2.1)
   bullet (~> 7.2.0)
   byebug
   cancancan (~> 3.6.1)
@@ -577,7 +577,7 @@ DEPENDENCIES
   rails_feather (~> 0.1.0)
   railsui!
   redis (>= 5.3)
-  rollbar (~> 3.5.2)
+  rollbar (~> 3.6.0)
   rubocop (~> 1.66.1)
   rubocop-rails-omakase
   ruby-vips (~> 2.2.2)
