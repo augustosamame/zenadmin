@@ -68,15 +68,15 @@ class Order < ApplicationRecord
   end
 
   def set_defaults
-    order_date = Time.zone.now
+    self.order_date ||= Time.zone.now
   end
 
   def determine_order_invoices_matrix
     Services::Sales::OrderInvoiceService.new(self).determine_order_invoices_matrix
   end
 
-  def last_issued_invoice_urls
-    self.invoices.where(status: "issued").pluck(:custom_id, :invoice_url)
+  def last_issued_ok_invoice_urls
+    self.invoices.where(status: "issued", sunat_status: "sunat_success").pluck(:custom_id, :invoice_url)
   end
 
   private

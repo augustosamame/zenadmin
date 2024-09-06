@@ -223,7 +223,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
 
   create_table "customers", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.integer "doc_type", default: 0
+    t.integer "doc_type", default: 1
     t.string "doc_id"
     t.datetime "birthdate"
     t.jsonb "avatar_data"
@@ -325,7 +325,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["custom_id", "invoice_type"], name: "index_invoices_on_custom_id_and_invoice_type", unique: true
+    t.index ["custom_id", "invoice_type", "status"], name: "index_invoices_on_custom_id_and_invoice_type_and_status", unique: true
     t.index ["invoice_series_id"], name: "index_invoices_on_invoice_series_id"
     t.index ["order_id"], name: "index_invoices_on_order_id"
     t.index ["payment_method_id"], name: "index_invoices_on_payment_method_id"

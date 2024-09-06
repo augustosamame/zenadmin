@@ -1,0 +1,123 @@
+<%= render "shared/admin/nav", { header_title: "Orden ##{@order.custom_id}" } do %>
+  <%= link_to "Volver a Ventas", admin_orders_path, class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Orden</h3>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Número de Orden</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.id %></dd>
+        </div>
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Fecha</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= friendly_date(current_user, @order.order_date) %></dd>
+        </div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Cliente</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.customer.name %></dd>
+        </div>
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Total</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_currency(@order.total_price, unit: 'S/') %></dd>
+        </div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Descuento</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_currency(@order.total_discount, unit: 'S/') %></dd>
+        </div>
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Estado de Pago</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.translated_payment_status %></dd>
+        </div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Estado</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.translated_status %></dd>
+        </div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Notas del Vendedor</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.seller_note %></dd>
+        </div>
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Comprobante</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= show_invoice_actions(@order) %></dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Order Items -->
+  <div class="mt-8">
+    <h4 class="mb-4 text-lg font-medium text-gray-900">Artículos de la Orden</h4>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @order.order_items.each do |item| %>
+          <tr>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.product.name %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.quantity %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(item.price, unit: 'S/') %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(item.price * item.quantity, unit: 'S/') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Payments -->
+  <div class="mt-8">
+    <h4 class="mb-4 text-lg font-medium text-gray-900">Pagos</h4>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @order.payments.each do |payment| %>
+          <tr>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= friendly_date(current_user, payment.created_at) %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.payment_method.description %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(payment.amount, unit: 'S/') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Sellers -->
+  <div class="mt-8">
+    <h4 class="mb-4 text-lg font-medium text-gray-900">Vendedores</h4>
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Porcentaje</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Venta</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @order.commissions.each do |commission| %>
+          <tr>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.name %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.email %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_percentage(commission.percentage, precision: 2) %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(commission.sale_amount, unit: 'S/') %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+</div>

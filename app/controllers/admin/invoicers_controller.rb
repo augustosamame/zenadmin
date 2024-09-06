@@ -2,7 +2,7 @@ class Admin::InvoicersController < Admin::AdminController
   before_action :set_invoicer, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @invoicers = Invoicer.all
+    @invoicers = Invoicer.all.order(id: :asc)
   end
 
   def show

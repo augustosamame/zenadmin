@@ -17,7 +17,7 @@ class CreateInvoices < ActiveRecord::Migration[7.2]
       t.timestamps
     end
 
-    add_index :invoices, [ :custom_id, :invoice_type ], unique: true
+    add_index :invoices, [ :custom_id, :invoice_type, :status ], unique: true
     add_index :invoices, :sunat_status
   end
 end

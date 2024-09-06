@@ -4,7 +4,7 @@ class Admin::OrdersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @orders = Order.includes([ :user ]).all
+        @orders = Order.includes([ :user, :invoices ]).all
         if @orders.size > 50
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
         else
@@ -63,11 +63,32 @@ class Admin::OrdersController < Admin::AdminController
       render json: { status: "error", errors: e.message }
   end
 
+  def show
+    @order = Order.includes(:order_items, :payments, :user, :commissions).find(params[:id])
+  end
+
   def pos
     @order = Order.new
     @can_create_unpaid_orders = $global_settings[:pos_can_create_unpaid_orders]
     if @current_cashier_shift.blank? || @current_cashier_shift.status == "closed"
       redirect_to admin_cashier_shifts_path, alert: "El turno de caja está cerrado."
+    end
+  end
+
+  def retry_invoice
+    @order = Order.find(params[:order_id])
+    @options = {}
+
+    # don't use worker here so we can get the response back to the frontend
+    Services::Sales::OrderInvoiceService.new(@order, @options).create_invoices
+
+    respond_to do |format|
+      format.html do
+        redirect_to admin_orders_path, notice: "Se ha reenviado el comprobante."
+      end
+      format.json do
+        render json: { message: "Se ha reenviado el comprobante.", success: true }, status: :ok
+      end
     end
   end
 

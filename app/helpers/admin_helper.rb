@@ -76,4 +76,31 @@ module AdminHelper
   def seller_comission_percentage(location)
     CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: location).sales_on_month_for_location, location)&.commission_percentage || 0
   end
+
+  def show_invoice_actions(order)
+    if order.last_issued_ok_invoice_urls.present?
+      order.last_issued_ok_invoice_urls.map do |label, url|
+        link_to label, url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline"
+      end.join(", ").html_safe
+    else
+      if order.invoices.present?
+        content_tag(:div, class: "flex items-center space-x-2", data: { controller: "invoice-error-modal", invoice_error_modal_order_id_value: order.id }) do
+          concat(button_tag "Error", type: "button", class: "text-red-600 underline cursor-pointer", data: { action: "click->invoice-error-modal#open" })
+          concat(button_tag "Reenviar", type: "button", class: "btn btn-sm btn-primary", data: {
+            action: "click->invoice-error-modal#resendInvoice",
+            invoice_error_modal_order_id_param: order.id
+          })
+          concat(content_tag(:div, class: "hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full", data: { invoice_error_modal_target: "modal" }) do
+            content_tag(:div, class: "relative top-1/4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white") do
+              concat(content_tag(:h3, "Error al emitir el Comprobante", class: "text-lg font-bold mb-4"))
+              concat(content_tag(:p, order.invoices.last.invoice_sunat_response, class: "mb-4 overflow-auto max-h-96"))
+              concat(button_tag "Cerrar", type: "button", class: "btn btn-sm btn-secondary", data: { action: "click->invoice-error-modal#close" })
+            end
+          end)
+        end
+      else
+        "Aún no emitida"
+      end
+    end
+  end
 end

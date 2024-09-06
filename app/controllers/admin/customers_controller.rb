@@ -11,7 +11,7 @@ class Admin::CustomersController < Admin::AdminController
         render json: @customers.select(:id, :first_name, :last_name, :email, :phone)
       end
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.all })
+        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes([ :user ]).all })
       end
     end
   end
@@ -37,21 +37,21 @@ class Admin::CustomersController < Admin::AdminController
       if @user.save
         format.turbo_stream { render turbo_stream: [
           turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.all, in_modal: params[:in_modal] }),
-          turbo_stream.append("switchable-container", 
+          turbo_stream.append("switchable-container",
             "<script>document.dispatchEvent(new CustomEvent('customer-form-result', { detail: { success: true } }))</script>"
         )
         ]
       }
       else
         format.html { render :new }
-        format.turbo_stream { 
+        format.turbo_stream {
           render turbo_stream: [
             turbo_stream.replace(
-              "switchable-container", 
+              "switchable-container",
               partial: "admin/customers/form",
               locals: { in_modal: params[:in_modal], user: @user }
             ),
-          turbo_stream.append("switchable-container", 
+          turbo_stream.append("switchable-container",
             "<script>document.dispatchEvent(new CustomEvent('customer-form-result', { detail: { success: false } }))</script>"
           )
           ]
@@ -115,6 +115,6 @@ class Admin::CustomersController < Admin::AdminController
   private
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [:id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :_destroy])
+      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :_destroy ])
     end
 end

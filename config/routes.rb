@@ -23,7 +23,10 @@ Rails.application.routes.draw do
       resources :media, module: :admin
     end
 
-    resources :orders, only: [ :index, :new, :create, :update ] do
+    resources :orders, only: [ :index, :new, :create, :update, :show ] do
+      member do
+        post :retry_invoice
+      end
       collection do
         get "pos"
       end

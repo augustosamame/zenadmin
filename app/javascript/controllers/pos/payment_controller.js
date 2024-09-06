@@ -162,10 +162,13 @@ export default class extends Controller {
       return;
     }
 
+    const selectedRuc = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedRuc;
+    console.log('selectedRuc', selectedRuc);
+
     const rucCheckbox = document.querySelector('#confirm-factura');
     console.log(rucCheckbox);
     const isRucChecked = rucCheckbox ? rucCheckbox.checked : false;
-    console.log(isRucChecked);
+    console.log('is_ruc_checked', isRucChecked);
 
 
     const orderItems = document.querySelectorAll('[data-pos--order-items-target="items"] div.flex');
@@ -207,7 +210,7 @@ export default class extends Controller {
         total_discount: 0,
         shipping_price: 0,
         currency: 'PEN',
-        wants_factura: isRucChecked,
+        wants_factura: selectedRuc && isRucChecked,
         payment_status: 'paid',
         seller_note: comment,
         order_items_attributes: orderItemsAttributes,

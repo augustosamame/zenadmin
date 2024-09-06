@@ -21,36 +21,20 @@
       <tbody>
         <% @orders.each do |order| %>
           <tr>
-            <td class="px-4 py-2"><%= order.id %></td>
-            <td class="px-4 py-2"><%= order.order_date %></td>
+            <td class="px-4 py-2"><%= order.custom_id %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, order.order_date) %></td>
             <td class="px-4 py-2"><%= order.customer&.name %></td>
             <td class="px-4 py-2"><%= number_to_currency(order.total_price, unit: 'S/') %></td>
             <td class="px-4 py-2"><%= number_to_currency(order.total_discount, unit: 'S/') %></td>
-            <td class="px-4 py-2">
-              <% order.last_issued_invoice_urls.each do |label, url| %>
-                <a href="<%= url %>" target="_blank" class="text-blue-500 hover:underline"><%= label %></a><br>
-              <% end %>
+            <td class="px-4 py-2"><%= show_invoice_actions(order) %>
+              
             </td>
             <td class="px-4 py-2"><%= order.translated_payment_status %></td>
             <td class="px-4 py-2"><%= order.translated_status %></td>
             <td class="px-4 py-2">
-              <div data-controller="dropdown" class="relative">
-                <button data-action="click->dropdown#toggle click@window->dropdown#hide"
-                  class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
-                    <%= icon "cog-6-tooth", classes: "w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                </button>
-                <ul data-dropdown-target="menu"
-                  class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
-                  <% @default_object_options_array.each do |option| %>
-                    <li>
-                      <%= link_to "#", data: { action: "click->dropdown#handleAction", object_id: order.id, event_name: option[:event_name] }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
-                        <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-                        <span><%= option[:label] %></span>
-                      <% end %>
-                    </li>
-                  <% end %>
-                </ul>
-              </div>
+              <%= link_to admin_order_path(order), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+                <%= icon "eye", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+              <% end %>
             </td>
           </tr>
         <% end %>
