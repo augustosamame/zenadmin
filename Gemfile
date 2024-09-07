@@ -70,7 +70,7 @@ gem "geocoder", "~> 1.8.3"
 gem "kaminari", "~> 1.2.2"
 gem "web-push", "~> 3.0.1"
 gem "aasm", "~> 5.5.0"
-gem 'rails-i18n', '~> 7.0.9'
+gem "rails-i18n", "~> 7.0.9"
 
 
 group :development, :test do
