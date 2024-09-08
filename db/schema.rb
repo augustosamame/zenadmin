@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -575,6 +575,38 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "requisition_lines", force: :cascade do |t|
+    t.bigint "requisition_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "automatic_quantity", null: false
+    t.integer "presold_quantity"
+    t.integer "manual_quantity"
+    t.integer "supplied_quantity"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_requisition_lines_on_product_id"
+    t.index ["requisition_id"], name: "index_requisition_lines_on_requisition_id"
+  end
+
+  create_table "requisitions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "location_id", null: false
+    t.bigint "warehouse_id", null: false
+    t.string "custom_id", null: false
+    t.string "stage", default: "pending"
+    t.date "requisition_date", null: false
+    t.text "comments"
+    t.integer "requisition_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_requisitions_on_custom_id", unique: true
+    t.index ["location_id"], name: "index_requisitions_on_location_id"
+    t.index ["user_id"], name: "index_requisitions_on_user_id"
+    t.index ["warehouse_id"], name: "index_requisitions_on_warehouse_id"
+  end
+
   create_table "roles", force: :cascade do |t|
     t.string "name", null: false
     t.datetime "created_at", null: false
@@ -795,6 +827,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_05_205907) do
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchases", "regions"
   add_foreign_key "purchases_vendors", "regions"
+  add_foreign_key "requisition_lines", "products"
+  add_foreign_key "requisition_lines", "requisitions"
+  add_foreign_key "requisitions", "locations"
+  add_foreign_key "requisitions", "users"
+  add_foreign_key "requisitions", "warehouses"
   add_foreign_key "seller_biweekly_sales_targets", "users"
   add_foreign_key "seller_biweekly_sales_targets", "users", column: "seller_id"
   add_foreign_key "stock_transfer_lines", "products"

@@ -68,5 +68,10 @@ export const resourceMappings = {
     buttonText: "Crear Meta de Ventas Quincenal",
     buttonUrl: "/admin/seller_biweekly_sales_targets/new",
     ajaxUrl: "/admin/seller_biweekly_sales_targets.json"
+  },
+  Requisition: {
+    buttonText: "Crear Pedido",
+    buttonUrl: "/admin/requisitions/new",
+    ajaxUrl: "/admin/requisitions.json"
   }
 }

@@ -70,7 +70,7 @@ storeuser3.add_role('seller')
 supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
 supervisor_1.add_role('supervisor')
 
-warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default)
+warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default, is_main: true)
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
 warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id, region: region_default)

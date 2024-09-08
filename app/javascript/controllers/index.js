@@ -4,6 +4,15 @@
 
 import { application } from "./application"
 
+import NestedFormController from "./nested_form_controller"
+application.register("nested-form", NestedFormController)
+
+import RequisitionController from "./requisition_controller"
+application.register("requisition", RequisitionController)
+
+import DynamicFormController from "./dynamic_form_controller"
+application.register("dynamic-form", DynamicFormController)
+
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 

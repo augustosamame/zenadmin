@@ -79,6 +79,10 @@ class Order < ApplicationRecord
     self.invoices.where(status: "issued", sunat_status: "sunat_success").pluck(:custom_id, :invoice_url)
   end
 
+  def invoice
+    self.invoices&.sunat_success&.issued&.last
+  end
+
   private
 
     def update_commissions_status

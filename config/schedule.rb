@@ -16,5 +16,9 @@
 # every 4.days do
 #   runner "AnotherModel.prune_old_records"
 # end
+#
+every :monday, at: "9am" do # Use any day of the week or :weekend, :weekday
+  runner "Services::Inventory::AutomaticRequisitionsService.create_weekly_requisitions"
+end
 
 # Learn more: http://github.com/javan/whenever

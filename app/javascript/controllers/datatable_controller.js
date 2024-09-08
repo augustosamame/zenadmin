@@ -77,7 +77,7 @@ export default class extends Controller {
     const resourceMapping = this.constructor.resourceMappings[resourceName];
 
     if (!resourceMapping) {
-      console.error(`Error: No mapping found for resource ${resourceName}`);
+      console.error(`Error: No mapping found in datatable controllerfor resource ${resourceName}`);
       return options;
     }
 
@@ -233,7 +233,7 @@ export default class extends Controller {
     const searchInput = $('.dt-search input');
     if (searchInput.length > 0) {
       searchInput.addClass('form-input block w-full lg:w-64 mt-2 sm:mt-0 rounded-md border-slate-300 focus:border-primary-500 focus:ring-primary-500 max-w-[200px]')
-        .attr('placeholder', 'Nombre, DNI o Móvil...');
+        .attr('placeholder', 'Ingrese el término...');
     }
   }
 

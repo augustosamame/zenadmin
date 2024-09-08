@@ -16,7 +16,7 @@ class Admin::OrdersController < Admin::AdminController
         render json: datatable_json
       end
     end
-	end
+  end
 
   def new
     @order_data = session[:draft_order] || {}
@@ -58,9 +58,9 @@ class Admin::OrdersController < Admin::AdminController
         render json: { status: "error", errors: @order.errors.full_messages }
       end
     end
-    rescue ActiveRecord::Rollback => e
-      Rails.logger.info("Error creating order in rollback: #{@order.errors.full_messages}")
-      render json: { status: "error", errors: e.message }
+  rescue ActiveRecord::Rollback => e
+    Rails.logger.info("Error creating order in rollback: #{@order.errors.full_messages}")
+    render json: { status: "error", errors: e.message }
   end
 
   def show

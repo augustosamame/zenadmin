@@ -125,6 +125,7 @@ module Services
           location: @order.location,
           order: @order
         )
+        invoice_data
       end
     end
   end

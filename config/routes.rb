@@ -23,6 +23,13 @@ Rails.application.routes.draw do
       resources :media, module: :admin
     end
 
+    resources :requisitions do
+      member do
+        patch :fulfill
+      end
+      resources :requisition_lines
+    end
+
     resources :orders, only: [ :index, :new, :create, :update, :show ] do
       member do
         post :retry_invoice
@@ -127,4 +134,8 @@ Rails.application.routes.draw do
   # root "posts#index"
 
   get "not_authorized" => "application#not_authorized"
+
+  if Rails.env.production?
+    match "*unmatched", to: "application#route_not_found", via: :all
+  end
 end

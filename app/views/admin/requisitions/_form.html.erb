@@ -1,0 +1,60 @@
+<%= simple_form_for([:admin, @requisition], html: { data: { controller: "dynamic-form", action: "submit->dynamic-form#submitForm", "dynamic-form-target" => "form" } }) do |form| %>
+  <!-- Header Section -->
+  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+      <!-- Location -->
+      <div>
+        <%= form.label :location_id, "Ubicación", class: "form-label" %>
+        <%= form.collection_select :location_id, Location.all, :id, :name, {}, class: "form-input" %>
+      </div>
+
+      <!-- Warehouse -->
+      <div>
+        <%= form.label :warehouse_id, "Almacén", class: "form-label" %>
+        <%= form.collection_select :warehouse_id, Warehouse.all, :id, :name, {}, class: "form-input" %>
+      </div>
+    </div>
+
+    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+      <!-- Requisition Date -->
+      <div>
+        <%= form.label :requisition_date, "Fecha de Pedido", class: "form-label" %>
+        <%= form.date_field :requisition_date, class: "form-input" %>
+      </div>
+
+    </div>
+
+    <!-- Comments Field -->
+    <div class="mt-4">
+      <%= form.label :comments, "Comentarios", class: "form-label" %>
+      <%= form.text_area :comments, class: "form-input" %>
+    </div>
+  </div>
+
+  <!-- Products Section -->
+  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
+    <div id="requisition-form-lines" data-dynamic-form-target="container">
+      <%= form.simple_fields_for :requisition_lines do |line_form| %>
+        <%= render 'requisition_line_fields', f: line_form %>
+      <% end %>
+    </div>
+
+    <template data-dynamic-form-target="template">
+      <%= form.simple_fields_for :requisition_lines, RequisitionLine.new, child_index: 'NEW_RECORD' do |line_form| %>
+        <%= render 'requisition_line_fields', f: line_form %>
+      <% end %>
+    </template>
+
+    <!-- Add Product Button -->
+    <div class="flex justify-end mt-4">
+      <button type="button" class="btn btn-secondary" data-action="click->dynamic-form#add">Agregar Producto</button>
+    </div>
+  </div>
+
+  <!-- Form Actions -->
+  <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+    <%= form.button :submit, @requisition.new_record? ? "Crear Pedido" : "Actualizar Pedido", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_requisitions_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+  </div>
+<% end %>
