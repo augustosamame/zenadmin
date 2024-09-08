@@ -25,7 +25,7 @@
               <%= image_tag periodic_inventory_line.product.smart_image(:thumb), alt: periodic_inventory_line.product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if periodic_inventory_line.product.media.present? %>
             </td>
             <td class="px-4 py-2"><%= periodic_inventory_line.product.name %></td>
-            <td class="px-4 py-2"><%= number_to_currency(periodic_inventory_line.product.price, unit: 'S/') %></td>
+            <td class="px-4 py-2"><%= format_currency(periodic_inventory_line.product.price) %></td>
             <td class="px-4 py-2"><%= periodic_inventory_line.stock %></td>
 
           </tr>

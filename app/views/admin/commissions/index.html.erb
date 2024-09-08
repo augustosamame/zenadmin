@@ -51,7 +51,7 @@
             <td class="px-4 py-2"><%= commission.order.location.name %></td>
             <td class="px-4 py-2"><%= seller_comission_percentage(commission.order.location) %>%</td>
             <td class="px-4 py-2"><%= commission.order.custom_id %></td>
-            <td class="px-4 py-2"><%= humanized_money_with_symbol(commission.order.total_price - commission.order.total_discount) %></td>
+            <td class="px-4 py-2"><%= format_currency(commission.order.total_price - commission.order.total_discount) %></td>
             <td class="px-4 py-2"><%= commission.percentage %>%</td>
             <td class="px-4 py-2"><%= (commission.order.total_price - commission.order.total_discount) * commission.percentage / 100 %></td>
             <td class="px-4 py-2"><%= humanized_money_with_symbol commission.amount %></td>

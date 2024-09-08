@@ -1,11 +1,18 @@
-# encoding : utf-8
+Money.locale_backend = :i18n
 
 MoneyRails.configure do |config|
-  # To set the default currency
-  #
   config.default_currency = :pen
-
-  Money.locale_backend = :i18n
-  #
   config.rounding_mode = BigDecimal::ROUND_HALF_UP
+
+  config.default_format = {
+    format: "%u %n",
+    symbol: "S/",
+    symbol_position: :before,
+    thousands_separator: ",",
+    decimal_mark: ".",
+    sign_before_symbol: true
+  }
+
+  # Add this line to ensure Money objects use the currency specified in the model
+  config.no_cents_if_whole = false
 end

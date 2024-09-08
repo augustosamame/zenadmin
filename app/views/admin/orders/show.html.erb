@@ -23,11 +23,11 @@
         </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Total</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_currency(@order.total_price, unit: 'S/') %></dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= format_currency(@order.total_price) %></dd>
         </div>
         <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Descuento</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= number_to_currency(@order.total_discount, unit: 'S/') %></dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= format_currency(@order.total_discount) %></dd>
         </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Estado de Pago</dt>
@@ -66,8 +66,8 @@
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.product.name %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.quantity %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(item.price, unit: 'S/') %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(item.price * item.quantity, unit: 'S/') %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(item.price) %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(item.price * item.quantity) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -90,7 +90,7 @@
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= friendly_date(current_user, payment.created_at) %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.payment_method.description %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(payment.amount, unit: 'S/') %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(payment.amount) %></td>
           </tr>
         <% end %>
       </tbody>
@@ -115,7 +115,7 @@
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.name %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.email %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_percentage(commission.percentage, precision: 2) %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_currency(commission.sale_amount, unit: 'S/') %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission.sale_amount) %></td>
           </tr>
         <% end %>
       </tbody>

@@ -19,7 +19,7 @@
           <tr>
             <td><%= target.seller.name %></td>
             <td><%= target.year_month_period %></td>
-            <td><%= number_to_currency(target.sales_target_cents / 100.0) %></td>
+            <td><%= format_currency(target.sales_target) %></td>
             <td><%= number_to_percentage(target.target_commission, precision: 2) %></td>
             <td><%= target.translated_status.titleize %></td>
             <td>

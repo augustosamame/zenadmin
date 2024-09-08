@@ -1,11 +1,11 @@
 class Admin::OrdersController < Admin::AdminController
-  include ActionView::Helpers::NumberHelper
+  include MoneyRails::ActionViewExtension
 
   def index
     respond_to do |format|
       format.html do
         @orders = Order.includes([ :user, :invoices ]).all
-        if @orders.size > 50
+        if @orders.size > 500
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
         else
           @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;"
@@ -147,8 +147,8 @@ class Admin::OrdersController < Admin::AdminController
             order.id,
             order.order_date&.strftime("%Y-%m-%d %H:%M:%S"),
             order.customer.name,
-            number_to_currency(order.total_price, unit: "S/"),
-            number_to_currency(order.total_discount, unit: "S/"),
+            format_currency(order.total_price),
+            format_currency(order.total_discount),
             order.active_invoice_id,
             order.payment_status,
             order.status,

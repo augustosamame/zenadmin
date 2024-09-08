@@ -172,8 +172,8 @@ class Admin::ProductsController < Admin::AdminController
             product.custom_id,
             product_image_tag_thumb(product),
             product.name,
-            number_to_currency(product.price_cents / 100.0),
-            product.discounted_price_cents ? number_to_currency(product.discounted_price_cents / 100.0) : "N/A",
+            format_currency(product.price),
+            product.discounted_price ? format_currency(product.discounted_price) : "N/A",
             product.stock(@current_warehouse),
             product.status == 0 ? "Active" : "Inactive",
             render_to_string(partial: "admin/products/actions", formats: [ :html ], locals: { product: product, warehouse: @current_warehouse, default_object_options_array: @default_object_options_array })

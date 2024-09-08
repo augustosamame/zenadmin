@@ -108,7 +108,7 @@ module AdminHelper
     if notification.notifiable.present?
       case notification.notifiable.class.name
       when "Order"
-        link_to notification.message_title, admin_order_path(notification.notifiable)
+        link_to notification.message_body, admin_order_path(notification.notifiable)
       else
         notification.message_title
       end

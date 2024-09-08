@@ -35,7 +35,7 @@ module Services
         end
 
         def formatted_total_price
-          number_to_currency(@notifiable.total_price, unit: @notifiable.currency, format: "%u %n")
+          format_currency(@notifiable.total_price)
         end
 
         def customer_name

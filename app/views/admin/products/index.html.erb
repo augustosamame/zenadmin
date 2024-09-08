@@ -26,8 +26,8 @@
               <%= image_tag product.smart_image(:thumb), alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
             </td>
             <td class="px-4 py-2"><%= product.name %></td>
-            <td class="px-4 py-2"><%= number_to_currency(product.price, unit: 'S/') %></td>
-            <td class="px-4 py-2"><%= product.discounted_price_cents ? number_to_currency(product.discounted_price, unit: 'S/') : 'N/A' %></td>
+            <td class="px-4 py-2"><%= format_currency(product.price) %></td>
+            <td class="px-4 py-2"><%= product.discounted_price_cents ? format_currency(product.discounted_price) : 'N/A' %></td>
             <td class="px-4 py-2"><%= product.stock(@current_warehouse) %></td>
             <td class="px-4 py-2"><%= product.status %></td>
 
