@@ -20,13 +20,14 @@ class Admin::RequisitionsController < Admin::AdminController
   def new
     @requisition = Requisition.new
     @requisition.user_id = current_user.id
-    @requisition.requisition_date = Time.zone.today
+    @requisition.requisition_date = Time.now
     @requisition.requisition_lines.build
   end
 
   def create
     @requisition = Requisition.new(requisition_params)
     @requisition.user_id = current_user.id
+    @requisition.requisition_type = "manual"
 
     if @requisition.save
       redirect_to admin_requisitions_path, notice: "El pedido se creó correctamente."

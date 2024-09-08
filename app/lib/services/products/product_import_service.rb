@@ -25,7 +25,7 @@ module Services
         end
 
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
-          break if index > 10
+          break if index > 5
           product_category_name = row[0]
           product_name = row[1]
           tag1_name = row[2]

@@ -28,13 +28,13 @@
             <td class="px-4 py-2"><%= requisition.location&.name %></td>
             <td class="px-4 py-2"><%= requisition.warehouse&.name %></td>
             <td class="px-4 py-2"><%= requisition.total_products %></td>
-            <td class="px-4 py-2"><%= requisition.requisition_type %></td>
-            <td class="px-4 py-2"><%= requisition.stage %></td>
-            <td class="px-4 py-2"><%= requisition.status %></td>
+            <td class="px-4 py-2"><%= requisition.translated_requisition_type %></td>
+            <td class="px-4 py-2"><%= requisition.translated_stage %></td>
+            <td class="px-4 py-2"><%= requisition.translated_status %></td>
             <td class="px-4 py-2">
               <%= link_to 'Ver', admin_requisition_path(requisition), class: 'text-indigo-600 hover:text-indigo-900' %>
               <%= link_to 'Editar', edit_admin_requisition_path(requisition), class: 'text-indigo-600 hover:text-indigo-900 ml-2' %>
-              <% if requisition.pending? %>
+              <% if requisition.req_pending? %>
                 <%= link_to 'Cumplir', fulfill_admin_requisition_path(requisition), method: :patch, data: { confirm: '¿Estás seguro de que quieres cumplir este pedido?' }, class: 'text-green-600 hover:text-green-900 ml-2' %>
               <% end %>
             </td>

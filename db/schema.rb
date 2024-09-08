@@ -594,8 +594,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
     t.bigint "location_id", null: false
     t.bigint "warehouse_id", null: false
     t.string "custom_id", null: false
-    t.string "stage", default: "pending"
-    t.date "requisition_date", null: false
+    t.string "stage", default: "req_pending"
+    t.datetime "requisition_date", null: false
     t.text "comments"
     t.integer "requisition_type", default: 0, null: false
     t.integer "status", default: 0, null: false
@@ -762,6 +762,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
   create_table "warehouses", force: :cascade do |t|
     t.string "name", null: false
     t.integer "location_id"
+    t.boolean "is_main", default: false
     t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

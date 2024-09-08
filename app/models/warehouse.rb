@@ -9,5 +9,5 @@ class Warehouse < ApplicationRecord
   has_many :warehouse_inventories, dependent: :destroy
   has_many :products, through: :warehouse_inventories
 
-  scope :main_warehouse, -> { where(status: :active, is_main: true).first }
+  scope :main_warehouse, -> { where(is_main: true).first }
 end

@@ -5,8 +5,8 @@ class CreateRequisitions < ActiveRecord::Migration[7.1]
       t.references :location, null: false, foreign_key: true
       t.references :warehouse, null: false, foreign_key: true
       t.string :custom_id, null: false
-      t.string :stage, default: 'pending'
-      t.date :requisition_date, null: false
+      t.string :stage, default: 'req_pending'
+      t.datetime :requisition_date, null: false
       t.text :comments
       t.integer :requisition_type, default: 0, null: false
       t.integer :status, default: 0, null: false

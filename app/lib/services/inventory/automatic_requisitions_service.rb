@@ -9,7 +9,7 @@ module Services
           if main_warehouse && user
             Requisition.transaction do
               requisition = Requisition.new(
-                requisition_date: Date.today,
+                requisition_date: Time.now,
                 warehouse_id: main_warehouse.id,
                 location_id: location.id,
                 user_id: user.id,

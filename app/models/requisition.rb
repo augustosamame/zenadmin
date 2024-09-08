@@ -11,7 +11,7 @@ class Requisition < ApplicationRecord
   has_many :requisition_lines, dependent: :destroy
   has_many :products, through: :requisition_lines
 
-  enum :stage, { new: 0, pending: 0, fulfilled: 1 }
+  enum :stage, { req_new: 0, req_pending: 1, req_fulfilled: 2 }
   translate_enum :stage
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
@@ -31,12 +31,12 @@ class Requisition < ApplicationRecord
   after_commit :send_pending_alert_to_main_warehouse, if: :pending_alert_to_main_warehouse
 
   aasm column: "stage", enum: true do
-    state :new, initial: true
-    state :pending
-    state :fulfilled
+    state :req_new, initial: true
+    state :req_pending
+    state :req_fulfilled
 
     event :submit do
-      transitions from: :new, to: :pending do
+      transitions from: :req_new, to: :req_pending do
         after do
           self.pending_alert_to_main_warehouse = true
         end
@@ -44,7 +44,7 @@ class Requisition < ApplicationRecord
     end
 
     event :fulfill do
-      transitions from: :pending, to: :fulfilled
+      transitions from: :req_pending, to: :req_fulfilled
     end
   end
 
