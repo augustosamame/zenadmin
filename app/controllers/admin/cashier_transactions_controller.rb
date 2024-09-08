@@ -28,7 +28,9 @@ class Admin::CashierTransactionsController < Admin::AdminController
   def build_transactable
     return unless params[:transactable_type].present?
 
-    transactable_class = params[:transactable_type].constantize
+    transactable_class = safe_constantize(params[:transactable_type])
+    return unless transactable_class
+
     @cashier_transaction.transactable ||= transactable_class.new(filtered_transactable_params)
     assign_transactable_attributes
   end
@@ -41,4 +43,11 @@ class Admin::CashierTransactionsController < Admin::AdminController
   def filtered_transactable_params
     params.fetch(params[:transactable_type].underscore, {}).permit(:id, :description, :received_by_id, :paid_to_id, :_destroy)
   end
+
+  private
+
+    def safe_constantize(class_name)
+      allowed_classes = [ "Payment", "CashInflow", "CashOutflow" ] # Add all allowed class names
+      class_name.in?(allowed_classes) ? class_name.constantize : nil
+    end
 end
