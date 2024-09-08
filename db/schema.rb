@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_08_142407) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -357,6 +357,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
     t.index ["mediable_type", "mediable_id"], name: "index_media_on_mediable"
   end
 
+  create_table "notification_settings", force: :cascade do |t|
+    t.string "trigger_type", null: false
+    t.jsonb "media", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["trigger_type"], name: "index_notification_settings_on_trigger_type", unique: true
+  end
+
+  create_table "notifications", force: :cascade do |t|
+    t.string "notifiable_type", null: false
+    t.bigint "notifiable_id", null: false
+    t.integer "medium", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "severity", default: 0, null: false
+    t.text "message_title"
+    t.text "message_body", null: false
+    t.text "message_image"
+    t.datetime "read_at"
+    t.datetime "clicked_at"
+    t.datetime "opened_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+  end
+
   create_table "order_items", force: :cascade do |t|
     t.bigint "order_id", null: false
     t.bigint "product_id", null: false
@@ -481,6 +506,20 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
     t.index ["periodic_inventory_id"], name: "index_periodic_inventory_lines_on_periodic_inventory_id"
     t.index ["product_id"], name: "index_periodic_inventory_lines_on_product_id"
     t.index ["status"], name: "index_periodic_inventory_lines_on_status"
+  end
+
+  create_table "preorders", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "warehouse_id", null: false
+    t.decimal "quantity", null: false
+    t.decimal "fulfilled_quantity", default: "0.0", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_preorders_on_order_id"
+    t.index ["product_id"], name: "index_preorders_on_product_id"
+    t.index ["warehouse_id"], name: "index_preorders_on_warehouse_id"
   end
 
   create_table "product_categories", force: :cascade do |t|
@@ -820,6 +859,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_07_012300) do
   add_foreign_key "periodic_inventories", "warehouses"
   add_foreign_key "periodic_inventory_lines", "periodic_inventories"
   add_foreign_key "periodic_inventory_lines", "products"
+  add_foreign_key "preorders", "orders"
+  add_foreign_key "preorders", "products"
+  add_foreign_key "preorders", "warehouses"
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"

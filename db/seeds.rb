@@ -166,10 +166,10 @@ user4.add_role('seller')
 user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", login: "seller3@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
 user5.add_role('seller')
 
-invoicer1 = Invoicer.find_or_create_by!(name: 'El Jardin del Zen', razon_social: 'El Jardin del Zen EIRL', ruc: '20513903180', tipo_ruc: 'RUC', default: true, einvoice_api_secret: "12345678901234561354", region: region_default)
-invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20518549937', tipo_ruc: 'RUC', einvoice_api_secret: "", region: region_default)
-invoicer3 = Invoicer.find_or_create_by!(name: 'Alicia Alvariño Garland', razon_social: 'Alicia Alvariño Garland', ruc: '10078741258', tipo_ruc: 'RUS', einvoice_api_secret: "12345678901220560554", region: region_default)
-invoicer4 = Invoicer.find_or_create_by!(name: 'Maria Isabel Garland', razon_social: 'Maria Isabel Garland', ruc: '10107907365', tipo_ruc: 'RUS', einvoice_api_secret: "", region: region_default)
+invoicer1 = Invoicer.find_or_create_by!(name: 'El Jardin del Zen', razon_social: 'El Jardin del Zen EIRL', ruc: '20513903180', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561354", region: region_default)
+invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20518549937', tipo_ruc: 'RUC', einvoice_api_key: "", region: region_default)
+invoicer3 = Invoicer.find_or_create_by!(name: 'Alicia Alvariño Garland', razon_social: 'Alicia Alvariño Garland', ruc: '10078741258', tipo_ruc: 'RUS', einvoice_api_key: "12345678901220560554", region: region_default)
+invoicer4 = Invoicer.find_or_create_by!(name: 'Maria Isabel Garland', razon_social: 'Maria Isabel Garland', ruc: '10107907365', tipo_ruc: 'RUS', einvoice_api_key: "", region: region_default)
 
 invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'factura', prefix: 'F016', next_number: 1)
 invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'boleta', prefix: 'B016', next_number: 1)
@@ -180,6 +180,12 @@ invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_t
 invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer3, comprobante_type: 'boleta', prefix: 'B003', next_number: 1)
 
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'))
+
+NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard: true, email: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

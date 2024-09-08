@@ -136,6 +136,6 @@ Rails.application.routes.draw do
   get "not_authorized" => "application#not_authorized"
 
   if Rails.env.production?
-    match "*unmatched", to: "application#route_not_found", via: :all
+    match "*unmatched", to: "application#render_not_found", via: :all
   end
 end

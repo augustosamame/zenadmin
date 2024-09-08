@@ -112,7 +112,7 @@ module Services
           if invoice_series.present?
             invoice_series = invoice_series.first
           else
-            raise "No matching or default invoice series found for order #{@order.id}, location #{@order.location_id}, payment method #{payment.payment_method_id}"
+            raise "No matching or default invoice series found for order #{@order.id}, location #{@order.location_id}, payment method #{priority_payment&.payment_method_id}"
           end
         end
 

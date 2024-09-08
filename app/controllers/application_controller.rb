@@ -1,5 +1,6 @@
 class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+  rescue_from ActionView::Template::Error, with: :render_not_found
   helper Railsui::ThemeHelper
 
   before_action :configure_permitted_parameters, if: :devise_controller?
@@ -25,8 +26,12 @@ class ApplicationController < ActionController::Base
     ]
   end
 
-  def route_not_found
-    render file: Rails.public_path.join("404.html"), status: :not_found
+  def render_not_found
+    if Rails.env.production?
+      render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
+    else
+      raise
+    end
   end
 
   rescue_from CanCan::AccessDenied do |exception|
@@ -36,16 +41,6 @@ class ApplicationController < ActionController::Base
       format.js   { head :forbidden, content_type: "text/html" }
     end
   end
-
-  private
-
-    def render_not_found
-      if Rails.env.production?
-        render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
-      else
-        raise
-      end
-    end
 
   protected
 

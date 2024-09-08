@@ -37,6 +37,7 @@ class Order < ApplicationRecord
 
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
+  after_commit :create_notification
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -87,5 +88,9 @@ class Order < ApplicationRecord
 
     def update_commissions_status
       commissions.status_order_unpaid.update_all(status: :status_order_paid)
+    end
+
+    def create_notification
+      Services::Notifications::CreateNotificationService.new(self).create
     end
 end
