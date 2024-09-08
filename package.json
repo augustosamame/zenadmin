@@ -36,5 +36,8 @@
     "tom-select": "^2.3.1",
     "trix": "^2.1.5",
     "uppy": "3.27.4"
+  },
+  "resolutions": {
+    "micromatch": "4.0.8"
   }
 }
