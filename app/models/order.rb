@@ -67,7 +67,7 @@ class Order < ApplicationRecord
   end
 
   def customer
-    user
+    Customer.find(user_id)&.user
   end
 
   def set_defaults

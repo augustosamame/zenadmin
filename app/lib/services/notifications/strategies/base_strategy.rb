@@ -2,7 +2,7 @@ module Services
   module Notifications
     module Strategies
       class BaseStrategy
-        include ActionView::Helpers::NumberHelper
+        include CurrencyFormattable
 
         def initialize(notifiable)
           @notifiable = notifiable
@@ -39,7 +39,7 @@ module Services
         end
 
         def customer_name
-          @notifiable.user.name
+          @notifiable.customer.name
         end
       end
     end

@@ -21,15 +21,16 @@ setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfe
 setting_12 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda", boolean_value: false)
 setting_13 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda y por medio de pago", boolean_value: true)
 
-CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'VEN', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: 'PUR', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :product, prefix: 'PRO', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :order, prefix: 'ORD', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'PRO', length: 4, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 4, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: 'COM', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :product, prefix: 'PRO', length: 4, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :order, prefix: 'VEN', length: 6, next_number: 1, status: :active)
 CustomNumbering.find_or_create_by!(record_type: :cash_inflow, prefix: 'CIN', length: 5, next_number: 1, status: :active)
 CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: 'COU', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :payment, prefix: 'PAY', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: 'INT', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :payment, prefix: 'PAG', length: 6, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: 'TRA', length: 5, next_number: 1, status: :active)
+CustomNumbering.find_or_create_by!(record_type: :requisition, prefix: 'PED', length: 5, next_number: 1, status: :active)
 
 region_default = Region.find_or_create_by!(name: 'default')
 
