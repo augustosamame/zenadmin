@@ -8,10 +8,24 @@ namespace :db do
   end
 
   desc "Drop, create, and migrate the database"
-  task nukedb: :environment do
-    Rake::Task["db:drop"].invoke
-    Rake::Task["db:create"].invoke
-    Rake::Task["db:migrate"].invoke
-    puts "Database dropped, created, and migrated successfully."
-  end
+task nukedb: :environment do
+  # Disconnect from the database
+  ActiveRecord::Base.connection_pool.disconnect!
+
+  # Run the kill_connection script
+  system("zsh -c '~/scripts/kill_connections.sh'")
+
+  # Small delay to ensure connections are fully closed
+  sleep 1
+
+  # Drop the database without using ActiveRecord
+  config = ActiveRecord::Base.configurations.configs_for(env_name: Rails.env).first
+  system("dropdb #{config.database}")
+
+  # Create and migrate the database
+  Rake::Task["db:create"].invoke
+  Rake::Task["db:migrate"].invoke
+
+  puts "Database dropped, created, and migrated successfully."
+end
 end

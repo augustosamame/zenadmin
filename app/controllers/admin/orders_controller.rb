@@ -30,7 +30,7 @@ class Admin::OrdersController < Admin::AdminController
       if @order.origin == "pos"
         # POS context: current_user is the seller, user_id is provided
         @order.seller_id = current_user.id
-        @order.user_id = Customer.find(@order.user_id)&.user_id ||= Customer.find(get_generic_customer_id).user_id
+        @order.user_id ||= User.find(get_generic_customer_id)&.id
         @order.location_id = @current_location.id
       elsif @order.origin == "ecommerce"
         # eCommerce context: current_user is the eCommerce store, user_id is not provided

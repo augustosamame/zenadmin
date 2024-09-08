@@ -12,7 +12,10 @@ module Services
           if product_to_update.present?
             product_to_update.update(stock: product_to_update.stock - order_item.quantity)
           else
-            WarehouseInventory.create(warehouse: warehouse, product: order_item.product, stock: -order_item.quantity)
+            product_to_update = WarehouseInventory.create(warehouse: warehouse, product: order_item.product, stock: -order_item.quantity)
+          end
+          if product_to_update.stock < 0
+            Preorder.create(warehouse: warehouse, product: order_item.product, order: @order, quantity: product_to_update.stock.abs)
           end
         end
       end
