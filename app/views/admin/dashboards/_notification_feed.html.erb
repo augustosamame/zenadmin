@@ -1,4 +1,4 @@
-<ul id="notification_feed" class="mt-6 divide-y text-slate-600 dark:text-slate-300 dark:divide-slate-600">
+<ul id="notification_feed" class="relative mt-6 divide-y text-slate-600 dark:text-slate-300 dark:divide-slate-600">
   <% Notification.includes([:notifiable]).order(created_at: :desc).limit(5).each do |notification| %>
     <li class="flex flex-wrap items-start justify-between py-3">
       <div class="flex items-start space-x-3">

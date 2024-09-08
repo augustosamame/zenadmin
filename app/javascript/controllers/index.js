@@ -4,15 +4,6 @@
 
 import { application } from "./application"
 
-import NestedFormController from "./nested_form_controller"
-application.register("nested-form", NestedFormController)
-
-import RequisitionFormController from "./requisition_form_controller"
-application.register("requisition-form", RequisitionFormController)
-
-import DynamicFormController from "./dynamic_form_controller"
-application.register("dynamic-form", DynamicFormController)
-
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 
@@ -42,6 +33,9 @@ application.register("datatable", DatatableController)
 
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
+
+import DynamicFormController from "./dynamic_form_controller"
+application.register("dynamic-form", DynamicFormController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
@@ -73,6 +67,9 @@ application.register("modal", ModalController)
 import NavController from "./nav_controller"
 application.register("nav", NavController)
 
+import NestedFormController from "./nested_form_controller"
+application.register("nested-form", NestedFormController)
+
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
@@ -96,6 +93,9 @@ application.register("pos--product-grid", Pos__ProductGridController)
 
 import Pos__SellersModalController from "./pos/sellers_modal_controller"
 application.register("pos--sellers-modal", Pos__SellersModalController)
+
+import RequisitionFormController from "./requisition_form_controller"
+application.register("requisition-form", RequisitionFormController)
 
 import SelectController from "./select_controller"
 application.register("select", SelectController)
