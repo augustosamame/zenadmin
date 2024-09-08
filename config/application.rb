@@ -46,6 +46,7 @@ module EdukaiErp
     config.active_record.default_timezone = :utc
     config.i18n.default_locale = :es
     # config.eager_load_paths << Rails.root.join("extras")
+    config.turbo.broadcast_job_processor = :inline
 
     # Don't generate system test files.
     config.generators.system_tests = nil

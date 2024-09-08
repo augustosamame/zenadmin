@@ -11,3 +11,6 @@ import "tom-select"
 
 import "trix"
 import "@rails/actiontext"
+
+import { initializeNotificationSound } from "./edukaierp_custom"
+initializeNotificationSound();

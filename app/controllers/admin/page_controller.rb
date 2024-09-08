@@ -55,10 +55,6 @@ class Admin::PageController < Admin::AdminController
 		render layout: "admin"
 	end
 
-	def dashboard
-		render layout: "admin"
-	end
-
 	def pricing
 	end
 

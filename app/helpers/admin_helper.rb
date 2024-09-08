@@ -103,4 +103,17 @@ module AdminHelper
       end
     end
   end
+
+  def smart_notification_linker(notification)
+    if notification.notifiable.present?
+      case notification.notifiable.class.name
+      when "Order"
+        link_to notification.message_title, admin_order_path(notification.notifiable)
+      else
+        notification.message_title
+      end
+    else
+      notification.message_title
+    end
+  end
 end

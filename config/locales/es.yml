@@ -30,6 +30,9 @@
 es:
   cash_inflow: Ingreso a Caja
   cash_outflow: Salida de Caja
+  notification:
+    types:
+      order: Venta
   activerecord:
     attributes:
       seller_biweekly_sales_target:

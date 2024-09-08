@@ -1,5 +1,5 @@
 class Admin::AdminController < ApplicationController
-	layout "admin"
+  layout :admin_layout
   helper :admin
 
   before_action :authenticate_user!, unless: :devise_controller?
@@ -19,6 +19,11 @@ class Admin::AdminController < ApplicationController
       { event_name: "edit", label: "Editar", icon: "pencil-square" },
       { event_name: "delete", label: "Eliminar", icon: "trash" }
     ]
+  end
+
+  def admin_layout
+    return "turbo_rails/frame" if turbo_frame_request?
+    "admin"
   end
 
   def force_temp_password_change

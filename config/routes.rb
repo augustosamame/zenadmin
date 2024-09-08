@@ -93,7 +93,9 @@ Rails.application.routes.draw do
     resources :invoice_series
     resources :invoice_series_mappings
 
-    get "dashboard", to: "page#dashboard"
+    get "dashboard", to: "dashboards#admin_dashboard"
+
+
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"
     get "billing", to: "page#billing"
