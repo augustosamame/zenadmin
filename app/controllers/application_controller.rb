@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
-  rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
-  rescue_from ActionView::Template::Error, with: :render_not_found
+  # rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
+  # rescue_from ActionView::Template::Error, with: :render_not_found
   helper Railsui::ThemeHelper
 
   before_action :configure_permitted_parameters, if: :devise_controller?
