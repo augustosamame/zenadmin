@@ -103,13 +103,17 @@ namespace :deploy do
     on roles(:web) do
       within release_path do
         with rails_env: fetch(:rails_env) do
-          # Run Yarn build for production assets
+          # Run Yarn install
           execute :yarn, "install"
-          # invoke "deploy:yarn_install"
-          execute :yarn, "build:js:prod"
-          # invoke "deploy:yarn_build"
 
-          execute :rake, "assets:precompile"
+          # Run production JS build
+          execute :yarn, "build:js:prod"
+
+          # Run production CSS build (adjust the script name if necessary)
+          execute :yarn, "build:css:prod"
+
+          # Precompile Rails assets without running Yarn again
+          execute :rake, "assets:precompile SKIP_YARN_INSTALL=true SKIP_YARN_BUILD=true"
         end
       end
     end
