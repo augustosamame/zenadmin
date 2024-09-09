@@ -109,16 +109,16 @@ namespace :deploy do
           # Run production JS build
           execute :yarn, "build:js:prod"
 
-          # Run production CSS build (adjust the script name if necessary)
+          # Run production CSS build
           execute :yarn, "build:css:prod"
 
-          # Precompile Rails assets without running Yarn again
-          execute :rake, "assets:precompile SKIP_YARN_INSTALL=true SKIP_YARN_BUILD=true"
+          # Run a custom rake task for asset precompilation
+          execute :rake, "custom_assets:precompile"
         end
       end
     end
   end
-end
 
-# Hook the custom precompile task into the deploy process
-before "deploy:assets:precompile", "deploy:precompile_assets"
+  # Hook the custom precompile task into the deploy process
+  before "deploy:assets:precompile", "deploy:precompile_assets"
+end
