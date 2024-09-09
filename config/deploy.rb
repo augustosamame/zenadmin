@@ -1,6 +1,8 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.19.1"
 
+load "lib/capistrano/tasks/custom_assets.rake"
+
 set :application, "rails_app"
 set :repo_url, "git@github.com:augustosamame/zenadmin.git"
 
@@ -103,6 +105,7 @@ namespace :deploy do
     on roles(:web) do
       within release_path do
         with rails_env: fetch(:rails_env) do
+          invoke "deploy:assets:precompile"
           # Run Yarn install
           execute :yarn, "install"
 
@@ -111,9 +114,6 @@ namespace :deploy do
 
           # Run production CSS build
           execute :yarn, "build:css:prod"
-
-          # Run a custom rake task for asset precompilation
-          execute :rake, "custom_assets:precompile"
         end
       end
     end
