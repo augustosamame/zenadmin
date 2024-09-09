@@ -40,6 +40,8 @@ class Order < ApplicationRecord
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
   after_commit :create_notification
+  after_create_commit -> { broadcast_refresh_to "admin_dashboard", target: "sales_count" }
+
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true

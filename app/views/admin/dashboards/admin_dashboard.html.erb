@@ -1,59 +1,14 @@
-<%= render "shared/admin/nav", { header_title: "Dashboard" } do %>
+<%= render "shared/admin/nav", { header_title: "Tablero Principal" } do %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 
-<div class="px-4">
-  <div class="container flex items-center justify-between mx-auto mt-4">
-    <h2 class="mb-0 text-base font-medium text-slate-700 dark:text-slate-300">
-      Recent stats
-    </h2>
-    <div data-controller="modal">
-      <button type="button" class="space-x-2 btn btn-white" tabindex="0" data-action="click->modal#open">
-        <%= icon "cog-6-tooth", classes: "stroke-current w-4 h-4 text-slate-600 dark:text-slate-300" %>
-        <span class="pointer-events-none">Customize dashboard</span>
-      </button>
-      <div aria-labelledby="modal-title" aria-modal="true" data-action="keyup@window->modal#closeWithEsc"
-        data-modal-target="container" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog">
-        <div class="relative w-full h-screen">
-          <div data-modal-target="content" data-transition-enter-active="transition ease-out duration-300"
-            data-transition-enter-from="transform opacity-0 scale-95"
-            data-transition-enter-to="transform opacity-100 scale-100"
-            data-transition-leave-active="transition ease-in duration-300"
-            data-transition-leave-from="transform opacity-100 scale-100"
-            data-transition-leave-to="transform opacity-0 scale-95"
-            class="hidden h-auto max-w-2xl p-8 m-4 mx-auto bg-white rounded shadow-xl dark:bg-slate-700">
-            <div class="m-auto prose dark:bg-slate-700 dark:text-slate-200">
-              <h2 id="modal-title" class="dark:text-slate-100">Customize dashboard</h2>
-              <p>This could be some sort of widget enabling interface for the dashboard</p>
-              <div class="flex flex-wrap items-center justify-end space-x-4">
-                <button class="btn btn-primary" data-action="click->modal#close">Close</button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
+<%= turbo_stream_from "admin_dashboard" %>
 
+<div class="px-4">
   <div class="container grid grid-cols-12 gap-4 mx-auto mt-4 mb-24 md:gap-6">
-    <div
-      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
-      <div class="flex items-start space-x-3">
-        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-600/30">
-          <%= icon "envelope-open", classes: "w-5 h-5 text-primary-600 stroke-current dark:text-primary-300" %>
-        </div>
-        <div class="flex-1">
-          <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Open deals</span>
-          <div class="flex items-center mt-1 mb-2 space-x-2">
-            <h3 class="text-4xl font-bold tracking-tight">32</h3>
-            <p class="text-red-600">-2</p>
-          </div>
-          <p class="text-sm text-slate-400">vs last month: <strong
-              class="text-slate-600 dark:text-slate-400">34</strong>
-          </p>
-        </div>
-      </div>
-    </div>
+
+    <%= render "sales_count" %>
+
     <div
       class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
