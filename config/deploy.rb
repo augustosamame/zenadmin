@@ -104,8 +104,10 @@ namespace :deploy do
       within release_path do
         with rails_env: fetch(:rails_env) do
           # Run Yarn build for production assets
-          invoke "deploy:yarn_install"
-          invoke "deploy:yarn_build"
+          execute :yarn, "install"
+          # invoke "deploy:yarn_install"
+          execute :yarn, "build:js:prod"
+          # invoke "deploy:yarn_build"
 
           execute :rake, "assets:precompile"
         end
