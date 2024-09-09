@@ -38,21 +38,21 @@ Rails.application.config.after_initialize do
       unless CustomNumbering.exists?(record_type: record_type)
         case record_type
         when "purchases_vendor"
-          CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: "VEN", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: "VEP", length: 4, next_number: 1, status: :active)
         when "supplier"
-          CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: "SUP", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: "PRO", length: 4, next_number: 1, status: :active)
         when "purchase"
-          CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: "PUR", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: "COM", length: 5, next_number: 1, status: :active)
         when "product"
-          CustomNumbering.find_or_create_by!(record_type: :product, prefix: "PRO", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :product, prefix: "PRO", length: 4, next_number: 1, status: :active)
         when "order"
-          CustomNumbering.find_or_create_by!(record_type: :order, prefix: "ORD", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :order, prefix: "VEN", length: 6, next_number: 1, status: :active)
         when "cash_inflow"
           CustomNumbering.find_or_create_by!(record_type: :cash_inflow, prefix: "CIN", length: 5, next_number: 1, status: :active)
         when "cash_outflow"
           CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: "COU", length: 5, next_number: 1, status: :active)
         when "payment"
-          CustomNumbering.find_or_create_by!(record_type: :payment, prefix: "PAY", length: 5, next_number: 1, status: :active)
+          CustomNumbering.find_or_create_by!(record_type: :payment, prefix: "PAG", length: 6, next_number: 1, status: :active)
         when "stock_transfer"
           CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: "INT", length: 5, next_number: 1, status: :active)
         when "requisition"

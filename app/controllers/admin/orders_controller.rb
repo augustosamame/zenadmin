@@ -4,7 +4,7 @@ class Admin::OrdersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @orders = Order.includes([ :user, :invoices ]).all
+        @orders = Order.includes([ :invoices ]).all
         if @orders.size > 500
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
         else
@@ -100,7 +100,7 @@ class Admin::OrdersController < Admin::AdminController
 
     def get_generic_customer_id
       # Logic to find the generic customer (guest)
-      User.find_by!(email: "generic_customer@devtechperu.com").try(:id)
+      User.find_by!(email: "generic_customer@devtechperu.com")&.customer&.id
     end
 
     def get_ecommerce_store_seller_id

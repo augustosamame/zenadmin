@@ -21,16 +21,7 @@ setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfe
 setting_12 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda", boolean_value: false)
 setting_13 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda y por medio de pago", boolean_value: true)
 
-CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: 'PRO', length: 4, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: 'SUP', length: 4, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: 'COM', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :product, prefix: 'PRO', length: 4, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :order, prefix: 'VEN', length: 6, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :cash_inflow, prefix: 'CIN', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: 'COU', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :payment, prefix: 'PAG', length: 6, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: 'TRA', length: 5, next_number: 1, status: :active)
-CustomNumbering.find_or_create_by!(record_type: :requisition, prefix: 'PED', length: 5, next_number: 1, status: :active)
+## custom numbering fields creation now handled by load_global_settings.rb initializer
 
 region_default = Region.find_or_create_by!(name: 'default')
 
@@ -155,10 +146,21 @@ useradmin2 = User.create!(email: 'ventas@aromaterapia.com.pe', phone: "986976367
 useradmin2.add_role('super_admin')
 
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: false)
+
 generic_customer.add_role('customer')
+
+Customer.create!(
+  doc_id: "99999999",
+  user: generic_customer,
+)
 
 user2 = User.create!(email: 'customer1@devtechperu.com', phone: "986976378", login: "customer1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Samamé")
 user2.add_role('customer')
+
+Customer.create!(
+  doc_id: "09344556",
+  user: user2,
+)
 
 user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", login: "seller1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Maria", last_name: "Angeles", location_id: location_1.id)
 user3.add_role('seller')
@@ -184,9 +186,9 @@ InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: in
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'))
 
-NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard: true, email: true })
-NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
-NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
-NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard: true, email: true, alert_header_icon: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard_alert: true, email: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard_alert: true, email: true })
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import
