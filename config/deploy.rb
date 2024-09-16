@@ -1,8 +1,6 @@
 # config valid for current version and patch releases of Capistrano
 lock "~> 3.19.1"
 
-load "lib/capistrano/tasks/custom_assets.rake"
-
 set :application, "rails_app"
 set :repo_url, "git@github.com:augustosamame/zenadmin.git"
 
@@ -105,20 +103,18 @@ namespace :deploy do
     on roles(:web) do
       within release_path do
         with rails_env: fetch(:rails_env) do
-          invoke "deploy:assets:precompile"
-          # Run Yarn install
+          execute :rake, "assets:precompile"
+          # Run Yarn build for production assets
           execute :yarn, "install"
-
-          # Run production JS build
+          # invoke "deploy:yarn_install"
           execute :yarn, "build:js:prod"
-
-          # Run production CSS build
-          execute :yarn, "build:css:prod"
+          # invoke "deploy:yarn_build"
+          # TODO fix the double build issue
         end
       end
     end
   end
-
-  # Hook the custom precompile task into the deploy process
-  before "deploy:assets:precompile", "deploy:precompile_assets"
 end
+
+# Hook the custom precompile task into the deploy process
+before "deploy:assets:precompile", "deploy:precompile_assets"

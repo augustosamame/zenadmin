@@ -9,24 +9,10 @@
 
     <%= render "sales_count" %>
 
-    <div
-      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
-      <div class="flex items-start space-x-3">
-        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-red-50 dark:bg-red-500/20">
-          <%= icon "exclamation-circle", classes: "w-6 h-6 text-red-600 stroke-current dark:text-red-400/90" %>
-        </div>
-        <div class="flex-1">
-          <span class="text-sm font-medium text-red-400 dark:text-red-400/90">Untouched deals</span>
-          <div class="flex items-center mt-1 mb-2 space-x-2">
-            <h3 class="text-4xl font-bold tracking-tight">40</h3>
-            <p class="text-green-600">+1</p>
-          </div>
-          <p class="text-sm text-slate-500">vs last month: <strong
-              class="text-slate-600 dark:text-slate-400">39</strong>
-          </p>
-        </div>
-      </div>
-    </div>
+    <%= render "sales_amount" %>
+
+    <%= render "sales_amount_this_month" %>
+
     <div
       class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
       <div class="flex items-start space-x-3">
