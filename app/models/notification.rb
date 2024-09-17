@@ -13,7 +13,7 @@ class Notification < ApplicationRecord
     case medium
     when "notification_feed"
       Services::Notifications::NotificationFeedService.new(self).create
-      broadcast_refresh_to "notifications" # , target: "notification_feed"
+      broadcast_refresh_to "notifications"
     when "alert_header_icon"
       Services::Notifications::AlertHeaderIconService.new(self).create
     when "dashboard_alert"

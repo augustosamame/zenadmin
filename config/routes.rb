@@ -93,7 +93,8 @@ Rails.application.routes.draw do
     resources :invoice_series
     resources :invoice_series_mappings
 
-    get "dashboard", to: "dashboards#admin_dashboard"
+    get "sales_dashboard", to: "dashboards#sales_dashboard"
+    post "dashboards/set_location", to: "dashboards#set_location"
 
 
     get "integrations", to: "page#integrations"
@@ -119,7 +120,7 @@ Rails.application.routes.draw do
   # Inherits from Railsui::PageController#index
   # To overide, add your own page#index view or change to a new root
   # Visit the start page for Rails UI any time at /railsui/start
-  root action: :admin_dashboard, controller: "admin/dashboards"
+  root action: :sales_dashboard, controller: "admin/dashboards"
 
   devise_for :users, skip: [ :registrations ]
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html

@@ -122,8 +122,9 @@ es:
           active: Activo
           inactive: Inactivo
         adjustment_type_list:
-          merma: Merma
+          devolucion: Devolución
           pérdida_o_robo: Pérdida o Robo
+          rotura: Rotura
           venta_incorrecta: Venta incorrecta
           otros: Otros
       tag:

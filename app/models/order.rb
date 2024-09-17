@@ -40,7 +40,7 @@ class Order < ApplicationRecord
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
   after_commit :create_notification
-  after_create_commit -> { broadcast_refresh_to "admin_dashboard", target: "sales_count" }
+  after_create_commit :refresh_dashboard_metrics
 
 
   validates :user_id, :location_id, :region_id, presence: true
@@ -59,6 +59,12 @@ class Order < ApplicationRecord
                   }
 
   attr_accessor :sellers_attributes, :invoice_series_comprobante_type
+
+  def refresh_dashboard_metrics
+    broadcast_refresh_to "sales_dashboard", target: "sales_count"
+    broadcast_refresh_to "sales_dashboard", target: "sales_amount"
+    broadcast_refresh_to "sales_dashboard", target: "sales_amount_this_month"
+  end
 
   def total_items
     order_items.sum(:quantity)

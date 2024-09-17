@@ -1,0 +1,18 @@
+<li class="flex flex-col py-3">
+  <div class="flex items-start justify-between">
+    <div class="flex items-start space-x-3">
+      <%= link_to "#", class: "flex items-center" do %>
+        <%= image_tag notification.message_image, alt: notification.message_title, class: "w-10 h-10 rounded-full" %>
+      <% end %>
+      <div>
+        <%= smart_notification_linker(notification) %>
+      </div>
+    </div>
+  </div>
+  <div class="flex items-center justify-between mt-2">
+    <p class="text-sm text-slate-500">hace <%= time_ago_in_words(notification.created_at) %></p>
+    <span class="inline-block px-2 py-1 text-xs font-medium leading-tight text-yellow-800 bg-yellow-100 rounded dark:bg-yellow-300/10 dark:text-yellow-500/80">
+      <%= t("notification.types.#{notification.notifiable.class.name.underscore}") %>
+    </span>
+  </div>
+</li>

@@ -1,67 +1,24 @@
-<%= render "shared/admin/nav", { header_title: "Tablero Principal" } do %>
-  <%= render "shared/admin/create_dropdown" %>
+<%= render "shared/admin/nav", { header_title: "Tablero de Ventas" } do %>
+  <%= render "select_location_dropdown" %>
 <% end %>
 
-<%= turbo_stream_from "admin_dashboard" %>
+<%= turbo_stream_from "sales_dashboard" %>
 
 <div class="px-4">
   <div class="container grid grid-cols-12 gap-4 mx-auto mt-4 mb-24 md:gap-6">
 
     <%= render "sales_count" %>
-
     <%= render "sales_amount" %>
-
     <%= render "sales_amount_this_month" %>
+    <%= render "sales_average_per_day_this_month" %>
 
-    <div
-      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
-      <div class="flex items-start space-x-3">
-        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-blue-50 dark:bg-blue-500/20">
-          <%= icon "phone-arrow-up-right", classes: "w-5 h-5 text-blue-600 stroke-current dark:text-blue-400/80" %>
-        </div>
-        <div class="flex-1">
-          <span class="text-sm font-medium text-blue-500 dark:text-blue-300/90">Calls today</span>
-          <div class="flex items-center mt-1 mb-2 space-x-2">
-            <h3 class="text-4xl font-bold tracking-tight">25</h3>
-            <p class="text-green-600">+7</p>
-          </div>
-          <p class="text-sm text-slate-500">vs yesterday: <strong
-              class="text-slate-600 dark:text-slate-400">18</strong>
-          </p>
-        </div>
-      </div>
-
-    </div>
-    <div
-      class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
-      <div class="flex items-start space-x-3">
-        <div class="flex items-center justify-center w-10 h-10 rounded-full bg-green-50 dark:bg-green-500/20">
-          <%= icon "currency-dollar", classes: "w-6 h-6 text-green-600 stroke-current dark:text-green-400/80" %>
-        </div>
-        <div class="flex-1">
-          <span class="text-sm font-medium text-green-500 dark:text-green-400/90">Revenue this month</span>
-
-          <div class="flex items-center mt-1 mb-2 space-x-2">
-            <h3 class="text-3xl font-bold tracking-tight">$125,302</h3>
-            <p class="text-green-600">+2%</p>
-          </div>
-          <p class="text-sm text-slate-500">vs last month: <strong
-              class="text-slate-600 dark:text-slate-400">$102,103</strong>
-          </p>
-        </div>
-      </div>
-    </div>
-
-    <div class="flex items-center col-span-12">
-      <div class="w-1/2 h-px bg-gradient-to-l from-slate-200 dark:from-slate-600"></div>
-      <div class="w-1/2 h-px bg-gradient-to-r from-slate-200 dark:from-slate-600"></div>
-    </div>
+    <%= render "separator" %>
 
     <div
       class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-7 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none dark:text-slate-300">
       <div class="flex items-start justify-between pb-10">
         <div class="flex-1">
-          <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Deal revenue forecast
+          <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Proyección de ventas vs metas
           </h4>
         </div>
         <select name="revenue_period" id="revenue_period"
@@ -95,7 +52,7 @@
       </div>
 
       <%= turbo_stream_from "notifications" %>
-      <%= render "notification_feed" %>
+      <%= render "sales_dashboard_notification_feed" %>
     </div>
 
     <div

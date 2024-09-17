@@ -1,17 +1,17 @@
-<div id="sales_amount_this_month"
+<div id="sales_average_per_day_this_month"
   class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
   <div class="flex items-start space-x-3">
     <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-600/30">
       <%= icon "currency-dollar", classes: "w-5 h-5 text-primary-600 stroke-current dark:text-primary-300" %>
     </div>
     <div class="flex-1">
-      <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Ventas del mes</span>
+      <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Promedio diario este mes</span>
       <div class="flex items-center mt-1 mb-2 space-x-2">
-        <h3 class="text-3xl font-bold tracking-tight"><%= format_currency(@sales_amount_this_month) %></h3>
-        <p class="text-red-600"><%= @sales_amount_change_since_last_month_percentage %></p>
+        <h3 class="text-3xl font-bold tracking-tight"><%= format_currency(@sales_daily_average_this_month) %></h3>
+        <p class="text-red-600"><%= @sales_daily_average_change_since_last_month %></p>
       </div>
       <p class="text-sm text-slate-400">vs último mes: <strong
-          class="text-slate-600 dark:text-slate-400"><%= format_currency(@sales_amount_last_month) %></strong>
+          class="text-slate-600 dark:text-slate-400"><%= format_currency(@sales_daily_average_last_month) %></strong>
       </p>
     </div>
   </div>

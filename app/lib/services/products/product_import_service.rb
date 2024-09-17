@@ -25,7 +25,7 @@ module Services
         end
 
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
-          break if index > 5
+          break if index > 25
           product_category_name = row[0]
           product_name = row[1]
           tag1_name = row[2]
@@ -39,8 +39,8 @@ module Services
             name: product_name.downcase.capitalize,
             description: "Description for #{product_name}",
             permalink: product_name.parameterize,
-            price_cents: 5000,
-            discounted_price_cents: 4000,
+            price_cents: 4000,
+            discounted_price_cents: 3500,
             # custom_id: custom_id,
             brand_id: brand_id,
             product_categories: [ product_category ]

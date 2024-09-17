@@ -1,0 +1,8 @@
+<ul id="sales_dashboard_notification_feed" class="relative mt-6 divide-y text-slate-600 dark:text-slate-300 dark:divide-slate-600">
+  <% notifications = Notification.includes(:notifiable).where(medium: :notification_feed).order(created_at: :desc).limit(5) %>
+  <% notifications.each do |notification| %>
+    <% if !session[:location_id].present? || (notification.notifiable.respond_to?(:location_id) && notification.notifiable.location_id == session[:location_id]&.to_i) %>
+      <%= render 'admin/dashboards/notification_feed_item', notification: notification %>
+    <% end %>
+  <% end %>
+</ul>

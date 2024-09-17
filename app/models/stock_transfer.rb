@@ -13,7 +13,7 @@ class StockTransfer < ApplicationRecord
 
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
-  enum :adjustment_type, { merma: 0, pérdida_o_robo: 1, venta_incorrecta: 2, otros: 3 }
+  enum :adjustment_type, { devolucion: 0, perdida_o_robo: 1, rotura: 2, venta_incorrecta: 3, otros: 4 }
   translate_enum :adjustment_type
 
   aasm column: "stage" do

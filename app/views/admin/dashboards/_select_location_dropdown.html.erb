@@ -1,0 +1,30 @@
+<div data-controller="dashboard--select-location-dropdown" class="relative">
+  <button data-action="click->dashboard--select-location-dropdown#toggle click@window->dashboard--select-location-dropdown#hide"
+          data-dashboard--select-location-dropdown-target="trigger"
+          class="flex items-center space-x-2 btn btn-primary sm:pr-2 focus:ring-slate-100/20 group dark:focus:ring-slate-500/20">
+    <span><%= @selected_location_name || 'Todas' %></span>
+    <%= icon "chevron-down", classes: "stroke-current w-3 h-3 text-white group-focus:rotate-180 transition ease-in-out transform" %>
+  </button>
+
+  <ul data-dashboard--select-location-dropdown-target="menu"
+      class="absolute right-0 z-50 hidden w-48 py-2 mt-2 transition origin-top-right transform bg-white border rounded-lg shadow-xl dark:bg-slate-700 border-slate-200 dark:border-slate-500">
+    <li>
+      <a href="#"
+         data-action="click->dashboard--select-location-dropdown#select"
+         data-location-id=""
+         class="block px-4 py-2 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 <%= 'bg-slate-100 dark:bg-slate-600' if @selected_location_id.blank? %>">
+        Todas
+      </a>
+    </li>
+    <% @locations.each do |id, name| %>
+      <li>
+        <a href="#"
+           data-action="click->dashboard--select-location-dropdown#select"
+           data-location-id="<%= id %>"
+           class="block px-4 py-2 text-sm text-slate-600 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-600 <%= 'bg-slate-100 dark:bg-slate-600' if @selected_location_id.to_s == id.to_s %>">
+          <%= name %>
+        </a>
+      </li>
+    <% end %>
+  </ul>
+</div>

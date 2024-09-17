@@ -5,9 +5,9 @@
       <%= icon "currency-dollar", classes: "w-5 h-5 text-primary-600 stroke-current dark:text-primary-300" %>
     </div>
     <div class="flex-1">
-      <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Monto de ventas</span>
+      <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Monto de ventas Hoy</span>
       <div class="flex items-center mt-1 mb-2 space-x-2">
-        <h3 class="text-2xl font-bold tracking-tight"><%= format_currency(@sales_amount) %></h3>
+        <h3 class="text-3xl font-bold tracking-tight"><%= format_currency(@sales_amount) %></h3>
         <p class="text-red-600"><%= @sales_amount_change_since_yesterday %></p>
       </div>
       <p class="text-sm text-slate-400">vs último mes: <strong

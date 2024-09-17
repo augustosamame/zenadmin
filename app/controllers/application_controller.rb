@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   rescue_from ActionView::Template::Error, with: :render_not_found
   helper Railsui::ThemeHelper
 
+  protect_from_forgery with: :exception
+
   before_action :configure_permitted_parameters, if: :devise_controller?
   before_action :set_railsui_demo_links
 
@@ -21,8 +23,7 @@ class ApplicationController < ActionController::Base
       :message,
       :messages,
       :project,
-      :projects,
-      :dashboard
+      :projects
     ]
   end
 
