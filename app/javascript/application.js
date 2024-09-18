@@ -12,5 +12,8 @@ import "tom-select"
 import "trix"
 import "@rails/actiontext"
 
+// Add this line to import ApexCharts CSS
+import "apexcharts/dist/apexcharts.css"
+
 import { initializeNotificationSound } from "./edukaierp_custom"
 initializeNotificationSound();

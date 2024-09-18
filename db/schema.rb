@@ -184,12 +184,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_08_142407) do
 
   create_table "commission_ranges", force: :cascade do |t|
     t.bigint "user_id", null: false
+    t.string "year_month_period"
     t.decimal "min_sales", precision: 10, scale: 2, null: false
     t.decimal "max_sales", precision: 10, scale: 2
     t.decimal "commission_percentage", precision: 5, scale: 2, null: false
     t.bigint "location_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["location_id", "year_month_period"], name: "index_commission_ranges_on_location_id_and_year_month_period"
     t.index ["location_id"], name: "index_commission_ranges_on_location_id"
     t.index ["max_sales"], name: "index_commission_ranges_on_max_sales"
     t.index ["min_sales"], name: "index_commission_ranges_on_min_sales"
@@ -658,6 +660,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_08_142407) do
     t.bigint "user_id", null: false
     t.string "year_month_period"
     t.integer "sales_target_cents", null: false
+    t.string "currency", default: "PEN", null: false
     t.decimal "target_commission", precision: 5, scale: 2, null: false
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false

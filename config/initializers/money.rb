@@ -7,7 +7,6 @@ MoneyRails.configure do |config|
   config.default_format = {
     format: "%u %n",
     symbol: "S/",
-    symbol_position: :before,
     thousands_separator: ",",
     decimal_mark: ".",
     sign_before_symbol: true

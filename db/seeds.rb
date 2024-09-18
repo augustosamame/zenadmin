@@ -135,9 +135,9 @@ end
 user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
 user1.add_role('super_admin')
 
-CommissionRange.find_or_create_by!(user: user1, min_sales: 0, max_sales: 2000, commission_percentage: 2, location: location_1)
-CommissionRange.find_or_create_by!(user: user1, min_sales: 2000, max_sales: 5000, commission_percentage: 3, location: location_1)
-CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_percentage: 4, location: location_1)
+CommissionRange.find_or_create_by!(user: user1, min_sales: 0, max_sales: 2000, commission_percentage: 2, location: location_1, year_month_period: "2024_09_II")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 2000, max_sales: 5000, commission_percentage: 3, location: location_1, year_month_period: "2024_09_II")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_percentage: 4, location: location_1, year_month_period: "2024_09_II")
 
 useradmin1 = User.create!(email: 'aalvarino@aromaterapia.com.pe', phone: "986976366", login: "aalvarino@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Alicia", last_name: "Alvarino")
 useradmin1.add_role('super_admin')
@@ -149,7 +149,7 @@ generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone
 
 generic_customer.add_role('customer')
 
-Customer.create!(
+generic_customer_customer = Customer.create!(
   doc_id: "99999999",
   user: generic_customer,
 )
@@ -190,5 +190,17 @@ NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notificat
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard_alert: true, email: true })
+
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_I", currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_II", currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_I", currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_II", currency: "PEN", target_commission: 5.0)
+
+for i in 1..50
+  days_ago = rand(1..30)
+  sales_price_cents = rand(1000..10000)
+  created_time = Time.now - days_ago.days
+  Order.create!(user_id: generic_customer_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
+end
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

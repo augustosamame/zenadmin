@@ -4,6 +4,7 @@
       <thead>
         <tr>
           <th class="px-4 py-2 text-left">Localización</th>
+          <th class="px-4 py-2 text-left">Periodo</th>
           <th class="px-4 py-2 text-left">Ventas Mínimas</th>
           <th class="px-4 py-2 text-left">Ventas Máximas</th>
           <th class="px-4 py-2 text-left">Porcentaje de Comisión</th>
@@ -14,6 +15,7 @@
         <% @commission_ranges.each do |commission_range| %>
           <tr>
             <td class="px-4 py-2"><%= commission_range.location.name %></td>
+            <td class="px-4 py-2"><%= commission_range.year_month_period %></td>
             <td class="px-4 py-2"><%= format_currency(commission_range.min_sales) %></td>
             <td class="px-4 py-2"><%= format_currency(commission_range.max_sales) || 'Infinito' %></td>
             <td class="px-4 py-2"><%= commission_range.commission_percentage %> %</td>

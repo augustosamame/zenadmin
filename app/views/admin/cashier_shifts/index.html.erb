@@ -28,7 +28,7 @@
             <td class="px-4 py-2"><%= cashier_shift.status %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.closed_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.closed_by&.name %></td>
-            <td class="px-4 py-2"><%= humanized_money_with_symbol cashier_shift.total_balance %></td>
+            <td class="px-4 py-2"><%= format_currency(cashier_shift.total_balance) %></td>
             <td class="px-4 py-2">
               <%= link_to 'Ver', admin_cashier_shift_path(cashier_shift), class: 'btn btn-secondary' %>
             </td>

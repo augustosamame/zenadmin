@@ -2,7 +2,7 @@
   <div class="flex items-start justify-between">
     <div class="flex items-start space-x-3">
       <%= link_to "#", class: "flex items-center" do %>
-        <%= image_tag notification.message_image, alt: notification.message_title, class: "w-10 h-10 rounded-full" %>
+        <%= image_tag notification.message_image, alt: notification.message_title, class: "w-10 h-10 rounded-full" if notification.message_image.present? %>
       <% end %>
       <div>
         <%= smart_notification_linker(notification) %>

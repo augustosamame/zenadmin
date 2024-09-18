@@ -75,7 +75,7 @@
     </div>
     <div>
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Balance Total</p>
-      <p class="mt-1 text-lg font-semibold"><%= humanized_money_with_symbol @cashier_shift.total_balance %></p>
+      <p class="mt-1 text-lg font-semibold"><%= format_currency(@cashier_shift.total_balance) %></p>
     </div>
 
     <div class="col-span-3">
@@ -84,7 +84,7 @@
         <% @cashier_shift.cashier_transactions.includes([:payment_method]).group_by(&:payment_method).each do |payment_method, transactions| %>
           <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
             <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= payment_method&.description || 'Sin método' %></p>
-            <p class="text-lg font-semibold"><%= humanized_money_with_symbol transactions.sum(&:amount) %></p>
+            <p class="text-lg font-semibold"><%= format_currency(transactions.sum(&:amount)) %></p>
           </div>
         <% end %>
       </div>
@@ -116,7 +116,7 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.payment_method&.description %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= humanized_money_with_symbol transaction.amount %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= format_currency(transaction.amount) %></td>
 
           </tr>
         <% end %>

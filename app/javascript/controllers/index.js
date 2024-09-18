@@ -28,6 +28,15 @@ application.register("customer-form", CustomerFormController)
 import CustomerTableModalController from "./customer_table_modal_controller"
 application.register("customer-table-modal", CustomerTableModalController)
 
+import Dashboard__SelectLocationDropdownController from "./dashboard/select_location_dropdown_controller"
+application.register("dashboard--select-location-dropdown", Dashboard__SelectLocationDropdownController)
+
+import Dashboards__AutoRefreshController from "./dashboards/auto_refresh_controller"
+application.register("dashboards--auto-refresh", Dashboards__AutoRefreshController)
+
+import Dashboards__ChartsController from "./dashboards/charts_controller"
+application.register("dashboards--charts", Dashboards__ChartsController)
+
 import DatatableController from "./datatable_controller"
 application.register("datatable", DatatableController)
 
@@ -69,9 +78,6 @@ application.register("nav", NavController)
 
 import NestedFormController from "./nested_form_controller"
 application.register("nested-form", NestedFormController)
-
-import Dashboard__SelectLocationDropdownController from "./dashboard/select_location_dropdown_controller"
-application.register("dashboard--select-location-dropdown", Dashboard__SelectLocationDropdownController)
 
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)

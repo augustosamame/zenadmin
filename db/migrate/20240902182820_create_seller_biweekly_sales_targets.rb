@@ -5,6 +5,7 @@ class CreateSellerBiweeklySalesTargets < ActiveRecord::Migration[7.2]
       t.references :user, null: false, foreign_key: { to_table: :users }
       t.string :year_month_period # e.g. 2024_08_I, 2024_08_II
       t.integer :sales_target_cents, null: false
+      t.string :currency, default: "PEN", null: false
       t.decimal :target_commission, precision: 5, scale: 2, null: false
       t.integer :status, default: 0, null: false
 

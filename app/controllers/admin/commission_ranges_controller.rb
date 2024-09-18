@@ -51,6 +51,6 @@ class Admin::CommissionRangesController < Admin::AdminController
   end
 
   def commission_range_params
-    params.require(:commission_range).permit(:start_amount, :end_amount, :commission_percentage)
+    params.require(:commission_range).permit(:start_amount, :end_amount, :commission_percentage, :year_month_period, :location_id)
   end
 end
