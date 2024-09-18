@@ -1,0 +1,8 @@
+<div id="product-grid" data-pos--payment-target="productGrid" data-controller="pos--product-grid">
+  <!-- Search Bar -->
+  <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
+
+  <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" data-pos--product-grid-target="productContainer">
+    <!-- Products will be rendered here -->
+  </div>
+</div>

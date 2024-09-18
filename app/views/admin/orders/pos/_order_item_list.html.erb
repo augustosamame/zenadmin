@@ -1,0 +1,21 @@
+<!-- Order Item List Section -->
+<div class="flex flex-col flex-grow p-3 overflow-hidden bg-white rounded shadow-md min-h-56 dark:bg-gray-700">
+  <div id="pos--order-items" data-controller="pos--order-items" class="flex flex-col h-full">
+    <!-- Column Titles -->
+    <div class="flex gap-2 mb-2 font-bold">
+      <div class="flex-grow" style="flex-basis: 55%;">Producto</div>
+      <div class="flex-grow" style="flex-basis: 15%;">Cant</div>
+      <div class="flex-grow" style="flex-basis: 15%;">Precio</div>
+      <div class="flex-grow" style="flex-basis: 15%;">Subtotal</div>
+    </div>
+
+    <!-- Container for dynamically added items -->
+    <div data-pos--order-items-target="items" class="flex-grow overflow-auto"></div>
+
+    <!-- Total (Aligned at the Bottom) -->
+    <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
+      <span>Total:</span>
+      <span data-pos--order-items-target="total">S/ 0.00</span>
+    </div>
+  </div>
+</div>

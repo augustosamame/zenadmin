@@ -37,7 +37,7 @@ module Services
       # run this to calculate up to date commission amounts as the location commission rate may have changed if they reached a different range
       def self.recalculate_commissions
         Commission.where.not(status: :status_paid_out).includes(order: :location).each do |commission|
-          seller_comission_percentage = CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: commission.order.location).sales_on_month_for_location, commission.order.location)&.commission_percentage || 0
+          seller_comission_percentage = CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: commission.order.location).sales_on_month_for_location, commission.order.location, commission.order.order_date)&.commission_percentage || 0
           sale_amount_cents = commission.order.total_price_cents * (commission.percentage.to_f / 100)
           amount_cents = ((sale_amount_cents * (seller_comission_percentage / 100))/1.18)
           commission.update(amount_cents: amount_cents)

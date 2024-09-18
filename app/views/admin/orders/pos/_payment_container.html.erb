@@ -1,0 +1,43 @@
+<div data-pos--payment-target="paymentContainer" class="flex flex-col hidden h-full">
+    
+  <div data-pos--payment-target="paymentMethods">
+    <!-- Buttons will be dynamically added here -->
+  </div>
+
+  <div class="flex justify-center pt-4 mt-4 text-5xl border-t dark:border-gray-600">
+    <span data-pos--payment-target="total">S/ 0.00</span>
+  </div>
+
+  <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
+    <span data-pos--payment-target="remainingLabel">Remaining:</span>
+    <span data-pos--payment-target="remainingAmount">S/ 0.00</span>
+  </div>
+
+  <div data-pos--payment-target="paymentList" class="mt-4">
+    <!-- Payments will be listed here -->
+  </div>
+
+  <div class="mt-auto">
+    <div data-pos--payment-target="rucSection" class="hidden mb-4">
+      <div class="flex items-center mt-2">
+        <input type="checkbox" id="confirm-factura" class="mr-2" checked>
+        <label for="confirm-factura" class="text-base">Emitir factura</label>
+      </div>
+      <div class="flex flex-col pt-4 text-base border-t dark:border-gray-600">
+        <span data-pos--payment-target="ruc">RUC: </span>
+        <span data-pos--payment-target="razonSocial">Razón Social: </span>
+        <span data-pos--payment-target="direccion">Dirección: </span>
+      </div>
+    </div>
+
+    <div class="flex justify-between mt-4">
+      <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--payment#saveOrder">
+        Crear Venta
+      </button>
+      <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->pos--payment#cancelPayment">
+        Volver
+      </button>
+    </div>
+  </div>
+
+</div>

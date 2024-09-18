@@ -7,185 +7,22 @@
 <!-- Container to adjust layout for mobile and desktop -->
 <div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>">
 
-  <!-- Product Grid Section (on top for mobile, on right for desktop) -->
+  <!-- Product Grid and Payment Container Section (on top for mobile, on right for desktop) -->
   <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto">
 
-    <div id="product-grid" data-pos--payment-target="productGrid" data-controller="pos--product-grid">
-      <!-- Search Bar -->
-      <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
-
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" data-pos--product-grid-target="productContainer">
-        <!-- Products will be rendered here -->
-      </div>
-    </div>
-
-    <div data-pos--payment-target="paymentContainer" class="flex flex-col hidden h-full">
-    
-      <div data-pos--payment-target="paymentMethods">
-        <!-- Buttons will be dynamically added here -->
-      </div>
-
-      <div class="flex justify-center pt-4 mt-4 text-5xl border-t dark:border-gray-600">
-        <span data-pos--payment-target="total">S/ 0.00</span>
-      </div>
-
-      <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
-        <span data-pos--payment-target="remainingLabel">Remaining:</span>
-        <span data-pos--payment-target="remainingAmount">S/ 0.00</span>
-      </div>
-
-      <div data-pos--payment-target="paymentList" class="mt-4">
-        <!-- Payments will be listed here -->
-      </div>
-
-      <div class="mt-auto">
-        <div data-pos--payment-target="rucSection" class="hidden mb-4">
-          <div class="flex items-center mt-2">
-            <input type="checkbox" id="confirm-factura" class="mr-2" checked>
-            <label for="confirm-factura" class="text-base">Emitir factura</label>
-          </div>
-          <div class="flex flex-col pt-4 text-base border-t dark:border-gray-600">
-            <span data-pos--payment-target="ruc">RUC: </span>
-            <span data-pos--payment-target="razonSocial">Razón Social: </span>
-            <span data-pos--payment-target="direccion">Dirección: </span>
-          </div>
-        </div>
-
-        <div class="flex justify-between mt-4">
-          <button type="button" class="p-4 text-white bg-teal-500 rounded btn dark:bg-teal-400" data-action="click->pos--payment#saveOrder">
-            Crear Venta
-          </button>
-          <button type="button" class="p-4 text-black bg-gray-300 rounded btn dark:bg-gray-600 dark:text-white" data-action="click->pos--payment#cancelPayment">
-            Volver
-          </button>
-        </div>
-      </div>
-
-    </div>
+    <%= render "admin/orders/pos/product_grid" %>
+    <%= render "admin/orders/pos/payment_container" %>
 
   </div>
 
   <!-- Order and Keypad Section (full width on mobile, left half on desktop) -->
   <div class="flex flex-col w-full h-full p-3 bg-gray-100 lg:w-1/2 dark:bg-gray-800">
     
-    <!-- Order List Section -->
-    <div class="flex flex-col flex-grow p-3 overflow-hidden bg-white rounded shadow-md min-h-56 dark:bg-gray-700">
-      <div id="pos--order-items" data-controller="pos--order-items" class="flex flex-col h-full">
-        <!-- Column Titles -->
-        <div class="flex gap-2 mb-2 font-bold">
-          <div class="flex-grow" style="flex-basis: 55%;">Producto</div>
-          <div class="flex-grow" style="flex-basis: 15%;">Cant</div>
-          <div class="flex-grow" style="flex-basis: 15%;">Precio</div>
-          <div class="flex-grow" style="flex-basis: 15%;">Subtotal</div>
-        </div>
+    <%= render "admin/orders/pos/order_item_list" %>
+    <%= render "admin/orders/pos/pos_buttons_container" %>
 
-        <!-- Container for dynamically added items -->
-        <div data-pos--order-items-target="items" class="flex-grow overflow-auto"></div>
+    <%= render "admin/orders/pos/keypad_container" %>
 
-        <!-- Total (Aligned at the Bottom) -->
-        <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
-          <span>Total:</span>
-          <span data-pos--order-items-target="total">S/ 0.00</span>
-        </div>
-      </div>
-    </div>
-
-    <div data-controller="pos--buttons">
-      <!-- Buttons Section -->
-      <div class="grid grid-cols-3 gap-0 mt-4 mb-4">
-        <div data-controller="pos--comment-modal" class="flex items-center justify-center h-16">
-          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--comment-modal#open">
-            <%= icon "chat-bubble-left-right", classes: "w-6 h-6 mr-2" %>
-            Comentarios
-          </button>
-          <%= render 'shared/admin/pos/comment_modal' %>
-        </div>
-        
-        <div data-controller="customer-table-modal" class="flex items-center justify-center h-16">
-          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->customer-table-modal#open">
-            <%= icon "user", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-            Cliente
-          </button>
-          <%= render 'shared/admin/customer_table_modal' %>
-        </div>
-
-        <div data-controller="pos--sellers-modal">
-          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--sellers-modal#open">
-            <%= icon "user-group", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-            Vendedores
-          </button>
-          <%= render 'shared/admin/pos/sellers_modal' %>
-        </div>
-
-        <div class="flex items-center justify-center h-16">
-          <%= link_to admin_cashier_shift_path(@current_cashier_shift), class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
-            <%= icon "currency-dollar", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-            Caja
-          <% end %>
-        </div>
-
-        <div class="flex items-center justify-center h-16">
-          <%= link_to admin_orders_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
-            <%= icon "sparkles", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-            Ventas
-          <% end %>
-        </div>
-
-        <div class="flex items-center justify-center h-16">
-          <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
-            <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-            Comisiones
-          <% end %>
-        </div>
-        
-        <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer" class="flex items-center justify-center h-16">
-          <a href="#" class="flex items-center justify-center w-full h-full text-center text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600" data-action="click->pos--buttons#loadDraft">
-            <%= icon "document-arrow-up", classes: "w-6 h-6 mr-2" %>
-            Recuperar Borrador
-          </a>
-        </div>
-      </div>
-      
-    </div>
-
-
-
-
-
-    <!-- Keypad and Big Payment Button Section -->
-    <div class="flex h-48">
-      <!-- Big Payment Button -->
-      <div class="flex items-center justify-center w-1/3 h-full" data-action="click->pos--payment#payOrder">
-        <button type="button" class="flex items-center justify-center w-full h-full p-4 text-3xl text-white bg-teal-500 rounded btn dark:bg-teal-400">
-          Pagar
-        </button>
-      </div>
-
-      <!-- Numeric Keypad -->
-      <div class="flex-grow h-full">
-        <div id="keypad" data-controller="pos--keypad" class="h-full">
-          <div class="grid h-full grid-cols-4 gap-2">
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">1</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">2</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">3</button>
-            <button id="quantity-mode-button" class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#selectQuantityMode">Cant</button>
-
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">4</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">5</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">6</button>
-            <button id="price-mode-button" class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#selectPriceMode">Precio</button>
-
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">7</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">8</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">9</button>
-            <button class="text-2xl bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">⌫</button>
-
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">0</button>
-            <button class="text-lg bg-white btn keypad-button dark:bg-gray-800" data-action="click->pos--keypad#handleKeypad">.</button>
-            <!-- Additional buttons as needed -->
-          </div>
-        </div>
-      </div>
-    </div>
   </div>
+
 </div>

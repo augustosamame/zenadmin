@@ -1,0 +1,57 @@
+ <div data-controller="pos--buttons">
+  <!-- Buttons Section -->
+  <div class="grid grid-cols-3 gap-0 mt-4 mb-4">
+    <div data-controller="pos--comment-modal" class="flex items-center justify-center h-16">
+      <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--comment-modal#open">
+        <%= icon "chat-bubble-left-right", classes: "w-6 h-6 mr-2" %>
+        Comentarios
+      </button>
+      <%= render 'shared/admin/pos/comment_modal' %>
+    </div>
+    
+    <div data-controller="customer-table-modal" class="flex items-center justify-center h-16">
+      <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->customer-table-modal#open">
+        <%= icon "user", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+        Cliente
+      </button>
+      <%= render 'shared/admin/customer_table_modal' %>
+    </div>
+
+    <div data-controller="pos--sellers-modal">
+      <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--sellers-modal#open">
+        <%= icon "user-group", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+        Vendedores
+      </button>
+      <%= render 'shared/admin/pos/sellers_modal' %>
+    </div>
+
+    <div class="flex items-center justify-center h-16">
+      <%= link_to admin_cashier_shift_path(@current_cashier_shift), class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+        <%= icon "currency-dollar", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+        Caja
+      <% end %>
+    </div>
+
+    <div class="flex items-center justify-center h-16">
+      <%= link_to admin_orders_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+        <%= icon "sparkles", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+        Ventas
+      <% end %>
+    </div>
+
+    <div class="flex items-center justify-center h-16">
+      <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+        <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+        Comisiones
+      <% end %>
+    </div>
+    
+    <div id="draft-button-container" data-pos--buttons-target="draftButtonContainer" class="flex items-center justify-center h-16">
+      <a href="#" class="flex items-center justify-center w-full h-full text-center text-black bg-white border border-gray-300 btn dark:bg-slate-800 dark:text-white dark:border-slate-600" data-action="click->pos--buttons#loadDraft">
+        <%= icon "document-arrow-up", classes: "w-6 h-6 mr-2" %>
+        Recuperar Borrador
+      </a>
+    </div>
+  </div>
+  
+</div>
