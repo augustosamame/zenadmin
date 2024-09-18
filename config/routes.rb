@@ -141,4 +141,10 @@ Rails.application.routes.draw do
   if Rails.env.production?
     match "*unmatched", to: "application#render_not_found", via: :all
   end
+
+  match "/", via: [ :options, :propfind, :post ], to: lambda { |_| [ 204, { "Content-Type" => "text/plain" }, [] ] }
+
+  get "*unmatched_route", to: "application#render_not_found" unless Rails.env.development?
+  post "*unmatched_route", to: "application#render_not_found" unless Rails.env.development?
+  match "*unmatched_route", via: :all, to: "application#render_not_found" unless Rails.env.development?
 end

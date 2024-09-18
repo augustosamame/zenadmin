@@ -20,7 +20,7 @@ set :linked_files, fetch(:linked_files, []).push(".env", "config/master.key", "c
 append :linked_files, "config/master.key", ".env", "config/puma/production.rb"
 
 # Default value for linked_dirs is []
-append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "public/uploads", "vendor", "storage"
+append :linked_dirs, "log", "tmp/pids", "tmp/cache", "tmp/sockets", "public/system", "public/uploads", "vendor", "storage", "app/assets/builds"
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -91,29 +91,45 @@ namespace :deploy do
     on roles(:web) do
       within release_path do
         execute :yarn, "run build:js:prod"
+        execute :yarn, "run build:css:prod"
+      end
+    end
+  end
+
+  namespace :deploy do
+    desc "Precompile assets"
+    task :precompile_assets do
+      on roles(:web) do
+        within release_path do
+          with rails_env: fetch(:rails_env) do
+            execute :rake, "assets:precompile"
+            invoke "deploy:yarn_install"
+            invoke "deploy:yarn_build"
+          end
+        end
       end
     end
   end
 
   # Override the deploy:assets:precompile task
-  Rake::Task["deploy:assets:precompile"].clear
+  # Rake::Task["deploy:assets:precompile"].clear
 
-  desc "Precompile assets"
-  task :precompile_assets do
-    on roles(:web) do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :rake, "assets:precompile"
-          # Run Yarn build for production assets
-          execute :yarn, "install"
-          # invoke "deploy:yarn_install"
-          execute :yarn, "build:js:prod"
-          # invoke "deploy:yarn_build"
-          # TODO fix the double build issue
-        end
-      end
-    end
-  end
+  # desc "Precompile assets"
+  # task :precompile_assets do
+  # on roles(:web) do
+  # within release_path do
+  # with rails_env: fetch(:rails_env) do
+  # execute :rake, "assets:precompile"
+  # Run Yarn build for production assets
+  # execute :yarn, "install"
+  # invoke "deploy:yarn_install"
+  # execute :yarn, "build:js:prod"
+  # invoke "deploy:yarn_build"
+  # TODO fix the double build issue
+  # end
+  # end
+  # end
+  # end
 end
 
 # Hook the custom precompile task into the deploy process
