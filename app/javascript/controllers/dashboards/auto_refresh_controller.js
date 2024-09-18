@@ -24,8 +24,25 @@ export default class extends Controller {
     }
   }
 
+  dispatchRefreshEvent() {
+    console.log("Dispatching dashboardRefreshed event")
+    document.dispatchEvent(new CustomEvent('dashboardRefreshed'))
+  }
+
   refresh() {
     console.log("auto refreshing every " + this.intervalValue + "ms")
-    visit(window.location.href, { action: "replace" })
+
+    const visitResult = visit(window.location.href, { action: "replace" })
+
+    if (visitResult && typeof visitResult.then === 'function') {
+      visitResult.then(() => {
+        this.dispatchRefreshEvent()
+      })
+    } else {
+      // If visit doesn't return a Promise, wait a short time before dispatching the event
+      setTimeout(() => {
+        this.dispatchRefreshEvent()
+      }, 100)
+    }
   }
 }

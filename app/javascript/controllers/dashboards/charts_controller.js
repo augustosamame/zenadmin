@@ -10,11 +10,29 @@ export default class extends Controller {
   connect() {
     console.log("Charts controller connected")
     this.initializeChart()
+    this.handleResize = this.handleResize.bind(this)
+    window.addEventListener('resize', this.handleResize)
+
+    // Add event listener for dashboard refresh
+    this.handleDashboardRefresh = this.handleDashboardRefresh.bind(this)
+    document.addEventListener('dashboardRefreshed', this.handleDashboardRefresh)
+
   }
 
   disconnect() {
     console.log("Charts controller disconnected")
     this.destroyChart()
+    window.removeEventListener('resize', this.handleResize)
+  }
+
+  handleDashboardRefresh() {
+    console.log("Dashboard refreshed, reinitializing chart")
+    // Add a small delay before initializing the chart
+    setTimeout(() => {
+      this.initializeChart()
+      // Force a resize after initialization
+      this.handleResize()
+    }, 200)
   }
 
   initializeChart() {
@@ -53,7 +71,9 @@ export default class extends Controller {
       series,
       chart: {
         type: "line",
-        height: 350,
+        height: '100%',
+        width: '100%',
+        parentHeightOffset: 0,
         toolbar: {
           show: false
         }
@@ -74,7 +94,7 @@ export default class extends Controller {
       },
       yaxis: {
         title: {
-          text: 'Ventas acumuladas (S/ )'
+          text: 'Ventas acumuladas'
         },
         min: 0,
         max: maxYAxis,
@@ -122,6 +142,16 @@ export default class extends Controller {
       legend: {
         horizontalAlign: 'left'
       }
+    }
+  }
+
+  handleResize() {
+    if (this.teamGoalsChart) {
+      this.teamGoalsChart.updateOptions({
+        chart: {
+          width: '100%'
+        }
+      })
     }
   }
 

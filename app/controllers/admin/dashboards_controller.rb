@@ -88,7 +88,7 @@ class Admin::DashboardsController < Admin::AdminController
           running_total += sales
           timestamp = date.to_time.to_i * 1000
           cumulative_sales << { x: timestamp, y: running_total }
-          daily_bars << { x: timestamp, y: running_total }
+          daily_bars << { x: timestamp, y: sales }  # Changed to show daily sales
         end
 
         max_commission_range = @commission_ranges.map { |range| range.max_sales || range.min_sales * 2 }.max
@@ -103,7 +103,7 @@ class Admin::DashboardsController < Admin::AdminController
               data: daily_bars
             },
             {
-              name: "Ventas acumuladas",
+              name: "Ventas diarias acumuladas",
               type: "line",
               data: cumulative_sales
             }
