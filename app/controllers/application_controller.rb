@@ -1,6 +1,9 @@
 class ApplicationController < ActionController::Base
   rescue_from ActiveRecord::RecordNotFound, with: :render_not_found
   rescue_from ActionView::Template::Error, with: :render_not_found
+  rescue_from ArgumentError, with: :handle_argument_error
+  rescue_from ActionDispatch::Http::MimeNegotiation::InvalidType, with: :handle_invalid_mime_type
+
   helper Railsui::ThemeHelper
 
   protect_from_forgery with: :exception
@@ -32,6 +35,23 @@ class ApplicationController < ActionController::Base
       render file: "#{Rails.root}/public/404.html", status: :not_found, layout: false
     else
       raise
+    end
+  end
+
+  def handle_argument_error(exception)
+    if exception.message.include?("invalid byte sequence in UTF-8")
+      Rails.logger.error "Encoding Error: #{exception.message}"
+      render :head
+    else
+      # Re-raise if it's not an encoding error
+      raise exception
+    end
+  end
+
+  def handle_invalid_mime_type(exception)
+    Rails.logger.error "Invalid MIME type error: #{exception.message}"
+    respond_to do |format|
+      format.any  { head :bad_request }
     end
   end
 
