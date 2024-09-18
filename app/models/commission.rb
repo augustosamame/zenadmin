@@ -4,6 +4,7 @@ class Commission < ApplicationRecord
 
   belongs_to :user
   belongs_to :order
+  has_one :location, through: :order
   has_one :commission_payout, dependent: :destroy
 
   enum :status, { status_order_unpaid: 0, status_order_paid: 1, status_paid_out: 2 }

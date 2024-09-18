@@ -11,7 +11,7 @@ class Admin::DashboardsController < Admin::AdminController
     end
     set_sales_variables
     set_chart_data
-    Rails.logger.debug "Company Goals: #{@company_goals.inspect}"
+    set_seller_commissions_list
   end
 
   def set_location
@@ -30,8 +30,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     set_sales_variables
     set_chart_data
-
-    Rails.logger.debug "Company Goals: #{@company_goals.inspect}"
+    set_seller_commissions_list
 
     respond_to do |format|
       format.turbo_stream do
@@ -41,8 +40,8 @@ class Admin::DashboardsController < Admin::AdminController
           turbo_stream.replace("sales_amount_this_month", partial: "sales_amount_this_month"),
           turbo_stream.replace("sales_average_per_day_this_month", partial: "sales_average_per_day_this_month"),
           turbo_stream.replace("sales_dashboard_notification_feed", partial: "sales_dashboard_notification_feed"),
-          turbo_stream.replace("commission_targets_graph", partial: "commission_targets_graph")
-
+          turbo_stream.replace("commission_targets_graph", partial: "commission_targets_graph"),
+          turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_list")
         ]
       end
       format.html { redirect_to admin_sales_dashboard_path }
@@ -56,6 +55,17 @@ class Admin::DashboardsController < Admin::AdminController
       set_sales_amount_variables
       set_sales_amount_this_month_variables
       set_sales_daily_average_this_month_variables
+    end
+
+    def set_seller_commissions_list
+      if @selected_location.present?
+      @seller_commissions_list = Commission.joins(:order)
+                                       .where(orders: { location_id: @selected_location&.id })
+                                       .order(created_at: :desc)
+                                       .limit(5)
+      else
+        @seller_commissions_list = Commission.all.order(created_at: :desc).limit(5)
+      end
     end
 
     def set_chart_data

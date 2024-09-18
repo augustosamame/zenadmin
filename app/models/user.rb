@@ -68,6 +68,10 @@ class User < ApplicationRecord
     self.roles.where(name: [ "admin", "super_admin" ]).any?
   end
 
+  def roles_names
+    self.roles.pluck(:name).join(", ")
+  end
+
   private
 
   def set_login

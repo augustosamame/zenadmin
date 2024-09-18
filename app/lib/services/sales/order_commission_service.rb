@@ -14,7 +14,7 @@ module Services
         sellers = sellers_hash
 
         sellers.each do |seller_data|
-          seller_comission_percentage = CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: @order.location).sales_on_month_for_location, @order.location)&.commission_percentage || 0
+          seller_comission_percentage = CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: @order.location).sales_on_month_for_location, @order.location, @order.order_date)&.commission_percentage || 0
 
           seller_id = seller_data[:user_id] || seller_data[:id]
           percentage = seller_data[:percentage]
