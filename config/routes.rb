@@ -86,7 +86,7 @@ Rails.application.routes.draw do
 
     resources :cashier_transactions, only: [ :new, :create ]
     resources :commissions, only: [ :index, :show ]
-
+    resources :loyalty_tiers
     resources :invoicers do
       get "invoice_series", on: :member
     end

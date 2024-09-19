@@ -10,6 +10,7 @@ export default class extends Controller {
   static resourceMappings = resourceMappings;
 
   connect() {
+    console.log("Datatable controller connected");
     this.initializeMoment();
     this.initializeDataTable();
   }

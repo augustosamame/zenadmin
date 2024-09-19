@@ -1,0 +1,35 @@
+<%= render "shared/admin/nav", { header_title: "Rangos de Loyalty" } do %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rango</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cant de Compras</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto Total</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Descuento</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto Gratis</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
+          <th class="px-4 py-2 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @loyalty_tiers.each do |loyalty_tier| %>
+          <tr>
+            <td class="px-4 py-2"><%= loyalty_tier.name %></td>
+            <td class="px-4 py-2"><%= loyalty_tier.requirements_orders_count %></td>
+            <td class="px-4 py-2"><%= loyalty_tier.requirements_total_amount %></td>
+            <td class="px-4 py-2"><%= number_to_percentage(loyalty_tier.discount_percentage_integer, precision: 0) %></td>
+            <td class="px-4 py-2"><%= loyalty_tier.free_product&.name || 'N/A' %></td>
+            <td class="px-4 py-2"><%= loyalty_tier.status.capitalize %></td>
+            <td class="px-4 py-2">
+              <%= render partial: "admin/loyalty_tiers/actions", locals: { loyalty_tier: loyalty_tier, default_object_options_array: @default_object_options_array } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

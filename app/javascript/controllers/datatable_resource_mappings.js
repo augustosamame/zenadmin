@@ -1,4 +1,9 @@
 export const resourceMappings = {
+  LoyaltyTier: {
+    buttonText: "Crear Rangos de Loyalty",
+    buttonUrl: "/admin/loyalty_tiers/new",
+    ajaxUrl: "/admin/loyalty_tiers.json"
+  },
   Product: {
     buttonText: "Crear Producto",
     buttonUrl: "/admin/products/new",

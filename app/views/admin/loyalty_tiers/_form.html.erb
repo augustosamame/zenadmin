@@ -1,0 +1,37 @@
+<%= simple_form_for [:admin, loyalty_tier] do |f| %>
+<%= render 'shared/form_errors', model: loyalty_tier %>
+
+  <div class="grid grid-cols-1 gap-4">
+    <!-- Name Field -->
+    <div>
+      <%= f.input :name, label: "Name", required: true, input_html: { class: "form-input" } %>
+    </div>
+
+    <!-- Requirements Orders Count -->
+    <div>
+      <%= f.input :requirements_orders_count, label: "Cant de Compras en últimos 12 meses", input_html: { class: "form-input", type: "number", min: 0 } %>
+    </div>
+
+    <!-- Requirements Total Amount -->
+    <div>
+      <%= f.input :requirements_total_amount, label: "Monto de Compras en últimos 12 meses", input_html: { class: "form-input" } %>
+    </div>
+
+    <!-- Discount Percentage -->
+    <div>
+      <%= f.input :discount_percentage_integer, label: "% Descuento (opcional)", input_html: { class: "form-input", step: "1", min: 0, max: 100 } %>
+    </div>
+        <!-- Free Product Field -->
+    <div>
+      <%= f.input :free_product_id, label: "Producto Gratis (opcional)", as: :select, collection: Product.all.map { |p| [p.name, p.id] }, include_blank: true, input_html: { data: { controller: "select" }, class: "form-select" } %>
+    </div>
+        <!-- Status Field -->
+    <div>
+      <%= f.input :status, collection: LoyaltyTier.statuses.keys.map { |s| [s.capitalize, s] }, label: "Estado", prompt: "Selecciona Estado", input_html: { data: { controller: "select" }, class: "form-select" } %>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= f.button :submit, "Guardar", class: "btn btn-primary" %>
+  </div>
+<% end %>
