@@ -39,6 +39,7 @@ class Order < ApplicationRecord
 
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
+  after_commit :update_loyalty_tier, if: :paid?, on: [ :create, :update, :destroy ]
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
 
@@ -75,11 +76,15 @@ class Order < ApplicationRecord
   end
 
   def customer
-    Customer.find(user_id)&.user
+    Customer.find_by(user_id: self.user_id)&.user
   end
 
   def set_defaults
     self.order_date ||= Time.zone.now
+  end
+
+  def update_loyalty_tier
+    Services::Sales::LoyaltyTierService.new(self.user).update_loyalty_tier
   end
 
   def determine_order_invoices_matrix

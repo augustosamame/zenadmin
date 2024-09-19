@@ -11,6 +11,10 @@ class User < ApplicationRecord
   has_many :commissions, dependent: :destroy
   has_many :commissioned_orders, through: :commissions, source: :order
   belongs_to :location, optional: true
+  belongs_to :loyalty_tier, optional: true
+  has_many :user_free_products
+  has_many :orders
+
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

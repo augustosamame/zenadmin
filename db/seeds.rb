@@ -69,7 +69,7 @@ warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", locati
 
 cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
 
-3.times do
+4.times do
   Product.transaction do
     # Create a new Product
     product = Product.new(
@@ -196,11 +196,18 @@ SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: superviso
 SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_I", currency: "PEN", target_commission: 5.0)
 SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_II", currency: "PEN", target_commission: 5.0)
 
+random_products = Product.order("RANDOM()").limit(4).pluck(:id)
+
+LoyaltyTier.find_or_create_by!(name: 'Silver', requirements_orders_count: 20, requirements_total_amount: 2000, discount_percentage: 0.10, free_product_id: random_products[0])
+LoyaltyTier.find_or_create_by!(name: 'Gold', requirements_orders_count: 30, requirements_total_amount: 3000, discount_percentage: 0.15, free_product_id: random_products[1])
+LoyaltyTier.find_or_create_by!(name: 'Platinum', requirements_orders_count: 40, requirements_total_amount: 4000, discount_percentage: 0.20, free_product_id: random_products[2])
+LoyaltyTier.find_or_create_by!(name: 'Diamond', requirements_orders_count: 50, requirements_total_amount: 5000, discount_percentage: 0.25, free_product_id: random_products[3])
+
 for i in 1..50
   days_ago = rand(1..30)
   sales_price_cents = rand(1000..10000)
   created_time = Time.now - days_ago.days
-  Order.create!(user_id: generic_customer_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
+  Order.create!(user_id: generic_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
 end
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

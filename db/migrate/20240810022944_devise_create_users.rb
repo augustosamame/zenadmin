@@ -3,6 +3,8 @@
 class DeviseCreateUsers < ActiveRecord::Migration[7.2]
   def change
     create_table :users do |t|
+      t.references :loyalty_tier, foreign_key: true, index: true
+
       ## Database authenticatable
       t.string :email
       t.string :phone

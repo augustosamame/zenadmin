@@ -198,6 +198,7 @@ export default class extends Controller {
     });
 
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    console.log('selectedCustomerId', selectedCustomerId);
     const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
     const selectedSellers = JSON.parse(sellersButton.dataset.sellers || '[]');

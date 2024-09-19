@@ -30,7 +30,12 @@ class Admin::OrdersController < Admin::AdminController
       if @order.origin == "pos"
         # POS context: current_user is the seller, user_id is provided
         @order.seller_id = current_user.id
-        @order.user_id ||= User.find(get_generic_customer_id)&.id
+        if @order.user_id.blank?
+          @order.user_id = User.find(get_generic_customer_id)&.id
+        else
+          # id passed is actually the customer id
+          @order.user_id = Customer.find(@order.user_id)&.user_id
+        end
         @order.location_id = @current_location.id
       elsif @order.origin == "ecommerce"
         # eCommerce context: current_user is the eCommerce store, user_id is not provided
@@ -100,7 +105,7 @@ class Admin::OrdersController < Admin::AdminController
 
     def get_generic_customer_id
       # Logic to find the generic customer (guest)
-      User.find_by!(email: "generic_customer@devtechperu.com")&.customer&.id
+      User.find_by!(email: "generic_customer@devtechperu.com")&.id
     end
 
     def get_ecommerce_store_seller_id
