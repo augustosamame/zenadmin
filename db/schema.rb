@@ -769,7 +769,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_19_102131) do
     t.bigint "user_id", null: false
     t.bigint "product_id", null: false
     t.bigint "loyalty_tier_id", null: false
-    t.datetime "received_at"
+    t.datetime "claimed_at"
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

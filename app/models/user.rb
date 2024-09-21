@@ -76,6 +76,10 @@ class User < ApplicationRecord
     self.roles.pluck(:name).join(", ")
   end
 
+  def total_order_amount
+    Money.new(total_order_amount_cents || 0, "PEN") # Replace 'PEN' with your default currency if different
+  end
+
   private
 
   def set_login

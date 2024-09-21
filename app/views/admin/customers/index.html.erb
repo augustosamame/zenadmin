@@ -1,3 +1,5 @@
+
+
 <%= render "shared/admin/nav", { header_title: "Clientes" } do %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
@@ -13,6 +15,9 @@
           <th class="px-4 py-2 text-left">Móvil</th>
           <th class="px-4 py-2 text-left">Tipo Doc</th>
           <th class="px-4 py-2 text-left">Num Doc</th>
+          <th class="px-4 py-2 text-left">Rango de Loyalty</th>
+          <th class="px-4 py-2 text-left">Cant de Compras</th>
+          <th class="px-4 py-2 text-left">Monto Total</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
@@ -26,6 +31,9 @@
             <td class="px-4 py-2"><%= user.phone %></td>
             <td class="px-4 py-2"><%= user&.customer&.doc_type %></td>
             <td class="px-4 py-2"><%= user&.customer&.doc_id %></td>
+            <td class="px-4 py-2"><%= user&.loyalty_tier&.name %></td>
+            <td class="px-4 py-2"><%= user.orders_count %></td>
+            <td class="px-4 py-2"><%= format_currency(user.total_order_amount) %></td>
             <td class="px-4 py-2"><%= user.translated_status %></td>
             <td class="px-4 py-2">
               <%= render partial: "admin/customers/actions", locals: { user: user, default_object_options_array: @default_object_options_array } %>

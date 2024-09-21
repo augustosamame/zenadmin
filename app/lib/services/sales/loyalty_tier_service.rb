@@ -5,11 +5,22 @@ module Services
         @user = user
       end
 
+      def self.update_all_users_loyalty_tiers
+        User.find_each do |user|
+          new(user).update_loyalty_tier # necessary to use new(user) because @user will be used in the method
+        end
+      end
+
       def update_loyalty_tier
         qualifying_tier = find_qualifying_tier
-        if qualifying_tier.present? && (qualifying_tier.id != @user.loyalty_tier_id)
-          @user.update!(loyalty_tier: qualifying_tier)
-          assign_perks if qualifying_tier.present?
+        if qualifying_tier.present?
+          if qualifying_tier.id != @user.loyalty_tier_id
+            @user.update!(loyalty_tier: qualifying_tier)
+            assign_perks
+          end
+        else
+          @user.update!(loyalty_tier: nil)
+          @user.user_free_products.destroy_all
         end
       end
 
@@ -34,7 +45,7 @@ module Services
             tier = @user.loyalty_tier
             user_free_product = @user.user_free_products.find_by(product: product, loyalty_tier: tier)
             if user_free_product.present?
-              user_free_product.update(status: :claimed)
+              user_free_product.update(status: :claimed, claimed_at: Time.current)
             end
           end
         end

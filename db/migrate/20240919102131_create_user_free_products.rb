@@ -4,7 +4,7 @@ class CreateUserFreeProducts < ActiveRecord::Migration[7.2]
       t.references :user, null: false, foreign_key: true
       t.references :product, null: false, foreign_key: true
       t.references :loyalty_tier, null: false, foreign_key: true
-      t.datetime :received_at
+      t.datetime :claimed_at
       t.integer :status, default: 0
 
       t.timestamps

@@ -13,9 +13,6 @@
       <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
-      <%= nav_link_to "Clientes", send("admin_customers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
       <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
@@ -55,6 +52,9 @@
     </li>
     <li>
       <%= nav_link_to "Turnos de Caja", send("admin_cashier_shifts_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Clientes", send("admin_customers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
       <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>

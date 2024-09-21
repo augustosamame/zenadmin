@@ -21,4 +21,8 @@ every :monday, at: "9am" do # Use any day of the week or :weekend, :weekday
   runner "Services::Inventory::AutomaticRequisitionsService.create_weekly_requisitions"
 end
 
+every :day, at: "8am" do
+  runner "Services::Sales::LoyaltyTierService.update_all_users_loyalty_tiers"
+end
+
 # Learn more: http://github.com/javan/whenever

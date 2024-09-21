@@ -2,7 +2,14 @@ class Admin::CustomersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @users = User.includes([ :customer ]).where(internal: false).with_role("customer")
+        @users = User.includes([ :customer, :loyalty_tier ])
+                     .where(internal: false)
+                     .with_role("customer")
+                     .select("users.*,
+                              COUNT(DISTINCT orders.id) as orders_count,
+                              COALESCE(SUM(orders.total_price_cents), 0) as total_order_amount_cents")
+                     .left_joins(:orders)
+                     .group("users.id")
         @datatable_options = "resource_name:'Customer';hide_0;sort_0_desc;"
       end
       format.json do
