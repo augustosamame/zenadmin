@@ -36,8 +36,7 @@ class Product < ApplicationRecord
   monetize :discounted_price_cents, with_model_currency: :currency
 
   pg_search_scope :search_by_custom_id_and_name, against: [ :custom_id, :name ], using: {
-      tsearch: { prefix: true, any_word: true },
-      trigram: { threshold: 0.1 }
+      tsearch: { prefix: true, any_word: false }
   }, ignoring: :accents
 
   scope :tagged_with, ->(tag_name) {

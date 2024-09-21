@@ -105,6 +105,7 @@ namespace :deploy do
             execute :rake, "assets:precompile"
             invoke "deploy:yarn_install"
             invoke "deploy:yarn_build"
+            execute :yarn, "run build:css:prod"
           end
         end
       end

@@ -1,6 +1,11 @@
 <div id="product-grid" data-pos--payment-target="productGrid" data-controller="pos--product-grid">
-  <!-- Search Bar -->
-  <input type="text" placeholder="Buscar Productos..." class="w-full p-2 mb-4 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
+  <!-- Search Bar with Clear Button -->
+  <div class="relative mb-4">
+    <input type="text" placeholder="Buscar Productos..." class="w-full p-2 pr-10 text-black bg-white rounded dark:bg-gray-800 dark:text-white" data-pos--product-grid-target="search" data-action="input->pos--product-grid#searchProducts">
+    <button class="absolute inset-y-0 right-0 flex items-center px-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200" data-action="click->pos--product-grid#clearSearch" data-pos--product-grid-target="clearButton">
+      <span class="text-xl font-bold">×</span>
+    </button>
+  </div>
 
   <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4" data-pos--product-grid-target="productContainer">
     <!-- Products will be rendered here -->

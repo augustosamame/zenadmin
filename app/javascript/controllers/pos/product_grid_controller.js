@@ -1,18 +1,54 @@
 import { Controller } from '@hotwired/stimulus'
 import axios from 'axios'
+import debounce from 'lodash/debounce'
 
 export default class extends Controller {
-  static targets = ['search', 'product', 'productContainer']
+  static targets = ['search', 'product', 'productContainer', 'clearButton']
 
   connect() {
     console.log('Connected to the POS product grid controller!')
     this.searchTarget.focus()
     this.loadProducts()
+    this.updateClearButtonVisibility()
+    this.debouncedSearch = debounce(this.performSearch, 300)
+    this.beepSound = document.getElementById('barcode-add-sound')
   }
 
   searchProducts() {
-    const query = this.searchTarget.value
+    const query = this.searchTarget.value.trim()
+    // Trim the query and check again
+    
+    if (query.length >= 7) {
+      console.log('Searching for exact match:', query)
+      this.findExactMatch(query)
+    } else {
+      console.log('Performing regular search:', query)
+      this.debouncedSearch(query)
+    }
+
+    this.updateClearButtonVisibility()
+  }
+
+  performSearch = (query) => {
     this.loadProducts(query)
+  }
+
+  findExactMatch(query) {
+    axios.get('/admin/products/search', { params: { query: query, exact_match: true } })
+      .then(response => {
+        if (response.data.length === 1) {
+          // If exactly one product is found, add it to the order
+          this.addProductToOrder(response.data[0])
+          this.clearSearch()
+          this.beepSound.play()
+        } else {
+          // If no exact match or multiple matches, perform a regular search
+          this.renderProducts(response.data)
+        }
+      })
+      .catch(error => {
+        console.error('There was an error fetching the product:', error)
+      })
   }
 
   loadProducts(query = '') {
@@ -23,6 +59,21 @@ export default class extends Controller {
       .catch(error => {
         console.error('There was an error fetching the products:', error)
       })
+  }
+
+  clearSearch() {
+    this.searchTarget.value = ''
+    this.loadProducts()
+    this.updateClearButtonVisibility()
+    this.searchTarget.focus()
+  }
+
+  updateClearButtonVisibility() {
+    if (this.searchTarget.value) {
+      this.clearButtonTarget.classList.remove('hidden')
+    } else {
+      this.clearButtonTarget.classList.add('hidden')
+    }
   }
 
   renderProducts(products) {

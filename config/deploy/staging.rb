@@ -7,7 +7,7 @@
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
 
-server "35.173.198.98", user: "deploy", roles: %w[app db web], ssh_options: { keys: [ "/Users/augusto/Documents/Credentials/AWS/jardindelzen.pem" ], user: "deploy", port: 1222, keepalive: true }
+server "52.1.115.249", user: "deploy", roles: %w[app db web], ssh_options: { keys: [ "/Users/augusto/Documents/Credentials/AWS/jardindelzen.pem" ], user: "deploy", port: 1222, keepalive: true }
 
 
 
