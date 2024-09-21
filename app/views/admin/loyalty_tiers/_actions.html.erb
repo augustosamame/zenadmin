@@ -7,7 +7,7 @@
       class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
     <% default_object_options_array.each do |option| %>
       <li>
-        <%= link_to "#", data: { action: "click->dropdown#handleAction", object_id: loyalty_tier.id, event_name: option[:event_name] }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+        <%= link_to "#", data: { action: "click->dropdown#handleAction", object_id: loyalty_tier.id, event_name: option[:event_name], edit_url: edit_admin_loyalty_tier_path(loyalty_tier), destroy_url: admin_loyalty_tier_path(loyalty_tier) }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
           <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
           <span><%= option[:label] %></span>
         <% end %>

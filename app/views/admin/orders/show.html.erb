@@ -62,7 +62,7 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <% @order.order_items.each do |item| %>
+        <% @order.order_items.includes(:product).each do |item| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.product.name %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.quantity %></td>

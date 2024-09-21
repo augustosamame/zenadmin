@@ -8,7 +8,7 @@ class Admin::CustomersController < Admin::AdminController
       format.json do
         @customers = User.with_role("customer")
         # query for customers modal in pos
-        render json: @customers.select(:id, :first_name, :last_name, :email, :phone)
+        render json: @customers.select(:id, :first_name, :last_name, :email, :phone, :user_id)
       end
       format.turbo_stream do
         render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes([ :user ]).all })

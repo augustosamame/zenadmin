@@ -147,20 +147,20 @@ class Admin::DashboardsController < Admin::AdminController
     end
 
     def set_sales_amount_variables
-      @sales_amount = filtered_orders.where(order_date: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).sum(:total_price_cents) / 100.0
-      sales_amount_yesterday = filtered_orders.where(order_date: 1.day.ago.beginning_of_day..1.day.ago.end_of_day).sum(:total_price_cents) / 100.0 || 0
+      @sales_amount = (filtered_orders.where(order_date: Time.zone.now.beginning_of_day..Time.zone.now.end_of_day).sum(:total_price_cents) / 100.0).round(2)
+      sales_amount_yesterday = (filtered_orders.where(order_date: 1.day.ago.beginning_of_day..1.day.ago.end_of_day).sum(:total_price_cents) / 100.0 || 0).round(2)
       sales_amount_change_since_yesterday = @sales_amount - sales_amount_yesterday
       @sales_amount_change_since_yesterday = format_change(sales_amount_change_since_yesterday)
 
-      sales_amount_last_month = filtered_orders.where(order_date: 1.month.ago.beginning_of_day..1.month.ago.end_of_day).sum(:total_price_cents) / 100.0 || 0
+      sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_day..1.month.ago.end_of_day).sum(:total_price_cents) / 100.0 || 0).round(2)
       sales_amount_change_since_last_month = @sales_amount - sales_amount_last_month
       @sales_amount_change_since_last_month = format_change(sales_amount_change_since_last_month)
     end
 
     def set_sales_amount_this_month_variables
       Rails.logger.info("Setting sales amount this month variables")
-      @sales_amount_this_month = filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0
-      @sales_amount_last_month = filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0
+      @sales_amount_this_month = (filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0).round(2)
+      @sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0).round(2)
       @sales_amount_change_since_last_month = @sales_amount_this_month - @sales_amount_last_month
       @sales_amount_change_since_last_month = format_change(@sales_amount_change_since_last_month)
       @sales_amount_change_since_last_month_percentage = calculate_percentage_change(@sales_amount_this_month, @sales_amount_last_month)
@@ -171,8 +171,8 @@ class Admin::DashboardsController < Admin::AdminController
       days_this_month = Time.days_in_month(Time.zone.now.month)
       days_last_month = Time.days_in_month(1.month.ago.month)
 
-      sales_amount_this_month = filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0
-      sales_amount_last_month = filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0
+      sales_amount_this_month = (filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0).round(2)
+      sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0).round(2)
 
       @sales_daily_average_this_month = (sales_amount_this_month / days_this_month).round(2)
       @sales_daily_average_last_month = (sales_amount_last_month / days_last_month).round(2)
@@ -193,7 +193,7 @@ class Admin::DashboardsController < Admin::AdminController
         "+0"
       else
         if value.is_a?(Integer) || value.is_a?(Float)
-          value >= 0 ? "+#{value}" : "#{value}"
+          value >= 0 ? "+#{value.round(2)}" : "#{value.round(2)}"
         else
           if value.to_f >= 0
             "+#{value.to_f}%"

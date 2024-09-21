@@ -7,6 +7,7 @@ class CreateOrderItems < ActiveRecord::Migration[7.2]
       t.integer :price_cents
       t.integer :discounted_price_cents
       t.string :currency, default: "PEN"
+      t.boolean :is_loyalty_free, default: false
 
       t.timestamps
     end

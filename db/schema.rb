@@ -402,6 +402,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_19_102131) do
     t.integer "price_cents"
     t.integer "discounted_price_cents"
     t.string "currency", default: "PEN"
+    t.boolean "is_loyalty_free", default: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["order_id"], name: "index_order_items_on_order_id"

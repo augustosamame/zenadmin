@@ -40,6 +40,7 @@ class Order < ApplicationRecord
   # Update commissions when the order is marked as paid
   after_commit :update_commissions_status, if: :paid?
   after_commit :update_loyalty_tier, if: :paid?, on: [ :create, :update, :destroy ]
+  after_commit :update_free_product_availability, if: :paid?, on: [ :create ]
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
 
@@ -85,6 +86,12 @@ class Order < ApplicationRecord
 
   def update_loyalty_tier
     Services::Sales::LoyaltyTierService.new(self.user).update_loyalty_tier
+  end
+
+  def update_free_product_availability
+    if self.order_items.any? { |item| item.is_loyalty_free.present? }
+      Services::Sales::LoyaltyTierService.new(self.user).update_free_product_availability(self)
+    end
   end
 
   def determine_order_invoices_matrix

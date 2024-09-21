@@ -120,6 +120,7 @@ export default class extends Controller {
   selectObject(event) {
     const selectedRow = event.currentTarget.closest('tr');
     const objectId = selectedRow.dataset.objectId;
+    const userId = selectedRow.dataset.userId;
     const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
     const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
     const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
@@ -128,6 +129,7 @@ export default class extends Controller {
     // Update the Cliente button
     const clienteButton = document.querySelector('[data-action="click->customer-table-modal#open"]');
     clienteButton.dataset.selectedObjectId = objectId;
+    clienteButton.dataset.selectedUserId = userId;
     clienteButton.dataset.selectedRuc = ruc;
 
     // Keep the existing icon and update the text
@@ -136,6 +138,14 @@ export default class extends Controller {
     `;
     clienteButton.classList.add('bg-blue-500', 'text-white');
     clienteButton.classList.remove('bg-white');
+
+    const customerSelectedEvent = new CustomEvent('customer-selected', {
+      bubbles: true,
+      detail: { userId: userId }
+    });
+    this.element.dispatchEvent(customerSelectedEvent);
+
+    console.log('Customer selected event dispatched', { userId: userId });
 
     // Close the modal
     this.close(event);

@@ -80,6 +80,12 @@ class Admin::UsersController < Admin::AdminController
     render json: users.map { |user| { id: user.id, name: user.name } }
   end
 
+  def loyalty_info
+    @user = User.find(params[:id])
+    loyalty_service = Services::Sales::LoyaltyTierService.new(@user)
+    render json: loyalty_service.loyalty_info
+  end
+
   private
 
     def set_user

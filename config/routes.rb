@@ -39,7 +39,11 @@ Rails.application.routes.draw do
       end
     end
     resources :payment_methods
-    resources :users
+    resources :users do
+      member do
+        get "loyalty_info"
+      end
+    end
     get "sellers", to: "users#sellers"
     resources :customers
     post "pos_create_customer", to: "users#create_customer"

@@ -12,6 +12,12 @@
     <!-- Container for dynamically added items -->
     <div data-pos--order-items-target="items" class="flex-grow overflow-auto"></div>
 
+    <!-- Discount Row -->
+    <div data-pos--order-items-target="discountRow" class="flex justify-between hidden pt-2 mt-2 border-t dark:border-gray-600">
+      <span>Descuento:</span>
+      <span data-pos--order-items-target="discountAmount">S/ 0.00</span>
+    </div>
+
     <!-- Total (Aligned at the Bottom) -->
     <div class="flex justify-between pt-4 mt-4 text-2xl border-t dark:border-gray-600">
       <span>Total:</span>

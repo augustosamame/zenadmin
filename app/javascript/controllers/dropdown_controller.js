@@ -34,18 +34,33 @@ export default class extends Controller {
   handleAction(event) {
     event.preventDefault()
 
+    const eventName = event.currentTarget.dataset.eventName
+    const editUrl = event.currentTarget.dataset.editUrl
+    const destroyUrl = event.currentTarget.dataset.destroyUrl
     this.menuTarget.classList.add('hidden') // Hide the dropdown
 
     // Dispatch to the appropriate handler based on the event name
     if (this[eventName]) {
-      this[eventName]()
+      this[eventName](editUrl, destroyUrl)
     } else {
       console.warn(`No handler defined for event: ${eventName}`)
     }
   }
 
-  edit() {
-    // Implement edit logic here
+  edit(editUrl) {
+    if (editUrl) {
+      window.location.href = editUrl
+    } else {
+      console.warn('No edit URL provided')
+    }
+  }
+
+  destroy(destroyUrl) {
+    if (destroyUrl) {
+      window.location.href = destroyUrl
+    } else {
+      console.warn('No destroy URL provided')
+    }
   }
 
   message() {

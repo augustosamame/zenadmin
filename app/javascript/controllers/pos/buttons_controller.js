@@ -6,9 +6,15 @@ export default class extends Controller {
   connect() {
     console.log('Connected to the POS buttons controller!');
     // setup listeners for calls from other controllers
-    this.element.addEventListener('clear-selected-user', this.clearSelectedUser.bind(this));
+    this.element.addEventListener('clear-selected-user', this.handleClearSelectedUser.bind(this));
+
 
     this.checkForDraftOrder();
+  }
+
+  handleClearSelectedUser(event) {
+    this.clearSelectedUser();
+    this.clearLoyaltyInfo();
   }
 
   showDraftButton() {
@@ -79,6 +85,21 @@ export default class extends Controller {
     // Remove selected customer data
     clienteButton.removeAttribute('data-selected-object-id');
     console.log('Selected user cleared.');
+  }
+
+  clearLoyaltyInfo() {
+    console.log('Clearing loyalty info...');
+    const loyaltyInfoContainer = document.querySelector('[data-controller="pos--loyalty-info"]');
+    if (loyaltyInfoContainer) {
+      const loyaltyInfoController = this.application.getControllerForElementAndIdentifier(loyaltyInfoContainer, 'pos--loyalty-info');
+      if (loyaltyInfoController && typeof loyaltyInfoController.clearLoyaltyInfo === 'function') {
+        loyaltyInfoController.clearLoyaltyInfo();
+      } else {
+        console.warn('Loyalty info controller or clearLoyaltyInfo method not found');
+      }
+    } else {
+      console.warn('Loyalty info container not found');
+    }
   }
 
 

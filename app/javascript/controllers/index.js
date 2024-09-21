@@ -82,6 +82,9 @@ application.register("nested-form", NestedFormController)
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
+import Pos__LoyaltyInfoController from "./pos/loyalty_info_controller"
+application.register("pos--loyalty-info", Pos__LoyaltyInfoController)
+
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 

@@ -2,7 +2,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ['items', 'total'];
+  static targets = ['items', 'total', 'loyaltyInfo', 'discountRow', 'discountAmount'];
 
   connect() {
     console.log('Connected to OrderItemsController!', this.element);
@@ -21,11 +21,40 @@ export default class extends Controller {
     this.isReplacingQuantity = false;
     this.priceJustSelected = true;
     this.calculateTotal();
+    this.discountPercentage = 0;
+    this.setupLoyaltyEventListeners();
+  }
+
+  setupLoyaltyEventListeners() {
+    document.addEventListener('apply-loyalty-discount', this.handleLoyaltyDiscount.bind(this));
+    document.addEventListener('add-loyalty-free-product', this.handleLoyaltyFreeProduct.bind(this));
+  }
+
+  handleLoyaltyDiscount(event) {
+    this.discountPercentage = event.detail.discountPercentage;
+    this.calculateTotal();
+  }
+
+  handleLoyaltyFreeProduct(event) {
+    const { productId, productName, productCustomId } = event.detail;
+    this.addItem({
+      id: productId,
+      custom_id: productCustomId,
+      name: productName,
+      price: 0,
+      quantity: 1,
+      isLoyaltyFree: true
+    });
+  }
+
+  applyDiscount(event) {
+    this.discountPercentage = parseFloat(event.currentTarget.dataset.discount);
+    this.calculateTotal();
   }
 
   addItem(product) {
     const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.custom_id}"]`);
-
+    
     if (existingItem) {
       this.updateExistingItem(existingItem, product);
     } else {
@@ -38,6 +67,11 @@ export default class extends Controller {
     const buttonsController = this.application.getControllerForElementAndIdentifier(buttonsElement, 'pos--buttons');
     if (buttonsController) {
       buttonsController.hideDraftButton();
+    }
+
+    if (product.isLoyaltyFree) {
+      const itemElement = existingItem || this.itemsTarget.lastChild;
+      itemElement.setAttribute('data-item-loyalty-free', 'true');
     }
 
     this.calculateTotal();
@@ -214,13 +248,38 @@ export default class extends Controller {
   }
 
   calculateTotal() {
-    let total = 0;
-    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+    let subtotal = 0;
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+
+    if (items.length === 0) {
+      // No items in the order
+      this.discountRowTarget.classList.add('hidden');
+      this.totalTarget.textContent = 'S/ 0.00';
+      return;
+    }
+
+    items.forEach(item => {
       console.log('inside calculateTotal, item:', item);
-      const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
-      console.log('Subtotal:', subtotal);
-      total += subtotal;
+      const itemSubtotalElement = item.querySelector('[data-item-subtotal]');
+      if (itemSubtotalElement) {
+        const itemSubtotal = parseFloat(itemSubtotalElement.textContent.replace('S/ ', ''));
+        console.log('Subtotal:', itemSubtotal);
+        if (!isNaN(itemSubtotal)) {
+          subtotal += itemSubtotal;
+        }
+      }
     });
+
+    const discountAmount = subtotal * (this.discountPercentage / 100);
+    const total = subtotal - discountAmount;
+
+    if (this.discountPercentage > 0) {
+      this.discountRowTarget.classList.remove('hidden');
+      this.discountAmountTarget.textContent = `(S/ ${discountAmount.toFixed(2)})`;
+    } else {
+      this.discountRowTarget.classList.add('hidden');
+    }
+
     this.totalTarget.textContent = `S/ ${total.toFixed(2)}`;
   }
 
@@ -265,12 +324,14 @@ export default class extends Controller {
       const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim());
       const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
+      const isLoyaltyFree = item.hasAttribute('data-loyalty-free-product');
 
-      orderItems.push({ id, name, custom_id, quantity, price, subtotal });
+      orderItems.push({ id, name, custom_id, quantity, price, subtotal, isLoyaltyFree });
     });
 
     return {
       total_price: parseFloat(this.totalTarget.textContent.replace('S/ ', '')),
+      discount_percentage: this.discountPercentage,
       order_items_attributes: orderItems
     };
   }
