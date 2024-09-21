@@ -5,7 +5,7 @@ gem "rails", "~> 7.2.1"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # Use postgresql as the database for Active Record
-gem "pg", "~> 1.1"
+gem "pg", "~> 1.5.8"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", "6.4.3"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
@@ -14,7 +14,7 @@ gem "turbo-rails", "~> 2.0.9"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails", "~> 1.3.4"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
-gem "jbuilder"
+gem "jbuilder", "~> 2.13.0"
 # Use Redis adapter to run Action Cable in production
 gem "redis", ">= 5.3"
 
@@ -50,7 +50,7 @@ gem "simple_form", "~> 5.3.1"
 gem "money-rails", "~> 1.15.0"
 gem "pg_search", "~> 2.3.7"
 gem "hashids"
-gem "aws-sdk-s3", "~> 1.163.0"
+gem "aws-sdk-s3", "~> 1.164.0"
 gem "shrine", "~> 3.6.0"
 gem "marcel", "~> 1.0.4" # MIME type detection
 gem "ruby-vips", "~> 2.2.2"

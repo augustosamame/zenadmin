@@ -22,7 +22,7 @@ module Services
           current_tier_id: current_tier&.id,
           current_tier_name: current_tier&.name || "Sin Rango Actual",
           progress_to_next_tier: progress_to_next_tier(next_tier),
-          discount_percentage: current_tier&.discount_percentage * 100,
+          discount_percentage: current_tier&.discount_percentage.present? ? current_tier&.discount_percentage * 100 : 0,
           free_product: free_product_info(current_tier)
         }
       end
