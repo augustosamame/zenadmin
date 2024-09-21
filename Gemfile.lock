@@ -345,7 +345,7 @@ GEM
     parser (3.3.4.2)
       ast (~> 2.4.1)
       racc
-    pg (1.5.7)
+    pg (1.5.8)
     pg_search (2.3.7)
       activerecord (>= 6.1)
       activesupport (>= 6.1)
@@ -567,7 +567,7 @@ DEPENDENCIES
   kaminari (~> 1.2.2)
   marcel (~> 1.0.4)
   money-rails (~> 1.15.0)
-  pg (~> 1.1)
+  pg (~> 1.5)
   pg_search (~> 2.3.7)
   puma (= 6.4.3)
   rack-cors (~> 2.0.2)
