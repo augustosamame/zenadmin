@@ -33,7 +33,6 @@ export default class extends Controller {
 
   handleAction(event) {
     event.preventDefault()
-
     const eventName = event.currentTarget.dataset.eventName
     const editUrl = event.currentTarget.dataset.editUrl
     const destroyUrl = event.currentTarget.dataset.destroyUrl

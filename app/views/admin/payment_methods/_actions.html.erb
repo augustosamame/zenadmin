@@ -5,17 +5,13 @@
   </button>
   <ul data-dropdown-target="menu"
       class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
-    <li>
-      <%= link_to edit_admin_payment_method_path(payment_method), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
-        <%= icon "pencil", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-        <span>Edit</span>
-      <% end %>
-    </li>
-    <li>
-      <%= link_to admin_payment_method_path(payment_method), method: :delete, data: { confirm: "Are you sure?" }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
-        <%= icon "trash", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-        <span>Delete</span>
-      <% end %>
-    </li>
+    <% default_object_options_array.each do |option| %>
+      <li>
+        <%= link_to "#", data: { action: "click->dropdown#handleAction", test_id: "test", object_id: payment_method.id, event_name: option[:event_name], edit_url: edit_admin_payment_method_path(payment_method), destroy_url: admin_payment_method_path(payment_method) }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+          <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+          <span><%= option[:label] %></span>
+        <% end %>
+      </li>
+    <% end %>
   </ul>
 </div>

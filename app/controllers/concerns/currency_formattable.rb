@@ -9,8 +9,10 @@ module CurrencyFormattable
   def format_currency(value, currency = Money.default_currency)
     if value.is_a?(Money)
       humanized_money_with_symbol(value)
-    else
-      rounded_value = value.is_a?(BigDecimal) ? value.round(2) : BigDecimal(value.to_s).round(2)
+    elsif value.is_a?(String)
+      humanized_money_with_symbol(Money.new(value.to_f, currency))
+    elsif value.is_a?(BigDecimal)
+      rounded_value = value.round(2)
       number_to_currency(rounded_value,
         unit: currency.symbol,
         format: "%u %n",
