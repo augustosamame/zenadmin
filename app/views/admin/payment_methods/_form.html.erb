@@ -1,0 +1,24 @@
+<%= simple_form_for [:admin, payment_method] do |f| %>
+  <%= render 'shared/form_errors', model: payment_method %>
+
+  <div class="grid grid-cols-1 gap-4">
+    <!-- Name Field -->
+    <div>
+      <%= f.input :name, label: "Nombre", required: true, input_html: { class: "form-input" } %>
+    </div>
+
+    <!-- Description Field -->
+    <div>
+      <%= f.input :description, label: "Descripción", input_html: { class: "form-input" } %>
+    </div>
+
+    <!-- Status Field -->
+    <div>
+      <%= f.input :status, collection: PaymentMethod.statuses.keys.map { |s| [s.capitalize, s] }, label: "Estado", prompt: "Seleccione Estado", input_html: { data: { controller: "select" }, class: "form-select" } %>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= f.button :submit, "Guardar", class: "btn btn-primary" %>
+  </div>
+<% end %>

@@ -1,4 +1,5 @@
 class Admin::PaymentMethodsController < Admin::AdminController
+  before_action :set_payment_method, only: [ :edit, :update, :destroy ]
   def index
     @datatable_options = "resource_name:'PaymentMethod';create_button:true;"
     respond_to do |format|
@@ -21,13 +22,33 @@ class Admin::PaymentMethodsController < Admin::AdminController
     if @payment_method.save
       redirect_to admin_payment_methods_path
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
+  end
+
+  def edit
+  end
+
+  def update
+    if @payment_method.update(payment_method_params)
+      redirect_to admin_payment_methods_path, notice: "Payment method was successfully updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def destroy
+    @payment_method.destroy
+    redirect_to admin_payment_methods_path, notice: "Payment method was successfully deleted."
   end
 
 
 
   private
+
+  def set_payment_method
+    @payment_method = PaymentMethod.find(params[:id])
+  end
 
   def payment_method_params
     params.require(:payment_method).permit(:name, :description, :status)
