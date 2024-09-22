@@ -64,6 +64,14 @@ export const resourceMappings = {
     buttonUrl: "/admin/stock_transfers/new",
     ajaxUrl: "/admin/stock_transfers.json"
   },
+  StockAdjustment: {
+    buttonText: "Crear Ajuste de Inventario",
+    buttonUrl: "/admin/stock_transfers/new",
+    buttonParams: {
+      stock_adjustment: true
+    },
+    ajaxUrl: "/admin/stock_transfers.json"
+  },
   User: {
     buttonText: "Crear Usuario",
     buttonUrl: "/admin/users/new",

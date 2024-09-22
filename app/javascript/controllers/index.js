@@ -7,6 +7,9 @@ import { application } from "./application"
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 
+import CollapsibleFieldController from "./collapsible_field_controller"
+application.register("collapsible-field", CollapsibleFieldController)
+
 import ComboProductNormalPriceController from "./combo_product_normal_price_controller"
 application.register("combo-product-normal-price", ComboProductNormalPriceController)
 
@@ -67,6 +70,9 @@ application.register("invoice-series-mapping", InvoiceSeriesMappingController)
 import LoaderController from "./loader_controller"
 application.register("loader", LoaderController)
 
+import LoyaltyTierFormController from "./loyalty_tier_form_controller"
+application.register("loyalty-tier-form", LoyaltyTierFormController)
+
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 
@@ -82,9 +88,6 @@ application.register("nested-form", NestedFormController)
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
-import Pos__LoyaltyInfoController from "./pos/loyalty_info_controller"
-application.register("pos--loyalty-info", Pos__LoyaltyInfoController)
-
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 
@@ -93,6 +96,9 @@ application.register("pos--comment-modal", Pos__CommentModalController)
 
 import Pos__KeypadController from "./pos/keypad_controller"
 application.register("pos--keypad", Pos__KeypadController)
+
+import Pos__LoyaltyInfoController from "./pos/loyalty_info_controller"
+application.register("pos--loyalty-info", Pos__LoyaltyInfoController)
 
 import Pos__OrderItemsController from "./pos/order_items_controller"
 application.register("pos--order-items", Pos__OrderItemsController)

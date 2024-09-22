@@ -1,18 +1,40 @@
 <%= simple_form_for([:admin, @stock_transfer], html: { data: { controller: "stock-transfer-form", action: "submit->stock-transfer-form#submitForm", "stock-transfer-form-target" => "form" } }) do |form| %>
+  <!-- Error Messages -->
+  <%= render 'shared/form_errors', model: @stock_transfer %>
+
   <!-- Header Section -->
   <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+
+      <!-- Transfer Date -->
+      <div>
+        <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
+        <%= form.datetime_local_field :transfer_date, class: "form-input" %>
+      </div>
+      
       <!-- Origin Warehouse -->
       <div>
-        <%= form.label :origin_warehouse_id, "Almacén de Origen", class: "form-label" %>
-        <%= form.collection_select :origin_warehouse_id, Warehouse.all, :id, :name, { include_blank: 'Ninguno (Inventario Inicial)' }, class: "form-input" %>
+        <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "form-label" %>
+        <%= form.collection_select :origin_warehouse_id, Warehouse.all, :id, :name, { include_blank: @is_adjustment ? '' : 'Ninguno (Inventario Inicial)' }, class: "form-input" %>
       </div>
 
-      <!-- Destination Warehouse -->
-      <div>
-        <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
-        <%= form.collection_select :destination_warehouse_id, Warehouse.all, :id, :name, {}, class: "form-input" %>
-      </div>
+      <% if @is_adjustment %>
+
+        <!-- Adjustment Type -->
+        <div id="adjustment-type-field">
+          <%= form.label :adjustment_type, "Tipo de Ajuste", class: "form-label" %>
+          <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
+        </div>
+
+        <% else %>
+
+          <!-- Destination Warehouse -->
+          <div>
+          <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
+          <%= form.collection_select :destination_warehouse_id, Warehouse.all, :id, :name, {}, class: "form-input" %>
+        </div>
+
+      <% end %>
     </div>
 
       <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
@@ -26,51 +48,49 @@
 
       <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-[2fr_1fr_1fr] sm:gap-x-16 sm:gap-y-10">
 
-      <!-- Transfer Date -->
-      <div>
-        <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
-        <%= form.datetime_local_field :transfer_date, class: "form-input" %>
-      </div>
-
-      <!-- Is Adjustment? -->
-      <div>
-        <%= form.label :is_adjustment, "Ajuste de Inventario?", class: "form-label" %>
-        <%= form.check_box :is_adjustment, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleAdjustmentType" } %>
-      </div>
-
-      <!-- Adjustment Type -->
-      <div id="adjustment-type-field" class="hidden">
-        <%= form.label :adjustment_type, "Tipo de Ajuste", class: "form-label" %>
-        <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
-      </div>
     </div>
 
+    <div>
+      <%= form.label :is_adjustment, "Ajuste de Inventario", class: "form-label hidden" %>
+      <%= form.check_box :is_adjustment, class: "form-checkbox hidden" %>
+    </div>
 
     <!-- Comments Field -->
-    <div class="mt-4">
-      <%= form.label :comments, "Comentarios", class: "form-label" %>
-      <%= form.text_area :comments, class: "form-input" %>
+    <div class="mb-4" data-controller="collapsible-field">
+      <div class="flex items-center cursor-pointer" data-action="click->collapsible-field#toggle">
+        <%= form.label :comments, "Comentarios", class: "form-label mr-2 mb-0" %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200 transform" data-collapsible-field-target="arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div class="hidden mt-2" data-collapsible-field-target="content">
+        <%= form.text_area :comments, class: "form-input w-full" %>
+      </div>
     </div>
-  </div>
 
   <!-- Products Section -->
     <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-      <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
-      <div id="stock-transfer-form-lines" data-stock-transfer-form-target="lines">
-        <%= form.simple_fields_for :stock_transfer_lines do |line_form| %>
-          <%= render 'stock_transfer_line_fields', f: line_form %>
-        <% end %>
-      </div>
+      <div class="flex items-end space-x-4">
+        <div id="stock-transfer-form-lines" class="flex-grow" data-stock-transfer-form-target="lines">
+          <%= form.simple_fields_for :stock_transfer_lines do |line_form| %>
+            <%= render 'stock_transfer_line_fields', f: line_form %>
+          <% end %>
+        </div>
 
-      <!-- Add Product Button -->
-      <div class="flex justify-end mt-4">
-        <button type="button" class="btn btn-secondary" data-action="click->stock-transfer-form#addProduct">Agregar Producto</button>
+        <!-- Add Product Button -->
+        <div class="flex-shrink-0 mb-6">
+          <button type="button" class="p-2 text-green-500 hover:text-green-700" data-action="click->stock-transfer-form#addProduct">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+          </button>
+        </div>
       </div>
     </div>
 
     <!-- Form Actions -->
     <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
-      <%= form.button :submit, @stock_transfer.new_record? ? "Crear Transferencia de Stock" : "Grabar Transferencia de Stock", class: "btn btn-primary" %>
+      <%= form.button :submit, @button_label, class: "btn btn-primary" %>
       <%= link_to "Cancelar", admin_stock_transfers_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
     </div>
   

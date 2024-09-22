@@ -40,16 +40,22 @@ export default class extends Controller {
   removeProduct(event) {
     event.preventDefault()
 
-    // Find the closest line item to remove
-    const line = event.target.closest(".nested-fields")
+    const lines = this.linesTarget.querySelectorAll('.nested-fields')
+    if (lines.length > 1) {
 
-    // Mark the hidden field for _destroy if it exists or remove the element directly
-    const destroyInput = line.querySelector('input[name*="_destroy"]')
-    if (destroyInput) {
-      destroyInput.value = 1
-      line.style.display = "none"
+      // Find the closest line item to remove
+      const line = event.target.closest(".nested-fields")
+
+      // Mark the hidden field for _destroy if it exists or remove the element directly
+      const destroyInput = line.querySelector('input[name*="_destroy"]')
+      if (destroyInput) {
+        destroyInput.value = 1
+        line.style.display = "none"
+      } else {
+        line.remove()
+      }
     } else {
-      line.remove()
+      console.log("No se puede eliminar el único producto de la transferencia.")
     }
   }
 

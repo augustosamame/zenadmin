@@ -108,10 +108,24 @@ export default class extends Controller {
 
   createResourceButton(resourceMapping) {
     console.log("Creating resource button for resource:", resourceMapping);
+
+    let buttonUrl = resourceMapping.buttonUrl;
+
+    // Check if buttonParams exist and add them to the URL
+    if (resourceMapping.buttonParams) {
+      const params = new URLSearchParams();
+      Object.entries(resourceMapping.buttonParams).forEach(([key, value]) => {
+        params.append(key, value.toString());
+      });
+      buttonUrl += (buttonUrl.includes('?') ? '&' : '?') + params.toString();
+    }
+
+    console.log("Button URL:", buttonUrl);
+
     return {
       text: resourceMapping.buttonText,
       action: () => {
-        window.location.href = resourceMapping.buttonUrl;
+        window.location.href = buttonUrl;
       },
       className: 'dt-button bg-green-500 text-white hover:bg-green-400'
     };

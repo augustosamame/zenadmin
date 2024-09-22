@@ -16,6 +16,9 @@ class StockTransfer < ApplicationRecord
   enum :adjustment_type, { devolucion: 0, perdida_o_robo: 1, rotura: 2, venta_incorrecta: 3, otros: 4 }
   translate_enum :adjustment_type
 
+  validates :origin_warehouse_id, presence: true, if: :is_adjustment?
+  validates :destination_warehouse_id, presence: true, unless: :is_adjustment?
+
   aasm column: "stage" do
     state :pending, initial: true
     state :in_transit

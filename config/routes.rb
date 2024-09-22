@@ -73,6 +73,9 @@ Rails.application.routes.draw do
     end
 
     resources :stock_transfers do
+      collection do
+        get "index_stock_adjustments"
+      end
       member do
         patch :set_to_in_transit
         patch :set_to_complete
