@@ -2,7 +2,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   before_action :set_seller_biweekly_sales_target, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.all
+    @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.all.includes(:seller)
   end
 
   def show

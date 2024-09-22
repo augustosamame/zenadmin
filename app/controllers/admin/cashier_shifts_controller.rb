@@ -10,6 +10,7 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def new
     @cashier_shift = CashierShift.new
+    @available_cashiers = Cashier.where(location_id: @current_location.id)
     @cashier_shift.opened_at = Time.current
   end
 

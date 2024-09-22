@@ -1,7 +1,14 @@
 <%= simple_form_for([:admin, @requisition], html: { data: { controller: "dynamic-form", action: "submit->dynamic-form#submitForm", "dynamic-form-target" => "form" } }) do |form| %>
   <!-- Header Section -->
-  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+  <div class="p-6 mb-2 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+
+    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+      <!-- Requisition Date -->
+      <div>
+        <%= form.label :requisition_date, "Fecha de Pedido", class: "form-label" %>
+        <%= form.datetime_local_field :requisition_date, class: "form-input" %>
+      </div>
+
       <!-- Location -->
       <div>
         <%= form.label :location_id, "Ubicación", class: "form-label" %>
@@ -15,19 +22,17 @@
       </div>
     </div>
 
-    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
-      <!-- Requisition Date -->
-      <div>
-        <%= form.label :requisition_date, "Fecha de Pedido", class: "form-label" %>
-        <%= form.datetime_local_field :requisition_date, class: "form-input" %>
-      </div>
-
-    </div>
-
     <!-- Comments Field -->
-    <div class="mt-4">
-      <%= form.label :comments, "Comentarios", class: "form-label" %>
-      <%= form.text_area :comments, class: "form-input" %>
+    <div class="mt-4" data-controller="collapsible-field">
+      <div class="flex items-center cursor-pointer" data-action="click->collapsible-field#toggle">
+        <%= form.label :comments, "Comentarios", class: "form-label mr-2 mb-0" %>
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 transition-transform duration-200 transform" data-collapsible-field-target="arrow" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+        </svg>
+      </div>
+      <div class="hidden mt-2" data-collapsible-field-target="content">
+        <%= form.text_area :comments, class: "form-input w-full" %>
+      </div>
     </div>
   </div>
 
