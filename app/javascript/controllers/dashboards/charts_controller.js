@@ -32,7 +32,7 @@ export default class extends Controller {
       this.initializeChart()
       // Force a resize after initialization
       this.handleResize()
-    }, 200)
+    }, 400)
   }
 
   initializeChart() {

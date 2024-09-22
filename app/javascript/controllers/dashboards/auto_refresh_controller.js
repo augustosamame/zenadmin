@@ -42,7 +42,7 @@ export default class extends Controller {
       // If visit doesn't return a Promise, wait a short time before dispatching the event
       setTimeout(() => {
         this.dispatchRefreshEvent()
-      }, 100)
+      }, 200)
     }
   }
 }
