@@ -11,8 +11,8 @@ module CurrencyFormattable
       humanized_money_with_symbol(value)
     elsif value.is_a?(String)
       humanized_money_with_symbol(Money.new(value.to_f, currency))
-    elsif value.is_a?(BigDecimal)
-      rounded_value = value.round(2)
+    else
+      rounded_value = value.to_f.round(2)
       number_to_currency(rounded_value,
         unit: currency.symbol,
         format: "%u %n",
