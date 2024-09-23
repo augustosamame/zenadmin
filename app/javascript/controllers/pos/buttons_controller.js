@@ -7,6 +7,7 @@ export default class extends Controller {
     console.log('Connected to the POS buttons controller!');
     // setup listeners for calls from other controllers
     this.element.addEventListener('clear-selected-user', this.handleClearSelectedUser.bind(this));
+    this.element.addEventListener('clear-selected-sellers', this.handleClearSelectedSellers.bind(this));
 
 
     this.checkForDraftOrder();
@@ -15,6 +16,10 @@ export default class extends Controller {
   handleClearSelectedUser(event) {
     this.clearSelectedUser();
     this.clearLoyaltyInfo();
+  }
+
+  handleClearSelectedSellers(event) {
+    this.clearSelectedSellers();
   }
 
   showDraftButton() {
@@ -85,6 +90,63 @@ export default class extends Controller {
     // Remove selected customer data
     clienteButton.removeAttribute('data-selected-object-id');
     console.log('Selected user cleared.');
+  }
+
+  clearSelectedSellers() {
+    console.log('Clearing selected sellers...');
+
+    const sellersModalDiv = document.querySelector('[data-controller="pos--sellers-modal"]');
+    if (!sellersModalDiv) {
+      console.warn('Sellers modal div not found');
+      return;
+    }
+
+    const sellersButton = sellersModalDiv.querySelector('button');
+    if (!sellersButton) {
+      console.warn('Sellers button not found');
+      return;
+    }
+
+    // Reset button content to original icon and text
+    const icon = sellersButton.querySelector('svg');
+    sellersButton.innerHTML = `
+      ${icon ? icon.outerHTML : ''}
+      Vendedores
+    `;
+
+    // Reset button styles to original
+    sellersButton.classList.remove('bg-blue-500', 'text-white');
+    sellersButton.classList.add('text-black', 'bg-white', 'border', 'border-gray-300', 'dark:bg-slate-600', 'dark:text-white', 'dark:border-slate-400');
+
+    // Remove selected sellers data
+    sellersModalDiv.removeAttribute('data-sellers');
+
+    // Clear sellers from the modal controller
+    const sellersModalController = this.application.getControllerForElementAndIdentifier(sellersModalDiv, 'pos--sellers-modal');
+    if (sellersModalController && typeof sellersModalController.clearSelections === 'function') {
+      sellersModalController.clearSelections();
+    } else {
+      console.warn('Sellers modal controller or clearSelections method not found');
+    }
+
+    // Clear sellers from the order if necessary
+    this.clearSellersFromOrder();
+
+    console.log('Selected sellers cleared.');
+  }
+
+  clearSellersFromOrder() {
+    const orderElement = document.querySelector('[data-controller="pos--order"]');
+    if (orderElement) {
+      const orderController = this.application.getControllerForElementAndIdentifier(orderElement, 'pos--order');
+      if (orderController && typeof orderController.clearSellers === 'function') {
+        orderController.clearSellers();
+      } else {
+        console.warn('Order controller or clearSellers method not found');
+      }
+    } else {
+      console.warn('Order element not found');
+    }
   }
 
   clearLoyaltyInfo() {

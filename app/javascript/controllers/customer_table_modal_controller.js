@@ -121,6 +121,8 @@ export default class extends Controller {
     const selectedRow = event.currentTarget.closest('tr');
     const objectId = selectedRow.dataset.objectId;
     const userId = selectedRow.dataset.userId;
+    const phone = selectedRow.dataset.phone;
+    const email = selectedRow.dataset.email;
     const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
     const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
     const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
@@ -131,6 +133,8 @@ export default class extends Controller {
     clienteButton.dataset.selectedObjectId = objectId;
     clienteButton.dataset.selectedUserId = userId;
     clienteButton.dataset.selectedRuc = ruc;
+    clienteButton.dataset.selectedPhone = phone
+    clienteButton.dataset.selectedEmail = email
 
     // Keep the existing icon and update the text
     clienteButton.innerHTML = `

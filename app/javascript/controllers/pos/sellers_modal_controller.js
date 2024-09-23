@@ -10,6 +10,16 @@ export default class extends Controller {
     this.manualUpdate = false; // Flag to indicate manual update
   }
 
+  clearSelections() {
+    this.selectedSellers = [];
+    this.contentTarget.querySelectorAll('.seller-checkbox').forEach(checkbox => {
+      checkbox.checked = false;
+    });
+    this.contentTarget.querySelectorAll('.seller-percentage').forEach(input => {
+      input.value = '0';
+    });
+  }
+
   open() {
     this.containerTarget.classList.remove('hidden');
     this.contentTarget.classList.remove('hidden');

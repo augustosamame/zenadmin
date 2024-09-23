@@ -112,6 +112,9 @@ application.register("pos--order-items", Pos__OrderItemsController)
 import Pos__PaymentController from "./pos/payment_controller"
 application.register("pos--payment", Pos__PaymentController)
 
+import Pos__PostPosSaleController from "./pos/post_pos_sale_controller"
+application.register("pos--post-pos-sale", Pos__PostPosSaleController)
+
 import Pos__ProductGridController from "./pos/product_grid_controller"
 application.register("pos--product-grid", Pos__ProductGridController)
 

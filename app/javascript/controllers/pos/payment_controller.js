@@ -47,14 +47,9 @@ export default class extends Controller {
       return;
     }
 
-    // Hide the product grid and show the payment section
     this.productGridTarget.classList.add('hidden');
     this.paymentContainerTarget.classList.remove('hidden');
-
-    // Update the total amount in the payment section
     this.updateTotal();
-
-    // Fetch available payment methods
     this.fetchPaymentMethods();
   }
 
@@ -94,8 +89,6 @@ export default class extends Controller {
     const method = event.currentTarget.dataset.description;
     const methodId = event.currentTarget.dataset.id;
     let remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
-
-    // If remaining is less than or equal to zero, set payment amount to 0
     const paymentAmount = remaining > 0 ? remaining : 0;
 
     const paymentElement = document.createElement('div');
@@ -118,11 +111,8 @@ export default class extends Controller {
   }
 
   updateTotal() {
-    // Get the total from the order-items controller and display it in the payment section
     const orderItemsTotal = document.querySelector('[data-pos--order-items-target="total"]').textContent.trim();
     this.totalTarget.textContent = orderItemsTotal;
-
-    // Set remaining amount to the total initially
     this.remainingAmountTarget.textContent = orderItemsTotal;
   }
 
@@ -152,7 +142,6 @@ export default class extends Controller {
       totalPayments += parseFloat(input.value);
     });
 
-    // If unpaid orders are not allowed and total payments don't match the order total, show an alert
     if (!this.canCreateUnpaidOrders && totalPayments < totalOrderAmount) {
       this.showErrorModal(
         'Error',
@@ -170,7 +159,6 @@ export default class extends Controller {
     const isRucChecked = rucCheckbox ? rucCheckbox.checked : false;
     console.log('is_ruc_checked', isRucChecked);
 
-
     const orderItems = document.querySelectorAll('[data-pos--order-items-target="items"] div.flex');
     const orderItemsAttributes = [];
 
@@ -179,8 +167,8 @@ export default class extends Controller {
       const price = item.querySelector('.editable-price').textContent.replace('S/ ', '').trim();
 
       orderItemsAttributes.push({
-        product_id: item.dataset.productId, // Extract product ID
-        quantity: quantity, // Extract quantity
+        product_id: item.dataset.productId,
+        quantity: quantity,
         price_cents: parseInt(price * 100, 10),
         discounted_price_cents: 0,
         currency: 'PEN',
@@ -228,43 +216,18 @@ export default class extends Controller {
       }
     })
       .then(response => {
-        const title = 'Venta Creada';
-        const buttons = [
-          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
-        ];
-
-        if (response.status !== 200) {
-          // Handle non-200 HTTP response
-          this.showErrorModal('Error', 'Hubo un error al guardar la venta. Por favor, inténtalo de nuevo.', buttons);
-          return;
-        }
-
-        if (response.data.status === 'error') {
-          // Handle application-level error
-          const errorMessage = response.data.errors.join(', ');
-          this.showErrorModal('Error', `Hubo un error al guardar la venta: ${errorMessage}`, buttons);
+        console.log('Order save response:', response);
+        if (response.status !== 200 || response.data.status === 'error') {
+          let errorMessage = 'Hubo un error al guardar la venta. Por favor, inténtalo de nuevo.';
+          if (response.data.status === 'error') {
+            errorMessage = `Hubo un error al guardar la venta: ${response.data.errors.join(', ')}`;
+          }
+          this.showErrorModal('Error', errorMessage);
           return;
         }
 
         // Handle success
-        const message = `La Venta #${response.data.id} se creó satisfactoriamente.`;
-        this.showSuccessModal(title, message, buttons);
-
-        // Dispatch an event to clear the order items
-        document.querySelector('[data-controller="pos--order-items"]').dispatchEvent(
-          new CustomEvent('clear-order', { bubbles: true })
-        );
-
-        // Dispatch an event to clear the selected user in the buttons controller
-        document.querySelector('[data-controller="pos--buttons"]').dispatchEvent(
-          new CustomEvent('clear-selected-user', { bubbles: true })
-        );
-
-        this.paymentListTarget.innerHTML = '';
-        this.paymentContainerTarget.classList.add('hidden');
-        this.productGridTarget.classList.remove('hidden');
-
-        console.log('Order cleared after successful creation.');
+        this.showPostSaleModal(response.data);
       })
       .catch(error => {
         console.error('Error saving order:', error);
@@ -273,26 +236,32 @@ export default class extends Controller {
         ]);
       });
   }
-  
-  // Helper methods for showing modals
-  showErrorModal(title, message, buttons) {
-    this.showModal(title, message, buttons);
-  }
 
-  showSuccessModal(title, message, buttons) {
-    this.showModal(title, message, buttons);
-  }
+  showPostSaleModal(orderData) {
+    console.log('showing postsalemodal with orderData', orderData)
+    const modal = document.getElementById('post-sale-modal');
+    const controller = this.application.getControllerForElementAndIdentifier(modal, 'pos--post-pos-sale');
 
-  showModal(title, message, buttons) {
-    this.customModalController = this.application.getControllerForElementAndIdentifier(
-      document.querySelector('[data-controller="custom-modal"]'),
-      'custom-modal'
-    );
-
-    if (this.customModalController) {
-      this.customModalController.openWithContent(title, message, buttons);
+    if (controller) {
+      // Pass the order data to the PostPosSaleController
+      controller.setupModal(orderData);
+      modal.classList.remove('hidden');
     } else {
-      console.error('CustomModalController not found!');
+      console.error('PostPosSaleController not found');
+    }
+  }
+
+  showErrorModal(title, message, buttons) {
+    const customModal = document.querySelector('[data-controller="custom-modal"]');
+    if (customModal) {
+      const customModalController = this.application.getControllerForElementAndIdentifier(customModal, 'custom-modal');
+      if (customModalController) {
+        customModalController.openWithContent(title, message, buttons);
+      } else {
+        console.error('CustomModalController not found!');
+      }
+    } else {
+      console.error('Custom modal element not found!');
     }
   }
 

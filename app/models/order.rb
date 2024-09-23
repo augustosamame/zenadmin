@@ -84,6 +84,26 @@ class Order < ApplicationRecord
     self.order_date ||= Time.zone.now
   end
 
+  def universal_invoice_link
+    "#{Rails.application.config.action_mailer.default_url_options[:host]}/invoice/#{self.id}"
+  end
+
+  def universal_invoice_show
+    if self.last_issued_ok_invoice_urls.present?
+      {
+        message: nil,
+        url: self.last_issued_ok_invoice_urls.last[1],
+        status: :ready
+      }
+    else
+      {
+        message: "El comprobante aún está siendo generado. Por favor, inténtelo de nuevo más tarde.",
+        url: nil,
+        status: :pending
+      }
+    end
+  end
+
   def update_loyalty_tier
     Services::Sales::LoyaltyTierService.new(self.user).update_loyalty_tier
   end

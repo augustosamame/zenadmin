@@ -57,7 +57,7 @@ class Admin::OrdersController < Admin::AdminController
         GenerateEinvoice.perform_async(@order.id)
 
         session.delete(:draft_order)
-        render json: { status: "success", id: @order.id, message: "Order created successfully." }
+        render json: { status: "success", id: @order.id, message: "Order created successfully.", universal_invoice_link: @order.universal_invoice_link, order_data: @order.as_json(include: [ :user ]) }
       else
         Rails.logger.info("Error creating order: #{@order.errors.full_messages}")
         render json: { status: "error", errors: @order.errors.full_messages }

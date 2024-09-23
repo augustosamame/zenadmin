@@ -1,0 +1,33 @@
+<div id="post-sale-modal" class="fixed inset-0 z-50 hidden overflow-y-auto" data-controller="pos--post-pos-sale">
+  <div class="flex items-end justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
+    <div class="fixed inset-0 transition-opacity" aria-hidden="true">
+      <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
+    </div>
+
+    <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+    <div class="inline-block overflow-hidden text-left align-bottom transition-all transform bg-white rounded-lg shadow-xl sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+      <div class="px-4 pt-5 pb-4 bg-white sm:p-6 sm:pb-4">
+        <h3 class="text-lg font-medium leading-6 text-gray-900" data-pos--post-pos-sale-target="message"></h3>
+        
+        <div class="mt-4" data-pos--post-pos-sale-target="whatsappButton">
+          <!-- WhatsApp button will be inserted here if phone is available -->
+        </div>
+
+        <div class="hidden mt-4" data-pos--post-pos-sale-target="phoneInput">
+          <label for="phone" class="block text-sm font-medium text-gray-700">Número Móvil</label>
+          <input type="tel" name="phone" id="phone" class="block w-full mt-1 border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
+          <button data-pos--post-pos-sale-target="sendInvoiceButton" data-action="click->pos--post-pos-sale#sendInvoice" class="inline-flex items-center px-4 py-2 mt-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Enviar Comprobante
+          </button>
+        </div>
+      </div>
+
+      <div class="px-4 py-3 bg-gray-50 sm:px-6 sm:flex sm:flex-row-reverse">
+        <button type="button" data-action="click->pos--post-pos-sale#closeAndReload" class="inline-flex justify-center w-full px-4 py-2 text-base font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-700 sm:ml-3 sm:w-auto sm:text-sm">
+          Cerrar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

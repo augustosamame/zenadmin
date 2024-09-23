@@ -11,6 +11,8 @@ Rails.application.routes.draw do
   get "pricing", to: "page#pricing"
   get "about", to: "page#about"
 
+  get "invoice/:id", to: "orders#invoice", as: :invoice
+
   # create a namespace for admin
   namespace :admin do
     resources :products do
@@ -33,6 +35,7 @@ Rails.application.routes.draw do
     resources :orders, only: [ :index, :new, :create, :update, :show ] do
       member do
         post :retry_invoice
+        get :universal_invoice_show
       end
       collection do
         get "pos"
