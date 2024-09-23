@@ -1,0 +1,29 @@
+{
+  "ignored_warnings": [
+    {
+      "warning_type": "Redirect",
+      "warning_code": 18,
+      "fingerprint": "0621865659b3afa0c77d05e13d8e2ac981a1ecb3b764113db3a2555b01580866",
+      "check_name": "Redirect",
+      "message": "Possible unprotected redirect",
+      "file": "app/controllers/orders_controller.rb",
+      "line": 8,
+      "link": "https://brakemanscanner.org/docs/warning_types/redirect/",
+      "code": "redirect_to(Order.find(params[:id]).universal_invoice_show[:url], :allow_other_host => true)",
+      "render_path": null,
+      "location": {
+        "type": "method",
+        "class": "OrdersController",
+        "method": "invoice"
+      },
+      "user_input": "Order.find(params[:id]).universal_invoice_show[:url]",
+      "confidence": "Weak",
+      "cwe_id": [
+        601
+      ],
+      "note": ""
+    }
+  ],
+  "updated": "2024-09-22 22:55:40 -0500",
+  "brakeman_version": "6.2.1"
+}
