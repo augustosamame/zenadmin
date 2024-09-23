@@ -4,6 +4,12 @@
 
 import { application } from "./application"
 
+import AttendanceFormController from "./attendance_form_controller"
+application.register("attendance-form", AttendanceFormController)
+
+import AttendanceLogsController from "./attendance_logs_controller"
+application.register("attendance-logs", AttendanceLogsController)
+
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 

@@ -1,0 +1,123 @@
+<div class="container p-6 mx-auto mt-6">
+  <div class="w-full">
+    <div class="p-6 mb-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+      <%= simple_form_for([:admin, user_attendance_log], html: { class: "space-y-4", data: { controller: "attendance-form" } }) do |f| %>
+        <%= render 'shared/form_errors', model: user_attendance_log %>
+
+        <div>
+          <%= f.association :location,
+              collection: @elligible_locations,
+              label: "Ubicación", 
+              input_html: { 
+                class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
+                data: { action: "change->attendance-form#checkAttendanceStatus" },
+                disabled: user_attendance_log.persisted?
+              },
+              include_blank: false,
+              selected: (@elligible_locations.one? ? @elligible_locations.first.id : nil),
+              label_html: { 
+                class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+              } %>
+          <% if user_attendance_log.persisted? %>
+            <%= f.hidden_field :location_id %>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.association :user, 
+              collection: @elligible_sellers, 
+              label: "Vendedor", 
+              input_html: { 
+                class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
+                data: { 
+                  controller: "tom-select",
+                  tom_select_options_value: { 
+                    placeholder: "Seleccione un vendedor"
+                  }.to_json,
+                  action: "change->attendance-form#checkAttendanceStatus"
+                },
+                disabled: user_attendance_log.persisted?
+              }, 
+              label_html: { 
+                class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+              } %>
+          <% if user_attendance_log.persisted? %>
+            <%= f.hidden_field :user_id %>
+          <% end %>
+        </div>
+
+        <div>
+          <%= f.input :checkin, 
+              as: :datetime, 
+              label: "Hora de Checkin", 
+              input_html: { 
+                class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
+                data: { attendance_form_target: "checkinField" },
+                value: @current_time
+              }, 
+              label_html: { 
+                class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+              },
+              html5: true %>
+        </div>
+
+        <div data-attendance-form-target="checkoutField" class="hidden">
+          <%= f.input :checkout, 
+              as: :datetime, 
+              label: "Hora de Checkout", 
+              input_html: { 
+                class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+              }, 
+              label_html: { 
+                class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+              },
+              html5: true %>
+        </div>
+
+        <%= f.button :submit, 'Grabar', class: "btn btn-primary" %>
+      <% end %>
+    </div>
+
+    <!-- Already Checked-in Users Table -->
+    <div class="p-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+      <h4 class="mb-4 text-lg font-medium text-gray-900 dark:text-gray-100">Vendedores con checkin registrados:</h4>
+      <% if @already_checked_in_users.any? %>
+        <div class="overflow-x-auto">
+          <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+              <tr>
+                <th scope="col" class="px-6 py-3">Vendedor</th>
+                <th scope="col" class="px-6 py-3">Ubicación</th>
+                <th scope="col" class="px-6 py-3">Hora de Check-in</th>
+                <th scope="col" class="px-6 py-3">Acción</th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @already_checked_in_users.each do |user| %>
+                <% attendance_log = user.user_attendance_logs.find_by(checkout: nil) %>
+                <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+                  <td class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                    <%= user.name %>
+                  </td>
+                  <td class="px-6 py-4">
+                    <%= attendance_log&.location&.name || 'No especificada' %>
+                  </td>
+                  <td class="px-6 py-4">
+                    <%= attendance_log&.checkin&.strftime("%d/%m/%Y %H:%M") || '' %>
+                  </td>
+                  <td class="px-6 py-4">
+                    <%= link_to seller_checkout_admin_user_attendance_logs_path(attendance_log), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600" do %>
+                      <i class="fas fa-sign-out-alt"></i> <!-- Assuming you're using Font Awesome for icons -->
+                    <% end %>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-700 dark:text-gray-300">No hay vendedores registrados actualmente.</p>
+      <% end %>
+    </div>
+  </div>
+</div>

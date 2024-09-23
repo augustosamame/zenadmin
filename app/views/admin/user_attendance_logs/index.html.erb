@@ -1,0 +1,46 @@
+<%= render "shared/admin/nav", { header_title: "Registros de Asistencia" } do %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable attendance-logs" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <div class="flex items-center justify-between mb-4">
+      <% if current_user.any_admin_or_supervisor? %>
+        <div>
+          <%= form_tag admin_user_attendance_logs_path, method: :get, class: "flex items-center w-64", data: { action: "change->attendance-logs#refreshTable" } do %>
+            <%= select_tag :location_id, 
+                         options_from_collection_for_select(@locations, :id, :name, params[:location_id]), 
+                         prompt: "Todas las ubicaciones",
+                         class: "form-select mr-2" %>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Vendedor</th>
+          <th class="px-4 py-2 text-left">Ubicación</th>
+          <th class="px-4 py-2 text-left">Hora de Check-in</th>
+          <th class="px-4 py-2 text-left">Hora de Check-out</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @user_attendance_logs.each do |log| %>
+          <tr>
+            <td class="px-4 py-2"><%= log.user.name %></td>
+            <td class="px-4 py-2"><%= log.location.name %></td>
+            <td class="px-4 py-2"><%= log.checkin.strftime("%d/%m/%Y %H:%M") %></td>
+            <td class="px-4 py-2"><%= log.checkout&.strftime("%d/%m/%Y %H:%M") || '' %></td>
+            <td class="px-4 py-2"><%= log.checkout.nil? ? 'Activo' : 'Cerrado' %></td>
+            <td class="px-4 py-2">
+              <%= render partial: "admin/user_attendance_logs/actions", locals: { user_attendance_log: log, default_object_options_array: @default_object_options_array } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

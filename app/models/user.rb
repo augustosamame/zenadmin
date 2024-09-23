@@ -14,6 +14,7 @@ class User < ApplicationRecord
   belongs_to :loyalty_tier, optional: true
   has_many :user_free_products
   has_many :orders
+  has_many :user_attendance_logs
 
 
   # Include default devise modules. Others available are:
@@ -70,6 +71,10 @@ class User < ApplicationRecord
 
   def any_admin?
     self.roles.where(name: [ "admin", "super_admin" ]).any?
+  end
+
+  def any_admin_or_supervisor?
+    self.roles.where(name: [ "admin", "super_admin", "supervisor" ]).any?
   end
 
   def roles_names

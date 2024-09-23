@@ -86,5 +86,10 @@ export const resourceMappings = {
     buttonText: "Crear Pedido",
     buttonUrl: "/admin/requisitions/new",
     ajaxUrl: "/admin/requisitions.json"
+  },
+  UserAttendanceLog: {
+    buttonText: "Crear Checkin / Checkout",
+    buttonUrl: "/admin/user_attendance_logs/new",
+    ajaxUrl: "/admin/user_attendance_logs.json"
   }
 }

@@ -45,6 +45,18 @@ Rails.application.routes.draw do
       end
     end
     get "sellers", to: "users#sellers"
+
+    resources :user_attendance_logs, only: [ :index, :new, :create, :edit, :update ] do
+      collection do
+        get "check_attendance_status"
+        post "seller_checkout"
+        get "seller_checkin_status"
+        get "location_sellers"
+        get "seller_attendance_report"
+        get "location_attendance_report"
+      end
+    end
+
     resources :customers
     post "pos_create_customer", to: "users#create_customer"
     get "search_dni", to: "customers#search_dni"

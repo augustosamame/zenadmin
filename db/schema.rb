@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_19_102131) do
+ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -765,6 +765,18 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_19_102131) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "user_attendance_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "location_id", null: false
+    t.datetime "checkin"
+    t.datetime "checkout"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_user_attendance_logs_on_location_id"
+    t.index ["user_id"], name: "index_user_attendance_logs_on_user_id"
+  end
+
   create_table "user_free_products", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "product_id", null: false
@@ -916,6 +928,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_19_102131) do
   add_foreign_key "suppliers", "regions"
   add_foreign_key "taggings", "products"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "user_attendance_logs", "locations"
+  add_foreign_key "user_attendance_logs", "users"
   add_foreign_key "user_free_products", "loyalty_tiers"
   add_foreign_key "user_free_products", "products"
   add_foreign_key "user_free_products", "users"
