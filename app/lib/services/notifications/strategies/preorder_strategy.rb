@@ -3,11 +3,11 @@ module Services
     module Strategies
       class PreorderStrategy < BaseStrategy
         def title
-          "Tienda: #{location_name} - Venta #{@notifiable.order.custom_id} sin stock genera Preorden"
+          "Tienda: #{location_name} - Venta #{@notifiable.order.custom_id} sin stock genera Preventa"
         end
 
         def body
-          "Tienda: #{location_name} - Venta #{@notifiable.order.custom_id} sin stock genera Preorden #{object_identifier} por cantidad #{@notifiable.total_items} a cliente #{customer_name}"
+          "Tienda: #{location_name} - Venta #{@notifiable.order.custom_id} sin stock genera Preventa #{object_identifier} por cantidad #{@notifiable.total_items} a cliente #{customer_name}"
         end
 
         def image_url

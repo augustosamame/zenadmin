@@ -1,16 +1,16 @@
-<%= render "shared/admin/nav", { header_title: "Orden ##{@order.custom_id}" } do %>
+<%= render "shared/admin/nav", { header_title: "Venta ##{@order.custom_id}" } do %>
   <%= link_to "Volver a Ventas", admin_orders_path, class: "btn btn-secondary" %>
 <% end %>
 
 <div class="container px-4 py-8 mx-auto">
   <div class="overflow-hidden bg-white shadow sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Orden</h3>
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
     </div>
     <div class="border-t border-gray-200">
       <dl>
         <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-          <dt class="text-sm font-medium text-gray-500">Número de Orden</dt>
+          <dt class="text-sm font-medium text-gray-500">Número de Venta</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.id %></dd>
         </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -51,7 +51,7 @@
 
   <!-- Order Items -->
   <div class="mt-8">
-    <h4 class="mb-4 text-lg font-medium text-gray-900">Artículos de la Orden</h4>
+    <h4 class="mb-4 text-lg font-medium text-gray-900">Artículos de la Venta</h4>
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>

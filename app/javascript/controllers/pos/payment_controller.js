@@ -228,26 +228,26 @@ export default class extends Controller {
       }
     })
       .then(response => {
-        const title = 'Orden Creada';
+        const title = 'Venta Creada';
         const buttons = [
           { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
         ];
 
         if (response.status !== 200) {
           // Handle non-200 HTTP response
-          this.showErrorModal('Error', 'Hubo un error al guardar la orden. Por favor, inténtalo de nuevo.', buttons);
+          this.showErrorModal('Error', 'Hubo un error al guardar la venta. Por favor, inténtalo de nuevo.', buttons);
           return;
         }
 
         if (response.data.status === 'error') {
           // Handle application-level error
           const errorMessage = response.data.errors.join(', ');
-          this.showErrorModal('Error', `Hubo un error al guardar la orden: ${errorMessage}`, buttons);
+          this.showErrorModal('Error', `Hubo un error al guardar la venta: ${errorMessage}`, buttons);
           return;
         }
 
         // Handle success
-        const message = `La Orden #${response.data.id} se creó satisfactoriamente.`;
+        const message = `La Venta #${response.data.id} se creó satisfactoriamente.`;
         this.showSuccessModal(title, message, buttons);
 
         // Dispatch an event to clear the order items
@@ -268,7 +268,7 @@ export default class extends Controller {
       })
       .catch(error => {
         console.error('Error saving order:', error);
-        this.showErrorModal('Error', 'Hubo un error al guardar la orden. Por favor, inténtalo de nuevo.', [
+        this.showErrorModal('Error', 'Hubo un error al guardar la venta. Por favor, inténtalo de nuevo.', [
           { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
         ]);
       });
