@@ -10,7 +10,7 @@ gem "pg", "~> 1.5.8"
 gem "puma", "6.4.3"
 # Use JavaScript with ESM import maps [https://github.com/rails/importmap-rails]
 # Hotwire's SPA-like page accelerator [https://turbo.hotwired.dev]
-gem "turbo-rails", "~> 2.0.9"
+gem "turbo-rails", "~> 2.0.10"
 # Hotwire's modest JavaScript framework [https://stimulus.hotwired.dev]
 gem "stimulus-rails", "~> 1.3.4"
 # Build JSON APIs with ease [https://github.com/rails/jbuilder]
@@ -50,7 +50,7 @@ gem "simple_form", "~> 5.3.1"
 gem "money-rails", "~> 1.15.0"
 gem "pg_search", "~> 2.3.7"
 gem "hashids"
-gem "aws-sdk-s3", "~> 1.164.0"
+gem "aws-sdk-s3", "~> 1.165.0"
 gem "shrine", "~> 3.6.0"
 gem "marcel", "~> 1.0.4" # MIME type detection
 gem "ruby-vips", "~> 2.2.2"
@@ -64,7 +64,7 @@ gem "translate_enum", "~> 0.2.0"
 gem "jsonapi-serializer", "~> 2.2.0"
 gem "rubyzip", "~> 2.3.2"
 gem "devise-jwt", "~> 0.12.1"
-gem "jwt", "~> 2.8.2"
+gem "jwt", "~> 2.9.1"
 gem "rack-cors", "~> 2.0.2", require: "rack/cors"
 gem "geocoder", "~> 1.8.3"
 gem "kaminari", "~> 1.2.2"
