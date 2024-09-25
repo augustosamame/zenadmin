@@ -97,20 +97,20 @@ namespace :deploy do
   end
 
   namespace :deploy do
-    desc "Precompile assets"
-    task :precompile_assets do
-      on roles(:web) do
-        within release_path do
-          with rails_env: fetch(:rails_env) do
-            execute :yarn, "install"
-            execute :yarn, "run build:css:prod"
-            execute :yarn, "run build:js:prod"
-            execute :rake, "assets:precompile"
-          end
+  desc "Precompile assets"
+  task :precompile_assets do
+    on roles(:web) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :yarn, "install"
+          execute :yarn, "run build:css"
+          execute :yarn, "run build:js"
+          execute :rake, "assets:precompile"
         end
       end
     end
   end
+end
 
   # Override the deploy:assets:precompile task
   # Rake::Task["deploy:assets:precompile"].clear

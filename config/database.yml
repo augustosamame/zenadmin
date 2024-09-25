@@ -15,6 +15,7 @@ test:
 
 production:
   <<: *default
-  database: edukaierp_production
-  username: edukaierp
-  password: <%= ENV["EDUKAIERP_DATABASE_PASSWORD"] %>
+  #database: edukaierp_production
+  #username: edukaierp
+  #password: <%= ENV["EDUKAIERP_DATABASE_PASSWORD"] %>
+  database: edukaierp_development
