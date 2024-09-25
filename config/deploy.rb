@@ -102,10 +102,10 @@ namespace :deploy do
       on roles(:web) do
         within release_path do
           with rails_env: fetch(:rails_env) do
-            execute :rake, "assets:precompile"
-            invoke "deploy:yarn_install"
-            invoke "deploy:yarn_build"
+            execute :yarn, "install"
             execute :yarn, "run build:css:prod"
+            execute :yarn, "run build:js:prod"
+            execute :rake, "assets:precompile"
           end
         end
       end

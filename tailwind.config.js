@@ -53,7 +53,6 @@ module.exports = {
   plugins: [
     require("@tailwindcss/typography"),
     require("@tailwindcss/forms"),
-    // https://github.com/adoxography/tailwind-scrollbar
     require("tailwind-scrollbar")({ nocompatible: true }),
   ],
 }
