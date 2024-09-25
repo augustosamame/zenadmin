@@ -6,8 +6,10 @@ export default class extends Controller {
 
   connect() {
     console.log("SellersModalController connected");
+    console.log("Content Target:", this.contentTarget);
+    console.log("Modal Container Target:", this.modalContainerTarget);
     this.selectedSellers = [];
-    this.manualUpdate = false; // Flag to indicate manual update
+    this.manualUpdate = false;
   }
 
   clearSelections() {
@@ -37,7 +39,7 @@ export default class extends Controller {
       .then(response => {
         const sellers = response.data;
         const modalContent = this.buildModalContent(sellers);
-        this.contentTarget.innerHTML = modalContent;
+        this.modalContainerTarget.innerHTML = modalContent;
 
         // Restore selected sellers and their percentages
         this.restoreSavedSellers();
@@ -48,24 +50,43 @@ export default class extends Controller {
   }
 
   buildModalContent(sellers) {
+    const totalAmount = this.getTotalAmount();
     return `
-      <h2 class="text-lg font-semibold text-center dark:text-slate-100">Selecciona a los Vendedores</h2>
-      <div class="container p-4 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
-        <ul class="divide-y divide-gray-200 dark:divide-slate-600">
+    <div class="container p-4 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+      <table class="w-full">
+        <thead>
+          <tr class="text-left text-gray-600 dark:text-gray-300">
+            <th class="py-2">Nombre</th>
+            <th class="py-2 text-center">Seleccionado</th>
+            <th class="py-2 text-center">%</th>
+            <th class="py-2 text-center">Monto S/ ${totalAmount.toFixed(2)}</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 dark:divide-slate-600">
           ${sellers.map(seller => `
-            <li class="flex items-center justify-between py-2" data-seller-id="${seller.id}">
-              <span class="flex-1 text-gray-800 dark:text-gray-200 truncate">${seller.name}</span>
-              <input type="checkbox" class="seller-checkbox h-6 w-6 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-400 focus:ring-opacity-25 dark:bg-slate-600 dark:border-slate-500 dark:focus:ring-slate-500" data-action="change->pos--sellers-modal#toggleSeller">
-              <input type="number" class="seller-percentage w-32 ml-4 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" max="100" step="1" data-action="input->pos--sellers-modal#handleManualUpdate">
-            </li>
+            <tr class="py-2" data-seller-id="${seller.id}">
+              <td class="py-2">
+                <span class="text-gray-800 dark:text-gray-200 truncate">${seller.name}</span>
+              </td>
+              <td class="py-2 text-center">
+                <input type="checkbox" class="seller-checkbox h-6 w-6 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-400 focus:ring-opacity-25 dark:bg-slate-600 dark:border-slate-500 dark:focus:ring-slate-500" data-action="change->pos--sellers-modal#toggleSeller">
+              </td>
+              <td class="py-2 text-center">
+                <input type="number" class="seller-percentage w-24 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" max="100" step="1" data-action="input->pos--sellers-modal#handlePercentageUpdate">
+              </td>
+              <td class="py-2 text-center">
+                <input type="number" class="seller-amount w-28 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" step="0.01" data-action="input->pos--sellers-modal#handleAmountUpdate">
+              </td>
+            </tr>
           `).join('')}
-        </ul>
-      </div>
-      <div class="flex justify-end mt-4 space-x-4">
-        <button type="button" class="btn btn-secondary" data-action="click->pos--sellers-modal#close">Cancelar</button>
-        <button type="button" class="btn btn-primary" data-action="click->pos--sellers-modal#saveSellers">Guardar</button>
-      </div>
-    `;
+        </tbody>
+      </table>
+    </div>
+    <div class="flex justify-end mt-4 space-x-4">
+      <button type="button" class="btn btn-secondary" data-action="click->pos--sellers-modal#close">Cancelar</button>
+      <button type="button" class="btn btn-primary" data-action="click->pos--sellers-modal#saveSellers">Guardar</button>
+    </div>
+  `;
   }
 
   restoreSavedSellers() {
@@ -73,22 +94,35 @@ export default class extends Controller {
     this.selectedSellers = savedSellers.map(seller => seller.id);
 
     this.selectedSellers.forEach(id => {
-      const row = this.contentTarget.querySelector(`li[data-seller-id="${id}"]`);
+      const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${id}"]`);
       const checkbox = row.querySelector('.seller-checkbox');
       checkbox.checked = true;
       const percentageInput = row.querySelector('.seller-percentage');
       const savedSeller = savedSellers.find(seller => seller.id === id);
       percentageInput.value = savedSeller.percentage;
+      this.updateAmount(id, savedSeller.percentage);
     });
 
     this.updateCommission();
   }
 
   toggleSeller(event) {
-    this.manualUpdate = false; // Reset manual update flag
+    console.log("toggleSeller called");
+    this.manualUpdate = false;
 
     const checkbox = event.target;
-    const sellerId = checkbox.closest('li').dataset.sellerId;
+    console.log("Checkbox:", checkbox);
+
+    const row = checkbox.closest('tr');
+    console.log("Row:", row);
+
+    if (!row) {
+      console.error("Could not find parent row for checkbox");
+      return;
+    }
+
+    const sellerId = row.dataset.sellerId;
+    console.log("Seller ID:", sellerId);
 
     if (checkbox.checked) {
       this.selectedSellers.push(sellerId);
@@ -96,69 +130,141 @@ export default class extends Controller {
       this.selectedSellers = this.selectedSellers.filter(id => id !== sellerId);
     }
 
+    console.log("Selected Sellers:", this.selectedSellers);
+
     this.updateCommission();
   }
 
-  handleManualUpdate(event) {
-    const input = event.target;
-    const sellerId = input.closest('li').dataset.sellerId;
-
-    if (!this.selectedSellers.includes(sellerId)) {
-      this.selectedSellers.push(sellerId);
-      input.closest('li').querySelector('.seller-checkbox').checked = true;
-    }
-
-    this.manualUpdate = true; // Set manual update flag
-  }
-
   updateCommission() {
-    if (this.manualUpdate) return; // Skip if manually updating
+    if (this.manualUpdate) return;
 
     const selectedCount = this.selectedSellers.length;
     const defaultPercentage = selectedCount > 0 ? (100 / selectedCount).toFixed(2) : 0;
 
     this.selectedSellers.forEach(id => {
-      const row = this.contentTarget.querySelector(`li[data-seller-id="${id}"]`);
-      const percentageInput = row.querySelector('.seller-percentage');
-      percentageInput.value = defaultPercentage;
+      this.updateAmount(id, defaultPercentage);
     });
 
-    // Reset the percentages for any deselected sellers
-    this.contentTarget.querySelectorAll('li').forEach(row => {
+    this.modalContainerTarget.querySelectorAll('tr').forEach(row => {
       const sellerId = row.dataset.sellerId;
       if (!this.selectedSellers.includes(sellerId)) {
         const percentageInput = row.querySelector('.seller-percentage');
-        percentageInput.value = 0;
+        const amountInput = row.querySelector('.seller-amount');
+        if (percentageInput) percentageInput.value = '0';
+        if (amountInput) amountInput.value = '0';
       }
     });
   }
 
-  saveSellers() {
-    console.log('Saving sellers...');
-    const sellers = this.selectedSellers.map(id => {
-      const row = this.contentTarget.querySelector(`li[data-seller-id="${id}"]`);
-      const percentage = row.querySelector('.seller-percentage').value.trim();
+saveSellers() {
+  console.log('Saving sellers...');
+  const sellers = this.selectedSellers.map(id => {
+    const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${id}"]`);
+    const percentage = parseFloat(row.querySelector('.seller-percentage').value) || 0;
+    const amount = parseFloat(row.querySelector('.seller-amount').value) || 0;
 
-      return { id, percentage };
-    });
+    return { id, percentage, amount };
+  });
 
-    const totalPercentage = sellers.reduce((sum, seller) => sum + parseFloat(seller.percentage), 0);
-    if (totalPercentage !== 100) {
-      alert('El total de los porcentajes debe ser 100%.');
-      return;
-    }
+  const totalPercentage = sellers.reduce((sum, seller) => sum + seller.percentage, 0);
+  if (Math.abs(totalPercentage - 100) > 0.01) {
+    alert('El total de los porcentajes debe ser 100%.');
+    return;
+  }
 
     // Store the sellers data in a data attribute or local storage
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
     console.log('Sellers Button:', sellersButton);
     sellersButton.dataset.sellers = JSON.stringify(sellers);
     sellersButton.innerHTML = `
-      ${sellersButton.querySelector('svg').outerHTML} ${sellers.length} Vendedor${sellers.length > 1 ? 'es' : ''} Seleccionado${sellers.length > 1 ? 's' : ''}
-    `;
+    ${sellersButton.querySelector('svg').outerHTML} ${sellers.length} Vendedor${sellers.length > 1 ? 'es' : ''} Seleccionado${sellers.length > 1 ? 's' : ''}
+  `;
     sellersButton.classList.add('bg-blue-500', 'text-white');
     sellersButton.classList.remove('bg-white');
     console.log('Classes after update:', sellersButton.className);
 
     this.close();
+  }
+
+  updateAmount(sellerId, percentage) {
+    const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${sellerId}"]`);
+    if (row) {
+      const percentageInput = row.querySelector('.seller-percentage');
+      const amountInput = row.querySelector('.seller-amount');
+      if (percentageInput && amountInput) {
+        const totalAmount = this.getTotalAmount();
+        const percentageValue = parseFloat(percentage) || 0;
+        const amount = (totalAmount * percentageValue / 100).toFixed(2);
+        percentageInput.value = percentageValue.toFixed(2);
+        amountInput.value = amount;
+        console.log(`Updating amount for seller ${sellerId}: ${amount} (${percentageValue}% of ${totalAmount})`);
+      }
+    }
+  }
+
+  updatePercentage(sellerId, amount) {
+    const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${sellerId}"]`);
+    if (row) {
+      const percentageInput = row.querySelector('.seller-percentage');
+      const amountInput = row.querySelector('.seller-amount');
+      if (percentageInput && amountInput) {
+        const totalAmount = this.getTotalAmount();
+        const amountValue = parseFloat(amount) || 0;
+        const percentage = totalAmount > 0 ? ((amountValue / totalAmount) * 100).toFixed(2) : 0;
+        percentageInput.value = percentage;
+        amountInput.value = amountValue.toFixed(2);
+        console.log(`Updating percentage for seller ${sellerId}: ${percentage}% (${amountValue} of ${totalAmount})`);
+      }
+    }
+  }
+
+  getTotalAmount() {
+    const totalElement = document.querySelector('[data-pos--order-items-target="total"]');
+    if (totalElement) {
+      return parseFloat(totalElement.textContent.replace('S/ ', '')) || 0;
+    }
+    return 0;
+  }
+
+  handleManualUpdate(event) {
+    const input = event.target;
+    const sellerId = input.closest('tr').dataset.sellerId;
+
+    if (!this.selectedSellers.includes(sellerId)) {
+      this.selectedSellers.push(sellerId);
+      const checkbox = input.closest('tr').querySelector('.seller-checkbox');
+      if (checkbox) checkbox.checked = true;
+    }
+
+    this.updateAmount(sellerId, input.value);
+    this.manualUpdate = true;
+  }
+
+  handlePercentageUpdate(event) {
+    const input = event.target;
+    const sellerId = input.closest('tr').dataset.sellerId;
+    const percentage = parseFloat(input.value) || 0;
+
+    this.updateSellerSelection(sellerId);
+    this.updateAmount(sellerId, percentage);
+    this.manualUpdate = true;
+  }
+
+  handleAmountUpdate(event) {
+    const input = event.target;
+    const sellerId = input.closest('tr').dataset.sellerId;
+    const amount = parseFloat(input.value) || 0;
+
+    this.updateSellerSelection(sellerId);
+    this.updatePercentage(sellerId, amount);
+    this.manualUpdate = true;
+  }
+
+  updateSellerSelection(sellerId) {
+    if (!this.selectedSellers.includes(sellerId)) {
+      this.selectedSellers.push(sellerId);
+      const checkbox = this.modalContainerTarget.querySelector(`tr[data-seller-id="${sellerId}"] .seller-checkbox`);
+      if (checkbox) checkbox.checked = true;
+    }
   }
 }

@@ -281,6 +281,9 @@ export default class extends Controller {
     }
 
     this.totalTarget.textContent = `S/ ${total.toFixed(2)}`;
+
+    // const event = new CustomEvent('orderTotalUpdated', { detail: { total: total } });
+    // window.dispatchEvent(event);
   }
 
   addDraftItem(item) {
