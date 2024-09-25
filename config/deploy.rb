@@ -40,7 +40,7 @@ set :puma_systemctl_user, :system # when the puma.service is of type system
 set :sidekiq_service_unit_name, "sidekiq.service"
 set :sidekiq_service_unit_user, :system
 
-set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb package.json yarn.lock]
+# set :assets_dependencies, %w[app/assets lib/assets vendor/assets Gemfile.lock config/routes.rb package.json yarn.lock]
 
 set :whenever_environment, -> { fetch(:rails_env) }
 set :whenever_identifier, -> { "#{fetch(:application)}_#{fetch(:stage)}" }
@@ -76,62 +76,27 @@ end
 
 # this is added so that the yarn build and esbuild command is executed in the production environment
 
-namespace :deploy do
-  desc "Run yarn install"
-  task :yarn_install do
-    on roles(:web) do
-      within release_path do
-        execute :yarn, "install"
-      end
-    end
-  end
 
-  desc "Build assets with yarn for production"
-  task :yarn_build do
-    on roles(:web) do
-      within release_path do
-        execute :yarn, "run build:js:prod"
-        execute :yarn, "run build:css:prod"
-      end
-    end
-  end
+# Override the deploy:assets:precompile task
+# Rake::Task["deploy:assets:precompile"].clear
 
-  namespace :deploy do
-  desc "Precompile assets"
-  task :precompile_assets do
-    on roles(:web) do
-      within release_path do
-        with rails_env: fetch(:rails_env) do
-          execute :yarn, "install"
-          execute :yarn, "run build:css"
-          execute :yarn, "run build:js"
-          execute :rake, "assets:precompile"
-        end
-      end
-    end
-  end
-end
-
-  # Override the deploy:assets:precompile task
-  # Rake::Task["deploy:assets:precompile"].clear
-
-  # desc "Precompile assets"
-  # task :precompile_assets do
-  # on roles(:web) do
-  # within release_path do
-  # with rails_env: fetch(:rails_env) do
-  # execute :rake, "assets:precompile"
-  # Run Yarn build for production assets
-  # execute :yarn, "install"
-  # invoke "deploy:yarn_install"
-  # execute :yarn, "build:js:prod"
-  # invoke "deploy:yarn_build"
-  # TODO fix the double build issue
-  # end
-  # end
-  # end
-  # end
-end
+# desc "Precompile assets"
+# task :precompile_assets do
+# on roles(:web) do
+# within release_path do
+# with rails_env: fetch(:rails_env) do
+# execute :rake, "assets:precompile"
+# Run Yarn build for production assets
+# execute :yarn, "install"
+# invoke "deploy:yarn_install"
+# execute :yarn, "build:js:prod"
+# invoke "deploy:yarn_build"
+# TODO fix the double build issue
+# end
+# end
+# end
+# end
+# end
 
 # Hook the custom precompile task into the deploy process
-before "deploy:assets:precompile", "deploy:precompile_assets"
+# before "deploy:assets:precompile", "deploy:precompile_assets"
