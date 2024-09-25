@@ -3,6 +3,7 @@ module.exports = {
   content: [
     "./app/helpers/**/*.rb",
     "./app/javascript/**/*.js",
+    './app/assets/stylesheets/**/*.css',
     "./app/views/**/*.html.erb",
   ],
   safelist: [{ pattern: /form-.+/ }, { pattern: /btn-.+/ }],

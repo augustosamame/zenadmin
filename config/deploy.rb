@@ -74,6 +74,23 @@ namespace :deploy do
   before "deploy:migrate", "deploy:db_create"
 end
 
+namespace :deploy do
+  desc "Precompile assets"
+  task :precompile_assets do
+    on roles(:web) do
+      within release_path do
+        with rails_env: fetch(:rails_env) do
+          execute :yarn, "install"
+          execute :yarn, "run build"
+          execute :rake, "assets:precompile"
+        end
+      end
+    end
+  end
+end
+
+before "deploy:assets:precompile", "deploy:precompile_assets"
+
 # this is added so that the yarn build and esbuild command is executed in the production environment
 
 
