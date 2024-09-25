@@ -9,6 +9,13 @@ Rollbar.configure do |config|
     config.enabled = false
   end
 
+  config.before_process << proc do |options|
+    if options[:exception].is_a?(ArgumentError) &&
+       options[:exception].message.include?("invalid byte sequence in UTF-8")
+      "ignored"
+    end
+  end
+
   # By default, Rollbar will try to call the `current_user` controller method
   # to fetch the logged-in user object, and then call that object's `id`
   # method to fetch this property. To customize:
