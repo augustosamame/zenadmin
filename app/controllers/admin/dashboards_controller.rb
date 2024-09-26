@@ -59,12 +59,9 @@ class Admin::DashboardsController < Admin::AdminController
 
     def set_seller_commissions_list
       if @selected_location.present?
-      @seller_commissions_list = Commission.joins(:order)
-                                       .where(orders: { location_id: @selected_location&.id })
-                                       .order(created_at: :desc)
-                                       .limit(5)
+        @seller_commissions_list = Commission.joins(:order).includes(user: :avatar_attachment, order: {}).where(orders: { location_id: @selected_location&.id }).order(created_at: :desc).limit(5)
       else
-        @seller_commissions_list = Commission.all.includes([ :user, :order ]).order(created_at: :desc).limit(5)
+        @seller_commissions_list = Commission.all.includes(user: :avatar_attachment, order: {}).order(created_at: :desc).limit(5)
       end
     end
 
