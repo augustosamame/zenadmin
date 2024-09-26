@@ -486,7 +486,7 @@ GEM
     turbo-rails (2.0.10)
       actionpack (>= 6.0.0)
       railties (>= 6.0.0)
-    twilio-ruby (7.3.1)
+    twilio-ruby (7.3.2)
       faraday (>= 0.9, < 3.0)
       jwt (>= 1.5, < 3.0)
       nokogiri (>= 1.6, < 2.0)
@@ -590,7 +590,7 @@ DEPENDENCIES
   streamio-ffmpeg (~> 3.0.2)
   translate_enum (~> 0.2.0)
   turbo-rails (~> 2.0.10)
-  twilio-ruby (~> 7.3.1)
+  twilio-ruby (~> 7.3.2)
   tzinfo-data
   web-console
   web-push (~> 3.0.1)

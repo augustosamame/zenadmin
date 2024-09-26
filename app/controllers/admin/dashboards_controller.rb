@@ -64,7 +64,7 @@ class Admin::DashboardsController < Admin::AdminController
                                        .order(created_at: :desc)
                                        .limit(5)
       else
-        @seller_commissions_list = Commission.all.order(created_at: :desc).limit(5)
+        @seller_commissions_list = Commission.all.includes([ :user, :order ]).order(created_at: :desc).limit(5)
       end
     end
 
