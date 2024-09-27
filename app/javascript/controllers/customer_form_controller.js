@@ -20,7 +20,7 @@ export default class extends Controller {
       axios.get(`/admin/search_dni?numero=${docId}`, { headers: { 'Accept': 'application/json' } })
         .then(response => {
           if (response.data.error) {
-            this.showErrorDialog('Error', response.data.error);
+            //this.showErrorDialog('Error', response.data.error);
           } else {
             const data = response.data;
             const firstName = data.nombres;
@@ -34,7 +34,7 @@ export default class extends Controller {
         })
         .catch(error => {
           console.error('Error fetching customer data:', error);
-          this.showErrorDialog('Error', 'Error al buscar datos de cliente. Por favor, inténtelo de nuevo.');
+          //this.showErrorDialog('Error', 'Error al buscar datos de cliente. Por favor, inténtelo de nuevo.');
         });
     }
   }

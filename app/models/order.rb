@@ -85,7 +85,7 @@ class Order < ApplicationRecord
   end
 
   def universal_invoice_link
-    "#{Rails.application.config.action_mailer.default_url_options[:host]}/invoice/#{self.id}"
+    "#{ENV["DOMAIN_URL"]}/invoice/#{self.id}"
   end
 
   def universal_invoice_show

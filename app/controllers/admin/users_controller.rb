@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::AdminController
-  before_action :set_user, only: %i[edit update destroy]
+  before_action :set_user, only: %i[edit update destroy update_contact_info loyalty_info]
 
   def index
     respond_to do |format|
@@ -81,9 +81,20 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def loyalty_info
-    @user = User.find(params[:id])
     loyalty_service = Services::Sales::LoyaltyTierService.new(@user)
     render json: loyalty_service.loyalty_info
+  end
+
+  def update_contact_info
+    if @user.update(user_params)
+      if params[:order_to_email].present?
+        @order = Order.find(params[:order_to_email])
+        Services::Sales::OrderInvoiceService.new(@order).send_invoice_email
+      end
+      render json: @user
+    else
+      render json: @user.errors, status: :unprocessable_entity
+    end
   end
 
   private

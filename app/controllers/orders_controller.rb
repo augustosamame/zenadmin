@@ -7,7 +7,7 @@ class OrdersController < ApplicationController
     when :ready
       redirect_to @invoice_result[:url], allow_other_host: true
     when :pending
-      render plain: @invoice_result[:message], status: :processing
+      render json: { message: @invoice_result[:message] }, status: :ok
     else
       render plain: "Ocurrió un error al generar el comprobante. Por favor, inténtelo de nuevo más tarde.", status: :internal_server_error
     end

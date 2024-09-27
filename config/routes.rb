@@ -45,6 +45,7 @@ Rails.application.routes.draw do
     resources :users do
       member do
         get "loyalty_info"
+        patch "update_contact_info"
       end
     end
     get "sellers", to: "users#sellers"

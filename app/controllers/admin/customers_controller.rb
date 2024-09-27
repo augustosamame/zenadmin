@@ -97,13 +97,17 @@ class Admin::CustomersController < Admin::AdminController
 
   def search_dni
     response = Services::ReniecSunat::ConsultaDniRucPerudevs.consultar_dni(params[:numero])
-    if response["mensaje"] && response["mensaje"] == "Encontrado" && response["resultado"].present?
-      capitalized_response = response["resultado"].transform_values do |value|
-        value.split.map(&:capitalize).join(" ") if value.is_a?(String)
-      end
-      render json: capitalized_response
+    if response["estado"] == false
+      render json: { nombres: "", apellido_paterno: "", apellido_materno: "", fecha_nacimiento: "" }.to_json
     else
-      render json: { error: "No se encontraron datos para el DNI ingresado" }
+      if response["mensaje"] && response["mensaje"] == "Encontrado" && response["resultado"].present?
+        capitalized_response = response["resultado"].transform_values do |value|
+          value.split.map(&:capitalize).join(" ") if value.is_a?(String)
+        end
+        render json: capitalized_response
+      else
+        render json: { error: "No se encontraron datos para el DNI ingresado" }
+      end
     end
   end
 
