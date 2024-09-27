@@ -119,7 +119,7 @@ tag_1 = Tag.find_or_create_by!(name: 'Nuevas Fragancias')
 #  WarehouseInventory.create!(product: product, warehouse: warehouse_2, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
 # end
 
-PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarjeta de Crédito / Débito')
+PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarj Crédito / Débito')
 PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')
 PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
 PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectivo')

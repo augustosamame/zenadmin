@@ -4,11 +4,11 @@ class Admin::PaymentMethodsController < Admin::AdminController
     @datatable_options = "resource_name:'PaymentMethod';create_button:true;"
     respond_to do |format|
       format.html do
-        @payment_methods = PaymentMethod.all.active
+        @payment_methods = PaymentMethod.all.active.order(:id)
       end
 
       format.json do
-        render json: PaymentMethod.all.active
+        render json: PaymentMethod.all.active.order(:id)
       end
     end
   end

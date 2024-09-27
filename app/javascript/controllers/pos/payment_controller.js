@@ -87,21 +87,45 @@ export default class extends Controller {
 
   addPayment(event) {
     const method = event.currentTarget.dataset.description;
+    const methodName = event.currentTarget.dataset.method;
     const methodId = event.currentTarget.dataset.id;
     let remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
     const paymentAmount = remaining > 0 ? remaining : 0;
 
     const paymentElement = document.createElement('div');
-    paymentElement.classList.add('grid', 'grid-cols-[auto_1fr_auto]', 'gap-2', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
+    paymentElement.classList.add('grid', 'gap-2', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
     paymentElement.dataset.methodId = methodId;
-    paymentElement.innerHTML = `
-      <span class="self-center">${method}</span>
-      <input type="number" class="text-right border-none focus:ring-0 self-center" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-      <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
-    `;
+    paymentElement.dataset.methodName = methodName;
+
+    let gridColumns = 'grid-cols-[2fr_1fr_auto]';
+    let innerHtml = `
+  <span class="self-center mr-2 w-full">${method}</span>
+  <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-full" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+  <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
+`;
+
+    if (methodName === "card") {
+      gridColumns = 'grid-cols-[2fr_2fr_1fr_auto]';
+      innerHtml = `
+    <span class="self-center mr-2 w-full">${method}</span>
+    <div class="flex items-center w-full">
+      <label for="tx${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Tx #</label>
+      <input type="text" id="tx${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tx-input" >
+    </div>
+    <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+    <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
+  `;
+    }
+
+    paymentElement.classList.add(gridColumns);
+    paymentElement.innerHTML = innerHtml;
 
     this.paymentListTarget.appendChild(paymentElement);
     this.updateRemaining();
+  }
+
+  getUniqueId() {
+    return Date.now().toString(36) + Math.random().toString(36).substr(2);
   }
 
   removePayment(event) {
@@ -138,7 +162,7 @@ export default class extends Controller {
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
     let totalPayments = 0;
 
-    this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
+    this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
       totalPayments += parseFloat(input.value);
     });
 
@@ -177,13 +201,24 @@ export default class extends Controller {
     });
 
     const payments = [];
-    this.paymentListTarget.querySelectorAll('input[type="number"]').forEach(input => {
-      payments.push({
+    this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
+      const paymentElement = input.closest('div');
+      const paymentMethod = paymentElement.dataset.methodName;
+      const payment = {
         amount_cents: parseInt(input.value * 100, 10),
-        payment_method_id: input.closest('div').dataset.methodId,
+        payment_method_id: paymentElement.dataset.methodId,
         user_id: 1,
         payable_type: 'Order',
-      });
+      };
+
+      if (paymentMethod === 'card') {
+        const txInput = paymentElement.querySelector('.tx-input');
+        if (txInput) {
+          payment.processor_transacion_id = txInput.value;
+        }
+      }
+
+      payments.push(payment);
     });
 
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
