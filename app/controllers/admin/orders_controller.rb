@@ -69,7 +69,7 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def show
-    @order = Order.includes(:payments, :commissions).find(params[:id])
+    @order = Order.includes(payments: :payment_method, commissions: :user).find(params[:id])
   end
 
   def pos
@@ -94,6 +94,19 @@ class Admin::OrdersController < Admin::AdminController
       format.json do
         render json: { message: "Se ha reenviado el comprobante.", success: true }, status: :ok
       end
+    end
+  end
+
+  def edit
+    @order = Order.includes(commissions: :user).find(params[:id])
+  end
+
+  def update
+    @order = Order.includes(commissions: :user).find(params[:id])
+    if @order.update(order_params)
+      redirect_to admin_orders_path, notice: "Venta actualizada exitosamente."
+    else
+      render :edit, status: :unprocessable_entity
     end
   end
 

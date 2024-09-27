@@ -38,6 +38,7 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def show
     @transactions = @cashier_shift.cashier_transactions.order(created_at: :desc)
+    @sellers = User.where(id: @cashier_shift.sales_by_seller.keys).index_by(&:id)
   end
 
   def edit

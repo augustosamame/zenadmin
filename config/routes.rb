@@ -32,7 +32,7 @@ Rails.application.routes.draw do
       resources :requisition_lines
     end
 
-    resources :orders, only: [ :index, :new, :create, :update, :show ] do
+    resources :orders, only: [ :index, :new, :create, :update, :show, :edit, :update ] do
       member do
         post :retry_invoice
         get :universal_invoice_show

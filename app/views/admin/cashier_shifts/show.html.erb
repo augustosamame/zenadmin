@@ -89,6 +89,21 @@
         <% end %>
       </div>
     </div>
+
+    <div class="col-span-3">
+      <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Vendedor</p>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        <% @cashier_shift.sales_by_seller.each do |seller_id, total| %>
+          <% seller = @sellers[seller_id] %>
+          <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= seller&.name || 'Vendedor Desconocido' %></p>
+            <p class="text-lg font-semibold"><%= format_currency(total) %></p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+
   </div>
 
   <h2 class="mb-4 text-xl font-semibold">Movimientos de Caja</h2>
