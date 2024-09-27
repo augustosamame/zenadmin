@@ -43,6 +43,21 @@ module Services
           commission.update(amount_cents: amount_cents)
         end
       end
+
+      def recalculate_commissions
+        @order.commissions.where.not(status: :status_paid_out).each do |commission|
+          seller_commission_percentage = CommissionRange.find_commission_for_sales(
+            Services::Queries::SalesSearchService.new(location: @order.location).sales_on_month_for_location,
+            @order.location,
+            @order.order_date
+          )&.commission_percentage || 0
+
+          sale_amount_cents = @order.total_price_cents * (commission.percentage.to_f / 100)
+          amount_cents = ((sale_amount_cents * (seller_commission_percentage / 100)) / 1.18).round
+
+          commission.update(amount_cents: amount_cents)
+        end
+      end
     end
   end
 end

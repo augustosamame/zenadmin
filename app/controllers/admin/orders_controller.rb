@@ -99,12 +99,20 @@ class Admin::OrdersController < Admin::AdminController
 
   def edit
     @order = Order.includes(commissions: :user).find(params[:id])
+
+    # If there are no commissions, create default ones for all sellers
+    if @order.commissions.empty?
+      @order.sellers.each do |seller|
+        @order.commissions.build(user: seller, percentage: 0, sale_amount_cents: 0, amount_cents: 0)
+      end
+    end
   end
 
   def update
     @order = Order.includes(commissions: :user).find(params[:id])
     if @order.update(order_params)
-      redirect_to admin_orders_path, notice: "Venta actualizada exitosamente."
+      Services::Sales::OrderCommissionService.new(@order).recalculate_commissions
+      redirect_to admin_order_path(@order), notice: "Comisiones actualizadas exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
