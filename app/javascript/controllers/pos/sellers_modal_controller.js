@@ -82,10 +82,6 @@ export default class extends Controller {
         </tbody>
       </table>
     </div>
-    <div class="flex justify-end mt-4 space-x-4">
-      <button type="button" class="btn btn-secondary" data-action="click->pos--sellers-modal#close">Cancelar</button>
-      <button type="button" class="btn btn-primary" data-action="click->pos--sellers-modal#saveSellers">Guardar</button>
-    </div>
   `;
   }
 
@@ -158,6 +154,15 @@ export default class extends Controller {
 
 saveSellers() {
   console.log('Saving sellers...');
+
+  // Check if all sellers are deselected
+  if (this.selectedSellers.length === 0) {
+    console.log('No sellers selected. Resetting button.');
+    this.resetSellersButton();
+    this.close();
+    return;
+  }
+
   const sellers = this.selectedSellers.map(id => {
     const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${id}"]`);
     const percentage = parseFloat(row.querySelector('.seller-percentage').value) || 0;
@@ -167,7 +172,8 @@ saveSellers() {
   });
 
   const totalPercentage = sellers.reduce((sum, seller) => sum + seller.percentage, 0);
-  if (Math.abs(totalPercentage - 100) > 0.01) {
+  console.log('Total Percentage:', totalPercentage);
+  if (totalPercentage < 99.99) {
     alert('El total de los porcentajes debe ser 100%.');
     return;
   }
@@ -216,6 +222,17 @@ saveSellers() {
         console.log(`Updating percentage for seller ${sellerId}: ${percentage}% (${amountValue} of ${totalAmount})`);
       }
     }
+  }
+
+  resetSellersButton() {
+    const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
+    sellersButton.dataset.sellers = '[]';
+    sellersButton.innerHTML = `
+    ${sellersButton.querySelector('svg').outerHTML} Vendedores
+  `;
+    sellersButton.classList.remove('bg-blue-500', 'text-white');
+    sellersButton.classList.add('bg-white');
+    console.log('Classes after reset:', sellersButton.className);
   }
 
   getTotalAmount() {
