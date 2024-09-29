@@ -8,6 +8,8 @@ export default class extends Controller {
     console.log('Connected to PaymentController!');
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.canCreateUnpaidOrders = this.element.dataset.posCanCreateUnpaidOrders === 'true';
+    this.maxTotalSaleWithoutCustomer = parseFloat(document.getElementById('max-total-sale-without-customer').dataset.value);
+    console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
   }
 
   getRucData(customerId) {
@@ -25,18 +27,8 @@ export default class extends Controller {
   payOrder() {
     console.log('Pay button clicked');
 
-    // Get the OrderItemsController
-    const orderItemsElement = document.querySelector('[data-controller="pos--order-items"]');
-    const orderItemsController = this.application.getControllerForElementAndIdentifier(
-      orderItemsElement,
-      'pos--order-items'
-    );
-
-    // Validate all prices
-    if (orderItemsController && !orderItemsController.validateAllPrices()) {
-      console.log('Price validation failed');
-      return; // Stop here if validation fails
-    }
+    if (!this.validatePrices()) return;
+    if (!this.validateCustomerForLargeOrder()) return;
 
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
     const selectedRuc = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedRuc;
@@ -65,6 +57,40 @@ export default class extends Controller {
     this.paymentContainerTarget.classList.remove('hidden');
     this.updateTotal();
     this.fetchPaymentMethods();
+  }
+
+  validatePrices() {
+    const orderItemsElement = document.querySelector('[data-controller="pos--order-items"]');
+    const orderItemsController = this.application.getControllerForElementAndIdentifier(
+      orderItemsElement,
+      'pos--order-items'
+    );
+
+    if (orderItemsController && !orderItemsController.validateAllPrices()) {
+      console.log('Price validation failed');
+      return false;
+    }
+    return true;
+  }
+
+  validateCustomerForLargeOrder() {
+    const orderItemsTotal = document.querySelector('[data-pos--order-items-target="total"]').textContent.trim();
+    const totalAmount = parseFloat(orderItemsTotal.replace('S/', ''));
+
+    if (totalAmount >= this.maxTotalSaleWithoutCustomer) {
+      const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+      const genericCustomerId = '1'; // Assuming 1 is the ID of the generic customer, adjust if needed
+
+      if (!selectedCustomerId || selectedCustomerId === genericCustomerId) {
+        this.showErrorModal(
+          'Error de Validación',
+          `Las ventas sobre ${this.maxTotalSaleWithoutCustomer} soles requieren identificar al cliente con su DNI o RUC. Por favor escoja un cliente.`,
+          [{ label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }]
+        );
+        return false;
+      }
+    }
+    return true;
   }
 
   fetchPaymentMethods() {

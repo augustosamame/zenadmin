@@ -4,6 +4,8 @@
 
 <div id="max-price-discount-percentage" data-value="<%= $global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
 
+<div id="max-total-sale-without-customer" data-value="<%= $global_settings[:max_total_sale_without_customer] %>" style="display: none;"></div>
+
 <!-- Container to adjust layout for mobile and desktop -->
 <div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>">
 

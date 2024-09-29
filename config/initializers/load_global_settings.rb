@@ -8,6 +8,7 @@ Rails.application.config.after_initialize do
     { name: :track_inventory, default: true, data_type: "type_boolean", localized_name: "Medición de Inventarios", internal: true },
     { name: :multi_region, default: false, data_type: "type_boolean", localized_name: "Gestión de Múltiples Regiones", internal: true },
     { name: :max_price_discount_percentage, default: 10, data_type: "type_integer", localized_name: "Max % de descuento", internal: false },
+    { name: :max_total_sale_without_customer, default: 700, data_type: "type_integer", localized_name: "Maximo total de venta sin cliente", internal: false },
     { name: :ecommerce_active, default: true, data_type: "type_boolean", localized_name: "Módulo Ecommerce Activo", internal: true },
     { name: :pos_can_create_unpaid_orders, default: false, data_type: "type_boolean", localized_name: "POS puede crear ventas impagas", internal: true },
     { name: :audited_active, default: true, data_type: "type_boolean", localized_name: "Se generan tablas de auditoría", internal: true },

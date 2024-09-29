@@ -20,6 +20,7 @@ setting_10 = Setting.find_or_create_by!(name: 'stock_transfers_have_in_transit_s
 setting_11 = Setting.find_or_create_by!(name: 'show_sunat_guia_for_stock_transfers', data_type: "type_boolean", internal: true, localized_name: "Mostrar guías de remisión SUNAT en transferencias de stock", boolean_value: false)
 setting_12 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda", boolean_value: false)
 setting_13 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda y por medio de pago", boolean_value: true)
+setting_14 = Setting.find_or_create_by!(name: 'max_total_sale_without_customer', data_type: "type_integer", internal: false, localized_name: "Maximo total de venta sin cliente", integer_value: 700)
 
 ## custom numbering fields creation now handled by load_global_settings.rb initializer
 
