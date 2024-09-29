@@ -24,6 +24,20 @@ export default class extends Controller {
 
   payOrder() {
     console.log('Pay button clicked');
+
+    // Get the OrderItemsController
+    const orderItemsElement = document.querySelector('[data-controller="pos--order-items"]');
+    const orderItemsController = this.application.getControllerForElementAndIdentifier(
+      orderItemsElement,
+      'pos--order-items'
+    );
+
+    // Validate all prices
+    if (orderItemsController && !orderItemsController.validateAllPrices()) {
+      console.log('Price validation failed');
+      return; // Stop here if validation fails
+    }
+
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
     const selectedRuc = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedRuc;
     if (selectedRuc && selectedRuc.trim() !== '') {

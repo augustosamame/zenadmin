@@ -23,8 +23,12 @@ export default class extends Controller {
         } else if (this.currentMode === 'price') {
           orderItemsController.handleBackspaceForPrice();
         }
+      } else if (value === '.') {
+        if (this.currentMode === 'price') {
+          orderItemsController.handleDecimalPoint();
+        }
       } else {
-        if (orderItemsController.selectedItem) { // Ensure an item is selected
+        if (orderItemsController.selectedItem) {
           if (this.currentMode === 'quantity') {
             orderItemsController.updateQuantity(value);
           } else if (this.currentMode === 'price') {

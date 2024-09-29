@@ -11,6 +11,7 @@ export default class extends Controller {
 
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
     this.maxDiscountPercentage = parseFloat(document.getElementById('max-price-discount-percentage').dataset.value);
+    console.log('Max Discount Percentage:', this.maxDiscountPercentage);
     this.selectedItem = null;
     this.currentMode = 'quantity'; // Default mode is to update quantity
     const quantityButton = document.getElementById('quantity-mode-button');
@@ -23,6 +24,7 @@ export default class extends Controller {
     this.calculateTotal();
     this.discountPercentage = 0;
     this.setupLoyaltyEventListeners();
+    this.startingNewPrice = true;
   }
 
   setupLoyaltyEventListeners() {
@@ -45,6 +47,64 @@ export default class extends Controller {
       quantity: 1,
       isLoyaltyFree: true
     });
+  }
+
+  validateAllPrices() {
+    let invalidProducts = [];
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+    items.forEach(item => {
+      const validationResult = this.validatePrice(item);
+      if (!validationResult.isValid) {
+        invalidProducts.push(validationResult);
+      }
+    });
+    if (invalidProducts.length > 0) {
+      this.showPriceValidationError(invalidProducts);
+      return false;
+    }
+    return true;
+  }
+
+  validatePrice(item) {
+    const priceElement = item.querySelector('.editable-price');
+    const currentPrice = parseFloat(priceElement.textContent.replace('S/ ', ''));
+    const originalPrice = parseFloat(item.getAttribute('data-item-original-price'));
+    const minAllowedPrice = originalPrice * (1 - this.maxDiscountPercentage / 100);
+    const productName = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
+
+    if (currentPrice < minAllowedPrice) {
+      return {
+        isValid: false,
+        productName: productName,
+        currentPrice: currentPrice,
+        minAllowedPrice: minAllowedPrice
+      };
+    }
+    return { isValid: true };
+  }
+
+  showPriceValidationError(invalidProducts) {
+    const productList = invalidProducts.map(product =>
+      `- ${product.productName}: Precio actual S/ ${product.currentPrice.toFixed(2)}, Precio mínimo permitido S/ ${product.minAllowedPrice.toFixed(2)}`
+    ).join('\n');
+
+    const errorMessage = `Los siguientes productos tienen un precio por debajo del descuento máximo permitido (${this.maxDiscountPercentage}%):\n\n${productList}\n\nPor favor, revise los precios antes de continuar.`;
+
+    const customModal = document.querySelector('[data-controller="custom-modal"]');
+    if (customModal) {
+      const customModalController = this.application.getControllerForElementAndIdentifier(customModal, 'custom-modal');
+      if (customModalController) {
+        customModalController.openWithContent('Error de Validación', errorMessage, [
+          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
+        ]);
+      } else {
+        console.error('CustomModalController not found!');
+        alert(errorMessage);
+      }
+    } else {
+      console.error('Custom modal element not found!');
+      alert(errorMessage);
+    }
   }
 
   applyDiscount(event) {
@@ -90,6 +150,7 @@ export default class extends Controller {
 
     // Mark the first keypress
     this.isFirstKeyPress = true;
+    this.startingNewPrice = true;
   }
 
   updateQuantity(value) {
@@ -148,10 +209,10 @@ export default class extends Controller {
     this.saveDraft();
   }
 
-  updateSubtotal() {
-    const quantity = parseInt(this.selectedItem.querySelector('[data-item-quantity]').textContent);
-    const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
-    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+  updateSubtotal(item) {
+    const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent);
+    const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
+    const subtotalElement = item.querySelector('[data-item-subtotal]');
     subtotalElement.textContent = `S/ ${(quantity * price).toFixed(2)}`;
   }
 
@@ -164,30 +225,36 @@ export default class extends Controller {
 
   handleKeypadForPrice(digit) {
     console.log('Digit:', digit);
-    const selectedItem = this.itemsTarget.querySelector('.bg-blue-100');
-    if (!selectedItem) return;
+    if (!this.selectedItem) return;
 
     const priceElement = this.selectedItem.querySelector('.editable-price');
-    let currentPrice = priceElement.textContent.replace('S/', '').trim();
+    let currentPrice = priceElement.textContent.replace('S/ ', '').replace('.', '');
 
-    if (this.priceJustSelected || currentPrice === '0.00') {
+    // If we're starting a new price entry or the current price is 0
+    if (this.startingNewPrice || currentPrice === '000') {
       currentPrice = digit;
-      this.priceJustSelected = false;
+      this.startingNewPrice = false;
     } else {
       currentPrice += digit;
-      this.priceJustSelected = true;
     }
 
-    // Ensure the price is valid and formatted correctly
-    if (!currentPrice.includes('.')) {
-      currentPrice = parseFloat(currentPrice).toFixed(2);
+    // Remove leading zeros
+    currentPrice = currentPrice.replace(/^0+/, '');
+
+    // Ensure we have at least 3 digits (including 2 decimal places)
+    while (currentPrice.length < 3) {
+      currentPrice = '0' + currentPrice;
     }
 
-    priceElement.textContent = `S/ ${currentPrice}`;
-    console.log('Current Price:', currentPrice);
-    console.log('About to calculate total:');
+    // Insert decimal point
+    let formattedPrice = (currentPrice.slice(0, -2) + '.' + currentPrice.slice(-2)).replace(/^\./, '0.');
+
+    priceElement.textContent = `S/ ${formattedPrice}`;
+    console.log('Current Price:', formattedPrice);
+
+    this.updateSubtotal(this.selectedItem);
     this.calculateTotal();
-    this.saveDraft(); // Save changes immediately
+    this.saveDraft();
   }
 
   handleBackspaceForQuantity() {
@@ -220,25 +287,30 @@ export default class extends Controller {
     if (!this.selectedItem) return;
 
     const priceElement = this.selectedItem.querySelector('.editable-price');
-    let currentPrice = priceElement.textContent.replace('S/ ', '').trim();
+    let currentPrice = priceElement.textContent.replace('S/ ', '').replace('.', '');
 
     if (currentPrice.length > 1) {
-      currentPrice = currentPrice.slice(0, -1); // Remove the last digit
+      currentPrice = currentPrice.slice(0, -1);
     } else {
-      currentPrice = '0.00'; // Set to 0.00 if only one digit left
+      currentPrice = '000';
+      this.startingNewPrice = true;
     }
 
-    priceElement.textContent = `S/ ${parseFloat(currentPrice).toFixed(2)}`;
+    // Ensure we have at least 3 digits (including 2 decimal places)
+    while (currentPrice.length < 3) {
+      currentPrice = '0' + currentPrice;
+    }
 
-    // Update subtotal
-    const quantity = parseInt(this.selectedItem.querySelector('[data-item-quantity]').textContent);
-    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
-    subtotalElement.textContent = `S/ ${(quantity * parseFloat(currentPrice)).toFixed(2)}`;
+    // Insert decimal point
+    let formattedPrice = (currentPrice.slice(0, -2) + '.' + currentPrice.slice(-2)).replace(/^\./, '0.');
 
+    priceElement.textContent = `S/ ${formattedPrice}`;
+
+    this.updateSubtotal(this.selectedItem);
     this.calculateTotal();
     this.saveDraft();
   }
-
+  
   removeItemFromSelection() {
     if (!this.selectedItem) return;
     this.selectedItem.remove();
