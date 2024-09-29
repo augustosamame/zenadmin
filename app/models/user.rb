@@ -3,7 +3,7 @@ class User < ApplicationRecord
   audited_if_enabled
   include TranslateEnum
 
-  has_person_name
+  # has_person_name
   has_one_attached :avatar
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles

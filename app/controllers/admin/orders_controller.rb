@@ -99,13 +99,7 @@ class Admin::OrdersController < Admin::AdminController
 
   def edit
     @order = Order.includes(commissions: :user).find(params[:id])
-
-    # If there are no commissions, create default ones for all sellers
-    if @order.commissions.empty?
-      @order.sellers.each do |seller|
-        @order.commissions.build(user: seller, percentage: 0, sale_amount_cents: 0, amount_cents: 0)
-      end
-    end
+    @commissions = @order.commissions
   end
 
   def update
@@ -121,7 +115,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id

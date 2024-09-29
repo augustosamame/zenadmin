@@ -51,7 +51,24 @@ Rails.application.configure do
   # caching is enabled.
   config.action_mailer.perform_caching = false
 
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
+  config.action_mailer.raise_delivery_errors = true
+
+  config.action_mailer.default_url_options = { host: "devtechperu.com" }
+
+  config.action_mailer.delivery_method = :smtp
+  ActionMailer::Base.smtp_settings =
+  {
+    address: "email-smtp.us-east-1.amazonaws.com",
+    port: 587,
+    domain: "devtechperu.com",
+    authentication: :login,
+    user_name: ENV["SES_SMTP_USER"],
+    password: ENV["SES_SMTP_PASSWORD"],
+    # ssl: true,
+    # tls: true,
+    openssl_verify_mode: "peer",
+    enable_starttls_auto: true
+  }
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log

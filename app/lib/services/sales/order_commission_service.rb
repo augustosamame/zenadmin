@@ -52,10 +52,14 @@ module Services
             @order.order_date
           )&.commission_percentage || 0
 
-          sale_amount_cents = @order.total_price_cents * (commission.percentage.to_f / 100)
-          amount_cents = ((sale_amount_cents * (seller_commission_percentage / 100)) / 1.18).round
+          # Calculate the new sale_amount_cents based on the updated percentage
+          sale_amount_cents = (@order.total_price_cents * commission.percentage / 100).round
 
-          commission.update(amount_cents: amount_cents)
+          # Calculate the new amount_cents
+          amount_cents = ((sale_amount_cents * seller_commission_percentage / 100) / 1.18).round
+
+          # Update both sale_amount_cents and amount_cents
+          commission.update(sale_amount_cents: sale_amount_cents, amount_cents: amount_cents)
         end
       end
     end

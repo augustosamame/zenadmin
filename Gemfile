@@ -33,7 +33,7 @@ gem "bootsnap", require: false
 # Use Active Storage variants [https://guides.rubyonrails.org/active_storage_overview.html#transforming-images]
 gem "image_processing", "~> 1.2"
 
-gem "railsui", github: "getrailsui/railsui", branch: "main"
+gem "railsui", github: "augustosamame/railsui", branch: "main"
 
 gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"

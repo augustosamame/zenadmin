@@ -51,6 +51,7 @@ class Order < ApplicationRecord
 
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :payments, allow_destroy: true
+  accepts_nested_attributes_for :commissions, allow_destroy: true
 
   pg_search_scope :search_by_customer_name,
                   associated_against: {

@@ -15,8 +15,8 @@ GIT
       rails (>= 4.0)
 
 GIT
-  remote: https://github.com/getrailsui/railsui.git
-  revision: 1db7480fd26d2d3e1be423f608f851e4b0f6b08a
+  remote: https://github.com/augustosamame/railsui.git
+  revision: 174d8aff3097776df18016166c617ed085369d82
   branch: main
   specs:
     railsui (2.1.1)

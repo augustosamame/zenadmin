@@ -5,7 +5,7 @@
 <% end %>
 
 <div class="container px-4 py-8 mx-auto">
-  <%= form_with(model: [ :admin, @order ], local: true) do |form| %>
+  <%= simple_form_for [:admin, @order] do |f| %>
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
@@ -44,24 +44,22 @@
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <%= form.fields_for :commissions do |commission_form| %>
-            <% if commission_form.object && commission_form.object.user %>
-              <tr>
-                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.name %></td>
-                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.email %></td>
-                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                  <%= commission_form.number_field :percentage, step: 0.01, class: "w-24 px-2 py-1 text-sm border rounded" %>
-                </td>
-                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission_form.object.sale_amount) %></td>
-              </tr>
-            <% end %>
+          <%= f.simple_fields_for :commissions do |commission_form| %>
+            <tr>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.email %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <%= commission_form.input :percentage, label: false, input_html: { step: 0.01, class: "w-24 px-2 py-1 text-sm border rounded" } %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission_form.object.sale_amount) %></td>
+            </tr>
           <% end %>
         </tbody>
       </table>
     </div>
 
     <div class="mt-8">
-      <%= form.submit "Actualizar Comisiones", class: "btn btn-primary" %>
+      <%= f.submit "Actualizar Comisiones", class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>
