@@ -42,7 +42,7 @@ location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_de
 
 location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: region_default, email: "sanmiguel@devtechperu.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
 
-location_3 = Location.find_or_create_by!(name: 'La Rambla Brasil', region: region_default, email: "laramblabrasil@devtechperu.com", address: 'Av Brasil S/N, Breña', phone: '900000008')
+location_3 = Location.find_or_create_by!(name: 'Plaza Norte', region: region_default, email: "plazanorte@jardindelzen.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
 
 Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')
@@ -57,7 +57,7 @@ storeuser1.add_role('seller')
 storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
 storeuser2.add_role('seller')
 
-storeuser3 = User.create!(email: 'laramblabrasil@devtechperu.com', phone: "986976313", location_id: location_3.id, login: "laramblabrasil@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "La Rambla Brasil", internal: true)
+storeuser3 = User.create!(email: 'plazanorte@jardindelzen.com', phone: "928855854", location_id: location_3.id, login: "plazanorte@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza Norte", internal: true)
 storeuser3.add_role('seller')
 
 supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
@@ -67,8 +67,11 @@ warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: r
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
 warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id, region: region_default)
+warehouse_5 = Warehouse.find_or_create_by!(name: "Almacén Plaza Norte", location_id: location_3.id, region: region_default)
 
 cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
+
+=begin
 
 4.times do
   Product.transaction do
@@ -105,6 +108,8 @@ cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: loca
     media.save!
   end
 end
+
+=end
 
 
 # Associate the product with categories
@@ -183,9 +188,15 @@ invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_t
 
 invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer3, comprobante_type: 'boleta', prefix: 'B003', next_number: 1)
 
+invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'factura', prefix: 'F019', next_number: 1)
+invseries7 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'boleta', prefix: 'B019', next_number: 1)
+
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'))
+
+InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries6, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries7, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 
 NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
@@ -204,11 +215,13 @@ LoyaltyTier.find_or_create_by!(name: 'Gold', requirements_orders_count: 30, requ
 LoyaltyTier.find_or_create_by!(name: 'Platinum', requirements_orders_count: 40, requirements_total_amount: 4000, discount_percentage: 0.20, free_product_id: random_products[2])
 LoyaltyTier.find_or_create_by!(name: 'Diamond', requirements_orders_count: 50, requirements_total_amount: 5000, discount_percentage: 0.25, free_product_id: random_products[3])
 
+=begin
 for i in 1..50
   days_ago = rand(1..30)
   sales_price_cents = rand(1000..10000)
   created_time = Time.now - days_ago.days
   Order.create!(user_id: generic_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
 end
+=end
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import

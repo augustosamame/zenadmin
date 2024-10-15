@@ -21,7 +21,7 @@
             <td class="px-4 py-2"><%= mapping.location.name %></td>
             <td class="px-4 py-2"><%= mapping.invoice_series.invoicer.name %></td>
             <td class="px-4 py-2"><%= mapping.invoice_series.prefix %></td>
-            <td class="px-4 py-2"><%= mapping.payment_method&.name || 'N/A' %></td>
+            <td class="px-4 py-2"><%= mapping.payment_method&.description || 'N/A' %></td>
             <td class="px-4 py-2"><%= mapping.default ? 'Sí' : 'No' %></td>
             <td class="px-4 py-2">
               <div data-controller="dropdown" class="relative">
