@@ -1,8 +1,8 @@
 class Admin::ComboProductsController < Admin::AdminController
-  before_action :set_combo_product, only: [ :show, :edit, :update ]
+  before_action :set_combo_product, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @combo_products = ComboProduct.all
+    @combo_products = ComboProduct.all.includes(:product_1, :product_2)
     @datatable_options = "resource_name:'ComboProduct';create_button:true;"
   end
 
@@ -20,6 +20,12 @@ class Admin::ComboProductsController < Admin::AdminController
   end
 
   def show
+    redirect_to admin_combo_products_path
+  end
+
+  def destroy
+    @combo_product.destroy
+    redirect_to admin_combo_products_path, notice: "El pack fue eliminado exitosamente."
   end
 
   def edit

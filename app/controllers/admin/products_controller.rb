@@ -154,13 +154,33 @@ class Admin::ProductsController < Admin::AdminController
     def combo_to_json(combo)
       {
         id: combo.id,
-        custom_id: "COMBO-#{combo.id}",
+        custom_id: "PACK-#{combo.id}",
         name: combo.name,
         image: combo.product_1.smart_image(:small),
-        price: (combo.price_cents / 100.0),
-        stock: [ combo.product_1.stock(@current_warehouse) / combo.qty_1,
-                combo.product_2.stock(@current_warehouse) / combo.qty_2 ].min,
-        type: "ComboProduct"
+        price: combo.price.to_f,
+        stock: combo.stock(@current_warehouse),
+        type: "ComboProduct",
+        combo_details: {
+          normal_price: combo.normal_price.to_f,
+          price: combo.price.to_f,
+          discount: (combo.normal_price - combo.price).to_f,
+          products: [
+            {
+              id: combo.product_1.id,
+              custom_id: combo.product_1.custom_id,
+              name: combo.product_1.name,
+              quantity: combo.qty_1,
+              regular_price: combo.product_1.price.to_f
+            },
+            {
+              id: combo.product_2.id,
+              custom_id: combo.product_2.custom_id,
+              name: combo.product_2.name,
+              quantity: combo.qty_2,
+              regular_price: combo.product_2.price.to_f
+            }
+          ]
+        }
       }
     end
 

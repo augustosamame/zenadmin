@@ -106,7 +106,7 @@ export default class extends Controller {
     })
   }
 
-  addProductToOrder(product) {
+  addProductToOrder(item) {
     // Find the element that contains the pos--order-items controller
     const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]');
     console.log('Order Items Container:', orderItemsContainer);
@@ -116,13 +116,39 @@ export default class extends Controller {
 
     console.log('Order Items Controller:', orderItemsController);
 
-    // Call the addItem method on the orderItemsController
-    orderItemsController.addItem({
-      id: product.id,
-      custom_id: product.custom_id,
-      name: product.name,
-      price: product.price,
-      quantity: 1
-    });
+    if (item.type === "Product") {
+      // Handle regular product
+      orderItemsController.addItem({
+        id: item.id,
+        custom_id: item.custom_id,
+        name: item.name,
+        price: item.price,
+        quantity: 1,
+        isComboItem: false
+      });
+    } else if (item.type === "ComboProduct") {
+      // Handle combo product
+      const comboDetails = item.combo_details;
+      const comboId = item.id;
+
+      // Add each product in the combo
+      comboDetails.products.forEach(product => {
+        orderItemsController.addItem({
+          id: product.id,
+          custom_id: product.custom_id,
+          name: product.name,
+          price: product.regular_price,
+          quantity: product.quantity,
+          isComboItem: true,
+          comboId: comboId
+        });
+      });
+
+      // Calculate and apply the discount
+      const discountAmount = comboDetails.discount;
+      if (discountAmount > 0) {
+      orderItemsController.addComboDiscount(comboId, discountAmount);
+      }
+    }
   }
 }

@@ -25,6 +25,7 @@ export default class extends Controller {
     this.discountPercentage = 0;
     this.setupLoyaltyEventListeners();
     this.startingNewPrice = true;
+    this.comboDiscounts = new Map(); // To store discounts for each combo
   }
 
   setupLoyaltyEventListeners() {
@@ -138,7 +139,6 @@ export default class extends Controller {
     this.saveDraft();
   }
 
-
   selectItem(event) {
     // Clear any previously selected items
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
@@ -154,6 +154,7 @@ export default class extends Controller {
   }
 
   updateQuantity(value) {
+    console.log('updating quantity:', value);
     if (!this.selectedItem) return;
 
     const quantityElement = this.selectedItem.querySelector('[data-item-quantity]');
@@ -178,8 +179,39 @@ export default class extends Controller {
     const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
     subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
 
+    if (this.selectedItem.hasAttribute('data-combo-id')) {
+      console.log('has Combo ID:', this.selectedItem.getAttribute('data-combo-id'), 'will check and update');
+      this.checkAndUpdateComboDiscount(this.selectedItem);
+    }
+
     this.calculateTotal();
     this.saveDraft();
+  }
+
+  checkAndUpdateComboDiscount(item) {
+    const originalQuantity = parseInt(item.getAttribute('data-original-quantity'));
+    const currentQuantity = parseInt(item.querySelector('[data-item-quantity]').textContent);
+
+    if (currentQuantity < originalQuantity) {
+      this.removeComboDiscount(item);
+    }
+  }
+
+  removeComboDiscount(item) {
+    console.log('removing combo discount for:', item);
+    const comboId = item.getAttribute('data-combo-id');
+    // Convert comboId to the same type as the keys in the Map
+    const keyToDelete = Array.from(this.comboDiscounts.keys()).find(key => key.toString() === comboId);
+
+    if (keyToDelete !== undefined) {
+      this.comboDiscounts.delete(keyToDelete);
+    }
+
+    // Remove combo attributes from all items with this combo ID
+    this.itemsTarget.querySelectorAll(`[data-combo-id="${comboId}"]`).forEach(comboItem => {
+      comboItem.removeAttribute('data-combo-id');
+      comboItem.removeAttribute('data-original-quantity');
+    });
   }
 
   updatePrice(value) {
@@ -217,6 +249,12 @@ export default class extends Controller {
   }
 
   removeItem() {
+    console.log('removing item:', this.selectedItem);
+    if (this.selectedItem.hasAttribute('data-combo-id')) {
+      console.log('removing combo discount for:', this.selectedItem);
+      this.removeComboDiscount(this.selectedItem);;
+    }
+
     this.selectedItem.remove();
     this.selectedItem = null;
     this.calculateTotal();
@@ -278,6 +316,11 @@ export default class extends Controller {
       const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
       subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
 
+      if (this.selectedItem.hasAttribute('data-combo-id')) {
+        console.log('has Combo ID:', this.selectedItem.getAttribute('data-combo-id'), 'will check and update');
+        this.checkAndUpdateComboDiscount(this.selectedItem);
+      }
+
       this.calculateTotal();
       this.saveDraft();
     }
@@ -312,6 +355,11 @@ export default class extends Controller {
   }
   
   removeItemFromSelection() {
+    console.log('removing item:', this.selectedItem);
+    if (this.selectedItem.hasAttribute('data-combo-id')) {
+      this.removeComboDiscount(this.selectedItem);;
+    }
+
     if (!this.selectedItem) return;
     this.selectedItem.remove();
     this.selectedItem = null;
@@ -331,30 +379,39 @@ export default class extends Controller {
     }
 
     items.forEach(item => {
-      console.log('inside calculateTotal, item:', item);
       const itemSubtotalElement = item.querySelector('[data-item-subtotal]');
       if (itemSubtotalElement) {
         const itemSubtotal = parseFloat(itemSubtotalElement.textContent.replace('S/ ', ''));
-        console.log('Subtotal:', itemSubtotal);
         if (!isNaN(itemSubtotal)) {
           subtotal += itemSubtotal;
         }
       }
     });
 
-    const discountAmount = subtotal * (this.discountPercentage / 100);
-    const total = subtotal - discountAmount;
+    const totalComboDiscount = Array.from(this.comboDiscounts.values()).reduce((sum, discount) => sum + discount, 0);
+    // Apply combo discount and percentage discount
+    const percentageDiscount = subtotal * (this.discountPercentage / 100);
+    const totalDiscountAmount = totalComboDiscount + percentageDiscount;
+    const totalAfterDiscounts = subtotal - totalDiscountAmount;
 
-    if (this.discountPercentage > 0) {
+    // Update discount row
+    if (totalDiscountAmount > 0) {
       this.discountRowTarget.classList.remove('hidden');
-      this.discountAmountTarget.textContent = `(S/ ${discountAmount.toFixed(2)})`;
+      this.discountAmountTarget.textContent = `(S/ ${totalDiscountAmount.toFixed(2)})`;
     } else {
       this.discountRowTarget.classList.add('hidden');
     }
 
-    this.totalTarget.textContent = `S/ ${total.toFixed(2)}`;
+    // Update total
+    this.totalTarget.textContent = `S/ ${totalAfterDiscounts.toFixed(2)}`;
 
-    // const event = new CustomEvent('orderTotalUpdated', { detail: { total: total } });
+    console.log('Subtotal:', subtotal);
+    console.log('Total Combo Discount:', totalComboDiscount);
+    console.log('Percentage Discount:', percentageDiscount);
+    console.log('Total after discounts:', totalAfterDiscounts);
+
+    // Uncomment if you want to dispatch an event with the updated total
+    // const event = new CustomEvent('orderTotalUpdated', { detail: { total: totalAfterDiscounts } });
     // window.dispatchEvent(event);
   }
 
@@ -418,6 +475,17 @@ export default class extends Controller {
     quantityElement.textContent = newQuantity;
     const newSubtotal = (newQuantity * product.price).toFixed(2);
     subtotalElement.textContent = `S/ ${newSubtotal}`;
+
+    if (product.isComboItem) {
+      const currentQuantity = parseInt(existingItem.querySelector('[data-item-quantity]').textContent);
+      const newQuantity = currentQuantity + product.quantity;
+      existingItem.setAttribute('data-original-quantity', newQuantity);
+    }
+  }
+
+  addComboDiscount(comboId, discountAmount) {
+    this.comboDiscounts.set(comboId, discountAmount);
+    this.calculateTotal();
   }
 
   addNewItem(product) {
@@ -444,6 +512,11 @@ export default class extends Controller {
         <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
       </div>
     `;
+
+    if (product.isComboItem) {
+      itemElement.setAttribute('data-combo-id', product.comboId);
+      itemElement.setAttribute('data-original-quantity', product.quantity);
+    }
 
     this.itemsTarget.appendChild(itemElement);
   }
