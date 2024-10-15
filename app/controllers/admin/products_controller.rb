@@ -95,14 +95,20 @@ class Admin::ProductsController < Admin::AdminController
   def search
     if params[:query].blank?
       @products = Product.active.without_tests.includes(:warehouse_inventories).all
+      @combo_products = ComboProduct.all
     else
       if params[:query].length <= 50
         @products = Product.active.without_tests.search_by_custom_id_and_name(params[:query])
+        @combo_products = ComboProduct.where("name ILIKE ?", "%#{params[:query]}%")
       else
         @products = []
+        @combo_products = []
       end
     end
-    render json: @products.map { |product| { id: product.id, custom_id: product.custom_id, name: product.name, image: product.smart_image(:small), price: (product.price_cents / 100), stock: product.stock(@current_warehouse) } }
+
+    combined_results = (@products.map { |product| product_to_json(product) } + @combo_products.map { |combo| combo_to_json(combo) })
+
+    render json: combined_results
   end
 
   private
@@ -131,6 +137,31 @@ class Admin::ProductsController < Admin::AdminController
       end
 
       params
+    end
+
+    def product_to_json(product)
+      {
+        id: product.id,
+        custom_id: product.custom_id,
+        name: product.name,
+        image: product.smart_image(:small),
+        price: (product.price_cents / 100.0),
+        stock: product.stock(@current_warehouse),
+        type: "Product"
+      }
+    end
+
+    def combo_to_json(combo)
+      {
+        id: combo.id,
+        custom_id: "COMBO-#{combo.id}",
+        name: combo.name,
+        image: combo.product_1.smart_image(:small),
+        price: (combo.price_cents / 100.0),
+        stock: [ combo.product_1.stock(@current_warehouse) / combo.qty_1,
+                combo.product_2.stock(@current_warehouse) / combo.qty_2 ].min,
+        type: "ComboProduct"
+      }
     end
 
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable

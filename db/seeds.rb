@@ -51,7 +51,7 @@ Role.find_or_create_by!(name: 'supervisor')
 Role.find_or_create_by!(name: 'warehouse_manager')
 Role.find_or_create_by!(name: 'customer')
 
-storeuser1 = User.create!(email: 'jockeyplaza@devtechperu.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
+storeuser1 = User.create!(email: 'jockeyplaza@jardindelzen.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
 storeuser1.add_role('seller')
 
 storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
@@ -68,8 +68,6 @@ warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
 warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id, region: region_default)
 warehouse_5 = Warehouse.find_or_create_by!(name: "Almacén Plaza Norte", location_id: location_3.id, region: region_default)
-
-cashier_1 = Cashier.find_or_create_by!(name: "Caja Principal", location_id: location_1.id)
 
 =begin
 
@@ -176,7 +174,7 @@ user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", login
 user5.add_role('seller')
 
 invoicer1 = Invoicer.find_or_create_by!(name: 'El Jardin del Zen', razon_social: 'El Jardin del Zen EIRL', ruc: '20513903180', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561354", region: region_default)
-invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20518549937', tipo_ruc: 'RUC', einvoice_api_key: "", region: region_default)
+invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20518549937', tipo_ruc: 'RUC', einvoice_api_key: "12345678901234561355", region: region_default)
 invoicer3 = Invoicer.find_or_create_by!(name: 'Alicia Alvariño Garland', razon_social: 'Alicia Alvariño Garland', ruc: '10078741258', tipo_ruc: 'RUS', einvoice_api_key: "12345678901220560554", region: region_default)
 invoicer4 = Invoicer.find_or_create_by!(name: 'Maria Isabel Garland', razon_social: 'Maria Isabel Garland', ruc: '10107907365', tipo_ruc: 'RUS', einvoice_api_key: "", region: region_default)
 
@@ -224,4 +222,5 @@ for i in 1..50
 end
 =end
 
-Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call_jardin_del_zen_import
+Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 5).call
+Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call

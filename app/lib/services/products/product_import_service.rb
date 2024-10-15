@@ -3,11 +3,12 @@ require "csv"
 module Services
   module Products
     class ProductImportService
-      def initialize(file_path)
+      def initialize(file_path, max_rows = nil)
         @file_path = file_path
+        @max_rows = max_rows
       end
 
-      def call_jardin_del_zen_import
+      def call
         create_product_categories_and_tags_and_products
       end
 
@@ -25,7 +26,7 @@ module Services
         end
 
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
-          break if index > 5
+          break if @max_rows && index > @max_rows
           product_category_name = row[0]
           product_name = row[1]
           tag1_name = row[2]

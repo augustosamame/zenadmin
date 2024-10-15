@@ -53,7 +53,7 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer = StockTransfer.new(stock_transfer_params)
     @stock_transfer.user_id = current_user.id
     if @stock_transfer.save
-      @stock_transfer.finish_transfer! if @stock_transfer.stage == "complete" || @stock_transfer.origin_warehouse_id.nil? # inventario inicial
+      @stock_transfer.finish_transfer! if @stock_transfer.origin_warehouse_id.nil? # inventario inicial
       if @stock_transfer.is_adjustment
         redirect_to index_stock_adjustments_admin_stock_transfers_path, notice: "El ajuste de Stock se creó correctamente."
       else

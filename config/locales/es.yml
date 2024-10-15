@@ -28,6 +28,14 @@
 #       enabled: "ON"
 
 es:
+  number:
+    currency:
+      format:
+        delimiter: ","
+        separator: "."
+    format:
+      delimiter: ","
+      separator: "."
   cash_inflow: Ingreso a Caja
   cash_outflow: Salida de Caja
   notification:

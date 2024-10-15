@@ -14,6 +14,7 @@ class Admin::AdminController < ApplicationController
     session[:current_warehouse_id] = @current_warehouse.id
     current_cashier = Cashier.find_by(id: session[:current_cashier_id])
     @current_cashier = current_cashier || @current_location&.cashiers&.first
+    session[:current_cashier_id] = @current_cashier.id
     @current_cashier_shift = @current_cashier&.current_shift(current_user)
     @default_object_options_array = [
       { event_name: "edit", label: "Editar", icon: "pencil-square" },
