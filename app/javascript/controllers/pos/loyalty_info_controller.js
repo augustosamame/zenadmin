@@ -24,7 +24,12 @@ export default class extends Controller {
     axios.get(`/admin/users/${userId}/loyalty_info`)
       .then(response => {
         console.log('Loyalty info received', response.data)
-        this.renderLoyaltyInfo(response.data)
+        if (response.data) {
+          this.renderLoyaltyInfo(response.data)
+        } else {
+          // generic customer
+          this.clearLoyaltyInfo()
+        }
       })
       .catch(error => {
         console.error('Error loading loyalty info:', error)

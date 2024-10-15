@@ -81,8 +81,12 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def loyalty_info
-    loyalty_service = Services::Sales::LoyaltyTierService.new(@user)
-    render json: loyalty_service.loyalty_info
+    if @user.email == "generic_customer@devtechperu.com"
+      render json: nil
+    else
+      loyalty_service = Services::Sales::LoyaltyTierService.new(@user)
+      render json: loyalty_service.loyalty_info
+    end
   end
 
   def update_contact_info
