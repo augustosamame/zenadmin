@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import axios from 'axios'
 
 export default class extends Controller {
-  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'rucSection', 'ruc', 'razonSocial', 'direccion'];
+  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion'];
 
   connect() {
     console.log('Connected to PaymentController!');
@@ -52,6 +52,9 @@ export default class extends Controller {
       console.log('Cannot proceed to payment: Total is 0');
       return;
     }
+
+    const orderItemsDiscountAmount = document.querySelector('[data-pos--order-items-target="discountAmount"]').textContent.trim();
+    const discountAmount = parseFloat(orderItemsDiscountAmount.replace(/\(S\/\s*|\)/g, ''));
 
     this.productGridTarget.classList.add('hidden');
     this.paymentContainerTarget.classList.remove('hidden');
@@ -178,6 +181,9 @@ export default class extends Controller {
     const orderItemsTotal = document.querySelector('[data-pos--order-items-target="total"]').textContent.trim();
     this.totalTarget.textContent = orderItemsTotal;
     this.remainingAmountTarget.textContent = orderItemsTotal;
+    const orderItemsDiscountAmount = document.querySelector('[data-pos--order-items-target="discountAmount"]').textContent.trim();
+    const discountAmount = parseFloat(orderItemsDiscountAmount.replace(/\(S\/\s*|\)/g, ''));
+    this.totalDiscountTarget.textContent = discountAmount;
   }
 
   updateRemaining() {
@@ -200,6 +206,8 @@ export default class extends Controller {
     console.log('Saving order...');
 
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
+    const totalDiscountAmount = parseFloat(this.totalDiscountTarget.textContent.replace(/\(S\/\s*|\)/g, ''));
+    const totalOriginalPrice = totalOrderAmount + totalDiscountAmount;
     let totalPayments = 0;
 
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
@@ -271,8 +279,9 @@ export default class extends Controller {
       order: {
         stage: 'confirmed',
         user_id: selectedCustomerId,
-        total_price: parseFloat(this.totalTarget.textContent.replace('S/', '')),
-        total_discount: 0,
+        total_price: totalOrderAmount,
+        total_discount: totalDiscountAmount,
+        total_original_price: totalOriginalPrice,
         shipping_price: 0,
         currency: 'PEN',
         wants_factura: selectedRuc && isRucChecked,

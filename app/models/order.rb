@@ -20,6 +20,7 @@ class Order < ApplicationRecord
   translate_enum :status
 
   monetize :total_price_cents, with_model_currency: :currency
+  monetize :total_original_price_cents, with_model_currency: :currency
   monetize :total_discount_cents, with_model_currency: :currency
   monetize :shipping_price_cents, with_model_currency: :currency
 
@@ -47,6 +48,7 @@ class Order < ApplicationRecord
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
+  validates :total_original_price_cents, presence: true
   validates :currency, presence: true
 
   accepts_nested_attributes_for :order_items, allow_destroy: true

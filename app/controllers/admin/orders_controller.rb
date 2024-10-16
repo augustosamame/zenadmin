@@ -4,7 +4,7 @@ class Admin::OrdersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @orders = Order.includes([ :invoices ]).all
+        @orders = Order.all
         if @orders.size > 500
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
         else
@@ -115,7 +115,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :currency, :status, :user_id, :order_id ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type ], sellers_attributes: [ :id, :percentage ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id
@@ -146,9 +146,9 @@ class Admin::OrdersController < Admin::AdminController
           orders = orders.joins(:user)
           "users.first_name, users.last_name"
         when 3 then "total_price_cents"
-        when 4 then "total_discount_cents"
-        when 6 then "payment_status"
-        when 7 then "status"
+        when 5 then "total_discount_cents"
+        when 7 then "payment_status"
+        when 8 then "status"
         else "id"
         end
         direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
@@ -168,6 +168,7 @@ class Admin::OrdersController < Admin::AdminController
             order.order_date&.strftime("%Y-%m-%d %H:%M:%S"),
             order.customer.name,
             format_currency(order.total_price),
+            format_currency(order.total_original_price),
             format_currency(order.total_discount),
             order.active_invoice_id,
             order.payment_status,

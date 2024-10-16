@@ -45,7 +45,8 @@ module Services
           "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : "Sin dirección",
           "payment_term_id": 1,
           "payment_credit_days": 0,
-          "order_total": @order.total_price.to_f,
+          "order_total": (@order.total_price.to_f).round(2),
+          "order_discount": (@order.total_discount.to_f / 1.18).round(2),
           "tax_line_ids": [ {
             "tax_id": "IGV",
             "amount": (@order.total_price.to_f - (@order.total_price.to_f / 1.18)).round(2)

@@ -430,6 +430,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
     t.string "custom_id", null: false
     t.integer "order_recipient_id"
     t.integer "total_price_cents"
+    t.integer "total_original_price_cents"
     t.integer "total_discount_cents"
     t.integer "shipping_price_cents"
     t.string "currency", default: "PEN"

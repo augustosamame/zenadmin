@@ -8,6 +8,7 @@ class CreateOrders < ActiveRecord::Migration[7.2]
       t.string :custom_id, null: false
       t.integer :order_recipient_id
       t.integer :total_price_cents
+      t.integer :total_original_price_cents
       t.integer :total_discount_cents
       t.integer :shipping_price_cents
       t.string :currency, default: "PEN"
