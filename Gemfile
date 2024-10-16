@@ -50,7 +50,7 @@ gem "simple_form", "~> 5.3.1"
 gem "money-rails", "~> 1.15.0"
 gem "pg_search", "~> 2.3.7"
 gem "hashids"
-gem "aws-sdk-s3", "~> 1.166.0"
+gem "aws-sdk-s3", "~> 1.168.0"
 gem "shrine", "~> 3.6.0"
 gem "marcel", "~> 1.0.4" # MIME type detection
 gem "ruby-vips", "~> 2.2.2"
