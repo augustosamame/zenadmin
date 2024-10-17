@@ -26,7 +26,7 @@ export default class extends Controller {
     // Show the anchor element inside the draftButtonContainer
     const draftButton = this.draftButtonContainerTarget.querySelector('a');
     if (draftButton) {
-      draftButton.classList.remove('hidden');
+      // draftButton.classList.remove('hidden');
     }
   }
 
@@ -46,7 +46,8 @@ export default class extends Controller {
     const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
     
     if (currentItemCount === 0 && draftItemCount > 0) {
-      this.showDraftButton();
+      this.hideDraftButton();
+      // this.showDraftButton();
     } else {
       this.hideDraftButton();
     }
