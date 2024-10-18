@@ -40,7 +40,7 @@ module Services
           "invoicer_ruc": invoice_data.invoicer.ruc,
           "invoicer_razon_social": invoice_data.invoicer.razon_social,
           "customer_ruc": @order.wants_factura ? @order.customer.customer.factura_ruc : @order.customer.customer.doc_id,
-          "customer_comprobante_tipo_catalog_6": @order.wants_factura ? "6" : Customer.doc_types[@order.customer.customer.doc_type],
+          "customer_comprobante_tipo_catalog_6": invoice_customer_doc_type,
           "customer_name": @order.wants_factura ? @order.customer.customer.factura_razon_social : @order.customer.name,
           "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : "Sin dirección",
           "payment_term_id": 1,
@@ -132,6 +132,20 @@ module Services
           order: @order
         )
         invoice_data
+      end
+
+      private
+
+      def invoice_customer_doc_type
+        if @order.wants_factura
+          if @order.customer.customer.doc_type == "passport"
+            "7"
+          else
+            "6"
+          end
+        else
+          Customer.doc_types[@order.customer.customer.doc_type]
+        end
       end
     end
   end

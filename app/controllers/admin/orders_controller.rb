@@ -26,6 +26,7 @@ class Admin::OrdersController < Admin::AdminController
     ActiveRecord::Base.transaction do
       # TODO - Add validations for order creation for things that may have been changed in the frontend. Like max discount, etc. Maybe do this in the model?
       @order = Order.new(order_params.except(:payments_attributes))
+      @order.total_original_price = @order.total_price
 
       if @order.origin == "pos"
         # POS context: current_user is the seller, user_id is provided
