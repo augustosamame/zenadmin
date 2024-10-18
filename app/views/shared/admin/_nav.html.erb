@@ -125,6 +125,7 @@
           data-transition-leave-active="transition ease-in duration-300"
           data-transition-leave-from="transform opacity-100 scale-100"
           data-transition-leave-to="transform opacity-0 scale-95">
+          <!--
           <% if respond_to?(:admin_settings_path) %>
             <li>
               <%= link_to admin_settings_path, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>
@@ -139,6 +140,7 @@
               <% end %>
             </li>
           <% end %>
+          -->
           <% if respond_to?(:destroy_user_session_path) %>
             <li>
               <%= button_to destroy_user_session_path, method: :delete, class: "py-2 px-4 hover:text-primary-600 focus:text-primary-600 flex items-center space-x-2 w-full group text-slate-600 dark:text-slate-300 dark:hover:text-primary-400" do %>

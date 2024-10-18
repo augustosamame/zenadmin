@@ -1,11 +1,11 @@
 <%= render "shared/admin/nav", { header_title: "Kardex de Producto#{ current_user.any_admin? ? '' : ' Almacén - ' + @current_warehouse.name }", back_icon: true } %>
 
-<div data-controller="inventory--kardex">
+<div data-controller="inventory--kardex" data-inventory--kardex-url-value="<%= admin_inventory_fetch_kardex_movements_path %>">
   <%= simple_form_for :kardex, url: admin_inventory_fetch_kardex_movements_path, method: :get do |f| %>
     <div class="flex space-x-4">
       <div class="p-6 mb-4 w-96">
         <%= f.label :product_id, "Producto", class: "form-label" %>
-        <select data-action="change->inventory--kardex#fetchMovements"
+        <select
             data-controller="select"
             data-select-model-value="Product"
             data-select-multi-select-value="false"
@@ -25,7 +25,7 @@
       <% if current_user.any_admin? %>
         <div class="p-6 mb-4 w-96">
           <%= f.label :warehouse_id, "Almacén", class: "form-label" %>
-          <select data-action="change->inventory--kardex#fetchMovements"
+          <select
             data-controller="select"
             data-select-model-value="Warehouse"
             data-select-multi-select-value="false"
@@ -45,7 +45,6 @@
 
   <div class="container p-6 mx-6 mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <div id="kardex-table" 
-         data-inventory--kardex-target="movementsContainer" 
          data-controller="datatable" 
          data-datatable-options-value="server_side:false;resource_name:'Product';create_button:false;"
          data-url="<%= admin_inventory_fetch_kardex_movements_path %>">

@@ -46,6 +46,7 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer.user_id = current_user.id
     @stock_transfer.transfer_date = Time.zone.now
     @stock_transfer.stock_transfer_lines.build
+    @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
     set_form_variables
   end
 
