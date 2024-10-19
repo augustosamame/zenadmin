@@ -1,0 +1,36 @@
+<!-- app/views/admin/stock_transfers/initiate_receive.html.erb -->
+<%= render "shared/admin/nav", { header_title: "Receive Stock Transfer ##{@stock_transfer.id}" } %>
+
+<div class="container mx-auto mt-6" data-controller="stock-transfer-receive">
+  <%= form_with url: execute_receive_admin_stock_transfer_path(@stock_transfer), method: :post, data: { action: "submit->stock-transfer-receive#submitForm" } do |f| %>
+    <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Product</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Transferred Quantity</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Received Quantity</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Action</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @stock_transfer_lines.each do |line| %>
+            <tr data-stock-transfer-receive-target="row" data-line-id="<%= line.id %>">
+              <td class="px-6 py-4 whitespace-nowrap"><%= line.product.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap"><%= line.quantity %></td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <%= f.number_field "received_quantities[#{line.id}]", min: 0, max: line.quantity, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md", data: { stock_transfer_receive_target: "input", action: "input->stock-transfer-receive#checkCompleteness" } %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <button type="button" class="p-2 text-white bg-green-500 rounded-full" data-action="click->stock-transfer-receive#matchQuantity">
+                  <i class="fas fa-check"></i>
+                </button>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <%= f.submit "Complete Receive", class: "mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", data: { stock_transfer_receive_target: "submitButton" } %>
+  <% end %>
+</div>

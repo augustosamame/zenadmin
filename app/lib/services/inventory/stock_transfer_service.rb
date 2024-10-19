@@ -29,13 +29,25 @@ module Services
         end
       end
 
+      # Handles updating inventory when moving to 'complete'
       def update_destination_warehouse_inventory
         stock_transfer.stock_transfer_lines.each do |line|
+          if stock_transfer.is_adjustment?
+            if stock_transfer.adjustment_type != "devolucion"
+              # do nothing to destination warehouse stock if its an adjustment and adjustment type is not 'devolucion'
+              return
+            else
+              stock_transfer.destination_warehouse_id = Warehouse.find_by(is_main: true).id
+            end
+          end
           warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
           warehouse_inventory.stock ||= 0
-          warehouse_inventory.stock += line.quantity
+          quantity_to_add = line.received_quantity || line.quantity
+          warehouse_inventory.stock += quantity_to_add
           warehouse_inventory.save!
-
+          if line.received_quantity != line.quantity
+            Services::Notifications::CreateNotificationService.new(self, custom_strategy: "PartialStockTransfer").create
+          end
           remove_in_transit_record(line) if stock_transfer.aasm.from_state == :in_transit
         end
       end

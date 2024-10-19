@@ -78,6 +78,34 @@ Shrine is configured with multiple storages: a temporary cache storage, a public
 
 This summary provides a comprehensive overview of how Uppy and Shrine work together in this application for file uploads, processing, and storage management.
 
+* Notifications
+
+Our application uses a flexible and extensible notification system to keep users informed about various events. The architecture is designed to support multiple notification types and delivery methods.
+
+1. Notification Creation:
+   The `CreateNotificationService` is responsible for creating notifications. It uses a strategy pattern to determine the appropriate notification type and content based on the notifiable object. Custom strategies can be defined for different notifiable types (e.g., `PartialStockTransferStrategy`, `StockTransferStrategy`).
+
+2. Notification Settings:
+   The `NotificationSetting` model allows configuration of which notification types should be sent through various media (e.g., notification feed, dashboard alert, email). This provides flexibility in how notifications are delivered for different trigger types. A NotificationSetting record mush be created for each notification type so that we can use it to send notifications to users.
+
+3. Notification Delivery:
+   The `Notification` model handles the delivery of notifications after creation. It supports multiple delivery methods:
+   - Notification Feed: Real-time updates using Action Cable
+   - Alert Header Icon: For displaying alerts in the application header
+   - Dashboard Alert: For showing notifications on a dashboard
+   - Email: For sending email notifications
+   - SMS and WhatsApp: For mobile notifications (if implemented)
+
+4. Customization:
+   The system allows easy addition of new notification types and delivery methods. Custom strategies can be created by extending the `BaseStrategy` class and implementing the required methods (`title`, `body`, `image_url`).
+
+5. User Interaction:
+   Notifications can be marked as read, clicked, or opened, allowing for tracking of user engagement with notifications.
+
+This architecture provides a scalable and maintainable way to handle notifications across the application, with the flexibility to add new notification types and delivery methods as needed.
+
+
+
 * Deployment
 
 First you should prepare an EC2 server to be able to receive / run the project

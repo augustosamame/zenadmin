@@ -704,6 +704,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
     t.bigint "stock_transfer_id", null: false
     t.bigint "product_id", null: false
     t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "received_quantity", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["product_id"], name: "index_stock_transfer_lines_on_product_id"

@@ -31,7 +31,7 @@
           <!-- Destination Warehouse -->
           <div>
           <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
-          <%= form.collection_select :destination_warehouse_id, Warehouse.all, :id, :name, {}, class: "form-input" %>
+          <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
         </div>
 
       <% end %>

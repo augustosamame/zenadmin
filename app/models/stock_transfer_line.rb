@@ -3,4 +3,11 @@ class StockTransferLine < ApplicationRecord
   belongs_to :product
 
   validates :quantity, numericality: { greater_than: 0 }
+  before_save :set_received_quantity
+
+  private
+
+  def set_received_quantity
+    self.received_quantity = quantity if received_quantity.blank?
+  end
 end

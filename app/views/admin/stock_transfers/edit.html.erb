@@ -5,7 +5,7 @@
 
 <div class="container px-4 pb-24 mx-auto my-16">
   <div class="max-w-4xl mx-auto">
-    <h1 class="mb-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Editar Transferencia de Stock</h1>
+    <h1 class="mb-2 text-3xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100"><%= @stock_transfer.is_adjustment ? "Editar Ajuste de Inventario" : "Editar Transferencia de Stock" %></h1>
     <p class="mb-6 text-lg text-slate-500 dark:text-slate-400">Modificar los detalles de una transferencia de stock existente.</p>
 
     <%= render 'form', stock_transfer: @stock_transfer %>

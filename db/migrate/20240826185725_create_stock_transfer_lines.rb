@@ -4,6 +4,7 @@ class CreateStockTransferLines < ActiveRecord::Migration[7.2]
       t.references :stock_transfer, null: false, foreign_key: true
       t.references :product, null: false, foreign_key: true
       t.decimal :quantity, precision: 10, scale: 2, null: false
+      t.decimal :received_quantity, precision: 10, scale: 2, null: true
 
       t.timestamps
     end

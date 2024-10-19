@@ -45,7 +45,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
         current_stock -= qty_out
       else
         if movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
-          qty_in = movement.quantity
+          qty_in = movement.received_quantity || movement.quantity
           qty_out = 0
           current_stock += qty_in
         else

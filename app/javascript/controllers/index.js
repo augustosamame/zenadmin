@@ -133,6 +133,9 @@ application.register("seller-biweekly-sales-target-form", SellerBiweeklySalesTar
 import StockTransferFormController from "./stock_transfer_form_controller"
 application.register("stock-transfer-form", StockTransferFormController)
 
+import StockTransferReceiveController from "./stock_transfer_receive_controller"
+application.register("stock-transfer-receive", StockTransferReceiveController)
+
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
 

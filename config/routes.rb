@@ -94,7 +94,8 @@ Rails.application.routes.draw do
       end
       member do
         patch :set_to_in_transit
-        patch :set_to_complete
+        get :initiate_receive
+        post :execute_receive
       end
     end
     resources :in_transit_stocks

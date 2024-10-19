@@ -1,5 +1,5 @@
 class Admin::StockTransfersController < Admin::AdminController
-  before_action :set_stock_transfer, only: [ :show, :edit, :update, :destroy, :set_to_in_transit, :set_to_complete ]
+  before_action :set_stock_transfer, only: [ :show, :edit, :update, :destroy, :set_to_in_transit, :initiate_receive, :execute_receive ]
 
   def index
     respond_to do |format|
@@ -47,6 +47,7 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer.transfer_date = Time.zone.now
     @stock_transfer.stock_transfer_lines.build
     @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
+    @destination_warehouses = Warehouse.all - @origin_warehouses
     set_form_variables
   end
 
@@ -56,6 +57,7 @@ class Admin::StockTransfersController < Admin::AdminController
     if @stock_transfer.save
       @stock_transfer.finish_transfer! if @stock_transfer.origin_warehouse_id.nil? # inventario inicial
       if @stock_transfer.is_adjustment
+        @stock_transfer.finish_transfer!
         redirect_to index_stock_adjustments_admin_stock_transfers_path, notice: "El ajuste de Stock se creó correctamente."
       else
         redirect_to admin_stock_transfers_path, notice: "La transferencia de Stock se creó correctamente."
@@ -68,6 +70,10 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def edit
+    @is_adjustment = @stock_transfer.is_adjustment
+    @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
+    @destination_warehouses = Warehouse.all - @origin_warehouses
+    set_form_variables
   end
 
   def update
@@ -112,17 +118,23 @@ class Admin::StockTransfersController < Admin::AdminController
     end
   end
 
-  def set_to_complete
-    if @stock_transfer.may_finish_transfer?
+  def initiate_receive
+    @stock_transfer_lines = @stock_transfer.stock_transfer_lines.includes(:product)
+  end
+
+  def execute_receive
+    received_quantities = params[:received_quantities]
+    ActiveRecord::Base.transaction do
+      received_quantities.each do |line_id, quantity|
+        line = @stock_transfer.stock_transfer_lines.find(line_id)
+        line.update!(received_quantity: quantity.to_i)
+      end
+
       @stock_transfer.finish_transfer!
-      flash[:notice] = "Stock transfer set to Complete."
-    else
-      flash[:alert] = "Stock transfer could not be set to Complete."
     end
-    respond_to do |format|
-      format.html { redirect_to admin_stock_transfers_path }
-      format.js   # Responds to AJAX request (set_to_complete.js.erb)
-    end
+    redirect_to admin_stock_transfers_path, notice: "La transferencia de Stock se recibió correctamente."
+  rescue ActiveRecord::RecordInvalid => e
+    redirect_to initiate_receive_admin_stock_transfer_path(@stock_transfer), alert: "Error al recibir la transferencia de Stock. (#{e.message})"
   end
 
   private
@@ -145,6 +157,6 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def stock_transfer_params
-    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :_destroy ])
+    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
   end
 end

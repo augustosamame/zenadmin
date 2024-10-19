@@ -27,7 +27,7 @@ module Services
         protected
 
         def location_name
-          @notifiable.location.name
+          @notifiable&.location&.name
         end
 
         def object_identifier
@@ -39,7 +39,15 @@ module Services
         end
 
         def customer_name
-          @notifiable.customer.name
+          @notifiable&.customer&.name
+        end
+
+        def origin_warehouse_name
+          @notifiable&.origin_warehouse&.name
+        end
+
+        def destination_warehouse_name
+          @notifiable&.destination_warehouse&.name
         end
       end
     end
