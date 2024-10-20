@@ -7,6 +7,7 @@ module Services
 
       def create
         Rails.logger.info("Creating email for notification: #{@notification.id}")
+        AdminMailer.with(notification: @notification).partial_stock_transfer.deliver_now
       end
     end
   end

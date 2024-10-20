@@ -1,0 +1,37 @@
+<p>Hola Admin,</p>
+
+<p>Se ha realizado una transferencia de inventario incompleta.</p>
+
+<p>La transferencia de inventario #<%= @stock_transfer.custom_id %> incompleta se ha realizado desde el almacén <strong><%= @stock_transfer.origin_warehouse&.name %></strong> hacia el almacén <strong><%= @stock_transfer.destination_warehouse&.name %></strong>.</p>
+
+<%= spacer(16) %>
+
+<p>Los productos recibidos incompletos son:</p>
+
+<table class="mb-0" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Producto</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Cantidad Enviada</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Cantidad Recibida</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Diferencia</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @stock_transfer.stock_transfer_lines.each do |line| %>
+      <% if line.quantity != line.received_quantity %>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= line.product.name %></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.quantity %></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.received_quantity %></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.quantity - line.received_quantity %></td>
+        </tr>
+      <% end %>
+    <% end %>
+  </tbody>
+</table>
+
+<%= spacer(16) %>
+
+<p>Puede revisar la transferencia en el siguiente enlace: <%= link_to "Transferencia de inventario ##{@stock_transfer.custom_id}", admin_stock_transfer_url(@stock_transfer), target: "_blank" %></p>
+

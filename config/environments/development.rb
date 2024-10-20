@@ -10,7 +10,6 @@ Rails.application.configure do
     Bullet.add_footer    = false
   end
 
-  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
   # Settings specified here will take precedence over those in config/application.rb.
 
   # In the development environment your application's code is reloaded any time
@@ -53,7 +52,7 @@ Rails.application.configure do
 
   config.action_mailer.raise_delivery_errors = true
 
-  config.action_mailer.default_url_options = { host: "devtechperu.com" }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   config.action_mailer.delivery_method = :smtp
   ActionMailer::Base.smtp_settings =
@@ -93,7 +92,7 @@ Rails.application.configure do
   # Suppress logger output for asset requests.
   config.assets.quiet = true
   config.assets.debug = false
-  # config.asset_host = "http://localhost:3000"
+  config.asset_host = "http://localhost:3000"
   # config.assets.prefix = "/assets"
 
   # Raises error for missing translations.
