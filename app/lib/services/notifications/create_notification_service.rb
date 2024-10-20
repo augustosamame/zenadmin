@@ -3,7 +3,11 @@ module Services
     class CreateNotificationService
       def initialize(notifiable, options = {})
         @notifiable = notifiable
-        @strategy = notification_strategy_for(notifiable, options[:custom_strategy])
+        if options[:custom_strategy]
+          @strategy = notification_strategy_for(notifiable, options[:custom_strategy])
+        else
+          @strategy = notification_strategy_for(notifiable)
+        end
         @options = options
       end
 
