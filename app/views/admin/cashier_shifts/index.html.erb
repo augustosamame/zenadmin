@@ -25,7 +25,7 @@
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.date, false) %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.opened_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.opened_by&.name %></td>
-            <td class="px-4 py-2"><%= cashier_shift.status %></td>
+            <td class="px-4 py-2"><%= cashier_shift.translated_status %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.closed_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.closed_by&.name %></td>
             <td class="px-4 py-2"><%= format_currency(cashier_shift.total_balance) %></td>

@@ -114,7 +114,7 @@ class Admin::StockTransfersController < Admin::AdminController
     end
     respond_to do |format|
       format.html { redirect_to admin_stock_transfers_path }
-      format.js   # Responds to AJAX request (set_to_in_transit.js.erb)
+      format.turbo_stream { render turbo_stream: turbo_stream.append_all("body", "<script>window.location.reload();</script>") }
     end
   end
 

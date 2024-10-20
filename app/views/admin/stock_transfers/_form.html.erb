@@ -15,7 +15,7 @@
       <!-- Origin Warehouse -->
       <div>
         <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "form-label" %>
-        <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @is_adjustment ? '' : 'Ninguno (Inventario Inicial)' }, class: "form-input" %>
+        <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
       </div>
 
       <% if @is_adjustment %>

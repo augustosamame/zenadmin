@@ -43,6 +43,14 @@ es:
       order: Venta
   activerecord:
     attributes:
+      stock_transfer:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+        stage_list:
+          pending: Pendiente
+          in_transit: En Tránsito
+          complete: Completado
       seller_biweekly_sales_target:
         status_list:
           pending: Pendiente

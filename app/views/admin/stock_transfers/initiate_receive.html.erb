@@ -1,5 +1,5 @@
 <!-- app/views/admin/stock_transfers/initiate_receive.html.erb -->
-<%= render "shared/admin/nav", { header_title: "Receive Stock Transfer ##{@stock_transfer.id}" } %>
+<%= render "shared/admin/nav", { header_title: "Recibir Transferencia de Stock ##{@stock_transfer.id}" } %>
 
 <div class="container mx-auto mt-6" data-controller="stock-transfer-receive">
   <%= form_with url: execute_receive_admin_stock_transfer_path(@stock_transfer), method: :post, data: { action: "submit->stock-transfer-receive#submitForm" } do |f| %>
@@ -7,10 +7,10 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Product</th>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Transferred Quantity</th>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Received Quantity</th>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Action</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Transferida</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Recibida</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acción</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -31,6 +31,6 @@
         </tbody>
       </table>
     </div>
-    <%= f.submit "Complete Receive", class: "mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", data: { stock_transfer_receive_target: "submitButton" } %>
+    <%= f.submit "Completar Recepción", class: "mt-4 px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", data: { stock_transfer_receive_target: "submitButton" } %>
   <% end %>
 </div>

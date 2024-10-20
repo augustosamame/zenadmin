@@ -15,7 +15,7 @@ export const resourceMappings = {
     ajaxUrl: "/admin/inventory/periodic_inventories.json"
   },
   CashierShift: {
-    buttonText: "Crear Cierre de Caja",
+    buttonText: "Crear Turno de Caja",
     buttonUrl: "/admin/cashier_shifts/new",
     ajaxUrl: "/admin/cashier_shifts.json"
   },
