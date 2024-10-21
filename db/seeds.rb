@@ -22,6 +22,13 @@ setting_12 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_locat
 setting_13 = Setting.find_or_create_by!(name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: "type_boolean", internal: true, localized_name: "Múltiples razones sociales por tienda y por medio de pago", boolean_value: true)
 setting_14 = Setting.find_or_create_by!(name: 'max_total_sale_without_customer', data_type: "type_integer", internal: false, localized_name: "Maximo total de venta sin cliente", integer_value: 700)
 
+Role.find_or_create_by!(name: 'super_admin')
+Role.find_or_create_by!(name: 'admin')
+Role.find_or_create_by!(name: 'seller')
+Role.find_or_create_by!(name: 'supervisor')
+Role.find_or_create_by!(name: 'warehouse_manager')
+Role.find_or_create_by!(name: 'customer')
+
 ## custom numbering fields creation now handled by load_global_settings.rb initializer
 
 region_default = Region.find_or_create_by!(name: 'default')
@@ -38,18 +45,18 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory', region: re
 supplier_1 = Supplier.create!(name: "Infanti Vendor", sourceable: vendor_1, region: region_default)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, region: region_default)
 
+warehouse_user_1 = User.create!(email: 'almacen_principal@jardindelzen.com', phone: "986976311", login: "almacen_principal@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
+warehouse_user_1.add_role('warehouse_manager')
+
+location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@jardindelzen.com", address: 'Jr. Combate de Angamos 172, Santiago de Surco 15023', phone: '900000000')
+
+warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
+
 location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, email: "jockeyplaza@devtechperu.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: region_default, email: "sanmiguel@devtechperu.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
 
 location_3 = Location.find_or_create_by!(name: 'Plaza Norte', region: region_default, email: "plazanorte@jardindelzen.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
-
-Role.find_or_create_by!(name: 'super_admin')
-Role.find_or_create_by!(name: 'admin')
-Role.find_or_create_by!(name: 'seller')
-Role.find_or_create_by!(name: 'supervisor')
-Role.find_or_create_by!(name: 'warehouse_manager')
-Role.find_or_create_by!(name: 'customer')
 
 storeuser1 = User.create!(email: 'jockeyplaza@jardindelzen.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
 storeuser1.add_role('seller')
@@ -63,11 +70,9 @@ storeuser3.add_role('seller')
 supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
 supervisor_1.add_role('supervisor')
 
-warehouse_1 = Warehouse.find_or_create_by!(name: "Almacén Principal", region: region_default, is_main: true)
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
-warehouse_4 = Warehouse.find_or_create_by!(name: "Almacén Jockey Plaza", location_id: location_1.id, region: region_default)
-warehouse_5 = Warehouse.find_or_create_by!(name: "Almacén Plaza Norte", location_id: location_3.id, region: region_default)
+
 
 =begin
 
@@ -224,4 +229,4 @@ end
 =end
 
 Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 5).call
-Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
+#Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call

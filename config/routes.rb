@@ -120,8 +120,8 @@ Rails.application.routes.draw do
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     post "dashboards/set_location", to: "dashboards#set_location"
 
-    get 'reports/sales', to: 'reports#sales_form'
-    post 'reports/generate_sales', to: 'reports#generate_sales'
+    get 'reports/form', to: 'reports#reports_form'
+    post 'reports/generate', to: 'reports#generate'
     get "reports/cash_flow", to: "reports#cash_flow"
     get "reports/inventory_out", to: "reports#inventory_out"
     get "reports/consolidated", to: "reports#consolidated"

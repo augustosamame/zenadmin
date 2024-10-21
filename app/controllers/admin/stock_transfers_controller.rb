@@ -4,7 +4,14 @@ class Admin::StockTransfersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @stock_transfers = StockTransfer.where(is_adjustment: false).includes(:origin_warehouse, :destination_warehouse, :user).order(id: :desc)
+        if current_user.any_admin_or_supervisor?
+          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user).order(id: :desc)
+        else
+          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user)
+                                .where(origin_warehouse: { id: @current_warehouse.id })
+                                .or(StockTransfer.where(destination_warehouse: { id: @current_warehouse.id }))
+                                .order(id: :desc)
+        end
 
         if @stock_transfers.size > 50
           @datatable_options = "server_side:true;resource_name:'StockTransfer'; sort_0_desc;"

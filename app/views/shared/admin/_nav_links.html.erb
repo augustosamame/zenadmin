@@ -130,16 +130,7 @@
   </button>
   <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
     <li>
-      <%= nav_link_to "Reporte de Ventas", send("admin_reports_sales_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "Reporte de Caja", send("admin_reports_cash_flow_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "Reporte de Salidas de Almacén", send("admin_reports_inventory_out_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-    </li>
-    <li>
-      <%= nav_link_to "Reporte Consolidado", send("admin_reports_consolidated_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      <%= nav_link_to "Generar Reportes Diarios", send("admin_reports_form_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
   </ul>
 </li>
