@@ -2,11 +2,12 @@ require 'prawn'
 require 'prawn/table'
 
 class CashFlowReport < Prawn::Document
-  def initialize(start_date, end_date, location, cashier_transactions, current_cashier, current_user)
+  include AdminHelper
+  def initialize(start_date, end_date, location, cashier_shifts, current_cashier, current_user)
     @start_date = start_date
     @end_date = end_date
     @location = location
-    @cashier_transactions = cashier_transactions
+    @cashier_shifts = cashier_shifts
     @current_cashier = current_cashier
     @current_user = current_user
     @content_height = measure_content
@@ -29,13 +30,18 @@ class CashFlowReport < Prawn::Document
   def content_generator(pdf)
     start_date = @start_date
     end_date = @end_date
-    cashier_transactions = @cashier_transactions
+    cashier_shifts = @cashier_shifts
     location = @location
     current_cashier = @current_cashier
     current_user = @current_user
+    friendly_type_method = method(:friendly_transactable_type)
+
+    global_totals = Hash.new(0)
+
     pdf.instance_eval do
-      text "Reporte Diario de Salidas de Almacén", size: 12, align: :center, style: :bold
+      text "Reporte Diario de Caja", size: 12, align: :center, style: :bold
       text "Tienda: #{location&.name}", size: 10, align: :center, style: :bold
+      text "Caja: #{current_cashier&.name}", size: 10, align: :center, style: :bold
       move_down 10
       text_box "Fecha inicio: #{I18n.localize(start_date, format: "%d/%m/%y")}", size: 9, at: [0, cursor], width: 100
       text_box "Fecha fin: #{I18n.localize(end_date, format: "%d/%m/%y")}", size: 9, at: [110, cursor], width: 100, align: :right
@@ -45,42 +51,59 @@ class CashFlowReport < Prawn::Document
 
       text "Resumen", size: 10, style: :bold
       move_down 5
-      text "Total de Transacciones: #{cashier_transactions.count}", size: 8
+      text "Total de Turnos: #{cashier_shifts.count}", size: 8
       move_down 10
       stroke_horizontal_rule
       move_down 10
 
-      cashier_transactions.each do |cashier_transaction|
-        text_box "Transferencia ##{cashier_transaction.id}", size: 10, style: :bold, at: [0, cursor], width: 130
-        text_box "Hora: #{cashier_transaction.created_at.strftime("%H:%M")}", size: 10, at: [130, cursor], width: 80, align: :right
-        move_down 15
-        text_box "Destino: #{cashier_transaction.transactable_type}", size: 8, at: [0, cursor], width: 200
+      cashier_shifts.each do |cashier_shift|
+        text_box "Turno de Caja ##{cashier_shift.id}", size: 10, style: :bold, at: [0, cursor], width: 130
+        text_box "Hora: #{cashier_shift.created_at.strftime("%H:%M")}", size: 10, at: [130, cursor], width: 80, align: :right
         move_down 15
 
-        cashier_transaction_lines_data = [["Tx", "Tipo", "Medio", "Monto"]]
+        cashier_transaction_lines_data = [["Tx", "Hora", "Tipo", "Medio", "Monto"]]
+        shift_totals = Hash.new(0)
 
-        cashier_transactions.each do |cashier_transaction|
+        cashier_shift.cashier_transactions.each do |cashier_transaction|
           cashier_transaction_lines_data << [
             cashier_transaction.id,
-            cashier_transaction.transactable_type,
-            cashier_transaction.payment_method.name,
+            cashier_transaction.created_at.strftime("%H:%M"),
+            friendly_type_method.call(cashier_transaction),
+            cashier_transaction.payment_method.description,
             sprintf("S/ %.2f", cashier_transaction.amount)
           ]
+
+          shift_totals[cashier_transaction.payment_method.description] += cashier_transaction.amount
+          global_totals[cashier_transaction.payment_method.description] += cashier_transaction.amount
         end
 
         table cashier_transaction_lines_data do
           cells.padding = 2
           cells.borders = []
           cells.size = 7
-          columns(0).align = :left
-          columns(1..3).align = :right
+          columns(0..3).align = :left
+          columns(4).align = :right
           self.header = true
-          self.column_widths = [30, 60, 60, 50]
+          self.column_widths = [25, 30, 70, 35, 52]
         end
-        
+
+        if cashier_shifts.count > 1
+          move_down 10
+          text "Totales por medio de pago para este turno:", size: 9, style: :bold
+          shift_totals.each do |payment_method, total|
+            text "#{payment_method}: S/ #{sprintf("%.2f", total)}", size: 8
+          end
+        end
         move_down 10
         stroke_horizontal_rule
         move_down 10
+      end
+      move_down 10
+      text "Totales por medio de pago:", size: 10, style: :bold
+      move_down 5
+      global_totals.each do |payment_method, total|
+        text "#{payment_method}: S/ #{sprintf("%.2f", total)}", size: 9
+        move_down 5
       end
       move_down 10
       text_box "Reporte generado el: #{I18n.localize(Time.now, format: "%d/%m/%y - %H:%M:%S")}", size: 8, at: [0, cursor], width: 200
