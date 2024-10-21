@@ -101,6 +101,7 @@ Rails.application.routes.draw do
     resources :in_transit_stocks
 
     resources :combo_products
+    resources :discount_products
 
     resources :cashier_shifts do
       member do
