@@ -1,5 +1,6 @@
 class CashierTransaction < ApplicationRecord
   belongs_to :cashier_shift
+  has_one :cashier, through: :cashier_shift
   belongs_to :transactable, polymorphic: true
   belongs_to :payment_method
 

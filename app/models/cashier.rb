@@ -3,6 +3,7 @@ class Cashier < ApplicationRecord
 
   belongs_to :location
   has_many :cashier_shifts
+  has_many :cashier_transactions, through: :cashier_shifts
 
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status

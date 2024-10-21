@@ -59,6 +59,14 @@ class Admin::ReportsController < Admin::AdminController
     InventoryOutReport.new(@date, @date, @location, @stock_transfers, @total_quantity_out, @current_warehouse, current_user)
   end
 
+  def generate_cash_flow_report
+    @cashier_transactions = CashierTransaction.joins(:cashier)
+                                          .where(created_at: @date.beginning_of_day..@date.end_of_day)
+                                          .where(cashiers: { id: @current_cashier.id })
+                                          .order(id: :asc)
+    CashFlowReport.new(@date, @date, @location, @cashier_transactions, @current_cashier, current_user)
+  end
+
   def cash_flow
     respond_to do |format|
       format.pdf do
