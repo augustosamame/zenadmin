@@ -1,10 +1,15 @@
 class Admin::RequisitionsController < Admin::AdminController
   before_action :set_requisition, only: [ :show, :edit, :update, :destroy, :approve, :reject, :fulfill ]
+  before_action :set_locations_and_warehouses, only: [ :new, :create, :edit, :update ]
 
   def index
     respond_to do |format|
       format.html do
-        @requisitions = Requisition.all.includes(:location, :warehouse, :user).order(id: :desc)
+        if current_user.any_admin_or_supervisor?
+          @requisitions = Requisition.all.includes(:location, :warehouse, :user).order(id: :desc)
+        else
+          @requisitions = Requisition.where(location: @current_location).includes(:location, :warehouse, :user).order(id: :desc)
+        end
         @datatable_options = "resource_name:'Requisition'; sort_0_desc;"
       end
 
@@ -90,6 +95,15 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def set_requisition
     @requisition = Requisition.find(params[:id])
+  end
+
+  def set_locations_and_warehouses
+    if current_user.any_admin_or_supervisor?
+      @origin_locations = Location.all
+    else
+      @origin_locations = Location.where(id: @current_location.id)
+    end
+    @requisition_warehouses = Warehouse.where(is_main: true)
   end
 
   def requisition_params

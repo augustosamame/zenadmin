@@ -1,35 +1,36 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form"]
+  static targets = ["line", "lines", "form", "template"]
 
   connect() {
     console.log("Requisition form controller connected")
   }
 
-  addProduct(event) {
+  add(event) {
     event.preventDefault()
 
-    // Clone a template for a new line
-    const newLine = this.lineTarget.cloneNode(true)
+    // Use the template to create a new line
+    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
+    const newLine = document.createRange().createContextualFragment(content).firstElementChild
 
-    // Clean up Tom Select-specific elements and attributes in the cloned template
-    newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove());  // Remove Tom Select wrappers
+    // Clean up Tom Select-specific elements and attributes in the new line
+    newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove())
     newLine.querySelectorAll("input, select").forEach(input => {
       input.value = ""
       input.classList.remove("tomselected", "ts-hidden-accessible")
       input.removeAttribute("id")
-      input.style.display = ''; // Ensure the original select is visible
+      input.style.display = '' // Ensure the original select is visible
     })
 
-    // Append new line to the container using the target reference
+    // Append new line to the container
     this.linesTarget.appendChild(newLine)
 
-    // Initialize Tom Select only for the new row's select element
+    // Initialize Tom Select for the new row's select element if needed
     // this.initializeTomSelect(newLine.querySelector('select[data-controller="select"]'))
   }
 
-  removeProduct(event) {
+  remove(event) {
     event.preventDefault()
 
     // Find the closest line item to remove
@@ -46,40 +47,30 @@ export default class extends Controller {
   }
 
   submitForm(event) {
-    event.preventDefault(); // Prevent the default form submission
+    event.preventDefault()
 
-    console.log("Form submission intercepted, updating indices so that nested rows with tomselect dropdowns have correct indices...");
+    console.log("Form submission intercepted, updating indices...")
 
     // Update all indices before submitting the form
-    this.updateIndices();
+    this.updateIndices()
 
     // Now submit the form programmatically
-    this.formTarget.submit();
+    this.formTarget.submit()
   }
 
   updateIndices() {
-    console.log("Updating indices...");
-    const allLines = this.linesTarget.querySelectorAll('.nested-fields');
+    console.log("Updating indices...")
+    const allLines = this.linesTarget.querySelectorAll('.nested-fields')
 
     allLines.forEach((line, index) => {
-      // Find the select element and extract the integer index from its ID
-      const select = line.querySelector('select[id^="tomselect-"]');
-      if (select) {
-        const match = select.id.match(/tomselect-(\d+)/);
-        if (match) {
-          const extractedIndex = parseInt(match[1], 10) - 1; // Extracted index from ID minus 1
-
-          // Update the name attributes for all inputs/selects in this line
-          line.querySelectorAll('input[name], select[name]').forEach(input => {
-            let name = input.getAttribute('name');
-            if (name) {
-              const newName = name.replace(/\[\d*\]/, `[${extractedIndex}]`); // Replace with extracted index
-              input.setAttribute('name', newName);
-              console.log(`Updated name: ${newName}`);
-            }
-          });
+      line.querySelectorAll('input[name], select[name]').forEach(input => {
+        let name = input.getAttribute('name')
+        if (name) {
+          const newName = name.replace(/\[requisition_lines_attributes\]\[\d*\]/, `[requisition_lines_attributes][${index}]`)
+          input.setAttribute('name', newName)
+          console.log(`Updated name: ${newName}`)
         }
-      }
-    });
+      })
+    })
   }
 }
