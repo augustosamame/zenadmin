@@ -5,7 +5,7 @@ class Admin::ReportsController < Admin::AdminController
   end
 
   def generate
-    @date = params[:date].present? ? Date.parse(params[:date]) : Date.today
+    @date = params[:date].present? ? Date.parse(params[:date]) : Date.current
     @location = params[:location].present? ? params[:location] : @current_location
     report_type = params[:report_type]
 

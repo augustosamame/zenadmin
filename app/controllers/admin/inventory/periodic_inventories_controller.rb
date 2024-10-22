@@ -48,7 +48,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           adjustment_type: difference[:adjustment_type],
           stage: :complete,
           status: :active,
-          transfer_date: Time.now,
+          transfer_date: Time.current,
           origin_warehouse_id: difference[:warehouse_id],
           stock_transfer_lines_attributes: [
             {
@@ -71,7 +71,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           adjustment_type: difference[:adjustment_type],
           stage: :complete,
           status: :active,
-          transfer_date: Time.now,
+          transfer_date: Time.current,
           destination_warehouse_id: difference[:warehouse_id],
           stock_transfer_lines_attributes: [
             {

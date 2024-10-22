@@ -12,7 +12,7 @@ class Cashier < ApplicationRecord
     open_shift = cashier_shifts.find_or_initialize_by(status: :open)
     if open_shift.new_record?
       open_shift.assign_attributes(
-        date: Date.today,
+        date: Date.current,
         opened_at: Time.current,
         opened_by_id: current_user.id,
         total_sales_cents: 0

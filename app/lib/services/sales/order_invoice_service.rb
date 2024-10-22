@@ -33,7 +33,7 @@ module Services
         end
 
         invoice_data_hash = {
-          "date_invoice": @options[:date_invoice] || Time.now.strftime("%Y-%m-%d"),
+          "date_invoice": @options[:date_invoice] || Time.current.strftime("%Y-%m-%d"),
           "invoice_number": invoice_data.invoice_series.next_invoice_number,
           "order_custom_id": @order.custom_id,
           "currency_id": @order.currency,

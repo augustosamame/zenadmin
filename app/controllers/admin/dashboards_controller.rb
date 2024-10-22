@@ -69,8 +69,8 @@ class Admin::DashboardsController < Admin::AdminController
       if @selected_location.present?
         @commission_ranges = CommissionRange.where(location_id: @selected_location.id).order(:min_sales)
 
-        start_date = Date.today.beginning_of_month
-        end_date = Date.today
+        start_date = Date.current.beginning_of_month
+        end_date = Date.current
 
         daily_sales = filtered_orders.where(order_date: start_date..end_date)
                                     .group("DATE(order_date)")

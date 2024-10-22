@@ -4,7 +4,7 @@ module Services
       def initialize(location: nil, seller: nil, date_range: nil, year_month_period: nil)
         @location = location
         @seller = seller
-        @date_range = date_range || (Time.now.beginning_of_month..Time.now.end_of_month) # Default to current month
+        @date_range = date_range || (Time.current.beginning_of_month..Time.current.end_of_month) # Default to current month
         @year_month_period = year_month_period
       end
 

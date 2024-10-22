@@ -28,11 +28,11 @@ class Api::V1::WebEventsController < Api::V1::ApiBaseController
         if prospect.activities_from_tracking_pixel.present?
           current_activities = prospect.activities_from_tracking_pixel&.deep_stringify_keys || {}
           current_activities["prospect_landing_page_view"] ||= []
-          current_activities["prospect_landing_page_view"] << Time.now.iso8601
+          current_activities["prospect_landing_page_view"] << Time.current.iso8601
 
           prospect.update(activities_from_tracking_pixel: current_activities)
         else
-          prospect.update(activities_from_tracking_pixel: { prospect_landing_page_view: [ Time.now.iso8601 ] })
+          prospect.update(activities_from_tracking_pixel: { prospect_landing_page_view: [ Time.current.iso8601 ] })
         end
       else
         render json: "Not found", status: :unprocessable_entity and return

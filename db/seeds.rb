@@ -89,7 +89,7 @@ warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_def
       meta_keywords: Faker::Lorem.words(number: 5).join(', '),
       meta_description: Faker::Lorem.sentence(word_count: 10),
       stockable: Faker::Boolean.boolean,
-      available_at: Faker::Date.between(from: 2.days.ago, to: Date.today),
+      available_at: Faker::Date.between(from: 2.days.ago, to: Date.current),
       deleted_at: nil, # or `Faker::Date.between(from: 1.year.ago, to: 1.day.ago)` if you want some deleted products
       product_order: Faker::Number.between(from: 1, to: 100),
       status: "active",
@@ -223,7 +223,7 @@ LoyaltyTier.find_or_create_by!(name: 'Diamond', requirements_orders_count: 50, r
 for i in 1..50
   days_ago = rand(1..30)
   sales_price_cents = rand(1000..10000)
-  created_time = Time.now - days_ago.days
+  created_time = Time.current - days_ago.days
   Order.create!(user_id: generic_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
 end
 =end

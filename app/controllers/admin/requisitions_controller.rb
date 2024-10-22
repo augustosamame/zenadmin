@@ -25,7 +25,7 @@ class Admin::RequisitionsController < Admin::AdminController
   def new
     @requisition = Requisition.new
     @requisition.user_id = current_user.id
-    @requisition.requisition_date = Time.now
+    @requisition.requisition_date = Time.current
     @requisition.requisition_lines.build
   end
 

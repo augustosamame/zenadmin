@@ -121,6 +121,9 @@ application.register("pos--product-grid", Pos__ProductGridController)
 import Pos__SellersModalController from "./pos/sellers_modal_controller"
 application.register("pos--sellers-modal", Pos__SellersModalController)
 
+import ReportDateController from "./report_date_controller"
+application.register("report-date", ReportDateController)
+
 import RequisitionFormController from "./requisition_form_controller"
 application.register("requisition-form", RequisitionFormController)
 

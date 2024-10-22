@@ -106,7 +106,7 @@ class CashFlowReport < Prawn::Document
         move_down 5
       end
       move_down 10
-      text_box "Reporte generado el: #{I18n.localize(Time.now, format: "%d/%m/%y - %H:%M:%S")}", size: 8, at: [0, cursor], width: 200
+      text_box "Reporte generado el: #{I18n.localize(Time.current, format: "%d/%m/%y - %H:%M:%S")}", size: 8, at: [0, cursor], width: 200
       move_down 10
       text_box "por el usuario: #{current_user.email}", size: 8, at: [0, cursor], width: 200
     end

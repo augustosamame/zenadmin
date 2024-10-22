@@ -37,7 +37,7 @@ class ConsolidatedReport < Prawn::Document
     move_down 30
 
     # Add footer
-    text "Reporte generado el: #{I18n.localize(Time.now, format: "%d/%m/%y - %H:%M:%S")}", size: 8
+    text "Reporte generado el: #{I18n.localize(Time.current, format: "%d/%m/%y - %H:%M:%S")}", size: 8
     text "por el usuario: #{@current_user.email}", size: 8
   end
 end
