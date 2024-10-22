@@ -45,7 +45,7 @@ module EdukaiErp
     # in config/environments, which are processed later.
     #
     config.time_zone = "America/Lima" # e.g., 'America/New_York'
-    config.active_record.default_timezone = :utc
+    config.active_record.default_timezone = :local
     config.i18n.default_locale = :es
     # config.eager_load_paths << Rails.root.join("extras")
     config.turbo.broadcast_job_processor = :inline

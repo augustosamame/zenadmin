@@ -18,3 +18,4 @@ production:
   database: edukaierp_production
   username: edukaierp
   password: <%= ENV["EDUKAIERP_DATABASE_PASSWORD"] %>
+  timezone: America/Lima
