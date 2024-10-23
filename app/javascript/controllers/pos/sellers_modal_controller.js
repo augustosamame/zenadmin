@@ -185,7 +185,7 @@ saveSellers() {
     sellersButton.innerHTML = `
     ${sellersButton.querySelector('svg').outerHTML} ${sellers.length} Vendedor${sellers.length > 1 ? 'es' : ''} Seleccionado${sellers.length > 1 ? 's' : ''}
   `;
-    sellersButton.classList.add('bg-blue-500', 'text-white');
+    sellersButton.classList.add('bg-primary-500', 'text-white');
     sellersButton.classList.remove('bg-white');
     console.log('Classes after update:', sellersButton.className);
 
@@ -230,7 +230,7 @@ saveSellers() {
     sellersButton.innerHTML = `
     ${sellersButton.querySelector('svg').outerHTML} Vendedores
   `;
-    sellersButton.classList.remove('bg-blue-500', 'text-white');
+    sellersButton.classList.remove('bg-primary-500', 'text-white');
     sellersButton.classList.add('bg-white');
     console.log('Classes after reset:', sellersButton.className);
   }

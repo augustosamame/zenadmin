@@ -140,7 +140,7 @@ export default class extends Controller {
     clienteButton.innerHTML = `
       ${clienteButton.querySelector('svg').outerHTML.replace('text-slate-600', 'text-white').replace('dark:text-slate-300', 'text-white mr-2')} ${fullName}
     `;
-    clienteButton.classList.add('bg-blue-500', 'text-white');
+    clienteButton.classList.add('bg-primary-500', 'text-white');
     clienteButton.classList.remove('bg-white');
 
     const customerSelectedEvent = new CustomEvent('customer-selected', {

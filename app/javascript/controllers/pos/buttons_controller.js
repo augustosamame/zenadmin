@@ -85,7 +85,7 @@ export default class extends Controller {
     clienteButton.innerHTML = `${originalIcon} Cliente`;
 
     // Reset button styles to original
-    clienteButton.classList.remove('bg-blue-500', 'text-white');
+    clienteButton.classList.remove('bg-primary-500', 'text-white');
     clienteButton.classList.add('text-black', 'bg-white', 'border', 'border-gray-300', 'dark:bg-slate-600', 'dark:text-white', 'dark:border-slate-400');
 
     // Remove selected customer data
@@ -116,7 +116,7 @@ export default class extends Controller {
     `;
 
     // Reset button styles to original
-    sellersButton.classList.remove('bg-blue-500', 'text-white');
+    sellersButton.classList.remove('bg-primary-500', 'text-white');
     sellersButton.classList.add('text-black', 'bg-white', 'border', 'border-gray-300', 'dark:bg-slate-600', 'dark:text-white', 'dark:border-slate-400');
 
     // Remove selected sellers data

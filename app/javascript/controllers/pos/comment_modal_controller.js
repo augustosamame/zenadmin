@@ -37,7 +37,7 @@ export default class extends Controller {
         commentButton.innerHTML = `
         ${commentButton.querySelector('svg').outerHTML.replace('text-white', 'text-slate-600').replace('text-white mr-2', 'dark:text-slate-300 mr-2')} Comentarios
       `;
-        commentButton.classList.remove('bg-blue-500', 'text-white'); // Revert background and text color
+        commentButton.classList.remove('bg-primary-500', 'text-white'); // Revert background and text color
       }
     } else {
       // If a comment is present, update the button's appearance to indicate it
@@ -45,7 +45,7 @@ export default class extends Controller {
         commentButton.innerHTML = `
         ${commentButton.querySelector('svg').outerHTML.replace('text-slate-600', 'text-white').replace('dark:text-slate-300', 'text-white mr-2')} Comentarios
       `;
-        commentButton.classList.add('bg-blue-500', 'text-white');
+        commentButton.classList.add('bg-primary-500', 'text-white');
         commentButton.classList.remove('bg-white');
       }
     }

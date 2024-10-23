@@ -26,6 +26,7 @@ Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')
 Role.find_or_create_by!(name: 'seller')
 Role.find_or_create_by!(name: 'supervisor')
+Role.find_or_create_by!(name: 'store_manager')
 Role.find_or_create_by!(name: 'warehouse_manager')
 Role.find_or_create_by!(name: 'customer')
 
@@ -58,16 +59,16 @@ location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: regio
 
 location_3 = Location.find_or_create_by!(name: 'Plaza Norte', region: region_default, email: "plazanorte@jardindelzen.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
 
-storeuser1 = User.create!(email: 'jockeyplaza@jardindelzen.com', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
-storeuser1.add_role('seller')
+storeuser1 = User.create!(email: 'jockeyplaza@aromaterapia.com.pe', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
+storeuser1.add_role('store_manager')
 
-storeuser2 = User.create!(email: 'sanmiguel@devtechperu.com', phone: "986976312", location_id: location_2.id, login: "sanmiguel@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
-storeuser2.add_role('seller')
+storeuser2 = User.create!(email: 'sanmiguel@aromaterapia.com.pe', phone: "986976312", location_id: location_2.id, login: "sanmiguel@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
+storeuser2.add_role('store_manager')
 
-storeuser3 = User.create!(email: 'plazanorte@jardindelzen.com', phone: "928855854", location_id: location_3.id, login: "plazanorte@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza Norte", internal: true)
-storeuser3.add_role('seller')
+storeuser3 = User.create!(email: 'plazanorte@aromaterapia.com.pe', phone: "928855854", location_id: location_3.id, login: "plazanorte@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza Norte", internal: true)
+storeuser3.add_role('store_manager')
 
-supervisor_1 = User.create!(email: 'supervisor1@devtechperu.com', phone: "986976314", login: "supervisor1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Tiendas")
+supervisor_1 = User.create!(email: 'supervisor@aromaterapia.com.pe', phone: "986976314", login: "supervisor@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Carmen", last_name: "Supervisor")
 supervisor_1.add_role('supervisor')
 
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
@@ -151,7 +152,7 @@ CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_perc
 useradmin1 = User.create!(email: 'aalvarino@aromaterapia.com.pe', phone: "986976366", login: "aalvarino@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Alicia", last_name: "Alvarino")
 useradmin1.add_role('super_admin')
 
-useradmin2 = User.create!(email: 'ventas@aromaterapia.com.pe', phone: "986976367", login: "ventas@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Sasha", last_name: "Admin")
+useradmin2 = User.create!(email: 'administrador@aromaterapia.com.pe', phone: "986976367", login: "administrador@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Sasha", last_name: "Admin")
 useradmin2.add_role('super_admin')
 
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: false)
@@ -171,12 +172,46 @@ Customer.create!(
   user: user2,
 )
 
-user3 = User.create!(email: 'seller1@devtechperu.com', phone: "986976379", login: "seller1@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Maria", last_name: "Angeles", location_id: location_1.id)
-user3.add_role('seller')
-user4 = User.create!(email: 'seller2@devtechperu.com', phone: "986976380", login: "seller2@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Patricia", last_name: "Artieda", location_id: location_1.id)
-user4.add_role('seller')
-user5 = User.create!(email: 'seller3@devtechperu.com', phone: "986976381", login: "seller3@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Mayra", last_name: "Carrillo", location_id: location_1.id)
-user5.add_role('seller')
+[
+  "Abellud Figueroa afigue@aromaterapia.com.pe 12345678 928855845",
+  "Ricardo Morao rmorao@aromaterapia.com.pe 12345678 907488874",
+  "Jeannelly Reyes jreyes@aromaterapia.com.pe 12345678 927461873",
+  "Reishell Doncal rdoncal@aromaterapia.com.pe 12345678 902609704",
+  "Orlando Suarez osuare@aromaterapia.com.pe 12345678 920992372",
+  "Gianely Pedernez gpederne@aromaterapia.com.pe 12345678 926824979",
+  "Mario Mujica mmujica@aromaterapia.com.pe 12345678 943279987",
+  "Rosseline Lucho rlucho@aromaterapia.com.pe 12345678 933397687",
+  "Nils Frick nfrick@aromaterapia.com.pe 12345678 931887453",
+  "Steffany Gavilan sgavila@aromaterapia.com.pe 12345678 932843289",
+  "Patricia Pisconte ppiscont@aromaterapia.com.pe 12345678 924163827",
+  "Evelin Yarasca eyaras@aromaterapia.com.pe 12345678 947071687",
+  "Yanira Remigio yremigi@aromaterapia.com.pe 12345678 981537710",
+  "Valeria Perez vperez@aromaterapia.com.pe 12345678 965991870",
+  "Mayra Morales mmorale@aromaterapia.com.pe 12345678 976793464",
+  "Claudia Chuquimantari cchuqui@aromaterapia.com.pe 12345678 981524291",
+  "Leidy Coregana lcoregan@aromaterapia.com.pe 12345678 957243394",
+  "Diana Santillan dsantill@aromaterapia.com.pe 12345678 933153900",
+  "Camila Quispe cquispe@aromaterapia.com.pe 12345678 987976413",
+  "Mayke Elliott melliot@aromaterapia.com.pe 12345678 937259915",
+  "Eglis Mendez emendez@aromaterapia.com.pe 12345678 979337174",
+  "Yesenia Quispe yquispe@aromaterapia.com.pe 12345678 981524291",
+  "Carmen Hernandez cherna@aromaterapia.com.pe 12345678 980198604",
+  "Stephanie Sandoval ssandova@aromaterapia.com.pe 12345678 987969512"
+].each do |user_info|
+  first_name, last_name, email, password, phone = user_info.split
+  user = User.create!(
+    email: email,
+    phone: phone,
+    login: email,
+    require_password_change: false,
+    password: password,
+    first_name: first_name,
+    last_name: last_name,
+    location_id: nil
+  )
+  user.add_role('seller')
+  puts "Created user: #{user.email}"
+end
 
 invoicer1 = Invoicer.find_or_create_by!(name: 'El Jardin del Zen', razon_social: 'El Jardin del Zen EIRL', ruc: '20513903180', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561354", region: region_default)
 invoicer2 = Invoicer.find_or_create_by!(name: 'Laboratorio Cuerpo y Alma', razon_social: 'Laboratorio Cuerpo y Alma EIRL', ruc: '20518549937', tipo_ruc: 'RUC', einvoice_api_key: "12345678901234561355", region: region_default)
