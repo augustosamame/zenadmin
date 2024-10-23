@@ -1,0 +1,11 @@
+<%= render "shared/admin/nav", { header_title: "Editar Categoría de Producto" } %>
+
+<div class="container px-4 pb-24 mx-auto my-16">
+  <div class="max-w-md mx-auto">
+    <div class="mt-4">
+      <%= link_to "Volver", admin_product_categories_path, class: "btn btn-secondary mb-4" %>
+    </div>
+    <h1 class="mb-4 text-2xl font-bold text-slate-900 dark:text-slate-100">Editar Categoría de Producto</h1>
+    <%= render "form", product_category: @product_category %>
+  </div>
+</div>
