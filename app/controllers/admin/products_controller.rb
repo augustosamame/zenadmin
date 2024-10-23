@@ -8,7 +8,7 @@ class Admin::ProductsController < Admin::AdminController
     respond_to do |format|
       format.html do
         @products = Product
-        .includes(:media, :warehouse_inventories)
+        .includes(:media, :warehouse_inventories, :tags)
         .left_joins(:warehouse_inventories) # Ensures products without inventory are included
         .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
         .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc) # Use SQL to fetch stock in one go
