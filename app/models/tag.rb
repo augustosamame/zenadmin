@@ -7,4 +7,7 @@ class Tag < ApplicationRecord
 
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
+
+  enum :tag_type, { other: 0, discount: 1, category: 2, sub_category: 3, volume: 4, fragance: 5 }
+  translate_enum :tag_type
 end

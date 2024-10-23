@@ -12,3 +12,29 @@
 .no-spinner {
   -moz-appearance: textfield;
 }
+
+/* Tom Select */
+.ts-dropdown .optgroup-header {
+  font-weight: bold;
+  background-color: #f0f0f0;
+  padding: 5px 10px;
+}
+
+.ts-dropdown .custom-optgroup-header {
+  border-bottom: 1px solid #e0e0e0;
+  /* This adds the thin grey line */
+  margin-bottom: 5px;
+  /* Add some space below the line */
+  padding-bottom: 5px;
+  /* Add some space above the line */
+}
+
+/* Optional: Style the last optgroup to remove the bottom border */
+.ts-dropdown .optgroup:last-child .custom-optgroup-header {
+  border-bottom: none;
+}
+
+/* Optional: Add some padding to the options for better alignment */
+.ts-dropdown .option {
+  padding-left: 15px;
+}

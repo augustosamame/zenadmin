@@ -1,0 +1,53 @@
+<%# app/views/admin/discounts/_form.html.erb %>
+<%= simple_form_for([:admin, discount], html: { id: "discount_form", data: { controller: "discount-form" } }) do |form| %>
+ 
+  <%= render 'shared/form_errors', model: discount %>
+  
+  <div class="space-y-4" data-controller="dynamic-product-filter">
+    <%= form.input :name, label: "Nombre", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    
+    <%= form.input :discount_type, label: "Tipo de Descuento", collection: Discount.translated_discount_types.map { |translation, k, _v| [translation.titleize, k] }, 
+                   input_html: { class: "form-select", data: { action: "change->discount-form#toggleDiscountFields" } }, 
+                   label_html: { class: "form-label" } %>
+    
+    <div data-discount-form-target="globalFields">
+      <%= form.input :discount_percentage, label: "Descuento %", input_html: { class: "form-input", step: 0.01 }, label_html: { class: "form-label" } %>
+    </div>
+    
+    <div data-discount-form-target="groupFields" class="hidden">
+      <%= form.input :group_discount_payed_quantity, label: "Cantidad Total", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+      <%= form.input :group_discount_free_quantity, label: "Cantidad que se paga", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+    
+    <%= form.input :start_datetime, label: "Fecha de Inicio", as: :datetime, html5: true, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    
+    <%= form.input :end_datetime, label: "Fecha de Fin", as: :datetime, html5: true, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    
+    <%= form.input :status, label: "Estado", collection: Discount.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, input_html: { class: "form-select" }, label_html: { class: "form-label" } %>
+    
+    <div>
+      <%= label_tag :tag_ids, "Etiquetas", class: "form-label" %>
+      <%= select_tag :tag_ids, options_from_collection_for_select(Tag.all, :id, :name, discount.tags.pluck(:id)), 
+                     multiple: true, 
+                     class: "form-select", 
+                     data: { 
+                       controller: "select",
+                       select_placeholder_value: "Seleccionar etiquetas",
+                       select_multi_select_value: "true",
+                       dynamic_product_filter_target: "tagSelect"
+                     } %>
+    </div>
+
+    <div class="mt-8">
+      <h3 class="mb-4 text-lg font-semibold">Productos que coinciden</h3>
+      <div data-dynamic-product-filter-target="productsTable" data-url="<%= matching_products_admin_discounts_path %>">
+        <%= render 'matching_products', products: Product.none %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex items-center py-6 mt-6 space-x-4 border-t dark:border-slate-600">
+    <%= form.submit discount.new_record? ? "Crear Descuento" : "Actualizar Descuento", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_discounts_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

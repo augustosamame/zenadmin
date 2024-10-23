@@ -95,9 +95,15 @@ export default class extends Controller {
         </div>
         <span class="block text-sm">${product.custom_id}</span>
         <span class="block text-sm">${product.name}</span>
-        <div class="flex justify-between text-sm text-gray-500">
-          <span>S/ ${product.price}</span>
-          <span>Stock: ${product.stock}</span>
+        <div class="flex justify-between text-sm">
+          ${product.original_price !== product.discounted_price
+                ? `<span class="text-red-500">
+                <del class="text-gray-500">S/ ${product.original_price.toFixed(2)}</del>
+                S/ ${product.discounted_price.toFixed(2)}
+              </span>`
+                : `<span class="text-gray-500">S/ ${product.price.toFixed(2)}</span>`
+              }
+          <span class="text-gray-500">Stock: ${product.stock}</span>
         </div>
       `;
 
@@ -123,6 +129,7 @@ export default class extends Controller {
         custom_id: item.custom_id,
         name: item.name,
         price: item.price,
+        already_discounted: item.discounted_price !== item.original_price,
         quantity: 1,
         isComboItem: false
       });
@@ -137,7 +144,8 @@ export default class extends Controller {
           id: product.id,
           custom_id: product.custom_id,
           name: product.name,
-          price: product.regular_price,
+          price: product.discounted_price,
+          already_discounted: true,
           quantity: product.quantity,
           isComboItem: true,
           comboId: comboId

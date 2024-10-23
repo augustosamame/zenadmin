@@ -106,7 +106,12 @@ class Admin::ProductsController < Admin::AdminController
       end
     end
 
-    combined_results = (@products.map { |product| product_to_json(product) } + @combo_products.map { |combo| combo_to_json(combo) })
+    # Fetch applicable global discounts
+    product_ids = @products.pluck(:id)
+    applicable_discounts = Discount.active.current.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
+
+    combined_results = (@products.map { |product| product_to_json(product, applicable_discounts) } + 
+                        @combo_products.map { |combo| combo_to_json(combo) })
 
     render json: combined_results
   end
@@ -139,13 +144,22 @@ class Admin::ProductsController < Admin::AdminController
       params
     end
 
-    def product_to_json(product)
+    def product_to_json(product, applicable_discounts)
+      discount = applicable_discounts.find { |d| d.matching_product_ids.include?(product.id) }
+      discounted_price = if discount
+        (product.price_cents * (1 - discount.discount_percentage / 100.0) / 100.0).round(2)
+      else
+        (product.price_cents / 100.0)
+      end
+
       {
         id: product.id,
         custom_id: product.custom_id,
         name: product.name,
         image: product.smart_image(:small),
-        price: (product.price_cents / 100.0),
+        original_price: (product.price_cents / 100.0).to_f,
+        discounted_price: discounted_price.to_f,
+        price: discounted_price.to_f,
         stock: product.stock(@current_warehouse),
         type: "Product"
       }

@@ -45,6 +45,7 @@ export default class extends Controller {
       custom_id: productCustomId,
       name: productName,
       price: 0,
+      already_discounted: true,
       quantity: 1,
       isLoyaltyFree: true
     });
@@ -265,6 +266,13 @@ export default class extends Controller {
     console.log('Digit:', digit);
     if (!this.selectedItem) return;
 
+    // Check if the item is already discounted
+    const isAlreadyDiscounted = this.selectedItem.getAttribute('data-item-already-discounted') === 'true';
+    if (isAlreadyDiscounted) {
+      console.log('Cannot edit price for already discounted item');
+      return; // Exit the method if the item is already discounted
+    }
+
     const priceElement = this.selectedItem.querySelector('.editable-price');
     let currentPrice = priceElement.textContent.replace('S/ ', '').replace('.', '');
 
@@ -481,6 +489,7 @@ export default class extends Controller {
       const newQuantity = currentQuantity + product.quantity;
       existingItem.setAttribute('data-original-quantity', newQuantity);
     }
+    existingItem.setAttribute('data-item-already-discounted', product.already_discounted);
   }
 
   addComboDiscount(comboId, discountAmount) {
@@ -496,7 +505,7 @@ export default class extends Controller {
     itemElement.setAttribute('data-item-original-price', product.price);
     itemElement.setAttribute('data-product-id', product.id);
     itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
-
+    itemElement.setAttribute('data-item-already-discounted', product.already_discounted);
     itemElement.innerHTML = `
       <div class="flex-grow" style="flex-basis: 55%;">
         <span class="block font-medium">${product.name}</span>

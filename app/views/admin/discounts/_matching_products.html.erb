@@ -1,0 +1,24 @@
+<table class="min-w-full bg-white dark:bg-slate-800">
+  <thead>
+    <tr>
+      <th class="px-4 py-2 text-left">Código</th>
+      <th class="px-4 py-2 text-left">Imagen</th>
+      <th class="px-4 py-2 text-left">Nombre</th>
+      <th class="px-4 py-2 text-left">Precio</th>
+      <th class="px-4 py-2 text-left">Estado</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% products.each do |product| %>
+      <tr>
+        <td class="px-4 py-2"><%= product.custom_id %></td>
+        <td class="flex items-center px-4 py-2 space-x-3">
+          <%= image_tag product.smart_image(:thumb), alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
+        </td>
+        <td class="px-4 py-2"><%= product.name %></td>
+        <td class="px-4 py-2"><%= format_currency(product.price) %></td>
+        <td class="px-4 py-2"><%= product.status %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>

@@ -22,7 +22,16 @@ export default class extends Controller {
       create: false,  // Disable tag creation by default
       valueField: "id",
       labelField: "name",
-      searchField: "name"
+      searchField: "name",
+      optgroupField: 'class',
+      optgroupLabelField: 'label',
+      optgroupValueField: 'value',
+      lockOptgroupOrder: true,
+      render: {
+        optgroup_header: function (data, escape) {
+          return '<div class="optgroup-header custom-optgroup-header">' + escape(data.label) + '</div>';
+        }
+      }
     };
 
     // Initialize Tom Select only if not already initialized

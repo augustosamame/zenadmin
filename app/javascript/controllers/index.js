@@ -49,11 +49,17 @@ application.register("dashboards--charts", Dashboards__ChartsController)
 import DatatableController from "./datatable_controller"
 application.register("datatable", DatatableController)
 
+import DiscountFormController from "./discount_form_controller"
+application.register("discount-form", DiscountFormController)
+
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 
 import DynamicFormController from "./dynamic_form_controller"
 application.register("dynamic-form", DynamicFormController)
+
+import DynamicProductFilterController from "./dynamic_product_filter_controller"
+application.register("dynamic-product-filter", DynamicProductFilterController)
 
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
@@ -121,6 +127,9 @@ application.register("pos--product-grid", Pos__ProductGridController)
 import Pos__SellersModalController from "./pos/sellers_modal_controller"
 application.register("pos--sellers-modal", Pos__SellersModalController)
 
+import ProductCategoryFormController from "./product_category_form_controller"
+application.register("product-category-form", ProductCategoryFormController)
+
 import ReportDateController from "./report_date_controller"
 application.register("report-date", ReportDateController)
 
@@ -142,14 +151,14 @@ application.register("stock-transfer-receive", StockTransferReceiveController)
 import TabsController from "./tabs_controller"
 application.register("tabs", TabsController)
 
-import TooltipController from "./tooltip_controller"
-application.register("tooltip", TooltipController)
-
-import UppyUploadController from "./uppy_upload_controller"
-application.register("uppy-upload", UppyUploadController)
-
 import TagFormController from "./tag_form_controller"
 application.register("tag-form", TagFormController)
 
 import TagTableModalController from "./tag_table_modal_controller"
 application.register("tag-table-modal", TagTableModalController)
+
+import TooltipController from "./tooltip_controller"
+application.register("tooltip", TooltipController)
+
+import UppyUploadController from "./uppy_upload_controller"
+application.register("uppy-upload", UppyUploadController)

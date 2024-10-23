@@ -103,7 +103,9 @@ Rails.application.routes.draw do
 
     resources :combo_products
     resources :discount_products
-
+    resources :discounts do
+      get 'matching_products', on: :collection
+    end
     resources :cashier_shifts do
       member do
         patch :close

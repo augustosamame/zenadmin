@@ -144,6 +144,13 @@ es:
           venta_incorrecta: Venta incorrecta
           otros: Otros
       tag:
+        tag_type_list:
+          other: Otro
+          discount: Descuento
+          category: Categoría
+          sub_category: Subcategoría
+          volume: Peso / Volumen
+          fragance: Fragancia
         status_list:
           active: Activo
           inactive: Inactivo
@@ -151,6 +158,13 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      discount:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+        discount_type_list:
+          type_global: Global
+          type_group: Por Grupos (ej. 3x2)
       user:
         status_list:
           active: Activo

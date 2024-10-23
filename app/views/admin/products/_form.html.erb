@@ -49,24 +49,12 @@
               name="product[tag_ids][]" 
               id="product_tag_ids"
               multiple="multiple">
-        <% Tag.all.each do |tag| %>
-          <option value="<%= tag.id %>" <%= 'selected' if @product.tags.include?(tag) %>><%= tag.name %></option>
-        <% end %>
-      </select>
-    </div>
-
-    <!-- Product Categories Section with Tom Select -->
-    <div>
-      <%= form.label :product_category_ids, "Categorías", class: "form-label" %>
-        <select data-controller="select"
-              data-select-model-value="ProductCategory"
-              data-select-multi-select-value="true"
-              data-select-placeholder-value="Selecciona una o más categorías"
-              name="product[product_category_ids][]"
-              id="product_product_category_ids"
-              multiple="multiple">
-        <% @product_categories.all.each do |category| %>
-          <option value="<%= category.id %>" <%= 'selected' if @product.product_categories.include?(category) %>><%= category.full_name %></option>
+        <% Tag.translated_tag_types.each do |translation, tag_type, _| %>
+          <optgroup label="<%= translation.titleize %>">
+            <% Tag.where(tag_type: tag_type).each do |tag| %>
+              <option value="<%= tag.id %>" <%= 'selected' if @product.tags.include?(tag) %>><%= tag.name %></option>
+            <% end %>
+          </optgroup>
         <% end %>
       </select>
     </div>

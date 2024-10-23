@@ -42,6 +42,6 @@ class Admin::TagsController < Admin::AdminController
     end
 
     def tag_params
-      params.require(:tag).permit(:name, :status)
+      params.require(:tag).permit(:name, :tag_type, :visible_filter, :status)
     end
 end

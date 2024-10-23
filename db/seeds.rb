@@ -263,6 +263,6 @@ for i in 1..50
 end
 =end
 
-Services::Products::ProductImportService.new("productos_jardin_del_zen.csv").call
+Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 5).call
 Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
 Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call

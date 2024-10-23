@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_23_143930) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -243,6 +243,36 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
     t.datetime "updated_at", null: false
     t.index ["referrer_id"], name: "index_customers_on_referrer_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
+  end
+
+  create_table "discount_filters", force: :cascade do |t|
+    t.bigint "discount_id", null: false
+    t.string "filterable_type", null: false
+    t.bigint "filterable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discount_id"], name: "index_discount_filters_on_discount_id"
+    t.index ["filterable_type", "filterable_id"], name: "index_discount_filters_on_filterable"
+  end
+
+  create_table "discounts", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "discount_type", default: 0
+    t.decimal "discount_percentage", precision: 5, scale: 2
+    t.decimal "discount_fixed_amount", precision: 5, scale: 2
+    t.integer "group_discount_payed_quantity"
+    t.integer "group_discount_free_quantity"
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.integer "status", default: 0
+    t.integer "matching_product_ids", default: [], array: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["discount_type"], name: "index_discounts_on_discount_type"
+    t.index ["end_datetime"], name: "index_discounts_on_end_datetime"
+    t.index ["matching_product_ids"], name: "index_discounts_on_matching_product_ids", using: :gin
+    t.index ["start_datetime"], name: "index_discounts_on_start_datetime"
+    t.index ["status"], name: "index_discounts_on_status"
   end
 
   create_table "factory_factories", force: :cascade do |t|
@@ -761,6 +791,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
 
   create_table "tags", force: :cascade do |t|
     t.string "name", null: false
+    t.integer "tag_type", default: 0
+    t.boolean "visible_filter", default: false
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -872,6 +904,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_09_22_162710) do
   add_foreign_key "commissions", "users"
   add_foreign_key "customers", "users"
   add_foreign_key "customers", "users", column: "referrer_id"
+  add_foreign_key "discount_filters", "discounts"
   add_foreign_key "factory_factories", "regions"
   add_foreign_key "in_transit_stocks", "products"
   add_foreign_key "in_transit_stocks", "stock_transfers"

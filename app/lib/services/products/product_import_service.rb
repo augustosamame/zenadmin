@@ -20,9 +20,13 @@ module Services
           tag1_name = row[2]
           tag2_name = row[3]
 
+          random_tag_type = Tag.tag_types.keys.sample
+
           ProductCategory.find_or_create_by!(name: product_category_name)
-          Tag.find_or_create_by!(name: tag1_name) if tag1_name.present?
-          Tag.find_or_create_by!(name: tag2_name) if tag2_name.present?
+          found_tag = Tag.find_by(name: tag1_name)
+          Tag.create!(name: tag1_name, tag_type: random_tag_type) if found_tag.blank? && tag1_name.present?
+          found_tag = Tag.find_by(name: tag2_name)
+          Tag.create!(name: tag2_name, tag_type: random_tag_type) if found_tag.blank? && tag2_name.present?
         end
 
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|

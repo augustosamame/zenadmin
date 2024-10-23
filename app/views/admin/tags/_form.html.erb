@@ -11,6 +11,23 @@
       </div>
 
       <div>
+        <%= form.input :tag_type, 
+          label: "Familia", 
+          collection: Tag.translated_tag_types.map { |translation, k, _v| [translation.titleize, k] }, 
+          as: :select, 
+          input_html: { class: "form-select", data: { tag_form_target: "tag_type" } }, 
+          label_html: { class: "form-label" } %>
+      </div>
+
+      <div>
+        <%= form.input :visible_filter, 
+          label: "Visible en Filtros", 
+          as: :boolean, 
+          input_html: { class: "form-checkbox", data: { tag_form_target: "visible_filter" } }, 
+          label_html: { class: "form-label" } %>
+      </div>
+
+      <div>
         <%= form.input :status, 
           label: "Estado", 
           collection: Tag.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, 

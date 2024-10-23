@@ -101,5 +101,10 @@ export const resourceMappings = {
     buttonText: "Crear Categoría",
     buttonUrl: "/admin/product_categories/new",
     ajaxUrl: "/admin/product_categories.json"
+  },
+  Discount: {
+    buttonText: "Crear Descuento",
+    buttonUrl: "/admin/discounts/new",
+    ajaxUrl: "/admin/discounts.json"
   }
 }
