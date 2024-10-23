@@ -1,0 +1,36 @@
+<%= render "shared/admin/nav", { header_title: "Tags" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="container px-4 py-6 mx-auto">
+
+  <div data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+    <div class="overflow-x-auto">
+      <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+        <thead>
+          <tr>
+            <th class="px-4 py-2 text-left">ID</th>
+            <th class="px-4 py-2 text-left">Nombre</th>
+            <th class="px-4 py-2 text-left">Estado</th>
+            <th class="px-4 py-2 text-left">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @tags.each do |tag| %>
+            <tr>
+              <td class="px-4 py-2"><%= tag.id %></td>
+              <td class="px-4 py-2"><%= tag.name %></td>
+              <td class="px-4 py-2"><%= tag.status.titleize %></td>
+              <td class="px-4 py-2">
+                <%= link_to "Editar", edit_admin_tag_path(tag), class: "text-blue-500 hover:underline mr-2" %>
+                <%= form_with(url: admin_tag_path(tag), method: :delete, class: "inline", data: { turbo: false }) do |f| %>
+                  <%= f.submit "Eliminar", class: "text-red-500 hover:underline cursor-pointer bg-transparent border-none", onclick: "return confirm('¿Está seguro?');" %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

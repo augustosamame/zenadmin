@@ -91,5 +91,15 @@ export const resourceMappings = {
     buttonText: "Crear Checkin / Checkout",
     buttonUrl: "/admin/user_attendance_logs/new",
     ajaxUrl: "/admin/user_attendance_logs.json"
+  },
+  Tag: {
+    buttonText: "Crear Etiqueta",
+    buttonUrl: "/admin/tags/new",
+    ajaxUrl: "/admin/tags.json"
+  },
+  ProductCategory: {
+    buttonText: "Crear Categoría",
+    buttonUrl: "/admin/product_categories/new",
+    ajaxUrl: "/admin/product_categories.json"
   }
 }

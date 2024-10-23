@@ -78,7 +78,7 @@ export default class extends Controller {
     const resourceMapping = this.constructor.resourceMappings[resourceName];
 
     if (!resourceMapping) {
-      console.error(`Error: No mapping found in datatable controllerfor resource ${resourceName}`);
+      console.error(`Error: No mapping found in datatable controller for resource ${resourceName}`);
       return options;
     }
 

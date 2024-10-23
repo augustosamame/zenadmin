@@ -147,6 +147,10 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      product_category:
+        status_list:
+          active: Activo
+          inactive: Inactivo
       user:
         status_list:
           active: Activo

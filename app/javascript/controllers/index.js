@@ -147,3 +147,9 @@ application.register("tooltip", TooltipController)
 
 import UppyUploadController from "./uppy_upload_controller"
 application.register("uppy-upload", UppyUploadController)
+
+import TagFormController from "./tag_form_controller"
+application.register("tag-form", TagFormController)
+
+import TagTableModalController from "./tag_table_modal_controller"
+application.register("tag-table-modal", TagTableModalController)

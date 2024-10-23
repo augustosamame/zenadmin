@@ -118,6 +118,9 @@ Rails.application.routes.draw do
     resources :invoice_series
     resources :invoice_series_mappings
 
+    resources :tags, only: [ :index, :new, :create, :edit, :update, :destroy ]
+    resources :product_categories
+
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     post "dashboards/set_location", to: "dashboards#set_location"
 

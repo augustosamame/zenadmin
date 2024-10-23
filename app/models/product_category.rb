@@ -2,6 +2,7 @@ class ProductCategory < ApplicationRecord
   audited_if_enabled
 
   include MediaAttachable
+  include TranslateEnum
 
   # Self-referential association for parent-child relationships (subcategories)
   belongs_to :parent, class_name: "ProductCategory", optional: true
@@ -18,6 +19,7 @@ class ProductCategory < ApplicationRecord
 
   # Enum for the status of the product category
   enum :status, { active: 0, inactive: 1 }
+  translate_enum :status
 
   after_commit :create_or_update_tag, on: [ :create, :update ]
 

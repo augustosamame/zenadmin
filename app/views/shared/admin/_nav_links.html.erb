@@ -104,6 +104,14 @@
     <li>
       <%= nav_link_to "Productos", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if current_user.any_admin? %>
+      <li>
+        <%= nav_link_to "Categorías", send("admin_product_categories_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+      <li>
+        <%= nav_link_to "Etiquetas", send("admin_tags_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+    <% end %>
     <% if current_user.any_admin_or_supervisor? %>
     <li>
       <%= nav_link_to "Packs de Productos", send("admin_combo_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
