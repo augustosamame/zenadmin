@@ -21,9 +21,10 @@ Rails.application.routes.draw do
       get "combo_products_show", on: :member
     end
 
-    resources :product_categories do
+    resources :product_categories, except: [:show] do
       resources :media, module: :admin
     end
+    
 
     resources :requisitions do
       member do
