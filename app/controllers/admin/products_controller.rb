@@ -107,7 +107,7 @@ class Admin::ProductsController < Admin::AdminController
       end
     end
 
-    # Fetch applicable global discounts
+    # Apply applicable global discounts
     product_ids = @products.pluck(:id)
     applicable_discounts = Discount.active.current.type_global.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
 

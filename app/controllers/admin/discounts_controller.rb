@@ -3,7 +3,7 @@ class Admin::DiscountsController < Admin::AdminController
   before_action :set_discount, only: [:edit, :update, :destroy]
 
   def index
-    @discounts = Discount.all
+    @discounts = Discount.all.includes(:tags)
     @datatable_options = "resource_name:'Discount';create_button:true;hide_0;sort_0_desc;"
   end
 

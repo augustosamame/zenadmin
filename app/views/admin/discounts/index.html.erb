@@ -16,6 +16,7 @@
           <th class="px-4 py-2 text-left">Fecha de Fin</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Vigencia</th>
+          <th class="px-4 py-2 text-left">Productos Aplicados</th>
           <th class="px-4 py-2 text-left">Etiquetas</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
@@ -37,7 +38,16 @@
             <td class="px-4 py-2"><%= discount.end_datetime.strftime("%Y-%m-%d %H:%M") %></td>
             <td class="px-4 py-2"><%= discount.status.titleize %></td>
             <td class="px-4 py-2"><%= discount.is_current? ? "Vigente" : "No Vigente" %></td>
-            <td class="px-4 py-2"><%= discount.tags.pluck(:name).join(", ") %></td>
+            <td class="px-4 py-2"><%= discount.matching_product_ids.count %></td>
+            <td class="px-4 py-2">
+              <div class="flex flex-wrap gap-1">
+                <% discount.tags.each do |tag| %>
+                  <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                    <%= tag.name %>
+                  </span>
+                <% end %>
+              </div>
+            </td>
             <td class="px-4 py-2">
               <%= link_to "Editar", edit_admin_discount_path(discount), class: "text-blue-500 hover:underline mr-2" %>
               <%= form_with(url: admin_discount_path(discount), method: :delete, class: "inline", data: { turbo: false }) do |f| %>
