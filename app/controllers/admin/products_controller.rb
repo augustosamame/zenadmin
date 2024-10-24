@@ -11,7 +11,8 @@ class Admin::ProductsController < Admin::AdminController
         .includes(:media, :warehouse_inventories, :tags)
         .left_joins(:warehouse_inventories) # Ensures products without inventory are included
         .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
-        .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc) # Use SQL to fetch stock in one go
+        .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
+        .order(id: :desc) # Use SQL to fetch stock in one go
 
 
         if @products.size > 1000
@@ -108,7 +109,7 @@ class Admin::ProductsController < Admin::AdminController
 
     # Fetch applicable global discounts
     product_ids = @products.pluck(:id)
-    applicable_discounts = Discount.active.current.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
+    applicable_discounts = Discount.active.current.type_global.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
 
     combined_results = (@products.map { |product| product_to_json(product, applicable_discounts) } + 
                         @combo_products.map { |combo| combo_to_json(combo) })

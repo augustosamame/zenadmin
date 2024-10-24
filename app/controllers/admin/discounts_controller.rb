@@ -27,6 +27,7 @@ class Admin::DiscountsController < Admin::AdminController
     @discount = Discount.new(discount_params)
     if @discount.save
       create_or_update_filters
+      @discount.update_matching_product_ids
       redirect_to admin_discounts_path, notice: 'Descuento creado correctamente.'
     else
       render turbo_stream: turbo_stream.replace("discount_form", partial: "form", locals: { discount: @discount })
@@ -39,6 +40,7 @@ class Admin::DiscountsController < Admin::AdminController
   def update
     if @discount.update(discount_params)
       create_or_update_filters
+      @discount.update_matching_product_ids
       redirect_to admin_discounts_path, notice: 'Descuento actualizado correctamente.'
     else
       render turbo_stream: turbo_stream.replace("discount_form", partial: "form", locals: { discount: @discount })

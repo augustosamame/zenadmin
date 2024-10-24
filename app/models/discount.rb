@@ -20,23 +20,11 @@ class Discount < ApplicationRecord
   validates :end_datetime, presence: true
   validate :end_datetime_after_start_datetime
 
-  after_save :update_matching_product_ids
-
   scope :active, -> { where(status: :active) }
   scope :current, -> { active.where('start_datetime <= ? AND end_datetime >= ?', Time.current, Time.current) }
 
   def is_current?
     start_datetime <= Time.current && end_datetime >= Time.current
-  end
-
-  private
-
-  def end_datetime_after_start_datetime
-    return if end_datetime.blank? || start_datetime.blank?
-
-    if end_datetime < start_datetime
-      errors.add(:end_datetime, "debe ser después de la fecha de inicio")
-    end
   end
 
   def update_matching_product_ids
@@ -47,12 +35,17 @@ class Discount < ApplicationRecord
       matching_products = matching_products.joins(:taggings).where(taggings: { tag_id: tag_ids })
     end
 
-    if discount_filters.where(filterable_type: 'ProductCategory').exists?
-      category_ids = discount_filters.where(filterable_type: 'ProductCategory').pluck(:filterable_id)
-      matching_products = matching_products.joins(:product_categories).where(product_categories: { id: category_ids })
-    end
-
     self.update_column(:matching_product_ids, matching_products.distinct.pluck(:id))
+  end
+
+  private
+
+  def end_datetime_after_start_datetime
+    return if end_datetime.blank? || start_datetime.blank?
+
+    if end_datetime < start_datetime
+      errors.add(:end_datetime, "debe ser después de la fecha de inicio")
+    end
   end
 
   def group_discount_payed_quantity_greater_than_free_quantity
