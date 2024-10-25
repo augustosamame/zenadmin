@@ -17,6 +17,7 @@ Rails.application.routes.draw do
   namespace :admin do
     resources :products do
       resources :media, module: :admin
+      post "evaluate_group_discount", on: :collection
       get "search", on: :collection
       get "combo_products_show", on: :member
     end
@@ -122,7 +123,6 @@ Rails.application.routes.draw do
     resources :invoice_series_mappings
 
     resources :tags, only: [ :index, :new, :create, :edit, :update, :destroy ]
-    resources :product_categories
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     post "dashboards/set_location", to: "dashboards#set_location"

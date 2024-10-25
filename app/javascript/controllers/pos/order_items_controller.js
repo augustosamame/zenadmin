@@ -2,7 +2,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ['items', 'total', 'loyaltyInfo', 'discountRow', 'discountAmount'];
+  static targets = ['items', 'total', 'loyaltyInfo', 'discountRow', 'discountAmount', 'discountName'];
 
   connect() {
     console.log('Connected to OrderItemsController!', this.element);
@@ -26,6 +26,8 @@ export default class extends Controller {
     this.setupLoyaltyEventListeners();
     this.startingNewPrice = true;
     this.comboDiscounts = new Map(); // To store discounts for each combo
+    this.groupDiscountAmount = 0;
+    this.groupDiscountNames = [];
   }
 
   setupLoyaltyEventListeners() {
@@ -137,6 +139,7 @@ export default class extends Controller {
     }
 
     this.calculateTotal();
+    this.evaluateGroupDiscount();
     this.saveDraft();
   }
 
@@ -186,6 +189,7 @@ export default class extends Controller {
     }
 
     this.calculateTotal();
+    this.evaluateGroupDiscount();
     this.saveDraft();
   }
 
@@ -249,6 +253,46 @@ export default class extends Controller {
     subtotalElement.textContent = `S/ ${(quantity * price).toFixed(2)}`;
   }
 
+  evaluateGroupDiscount() {
+    const orderData = this.collectOrderData();
+    const orderDataItemsAttributes = orderData.order_items_attributes;
+    console.log('orderDataItemsAttributes:', orderDataItemsAttributes);
+    const orderItemsArrayOfHashes = orderDataItemsAttributes
+      .filter(item => !item.isDiscounted)
+      .map(item => ({
+        product_id: item.id,
+        qty: item.quantity,
+        price: item.price
+      }));
+    console.log('orderItemsArrayOfHashes:', orderItemsArrayOfHashes);
+    fetch('/admin/products/evaluate_group_discount', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': this.csrfToken
+      },
+      body: JSON.stringify({ pos_items: orderItemsArrayOfHashes })
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Group Discount Evaluation:', data);
+        console.log('Group Discount Names:', data.applied_discount_names);
+        // Update UI based on the response
+        this.applyGroupDiscount(data.total_discount_to_apply, data.applied_discount_names);
+      })
+      .catch(error => console.error('Error evaluating group discount:', error));
+  }
+
+  applyGroupDiscount(totalDiscount, discountNames) {
+    this.groupDiscountAmount = totalDiscount;
+    this.groupDiscountNames = discountNames || [];
+    this.calculateTotal();
+    // Logic to apply the discount to the total
+    // const currentTotal = parseFloat(this.totalTarget.textContent.replace('S/ ', ''));
+    // const newTotal = currentTotal - totalDiscount;
+    // this.totalTarget.textContent = `S/ ${newTotal.toFixed(2)}`;
+  }
+
   removeItem() {
     console.log('removing item:', this.selectedItem);
     if (this.selectedItem.hasAttribute('data-combo-id')) {
@@ -259,6 +303,7 @@ export default class extends Controller {
     this.selectedItem.remove();
     this.selectedItem = null;
     this.calculateTotal();
+    this.evaluateGroupDiscount();
     this.saveDraft();
   }
 
@@ -329,6 +374,7 @@ export default class extends Controller {
         this.checkAndUpdateComboDiscount(this.selectedItem);
       }
 
+      this.evaluateGroupDiscount();
       this.calculateTotal();
       this.saveDraft();
     }
@@ -358,6 +404,7 @@ export default class extends Controller {
     priceElement.textContent = `S/ ${formattedPrice}`;
 
     this.updateSubtotal(this.selectedItem);
+    this.evaluateGroupDiscount();
     this.calculateTotal();
     this.saveDraft();
   }
@@ -371,6 +418,7 @@ export default class extends Controller {
     if (!this.selectedItem) return;
     this.selectedItem.remove();
     this.selectedItem = null;
+    this.evaluateGroupDiscount();
     this.calculateTotal();
     this.saveDraft();
   }
@@ -397,15 +445,25 @@ export default class extends Controller {
     });
 
     const totalComboDiscount = Array.from(this.comboDiscounts.values()).reduce((sum, discount) => sum + discount, 0);
+
+    const subtotalAfterGroupDiscount = subtotal - this.groupDiscountAmount;
+
     // Apply combo discount and percentage discount
-    const percentageDiscount = subtotal * (this.discountPercentage / 100);
-    const totalDiscountAmount = totalComboDiscount + percentageDiscount;
+    const percentageDiscount = subtotalAfterGroupDiscount * (this.discountPercentage / 100);
+    const totalDiscountAmount = totalComboDiscount + percentageDiscount + this.groupDiscountAmount;
     const totalAfterDiscounts = subtotal - totalDiscountAmount;
 
     // Update discount row
     if (totalDiscountAmount > 0) {
       this.discountRowTarget.classList.remove('hidden');
       this.discountAmountTarget.textContent = `(S/ ${totalDiscountAmount.toFixed(2)})`;
+
+      if (this.groupDiscountNames.length > 0) {
+        const discountNamesString = this.groupDiscountNames.join(', ');
+        this.discountNameTarget.textContent = `Descuento: ${discountNamesString}`;
+      } else {
+        this.discountNameTarget.textContent = 'Descuento:';
+      }
     } else {
       this.discountRowTarget.classList.add('hidden');
     }
@@ -416,6 +474,8 @@ export default class extends Controller {
     console.log('Subtotal:', subtotal);
     console.log('Total Combo Discount:', totalComboDiscount);
     console.log('Percentage Discount:', percentageDiscount);
+    console.log('Group Discount:', this.groupDiscountAmount);
+    console.log('Total Discount:', totalDiscountAmount);
     console.log('Total after discounts:', totalAfterDiscounts);
 
     // Uncomment if you want to dispatch an event with the updated total
@@ -465,8 +525,9 @@ export default class extends Controller {
       const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
       const isLoyaltyFree = item.hasAttribute('data-loyalty-free-product');
+      const isDiscounted = item.getAttribute('data-item-already-discounted') === 'true';
 
-      orderItems.push({ id, name, custom_id, quantity, price, subtotal, isLoyaltyFree });
+      orderItems.push({ id, name, custom_id, quantity, price, subtotal, isLoyaltyFree, isDiscounted });
     });
 
     return {
