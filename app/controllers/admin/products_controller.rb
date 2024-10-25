@@ -124,20 +124,20 @@ class Admin::ProductsController < Admin::AdminController
       end
       pos_items_array = permitted_params.map(&:to_h)
       current_group_discounts = Discount.active.current.type_group
-      applicable_product_ids = current_group_discounts.flat_map(&:matching_product_ids)
 
-      pos_items_array_with_only_qualifying_items = pos_items_array.select do |item|
-        applicable_product_ids.include?(item['product_id'].to_i)
-      end
+      total_discount_to_apply = 0
+      number_of_qualifying_groups = 0
+      applied_discount_counts = Hash.new(0)
 
-      if applicable_product_ids.empty? || pos_items_array_with_only_qualifying_items.empty?
-        render json: {
-          number_of_qualifying_groups: 0,
-          total_discount_to_apply: 0,
-          applied_discount_names: nil
-        }
-      else 
-        expanded_items = pos_items_array_with_only_qualifying_items.flat_map do |item|
+      current_group_discounts.each do |group_discount|
+        applicable_product_ids = group_discount.matching_product_ids
+        qualifying_items = pos_items_array.select do |item|
+          applicable_product_ids.include?(item['product_id'].to_i)
+        end
+
+        next if qualifying_items.empty?
+
+        expanded_items = qualifying_items.flat_map do |item|
           Array.new(item['qty'].to_i) do
             {
               'product_id' => item['product_id'],
@@ -146,37 +146,36 @@ class Admin::ProductsController < Admin::AdminController
           end
         end
 
-        # Sort items by price (descending)
         sorted_items = expanded_items.sort_by { |item| -item['price'] }
+        payed_quantity = group_discount.group_discount_payed_quantity
+        free_quantity = group_discount.group_discount_free_quantity
 
-        applied_discount_counts = Hash.new(0)
-        total_discount_to_apply = 0
-        number_of_qualifying_groups = 0
-
-        current_group_discounts.each do |group_discount|
-          payed_quantity = group_discount.group_discount_payed_quantity
-          free_quantity = group_discount.group_discount_free_quantity
-
-          while sorted_items.size >= payed_quantity
-            group = sorted_items.shift(payed_quantity)
-            free_items = group.last(payed_quantity - free_quantity)
-            free_items_price = free_items.sum { |item| item['price'] }
-            
-            total_discount_to_apply += free_items_price
-            number_of_qualifying_groups += 1
-            applied_discount_counts[group_discount.name] += 1
-          end
+        while sorted_items.size >= payed_quantity
+          group = sorted_items.shift(payed_quantity)
+          free_items = group.last(payed_quantity - free_quantity)
+          free_items_price = free_items.sum { |item| item['price'] }
+          
+          total_discount_to_apply += free_items_price
+          number_of_qualifying_groups += 1
+          applied_discount_counts[group_discount.name] += 1
         end
+      end
 
+      if number_of_qualifying_groups > 0
         applied_discount_names = applied_discount_counts.map do |name, count|
           count > 1 ? "#{name} (x#{count})" : name
         end
-
 
         render json: {
           number_of_qualifying_groups: number_of_qualifying_groups,
           total_discount_to_apply: total_discount_to_apply,
           applied_discount_names: applied_discount_names
+        }
+      else
+        render json: {
+          number_of_qualifying_groups: 0,
+          total_discount_to_apply: 0,
+          applied_discount_names: nil
         }
       end
     else

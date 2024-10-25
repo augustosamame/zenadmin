@@ -29,6 +29,8 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
       t.boolean :internal, default: false
       t.integer :status, default: 0
 
+      t.datetime :reached_loyalty_tier_at
+
       t.timestamps null: false
 
       ## Trackable
