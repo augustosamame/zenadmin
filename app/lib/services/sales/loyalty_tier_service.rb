@@ -15,26 +15,41 @@ module Services
         qualifying_tier = find_qualifying_tier
         if qualifying_tier.present?
           if qualifying_tier.id != @user.loyalty_tier_id
-            @user.update!(loyalty_tier: qualifying_tier)
+            @user.update!(loyalty_tier: qualifying_tier, reached_loyalty_tier_at: Time.current)
             assign_perks
           end
         else
-          @user.update!(loyalty_tier: nil)
+          @user.update!(loyalty_tier: nil, reached_loyalty_tier_at: nil)
           @user.user_free_products.destroy_all
         end
       end
 
       def loyalty_info
+        current_time = Time.current
+        tier_reached_at = @user.reached_loyalty_tier_at
+        all_tiers = LoyaltyTier.order(requirements_total_amount: :asc, requirements_orders_count: :asc)
+
+        puts "tier_reached_at: #{tier_reached_at}"
+        if tier_reached_at.present? && (current_time.to_date - tier_reached_at.to_date) >= 1
+          puts "tier_reached_at is present and the difference in days is >= 1"
+          tier_active = true
+        else
+          puts "tier_reached_at is present and the difference in days is < 1"
+          tier_active = false
+        end
         current_tier = @user.loyalty_tier
+
         next_tier = LoyaltyTier.where("requirements_orders_count > ? OR requirements_total_amount > ?", current_tier&.requirements_orders_count.to_i, current_tier&.requirements_total_amount.to_f)
-                               .order(requirements_total_amount: :asc, requirements_orders_count: :asc).first
+                         .order(requirements_total_amount: :asc, requirements_orders_count: :asc).first
 
         {
           current_tier_id: current_tier&.id,
           current_tier_name: current_tier&.name || "Sin Rango Actual",
           progress_to_next_tier: progress_to_next_tier(next_tier),
           discount_percentage: current_tier&.discount_percentage.present? ? current_tier&.discount_percentage * 100 : 0,
-          free_product: free_product_info(current_tier)
+          free_product: free_product_info(current_tier),
+          days_since_tier_reached: days_since_tier_reached(tier_reached_at),
+          tier_active: tier_active
         }
       end
 
@@ -122,6 +137,15 @@ module Services
         last_free_product = @user.user_free_products.available.find_by(product: product, loyalty_tier: tier)
         last_free_product.present?
       end
+
+      def days_since_tier_reached(tier_reached_at)
+        if tier_reached_at.present?
+          (Time.current.to_date - tier_reached_at.to_date).to_i
+        else
+          nil
+        end
+      end
+
     end
   end
 end
