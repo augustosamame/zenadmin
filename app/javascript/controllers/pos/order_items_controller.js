@@ -559,6 +559,7 @@ export default class extends Controller {
   }
 
   addNewItem(product) {
+    console.log('Adding new item:', product);
     const itemElement = document.createElement('div');
     itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
     itemElement.setAttribute('data-item-name', product.name);

@@ -20,7 +20,7 @@ export const resourceMappings = {
     ajaxUrl: "/admin/cashier_shifts.json"
   },
   ComboProduct: {
-    buttonText: "Crear Pack de Productos",
+    buttonText: "Crear Combo de Productos",
     buttonUrl: "/admin/combo_products/new",
     ajaxUrl: "/admin/combo_products.json"
   },

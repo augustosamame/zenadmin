@@ -237,6 +237,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def combo_to_json(combo)
+      puts "combo: #{combo.inspect}"
       {
         id: combo.id,
         custom_id: "PACK-#{combo.id}",

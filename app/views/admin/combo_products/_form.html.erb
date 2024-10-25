@@ -2,7 +2,7 @@
   <%= render 'shared/form_errors', model: @combo_product %>
 
   <div>
-    <%= f.input :name, label: "Nombre del Pack", input_html: { class: "mt-1 block w-96 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+    <%= f.input :name, label: "Nombre del Combo", input_html: { class: "mt-1 block w-96 py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
   </div>
 
   <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
@@ -58,5 +58,5 @@
     </div>
   </div>
 
-  <%= f.submit 'Grabar Pack de Productos', class: "btn btn-primary" %>
+  <%= f.submit 'Grabar Combo de Productos', class: "btn btn-primary" %>
 <% end %>

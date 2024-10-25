@@ -140,11 +140,12 @@ export default class extends Controller {
 
       // Add each product in the combo
       comboDetails.products.forEach(product => {
+        console.log('Product:', product);
         orderItemsController.addItem({
           id: product.id,
           custom_id: product.custom_id,
           name: product.name,
-          price: product.discounted_price,
+          price: product.regular_price,
           already_discounted: true,
           quantity: product.quantity,
           isComboItem: true,
