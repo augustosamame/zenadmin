@@ -1,0 +1,46 @@
+<%= render "shared/admin/nav", { header_title: "Packs de Productos" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Etiquetas de Productos</th>
+          <th class="px-4 py-2 text-left">Precio Pack</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @product_packs.each do |product_pack| %>
+          <tr>
+            <td class="px-4 py-2"><%= product_pack.name %></td>
+            <td class="px-4 py-2">
+              <% product_pack.product_pack_items.includes(:tags).each do |item| %>
+                <div class="mb-2">
+                  <span class="font-medium"><%= item.quantity %>x</span>
+                  <div class="flex flex-wrap gap-1 mt-1">
+                    <% item.tags.each do |tag| %>
+                      <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                        <%= tag.name %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </td>
+            <td class="px-4 py-2"><%= format_currency(product_pack.price) %></td>
+            <td class="px-4 py-2"><%= product_pack.translated_status %></td>
+            <td class="px-4 py-2">
+              <%= link_to 'Edit', edit_admin_product_pack_path(product_pack), class: "btn btn-sm btn-primary" %>
+              <%= link_to 'Delete', admin_product_pack_path(product_pack), data: { turbo_method: :delete, turbo_confirm: 'Está seguro?' }, class: "btn btn-sm btn-danger" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

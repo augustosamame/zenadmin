@@ -5,6 +5,8 @@ class Tag < ApplicationRecord
   has_many :taggings, dependent: :destroy
   has_many :products, through: :taggings
 
+  has_and_belongs_to_many :product_pack_items
+
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
 

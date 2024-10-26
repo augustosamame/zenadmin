@@ -19,6 +19,7 @@ Rails.application.routes.draw do
       resources :media, module: :admin
       post "evaluate_group_discount", on: :collection
       get "search", on: :collection
+      get "products_matching_tags", on: :collection
       get "combo_products_show", on: :member
     end
 
@@ -103,6 +104,7 @@ Rails.application.routes.draw do
     resources :in_transit_stocks
 
     resources :combo_products
+    resources :product_packs
     resources :discount_products
     resources :discounts do
       get 'matching_products', on: :collection

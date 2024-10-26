@@ -28,6 +28,7 @@ export default class extends Controller {
     this.comboDiscounts = new Map(); // To store discounts for each combo
     this.groupDiscountAmount = 0;
     this.groupDiscountNames = [];
+    this.packDiscounts = new Map();
   }
 
   setupLoyaltyEventListeners() {
@@ -423,6 +424,12 @@ export default class extends Controller {
     this.saveDraft();
   }
 
+  addPackDiscount(packId, discountAmount, packName) {
+    this.packDiscounts = this.packDiscounts || new Map();
+    this.packDiscounts.set(packId, { amount: discountAmount, name: packName });
+    this.calculateTotal();
+  }
+
   calculateTotal() {
     let subtotal = 0;
     const items = this.itemsTarget.querySelectorAll('div.flex');
@@ -448,9 +455,18 @@ export default class extends Controller {
 
     const subtotalAfterGroupDiscount = subtotal - this.groupDiscountAmount;
 
-    // Apply combo discount and percentage discount
+    let totalPackDiscount = 0;
+    this.packDiscounts.forEach((discount, packId) => {
+      totalPackDiscount += discount.amount;
+      // You might want to display each pack discount separately in the UI
+      // For example:
+      // this.addDiscountRow(`Descuento Pack: ${discount.name}`, discount.amount);
+    });
+
+    // Apply combo discount, pack discount and percentage discount
     const percentageDiscount = subtotalAfterGroupDiscount * (this.discountPercentage / 100);
-    const totalDiscountAmount = totalComboDiscount + percentageDiscount + this.groupDiscountAmount;
+    const totalDiscountAmount = totalComboDiscount + percentageDiscount + this.groupDiscountAmount + totalPackDiscount;
+
     const totalAfterDiscounts = subtotal - totalDiscountAmount;
 
     // Update discount row

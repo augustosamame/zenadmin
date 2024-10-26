@@ -97,13 +97,16 @@ class Admin::ProductsController < Admin::AdminController
     if params[:query].blank?
       @products = Product.active.without_tests.includes(:warehouse_inventories).all
       @combo_products = ComboProduct.all
+      @product_packs = ProductPack.all
     else
       if params[:query].length <= 50
         @products = Product.active.without_tests.search_by_custom_id_and_name(params[:query])
         @combo_products = ComboProduct.where("name ILIKE ?", "%#{params[:query]}%")
+        @product_packs = ProductPack.where("name ILIKE ?", "%#{params[:query]}%")
       else
         @products = []
         @combo_products = []
+        @product_packs = []
       end
     end
 
@@ -111,10 +114,23 @@ class Admin::ProductsController < Admin::AdminController
     product_ids = @products.pluck(:id)
     applicable_discounts = Discount.active.current.type_global.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
 
-    combined_results = (@products.map { |product| product_to_json(product, applicable_discounts) } + 
-                        @combo_products.map { |combo| combo_to_json(combo) })
+    combined_results = (
+      @products.map { |product| product_to_json(product, applicable_discounts) } +
+      @combo_products.map { |combo| combo_to_json(combo) } +
+      @product_packs.map { |pack| product_pack_to_json(pack) }
+    )
 
     render json: combined_results
+  end
+
+  def products_matching_tags
+    tag_names = params[:tag_names].to_s.split(',')
+
+    @products = Product.joins(:tags)
+                      .where(tags: { name: tag_names })
+                      .distinct
+                      .select(:id, :name, :price_cents)
+    render json: @products.map { |p| { id: p.id, name: p.name, price: p.price_cents / 100.0 } }
   end
 
   def evaluate_group_discount
@@ -236,11 +252,31 @@ class Admin::ProductsController < Admin::AdminController
       }
     end
 
+    def product_pack_to_json(pack)
+      {
+        id: pack.id,
+        custom_id: "PACK-#{pack.id}",
+        name: pack.name,
+        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || 'https://devtech-edukaierp-dev.s3.amazonaws.com/public/default_product_image.jpg',
+        price: pack.price.to_f,
+        stock: calculate_pack_stock(pack),
+        type: "ProductPack",
+        pack_details: {
+          items: pack.product_pack_items.map do |item|
+            {
+              quantity: item.quantity,
+              tags: item.tags.map(&:name)
+            }
+          end
+        }
+      }
+    end
+
     def combo_to_json(combo)
       puts "combo: #{combo.inspect}"
       {
         id: combo.id,
-        custom_id: "PACK-#{combo.id}",
+        custom_id: "COMBO-#{combo.id}",
         name: combo.name,
         image: combo.product_1.smart_image(:small),
         price: combo.price.to_f,
@@ -268,6 +304,14 @@ class Admin::ProductsController < Admin::AdminController
           ]
         }
       }
+    end
+
+    def calculate_pack_stock(pack)
+      pack.product_pack_items.map do |item|
+        item.tags.map do |tag|
+          tag.products.map { |product| product.stock(@current_warehouse) }.min
+        end.min
+      end.min || 0
     end
 
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable

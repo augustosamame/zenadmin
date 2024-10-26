@@ -180,3 +180,7 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      product_pack:
+        status_list:
+          active: Activo
+          inactive: Inactivo

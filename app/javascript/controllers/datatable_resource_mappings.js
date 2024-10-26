@@ -106,5 +106,10 @@ export const resourceMappings = {
     buttonText: "Crear Descuento",
     buttonUrl: "/admin/discounts/new",
     ajaxUrl: "/admin/discounts.json"
+  },
+  ProductPack: {
+    buttonText: "Crear Pack de Productos",
+    buttonUrl: "/admin/product_packs/new",
+    ajaxUrl: "/admin/product_packs.json"
   }
 }

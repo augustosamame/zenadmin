@@ -130,6 +130,9 @@ application.register("pos--sellers-modal", Pos__SellersModalController)
 import ProductCategoryFormController from "./product_category_form_controller"
 application.register("product-category-form", ProductCategoryFormController)
 
+import ProductPackFormController from "./product_pack_form_controller"
+application.register("product-pack-form", ProductPackFormController)
+
 import ReportDateController from "./report_date_controller"
 application.register("report-date", ReportDateController)
 

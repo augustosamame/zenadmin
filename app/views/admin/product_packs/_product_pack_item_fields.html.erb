@@ -1,0 +1,34 @@
+<div class="flex items-center mb-4 space-x-4 nested-fields" data-product-pack-form-target="item">
+  <!-- Tag Field -->
+  <div class="flex items-center flex-1">
+    <%= f.label :tag_ids, "Etiquetas", class: "form-label mr-2 w-24 text-right" %>
+    <%= f.select :tag_ids,
+                 Tag.all.map { |tag| [tag.name, tag.id] },
+                 { include_hidden: false },
+                 {
+                   multiple: true,
+                   data: {
+                     controller: "select",
+                     select_model_value: "Tag",
+                     select_multi_select_value: true,
+                     select_placeholder_value: "Selecciona una o más etiquetas"
+                   },
+                   class: "form-input"
+                 } %>
+  </div>
+
+  <!-- Quantity Field -->
+  <div class="flex items-center w-48">
+    <%= f.label :quantity, "Cantidad", class: "form-label mr-2 w-16 text-right" %>
+    <%= f.number_field :quantity, class: "form-input w-20", step: 1 %>
+  </div>
+
+  <!-- Remove Item Icon -->
+  <div class="flex items-end">
+    <button type="button" class="p-2 text-red-500 hover:text-red-700" data-action="click->product-pack-form#removeItem">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+      </svg>
+    </button>
+  </div>
+</div>

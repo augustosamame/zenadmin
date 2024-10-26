@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_23_143930) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_25_184259) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -591,6 +591,31 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_23_143930) do
     t.index ["product_id"], name: "index_product_categories_products_on_product_id"
   end
 
+  create_table "product_pack_items", force: :cascade do |t|
+    t.bigint "product_pack_id", null: false
+    t.integer "quantity", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_pack_id"], name: "index_product_pack_items_on_product_pack_id"
+  end
+
+  create_table "product_pack_items_tags", id: false, force: :cascade do |t|
+    t.bigint "product_pack_item_id", null: false
+    t.bigint "tag_id", null: false
+    t.index ["product_pack_item_id", "tag_id"], name: "index_pp_items_tags_on_pp_item_id_and_tag_id"
+    t.index ["tag_id", "product_pack_item_id"], name: "index_pp_items_tags_on_tag_id_and_pp_item_id"
+  end
+
+  create_table "product_packs", force: :cascade do |t|
+    t.string "name", null: false
+    t.text "description"
+    t.integer "price_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "products", force: :cascade do |t|
     t.string "custom_id", null: false
     t.string "name", null: false
@@ -943,6 +968,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_23_143930) do
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"
+  add_foreign_key "product_pack_items", "product_packs"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
