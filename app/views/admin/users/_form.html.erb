@@ -42,14 +42,41 @@
       </select>
     </div>
 
+  </div>
+
+  <div class="grid grid-cols-2 gap-6">
     <div>
-      <video data-webcam-target="video" autoplay playsinline></video>
-      <canvas data-webcam-target="canvas" style="display:none;"></canvas>
-      <button type="button" data-action="webcam#capture" data-webcam-target="captureButton">Captura Facial</button>
-      <input type="hidden" name="user[photo]" data-webcam-target="photoInput">
-      <div data-webcam-target="message" class="mt-2 text-sm text-gray-600"></div>
+      <%= form.label :photo, "Foto Actual", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <% if @user.photo.present? %>
+        <div class="flex flex-col items-center space-y-2">
+          <div class="w-48 h-48 overflow-hidden border-2 border-gray-300 rounded-lg dark:border-gray-600">
+            <%= image_tag "data:image/jpeg;base64,#{@user.photo.split(',')[1]}", 
+                          class: "w-full h-full object-cover", 
+                          alt: "Foto de #{@user.name}" %>
+          </div>
+          <span class="text-sm text-gray-600 dark:text-gray-400">Foto guardada</span>
+        </div>
+      <% else %>
+        <div class="flex items-center justify-center w-48 h-48 bg-gray-100 border-2 border-gray-300 rounded-lg dark:border-gray-600">
+          <span class="text-sm text-gray-600 dark:text-gray-400">No hay foto guardada</span>
+        </div>
+      <% end %>
     </div>
 
+    <div class="ml-8">
+      <%= form.label :new_photo, "Capturar Nueva Foto", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <div class="space-y-4">
+        <div class="w-48 h-48 overflow-hidden border border-gray-300 rounded-lg dark:border-gray-600">
+          <video data-webcam-target="video" autoplay playsinline class="object-cover w-full h-full"></video>
+        </div>
+        <canvas data-webcam-target="canvas" style="display:none;"></canvas>
+        <input type="hidden" name="user[photo]" data-webcam-target="photoInput">
+        <div data-webcam-target="message" class="mt-2 text-sm text-gray-600 dark:text-gray-400"></div>
+        <button type="button" data-action="webcam#capture" data-webcam-target="captureButton" class="w-48 btn btn-secondary">
+          Capturar Foto
+        </button>
+      </div>
+    </div>
   </div>
 
   <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
