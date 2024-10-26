@@ -1,6 +1,6 @@
-<div class="max-w-3xl mx-auto px-4 my-16">
-  <div class="mb-4 pb-6 border-b">
-    <nav aria-label="breadcrumb" class="my-6 font-medium flex text-slate-500 dark:text-slate-200 text-sm">
+<div class="max-w-3xl px-4 mx-auto my-16">
+  <div class="pb-6 mb-4 border-b">
+    <nav aria-label="breadcrumb" class="flex my-6 text-sm font-medium text-slate-500 dark:text-slate-200">
       <ol class="flex flex-wrap items-center space-x-3">
         <li>
           <%%= link_to "<%= plural_table_name.titleize %>", <%= index_helper %>_path, class: "hover:underline hover:text-slate-600 dark:hover:text-slate-400" %>
@@ -14,8 +14,8 @@
       </ol>
     </nav>
     <div class="flex items-center justify-between">
-      <h1 class="text-4xl font-extrabold text-slate-900 dark:text-slate-100 tracking-tight">Edit <%= singular_table_name.titleize %></h1>
-      <%%= button_to "Delete", @<%= singular_table_name %>, method: :delete, class: "btn btn-light", form: { data: { turbo_confirm: "Are you sure?" } } %>
+      <h1 class="text-4xl font-extrabold tracking-tight text-slate-900 dark:text-slate-100">Edit <%= singular_table_name.titleize %></h1>
+      <%%= button_to "Borrar", @<%= singular_table_name %>, method: :delete, class: "btn btn-light", form: { data: { turbo_confirm: "Are you sure?" } } %>
     </div>
   </div>
 
