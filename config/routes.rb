@@ -23,6 +23,8 @@ Rails.application.routes.draw do
       get "combo_products_show", on: :member
     end
 
+    post "face_recognition", to: "face_recognition#recognize"
+
     resources :product_categories, except: [:show] do
       resources :media, module: :admin
     end
@@ -56,11 +58,12 @@ Rails.application.routes.draw do
     resources :user_attendance_logs, only: [ :index, :new, :create, :edit, :update ] do
       collection do
         get "check_attendance_status"
-        post "seller_checkout"
+        get "seller_checkout"
         get "seller_checkin_status"
         get "location_sellers"
         get "seller_attendance_report"
         get "location_attendance_report"
+        post 'compare_face'
       end
     end
 

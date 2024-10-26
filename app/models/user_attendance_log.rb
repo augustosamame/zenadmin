@@ -4,6 +4,8 @@ class UserAttendanceLog < ApplicationRecord
   belongs_to :user
   belongs_to :location
 
+  attr_accessor :captured_photo
+
   validates :checkin, presence: true
   validate :user_not_checked_in_elsewhere, on: :create
 

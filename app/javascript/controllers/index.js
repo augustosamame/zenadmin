@@ -165,3 +165,6 @@ application.register("tooltip", TooltipController)
 
 import UppyUploadController from "./uppy_upload_controller"
 application.register("uppy-upload", UppyUploadController)
+
+import WebcamController from "./webcam_controller"
+application.register("webcam", WebcamController)

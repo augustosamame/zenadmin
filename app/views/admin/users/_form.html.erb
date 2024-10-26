@@ -1,4 +1,4 @@
-<%= simple_form_for([:admin, @user]) do |form| %>
+<%= simple_form_for([:admin, @user], html: { class: "space-y-4", data: { controller: "webcam" } }) do |form| %>
   <%= render 'shared/form_errors', model: @user %>
   <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
     
@@ -40,6 +40,14 @@
           <option value="<%= role.id %>" <%= 'selected' if @user.roles.include?(role) %>><%= role.name %></option>
         <% end %>
       </select>
+    </div>
+
+    <div>
+      <video data-webcam-target="video" autoplay playsinline></video>
+      <canvas data-webcam-target="canvas" style="display:none;"></canvas>
+      <button type="button" data-action="webcam#capture" data-webcam-target="captureButton">Captura Facial</button>
+      <input type="hidden" name="user[photo]" data-webcam-target="photoInput">
+      <div data-webcam-target="message" class="mt-2 text-sm text-gray-600"></div>
     </div>
 
   </div>

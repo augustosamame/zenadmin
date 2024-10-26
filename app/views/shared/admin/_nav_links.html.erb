@@ -4,7 +4,7 @@
 <li>
   <%= nav_link_to "Venta POS", send("pos_admin_orders_path"), class: "nav-link bg-primary-500 text-white px-6 py-2 rounded hover:bg-blue-600 whitespace-nowrap w-full text-center" %>
 </li>
-<% if current_user.any_admin? %>
+<% if current_user.any_admin_or_supervisor? %>
   <li data-controller="dropdown" class="relative">
     <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
       Admin
@@ -13,21 +13,23 @@
       <li>
         <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
       </li>
-      <li>
-        <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Tiendas", send("admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Metas de Ventas", send("admin_seller_biweekly_sales_targets_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Rangos de Loyalty", send("admin_loyalty_tiers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
+      <% if current_user.any_admin? %>
+        <li>
+          <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+        </li>
+        <li>
+          <%= nav_link_to "Tiendas", send("admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+        </li>
+        <li>
+          <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+        </li>
+        <li>
+          <%= nav_link_to "Metas de Ventas", send("admin_seller_biweekly_sales_targets_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+        </li>
+        <li>
+          <%= nav_link_to "Rangos de Loyalty", send("admin_loyalty_tiers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+        </li>
+      <% end %>
     </ul>
   </li>
 

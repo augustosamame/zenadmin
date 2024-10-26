@@ -32,6 +32,7 @@ class Admin::UsersController < Admin::AdminController
     @user = User.new(user_params)
     @user.password = SecureRandom.alphanumeric(8)
     if @user.save
+      register_face_with_aws(@user)
       if @user.customer
         redirect_to admin_customers_path, notice: "Cliente fue creado correctamente"
       else
@@ -47,6 +48,7 @@ class Admin::UsersController < Admin::AdminController
 
   def update
     if @user.update(user_params)
+      register_face_with_aws(@user)
       redirect_to admin_users_path, notice: "User updated successfully"
     else
       render :edit
@@ -108,6 +110,36 @@ class Admin::UsersController < Admin::AdminController
     end
 
     def user_params
-      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
+      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, :photo, customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
+    end
+
+    def register_face_with_aws(user)
+      return unless user.photo.present?
+
+      client = Aws::Rekognition::Client.new(
+        region: 'us-east-1',
+        credentials: Aws::Credentials.new(
+          ENV['AWS_ACCESS_KEY_ID'],
+          ENV['AWS_SECRET_ACCESS_KEY']
+        )
+      )
+      photo_data = user.photo.split(',')[1] # Remove data URL prefix
+      image_bytes = Base64.decode64(photo_data)
+
+      begin
+        response = client.index_faces({
+          collection_id: "sellers_faces",
+          image: { bytes: image_bytes },
+          external_image_id: user.id.to_s,
+          detection_attributes: ["ALL"]
+        })
+        # You might want to save the face_id from the response to the user record
+        if response.face_records.any?
+          user.update(face_id: response.face_records.first.face.face_id)
+        end
+      rescue Aws::Rekognition::Errors::ServiceError => e
+        Rails.logger.error "Error indexing face: #{e.message}"
+        # Handle the error appropriately
+      end
     end
 end

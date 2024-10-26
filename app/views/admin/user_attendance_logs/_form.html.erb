@@ -1,7 +1,7 @@
 <div class="container p-6 mx-auto mt-6">
   <div class="w-full">
     <div class="p-6 mb-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
-      <%= simple_form_for([:admin, user_attendance_log], html: { class: "space-y-4", data: { controller: "attendance-form" } }) do |f| %>
+      <%= simple_form_for([:admin, user_attendance_log], html: { class: "space-y-4", data: { controller: "attendance-form webcam" } }) do |f| %>
         <%= render 'shared/form_errors', model: user_attendance_log %>
 
         <div>
@@ -30,6 +30,7 @@
               input_html: { 
                 class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
                 data: { 
+                  webcam_target: "userIdInput",
                   controller: "tom-select",
                   tom_select_options_value: { 
                     placeholder: "Seleccione un vendedor"
@@ -74,7 +75,15 @@
               html5: true %>
         </div>
 
-        <%= f.button :submit, 'Grabar', class: "btn btn-primary" %>
+        <div>
+          <video data-webcam-target="video" width="640" height="480" autoplay playsinline></video>
+          <canvas data-webcam-target="canvas" width="640" height="480" style="display: none;"></canvas>
+          <button type="button" data-action="webcam#capture" data-webcam-target="captureButton" class="mt-4 btn btn-secondary">Capturar Foto</button>
+          <%= f.input :captured_photo, as: :hidden, input_html: { data: { webcam_target: "photoInput" } } %>
+          <div data-webcam-target="message" class="mt-2 text-sm text-gray-600"></div>
+        </div>
+
+        <%= f.button :submit, 'Grabar', class: "btn btn-primary", data: { webcam_target: "submitButton", action: "click->attendance-form#submitForm" } %>
       <% end %>
     </div>
 
@@ -106,7 +115,7 @@
                     <%= attendance_log&.checkin&.strftime("%d/%m/%Y %H:%M") || '' %>
                   </td>
                   <td class="px-6 py-4">
-                    <%= link_to seller_checkout_admin_user_attendance_logs_path(attendance_log), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600" do %>
+                    <%= link_to seller_checkout_admin_user_attendance_logs_path(user_id: user.id, location_id: attendance_log.location_id), class: "text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-600" do %>
                       <i class="fas fa-sign-out-alt"></i> <!-- Assuming you're using Font Awesome for icons -->
                     <% end %>
                   </td>

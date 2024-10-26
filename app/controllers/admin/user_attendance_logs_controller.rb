@@ -63,6 +63,62 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
     end
   end
 
+  def compare_face
+    Rails.logger.info "Comparing face for user #{params[:user_attendance_log][:user_id]}"
+    user = User.find(params[:user_attendance_log][:user_id])
+    captured_photo = params[:user_attendance_log][:captured_photo]
+
+    unless user.photo.present?
+      render json: { match: false, error: "El usuario no tiene una foto registrada. Por favor, actualice el perfil del usuario con una foto antes de intentar el check-in." }
+    else
+
+      client = Aws::Rekognition::Client.new(
+        region: 'us-east-1',
+        credentials: Aws::Credentials.new(
+          ENV['AWS_ACCESS_KEY_ID'],
+          ENV['AWS_SECRET_ACCESS_KEY']
+        )
+      )
+
+      Rails.logger.info "Client created"
+
+      photo_data = captured_photo.split(',')[1] # Remove data URL prefix
+      image_bytes = Base64.decode64(photo_data)
+
+      begin
+        Rails.logger.info "Detecting faces in captured image"
+        detect_response = client.detect_faces({
+          image: { bytes: image_bytes },
+          attributes: ['DEFAULT']
+        })
+
+        if detect_response.face_details.empty?
+          Rails.logger.info "No face detected in the captured image for user #{user.id}"
+          return render json: { match: false, error: "No se detectó un rostro en la imagen capturada. Por favor, intente de nuevo." }
+        end
+
+        compare_response = client.compare_faces({
+          source_image: { bytes: image_bytes },
+          target_image: { bytes: Base64.decode64(user.photo.split(',')[1]) },
+          similarity_threshold: 90.0
+        })
+
+        Rails.logger.info "Response: #{compare_response.inspect}"
+
+        if compare_response.face_matches.any?
+          Rails.logger.info "Face match found for user #{user.id}"
+          render json: { match: true }
+        else
+          Rails.logger.info "No face match found for user #{user.id}"
+          render json: { match: false, error: "El rostro capturado no coincide con el registrado. Por favor, intente de nuevo." }
+        end
+      rescue Aws::Rekognition::Errors::ServiceError => e
+        Rails.logger.error "Error comparing faces: #{e.message}"
+        render json: { match: false, error: "Ocurrió un error durante la comparación facial" }, status: :internal_server_error
+      end
+    end
+  end
+
   def edit
     @user_attendance_log = UserAttendanceLog.find(params[:id])
     set_form_variables
@@ -80,18 +136,18 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
   end
 
   def seller_checkout
-    user_attendance_log = user.user_attendance_logs.current.first
+    user_attendance_log = @user.user_attendance_logs.current.first
 
     if user_attendance_log
-      user_attendance_log.update(check_out: Time.current)
-      user.update(location: nil)
+      user_attendance_log.update(checkout: Time.current)
+      @user.update(location: nil)
       respond_to do |format|
-        format.html { redirect_to admin_user_attendance_path, notice: "El vendedor ha hecho checkout en #{user_attendance_log.location.name}" }
+        format.html { redirect_to admin_user_attendance_logs_path, notice: "El vendedor ha hecho checkout en #{user_attendance_log.location.name}" }
         format.json { render json: { message: "El vendedor ha hecho checkout en #{user_attendance_log.location.name}" } }
       end
     else
       respond_to do |format|
-        format.html { redirect_to admin_user_attendance_path, alert: "El vendedor no tiene un checkin activo" }
+        format.html { redirect_to admin_user_attendance_logs_path, alert: "El vendedor no tiene un checkin activo" }
         format.json { render json: { error: "El vendedor no tiene un checkin activo" }, status: :not_found }
       end
     end
@@ -123,7 +179,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
   end
 
   def location_sellers
-    @users = location.users.joins(:user_attendance_logs).where(user_attendance_logs: { check_out: nil }).distinct
+    @users = location.users.joins(:user_attendance_logs).where(user_attendance_logs: { checkout: nil }).distinct
 
     respond_to do |format|
       format.html { render :location_sellers }
