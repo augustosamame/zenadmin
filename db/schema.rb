@@ -861,6 +861,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   create_table "user_seller_photos", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.text "seller_photo"
+    t.string "aws_rekognition_face_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["user_id"], name: "index_user_seller_photos_on_user_id"
@@ -885,7 +886,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
     t.boolean "internal", default: false
     t.integer "status", default: 0
     t.datetime "reached_loyalty_tier_at"
-    t.string "face_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_users_on_email"
