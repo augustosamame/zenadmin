@@ -68,7 +68,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
     user = User.find(params[:user_attendance_log][:user_id])
     captured_photo = params[:user_attendance_log][:captured_photo]
 
-    unless user.photo.present?
+    unless user.user_seller_photo&.seller_photo.present?
       render json: { match: false, error: "El usuario no tiene una foto registrada. Por favor, actualice el perfil del usuario con una foto antes de intentar el check-in." }
     else
 
@@ -99,7 +99,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
 
         compare_response = client.compare_faces({
           source_image: { bytes: image_bytes },
-          target_image: { bytes: Base64.decode64(user.photo.split(',')[1]) },
+          target_image: { bytes: Base64.decode64(user.user_seller_photo.seller_photo.split(',')[1]) },
           similarity_threshold: 90.0
         })
 
@@ -217,6 +217,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
   private
 
     def set_form_variables
+      @user_is_admin_or_supervisor = current_user.any_admin_or_supervisor?
       @current_time = Time.current.strftime("%Y-%m-%dT%H:%M")
       @elligible_locations = current_user.any_admin_or_supervisor? ? Location.all : Location.where(id: current_user.location_id)
       @elligible_sellers = User.with_role("seller").where(internal: false).distinct

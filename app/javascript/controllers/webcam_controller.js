@@ -2,16 +2,35 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["video", "canvas", "captureButton", "photoInput", "message", "submitButton", "userIdInput"];
+  static values = { adminOrSupervisor: Boolean }
 
   connect() {
     try {
       console.log("Webcam controller connected");
       this.requestCameraAccess();
-      this.submitButtonTarget.disabled = true;
+      if (this.adminOrSupervisorValue) {
+        this.enableSubmitButton();
+      } else {
+        this.disableSubmitButton();
+      }
     } catch (error) {
       console.error("Error in connect method:", error);
     }
     this.attempts = 0; // Initialize attempts count
+  }
+
+  enableSubmitButton() {
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = false;
+      this.submitButtonTarget.classList.remove('opacity-50', 'cursor-not-allowed');
+    }
+  }
+
+  disableSubmitButton() {
+    if (this.hasSubmitButtonTarget) {
+      this.submitButtonTarget.disabled = true;
+      this.submitButtonTarget.classList.add('opacity-50', 'cursor-not-allowed');
+    }
   }
 
   requestCameraAccess() {
@@ -42,14 +61,12 @@ export default class extends Controller {
     // Convert the canvas image to base64
     const imageData = this.canvasTarget.toDataURL('image/jpeg');
     this.photoInputTarget.value = imageData;
-    
+
     if (this.hasUserIdInputTarget) {
       this.compareFace(imageData);
     } else {
       this.showMessage("Foto capturada correctamente.");
-      if (this.hasSubmitButtonTarget) {
-        this.submitButtonTarget.disabled = false;
-      }
+      this.enableSubmitButton();
     }
 
   }
@@ -80,15 +97,13 @@ export default class extends Controller {
       .then(data => {
         if (data.match) {
           this.showMessage("Rostro reconocido. Puede realizar el check-in.");
-          if (this.hasSubmitButtonTarget) {
-            this.submitButtonTarget.disabled = false;
-          }
+          this.enableSubmitButton();
           this.element.dispatchEvent(new CustomEvent('faceRecognized', { bubbles: true }));
         } else {
           const errorMessage = data.error || "Rostro no reconocido. Por favor, intente de nuevo.";
           this.showMessage(errorMessage);
-          if (this.hasSubmitButtonTarget) {
-            this.submitButtonTarget.disabled = true;
+          if (this.adminOrSupervisorValue) {
+            this.disableSubmitButton();
           }
           this.element.dispatchEvent(new CustomEvent('faceNotRecognized', { bubbles: true, detail: { error: errorMessage } }));
         }
@@ -96,8 +111,8 @@ export default class extends Controller {
       .catch(error => {
         console.error('Error:', error);
         this.showMessage("Error en la comparación facial. Por favor, intente de nuevo.");
-        if (this.hasSubmitButtonTarget) {
-          this.submitButtonTarget.disabled = true;
+        if (this.adminOrSupervisorValue) {
+          this.disableSubmitButton();
         }
         this.element.dispatchEvent(new CustomEvent('faceRecognitionError', { bubbles: true }));
       });

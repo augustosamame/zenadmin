@@ -2,6 +2,7 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["checkoutField", "checkinField"]
+  static values = { adminOrSupervisor: Boolean }
 
   connect() {
     // Set initial value from the server if it exists
@@ -44,7 +45,8 @@ export default class extends Controller {
   }
 
   submitForm(event) {
-    if (!this.faceRecognized) {
+    console.log("Admin or supervisor value:", this.adminOrSupervisorValue);
+    if (!this.faceRecognized && !this.adminOrSupervisorValue) {
       event.preventDefault();
       alert("Por favor, capture y verifique su rostro antes de hacer check-in.");
     }

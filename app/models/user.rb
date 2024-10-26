@@ -8,6 +8,7 @@ class User < ApplicationRecord
   has_many :user_roles, dependent: :destroy
   has_many :roles, through: :user_roles
   has_one :customer, dependent: :destroy
+  has_one :user_seller_photo, dependent: :destroy
   has_many :commissions, dependent: :destroy
   has_many :commissioned_orders, through: :commissions, source: :order
   belongs_to :location, optional: true
@@ -32,6 +33,7 @@ class User < ApplicationRecord
   scope :with_role, ->(role_name) { joins(:roles).where(roles: { name: role_name }) }
 
   accepts_nested_attributes_for :customer, allow_destroy: true
+  accepts_nested_attributes_for :user_seller_photo, allow_destroy: true
 
   before_validation :set_login
   before_validation :set_user_email, on: :create

@@ -46,11 +46,11 @@
 
   <div class="grid grid-cols-2 gap-6">
     <div>
-      <%= form.label :photo, "Foto Actual", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" %>
-      <% if @user.photo.present? %>
+      <%= form.label :seller_photo, "Foto Actual", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-gray-300" %>
+      <% if @user.user_seller_photo&.seller_photo.present? %>
         <div class="flex flex-col items-center space-y-2">
           <div class="w-48 h-48 overflow-hidden border-2 border-gray-300 rounded-lg dark:border-gray-600">
-            <%= image_tag "data:image/jpeg;base64,#{@user.photo.split(',')[1]}", 
+            <%= image_tag "data:image/jpeg;base64,#{@user.user_seller_photo.seller_photo.split(',')[1]}", 
                           class: "w-full h-full object-cover", 
                           alt: "Foto de #{@user.name}" %>
           </div>
@@ -70,7 +70,9 @@
           <video data-webcam-target="video" autoplay playsinline class="object-cover w-full h-full"></video>
         </div>
         <canvas data-webcam-target="canvas" style="display:none;"></canvas>
-        <input type="hidden" name="user[photo]" data-webcam-target="photoInput">
+        <%= form.simple_fields_for :user_seller_photo do |photo_form| %>
+          <%= photo_form.input :seller_photo, as: :hidden, input_html: { data: { webcam_target: "photoInput" } } %>
+        <% end %>
         <div data-webcam-target="message" class="mt-2 text-sm text-gray-600 dark:text-gray-400"></div>
         <button type="button" data-action="webcam#capture" data-webcam-target="captureButton" class="w-48 btn btn-secondary">
           Capturar Foto

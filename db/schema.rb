@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_25_184259) do
+ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -858,6 +858,14 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_25_184259) do
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 
+  create_table "user_seller_photos", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.text "seller_photo"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["user_id"], name: "index_user_seller_photos_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.bigint "loyalty_tier_id"
     t.string "email"
@@ -877,7 +885,6 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_25_184259) do
     t.boolean "internal", default: false
     t.integer "status", default: 0
     t.datetime "reached_loyalty_tier_at"
-    t.text "photo"
     t.string "face_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -999,6 +1006,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_25_184259) do
   add_foreign_key "user_free_products", "users"
   add_foreign_key "user_roles", "roles"
   add_foreign_key "user_roles", "users"
+  add_foreign_key "user_seller_photos", "users"
   add_foreign_key "users", "loyalty_tiers"
   add_foreign_key "warehouse_inventories", "products"
   add_foreign_key "warehouse_inventories", "warehouses"

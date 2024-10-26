@@ -19,6 +19,8 @@ class UserAttendanceLog < ApplicationRecord
   def update_user_location
     latest_log = user.user_attendance_logs.order(checkin: :desc).first
 
+    byebug
+
     if self == latest_log
       if self.checkout.present?
         user.update(location_id: nil)

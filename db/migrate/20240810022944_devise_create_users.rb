@@ -31,7 +31,6 @@ class DeviseCreateUsers < ActiveRecord::Migration[7.2]
 
       t.datetime :reached_loyalty_tier_at
 
-      t.text :photo
       t.string :face_id
 
       t.timestamps null: false

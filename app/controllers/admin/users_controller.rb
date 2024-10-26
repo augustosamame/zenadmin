@@ -25,6 +25,7 @@ class Admin::UsersController < Admin::AdminController
 
   def new
     @user = User.new
+    @user.build_user_seller_photo
     @user.build_customer
   end
 
@@ -44,6 +45,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def edit
+    @user.build_user_seller_photo unless @user.user_seller_photo
   end
 
   def update
@@ -51,7 +53,7 @@ class Admin::UsersController < Admin::AdminController
       register_face_with_aws(@user)
       redirect_to admin_users_path, notice: "User updated successfully"
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
@@ -110,11 +112,11 @@ class Admin::UsersController < Admin::AdminController
     end
 
     def user_params
-      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, :photo, customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
+      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, user_seller_photo_attributes: [:id, :seller_photo], customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
     end
 
     def register_face_with_aws(user)
-      return unless user.photo.present?
+      return unless user.user_seller_photo.seller_photo.present?
 
       client = Aws::Rekognition::Client.new(
         region: 'us-east-1',
@@ -123,7 +125,7 @@ class Admin::UsersController < Admin::AdminController
           ENV['AWS_SECRET_ACCESS_KEY']
         )
       )
-      photo_data = user.photo.split(',')[1] # Remove data URL prefix
+      photo_data = user.user_seller_photo.seller_photo.split(',')[1] # Remove data URL prefix
       image_bytes = Base64.decode64(photo_data)
 
       begin
