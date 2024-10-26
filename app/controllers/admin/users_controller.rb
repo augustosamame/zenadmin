@@ -137,7 +137,7 @@ class Admin::UsersController < Admin::AdminController
         })
         # You might want to save the face_id from the response to the user record
         if response.face_records.any?
-          user.update(face_id: response.face_records.first.face.face_id)
+          user.user_seller_photo.update(aws_rekognition_face_id: response.face_records.first.face.face_id)
         end
       rescue Aws::Rekognition::Errors::ServiceError => e
         Rails.logger.error "Error indexing face: #{e.message}"
