@@ -112,20 +112,20 @@ class Admin::UsersController < Admin::AdminController
     end
 
     def user_params
-      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, user_seller_photo_attributes: [:id, :seller_photo], customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
+      params.require(:user).permit(:location_id, :status, :email, :phone, :first_name, :last_name, user_seller_photo_attributes: [ :id, :seller_photo ], customer_attributes: [ :doc_type, :doc_id, :birthdate ], role_ids: [])
     end
 
     def register_face_with_aws(user)
       return unless user.user_seller_photo.seller_photo.present?
 
       client = Aws::Rekognition::Client.new(
-        region: 'us-east-1',
+        region: "us-east-1",
         credentials: Aws::Credentials.new(
-          ENV['AWS_ACCESS_KEY_ID'],
-          ENV['AWS_SECRET_ACCESS_KEY']
+          ENV["AWS_ACCESS_KEY_ID"],
+          ENV["AWS_SECRET_ACCESS_KEY"]
         )
       )
-      photo_data = user.user_seller_photo.seller_photo.split(',')[1] # Remove data URL prefix
+      photo_data = user.user_seller_photo.seller_photo.split(",")[1] # Remove data URL prefix
       image_bytes = Base64.decode64(photo_data)
 
       begin
@@ -133,7 +133,7 @@ class Admin::UsersController < Admin::AdminController
           collection_id: "sellers_faces",
           image: { bytes: image_bytes },
           external_image_id: user.id.to_s,
-          detection_attributes: ["ALL"]
+          detection_attributes: [ "ALL" ]
         })
         # You might want to save the face_id from the response to the user record
         if response.face_records.any?

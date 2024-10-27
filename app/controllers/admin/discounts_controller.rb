@@ -1,6 +1,6 @@
 # app/controllers/admin/discounts_controller.rb
 class Admin::DiscountsController < Admin::AdminController
-  before_action :set_discount, only: [:edit, :update, :destroy]
+  before_action :set_discount, only: [ :edit, :update, :destroy ]
 
   def index
     @discounts = Discount.all.includes(:tags)
@@ -20,7 +20,7 @@ class Admin::DiscountsController < Admin::AdminController
       @products = @products.joins(:taggings).where(taggings: { tag_id: tag_ids }).distinct
     end
 
-    render partial: 'matching_products', locals: { products: @products }
+    render partial: "matching_products", locals: { products: @products }
   end
 
   def create
@@ -28,7 +28,7 @@ class Admin::DiscountsController < Admin::AdminController
     if @discount.save
       create_or_update_filters
       @discount.update_matching_product_ids
-      redirect_to admin_discounts_path, notice: 'Descuento creado correctamente.'
+      redirect_to admin_discounts_path, notice: "Descuento creado correctamente."
     else
       render turbo_stream: turbo_stream.replace("discount_form", partial: "form", locals: { discount: @discount })
     end
@@ -41,7 +41,7 @@ class Admin::DiscountsController < Admin::AdminController
     if @discount.update(discount_params)
       create_or_update_filters
       @discount.update_matching_product_ids
-      redirect_to admin_discounts_path, notice: 'Descuento actualizado correctamente.'
+      redirect_to admin_discounts_path, notice: "Descuento actualizado correctamente."
     else
       render turbo_stream: turbo_stream.replace("discount_form", partial: "form", locals: { discount: @discount })
     end
@@ -49,7 +49,7 @@ class Admin::DiscountsController < Admin::AdminController
 
   def destroy
     @discount.destroy
-    redirect_to admin_discounts_path, notice: 'Descuento eliminado correctamente.'
+    redirect_to admin_discounts_path, notice: "Descuento eliminado correctamente."
   end
 
   private
@@ -64,12 +64,11 @@ class Admin::DiscountsController < Admin::AdminController
 
   def create_or_update_filters
     @discount.discount_filters.destroy_all
-    
+
     if params[:tag_ids].present?
       params[:tag_ids].each do |tag_id|
-        @discount.discount_filters.create(filterable_type: 'Tag', filterable_id: tag_id)
+        @discount.discount_filters.create(filterable_type: "Tag", filterable_id: tag_id)
       end
     end
-
   end
 end

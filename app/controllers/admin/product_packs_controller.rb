@@ -1,5 +1,5 @@
 class Admin::ProductPacksController < Admin::AdminController
-  before_action :set_product_pack, only: [:show, :edit, :update, :destroy]
+  before_action :set_product_pack, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @product_packs = ProductPack.order(created_at: :desc)
@@ -17,7 +17,7 @@ class Admin::ProductPacksController < Admin::AdminController
   def create
     @product_pack = ProductPack.new(product_pack_params)
     if @product_pack.save
-      redirect_to admin_product_packs_path, notice: 'Product Pack was successfully created.'
+      redirect_to admin_product_packs_path, notice: "Product Pack was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -28,7 +28,7 @@ class Admin::ProductPacksController < Admin::AdminController
 
   def update
     if @product_pack.update(product_pack_params)
-      redirect_to admin_product_packs_path, notice: 'Product Pack was successfully updated.'
+      redirect_to admin_product_packs_path, notice: "Product Pack was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -36,7 +36,7 @@ class Admin::ProductPacksController < Admin::AdminController
 
   def destroy
     @product_pack.destroy
-    redirect_to admin_product_packs_path, notice: 'Product Pack was successfully destroyed.'
+    redirect_to admin_product_packs_path, notice: "Product Pack was successfully destroyed."
   end
 
   private
@@ -48,7 +48,7 @@ class Admin::ProductPacksController < Admin::AdminController
   def product_pack_params
     params.require(:product_pack).permit(
       :name, :description, :price, :status,
-      product_pack_items_attributes: [:id, :quantity, :_destroy, tag_ids: []]
+      product_pack_items_attributes: [ :id, :quantity, :_destroy, tag_ids: [] ]
     )
   end
 end

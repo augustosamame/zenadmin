@@ -32,4 +32,4 @@ plugin :tmp_restart
 # Only use a pidfile when requested
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
 
-ENV['TZ'] = 'America/Lima'
+ENV["TZ"] = "America/Lima"

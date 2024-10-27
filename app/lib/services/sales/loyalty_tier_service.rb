@@ -145,7 +145,6 @@ module Services
           nil
         end
       end
-
     end
   end
 end

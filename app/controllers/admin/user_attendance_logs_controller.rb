@@ -73,23 +73,23 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
     else
 
       client = Aws::Rekognition::Client.new(
-        region: 'us-east-1',
+        region: "us-east-1",
         credentials: Aws::Credentials.new(
-          ENV['AWS_ACCESS_KEY_ID'],
-          ENV['AWS_SECRET_ACCESS_KEY']
+          ENV["AWS_ACCESS_KEY_ID"],
+          ENV["AWS_SECRET_ACCESS_KEY"]
         )
       )
 
       Rails.logger.info "Client created"
 
-      photo_data = captured_photo.split(',')[1] # Remove data URL prefix
+      photo_data = captured_photo.split(",")[1] # Remove data URL prefix
       image_bytes = Base64.decode64(photo_data)
 
       begin
         Rails.logger.info "Detecting faces in captured image"
         detect_response = client.detect_faces({
           image: { bytes: image_bytes },
-          attributes: ['DEFAULT']
+          attributes: [ "DEFAULT" ]
         })
 
         if detect_response.face_details.empty?
@@ -99,7 +99,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
 
         compare_response = client.compare_faces({
           source_image: { bytes: image_bytes },
-          target_image: { bytes: Base64.decode64(user.user_seller_photo.seller_photo.split(',')[1]) },
+          target_image: { bytes: Base64.decode64(user.user_seller_photo.seller_photo.split(",")[1]) },
           similarity_threshold: 90.0
         })
 

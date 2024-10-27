@@ -11,7 +11,7 @@ module Services
       def call
         warehouse = Warehouse.find_by!(name: "Almacén Oficina Principal")
         user = User.find_by!(email: "almacen_principal@jardindelzen.com")
-        #inventario inicial oficina principal
+        # inventario inicial oficina principal
         ActiveRecord::Base.transaction do
           stock_transfer = StockTransfer.create!(
             user: user,
@@ -35,7 +35,7 @@ module Services
           end
           stock_transfer.finish_transfer!
         end
-        #transferencia inicial a tiendas
+        # transferencia inicial a tiendas
         warehouse_1 = Warehouse.find_by!(name: "Almacén Plaza Norte")
         ActiveRecord::Base.transaction do
           stock_transfer = StockTransfer.create!(

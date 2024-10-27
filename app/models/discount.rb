@@ -9,10 +9,10 @@ class Discount < ApplicationRecord
   translate_enum :discount_type
 
   has_many :discount_filters, dependent: :destroy
-  has_many :tags, through: :discount_filters, source: :filterable, source_type: 'Tag'
+  has_many :tags, through: :discount_filters, source: :filterable, source_type: "Tag"
 
   validates :name, presence: true
-  validates :discount_percentage, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 } , if: :type_global?
+  validates :discount_percentage, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 }, if: :type_global?
   validates :group_discount_payed_quantity, presence: true, numericality: { greater_than: 0 }, if: :type_group?
   validates :group_discount_free_quantity, presence: true, numericality: { greater_than: 0 }, if: :type_group?
   validate :group_discount_payed_quantity_greater_than_free_quantity, if: :type_group?
@@ -21,7 +21,7 @@ class Discount < ApplicationRecord
   validate :end_datetime_after_start_datetime
 
   scope :active, -> { where(status: :active) }
-  scope :current, -> { active.where('start_datetime <= ? AND end_datetime >= ?', Time.current, Time.current) }
+  scope :current, -> { active.where("start_datetime <= ? AND end_datetime >= ?", Time.current, Time.current) }
 
   def is_current?
     start_datetime <= Time.current && end_datetime >= Time.current
@@ -30,8 +30,8 @@ class Discount < ApplicationRecord
   def update_matching_product_ids
     matching_products = Product.all
 
-    if discount_filters.where(filterable_type: 'Tag').exists?
-      tag_ids = discount_filters.where(filterable_type: 'Tag').pluck(:filterable_id)
+    if discount_filters.where(filterable_type: "Tag").exists?
+      tag_ids = discount_filters.where(filterable_type: "Tag").pluck(:filterable_id)
       matching_products = matching_products.joins(:taggings).where(taggings: { tag_id: tag_ids })
     end
 

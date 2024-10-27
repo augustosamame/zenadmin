@@ -15,7 +15,6 @@ module Services
       private
 
       def apply_prices_to_products
-
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
           break if @max_rows && index > @max_rows
           product_name = row[5]

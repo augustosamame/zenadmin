@@ -1,5 +1,5 @@
-require 'prawn'
-require 'prawn/table'
+require "prawn"
+require "prawn/table"
 
 class ConsolidatedReport < Prawn::Document
   def initialize(date, location, sales_report, inventory_report, cash_flow_report, current_user)
@@ -9,9 +9,9 @@ class ConsolidatedReport < Prawn::Document
     @inventory_report = inventory_report
     @cash_flow_report = cash_flow_report
     @current_user = current_user
-    
+
     # Initialize with a very long page to accommodate all content
-    super(page_size: [222, 50000], margin: [5, 5, 5, 5])
+    super(page_size: [ 222, 50000 ], margin: [ 5, 5, 5, 5 ])
     generate_content
   end
 

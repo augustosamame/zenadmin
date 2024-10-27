@@ -112,7 +112,7 @@ class Admin::ProductsController < Admin::AdminController
 
     # Apply applicable global discounts
     product_ids = @products.pluck(:id)
-    applicable_discounts = Discount.active.current.type_global.where('matching_product_ids && ARRAY[?]::integer[]', product_ids)
+    applicable_discounts = Discount.active.current.type_global.where("matching_product_ids && ARRAY[?]::integer[]", product_ids)
 
     combined_results = (
       @products.map { |product| product_to_json(product, applicable_discounts) } +
@@ -124,7 +124,7 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def products_matching_tags
-    tag_names = params[:tag_names].to_s.split(',')
+    tag_names = params[:tag_names].to_s.split(",")
 
     @products = Product.joins(:tags)
                       .where(tags: { name: tag_names })
@@ -148,29 +148,29 @@ class Admin::ProductsController < Admin::AdminController
       current_group_discounts.each do |group_discount|
         applicable_product_ids = group_discount.matching_product_ids
         qualifying_items = pos_items_array.select do |item|
-          applicable_product_ids.include?(item['product_id'].to_i)
+          applicable_product_ids.include?(item["product_id"].to_i)
         end
 
         next if qualifying_items.empty?
 
         expanded_items = qualifying_items.flat_map do |item|
-          Array.new(item['qty'].to_i) do
+          Array.new(item["qty"].to_i) do
             {
-              'product_id' => item['product_id'],
-              'price' => item['price'].to_f
+              "product_id" => item["product_id"],
+              "price" => item["price"].to_f
             }
           end
         end
 
-        sorted_items = expanded_items.sort_by { |item| -item['price'] }
+        sorted_items = expanded_items.sort_by { |item| -item["price"] }
         payed_quantity = group_discount.group_discount_payed_quantity
         free_quantity = group_discount.group_discount_free_quantity
 
         while sorted_items.size >= payed_quantity
           group = sorted_items.shift(payed_quantity)
           free_items = group.last(payed_quantity - free_quantity)
-          free_items_price = free_items.sum { |item| item['price'] }
-          
+          free_items_price = free_items.sum { |item| item["price"] }
+
           total_discount_to_apply += free_items_price
           number_of_qualifying_groups += 1
           applied_discount_counts[group_discount.name] += 1
@@ -257,7 +257,7 @@ class Admin::ProductsController < Admin::AdminController
         id: pack.id,
         custom_id: "PACK-#{pack.id}",
         name: pack.name,
-        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || 'https://devtech-edukaierp-dev.s3.amazonaws.com/public/default_product_image.jpg',
+        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || "https://devtech-edukaierp-dev.s3.amazonaws.com/public/default_product_image.jpg",
         price: pack.price.to_f,
         stock: calculate_pack_stock(pack),
         type: "ProductPack",

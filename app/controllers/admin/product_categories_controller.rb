@@ -1,5 +1,5 @@
 class Admin::ProductCategoriesController < Admin::AdminController
-  before_action :set_product_category, only: [:edit, :update, :destroy]
+  before_action :set_product_category, only: [ :edit, :update, :destroy ]
 
   def index
     @product_categories = ProductCategory.includes(:parent).all

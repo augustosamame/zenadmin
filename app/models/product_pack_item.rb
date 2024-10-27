@@ -3,5 +3,4 @@ class ProductPackItem < ApplicationRecord
   has_and_belongs_to_many :tags
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
-
 end

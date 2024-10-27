@@ -25,10 +25,10 @@ Rails.application.routes.draw do
 
     post "face_recognition", to: "face_recognition#recognize"
 
-    resources :product_categories, except: [:show] do
+    resources :product_categories, except: [ :show ] do
       resources :media, module: :admin
     end
-    
+
 
     resources :requisitions do
       member do
@@ -63,7 +63,7 @@ Rails.application.routes.draw do
         get "location_sellers"
         get "seller_attendance_report"
         get "location_attendance_report"
-        post 'compare_face'
+        post "compare_face"
       end
     end
 
@@ -110,7 +110,7 @@ Rails.application.routes.draw do
     resources :product_packs
     resources :discount_products
     resources :discounts do
-      get 'matching_products', on: :collection
+      get "matching_products", on: :collection
     end
     resources :cashier_shifts do
       member do
@@ -132,8 +132,8 @@ Rails.application.routes.draw do
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     post "dashboards/set_location", to: "dashboards#set_location"
 
-    get 'reports/form', to: 'reports#reports_form'
-    post 'reports/generate', to: 'reports#generate'
+    get "reports/form", to: "reports#reports_form"
+    post "reports/generate", to: "reports#generate"
     get "reports/cash_flow", to: "reports#cash_flow"
     get "reports/inventory_out", to: "reports#inventory_out"
     get "reports/consolidated", to: "reports#consolidated"

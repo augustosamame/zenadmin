@@ -37,7 +37,7 @@ module EdukaiErp
     # Common ones are `templates`, `generators`, or `middleware`, for example.
     config.autoload_lib(ignore: %w[assets tasks])
 
-    config.autoload_paths += %W(#{config.root}/app/pdfs)
+    config.autoload_paths += %W[#{config.root}/app/pdfs]
 
     # Configuration for the application, engines, and railties goes here.
     #

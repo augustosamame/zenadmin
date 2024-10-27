@@ -13,5 +13,4 @@ class ProductPack < ApplicationRecord
   validates :price_cents, presence: true, numericality: { greater_than: 0 }
 
   accepts_nested_attributes_for :product_pack_items, allow_destroy: true, reject_if: :all_blank
-
 end

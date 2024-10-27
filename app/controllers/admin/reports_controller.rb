@@ -15,25 +15,25 @@ class Admin::ReportsController < Admin::AdminController
       end
       format.pdf do
         pdf_content = case report_type
-                      when 'ventas'
+        when "ventas"
                         generate_sales_report
-                      when 'inventario'
+        when "inventario"
                         generate_inventory_report
-                      when 'caja'
+        when "caja"
                         generate_cash_flow_report
-                      when 'consolidado'
+        when "consolidado"
                         generate_consolidated_report
-                      else
+        else
                         raise ArgumentError, "Invalid report type: #{report_type}"
-                      end
+        end
 
         filename = "reporte_#{report_type}_#{@date.strftime('%Y_%m_%d')}.pdf"
-        send_data pdf_content, 
-                  filename: filename, 
-                  type: 'application/pdf', 
-                  disposition: 'inline',
-                  stream: 'true',
-                  buffer_size: '4096'
+        send_data pdf_content,
+                  filename: filename,
+                  type: "application/pdf",
+                  disposition: "inline",
+                  stream: "true",
+                  buffer_size: "4096"
       end
     end
   end
@@ -45,7 +45,7 @@ class Admin::ReportsController < Admin::AdminController
                    .includes(order_items: :product, user: {})
                    .order(id: :asc)
     @total_sales = Order.where(id: @orders.pluck(:id)).sum(:total_price_cents) / 100.0
-    @total_items = @orders.joins(:order_items).sum('order_items.quantity')
+    @total_items = @orders.joins(:order_items).sum("order_items.quantity")
 
     SalesReport.new(@date, @date, @location, @orders, @total_sales, @total_items, current_user).render
   end
@@ -55,7 +55,7 @@ class Admin::ReportsController < Admin::AdminController
                                    .where(origin_warehouse_id: @current_warehouse.id)
                                    .includes(:stock_transfer_lines)
                                    .order(id: :asc)
-    @total_quantity_out = @stock_transfers.joins(:stock_transfer_lines).sum('stock_transfer_lines.quantity')
+    @total_quantity_out = @stock_transfers.joins(:stock_transfer_lines).sum("stock_transfer_lines.quantity")
     InventoryOutReport.new(@date, @date, @location, @stock_transfers, @total_quantity_out, @current_warehouse, current_user).render
   end
 
@@ -73,7 +73,7 @@ class Admin::ReportsController < Admin::AdminController
     cash_flow_report = generate_cash_flow_report
 
     combined_pdf = CombinePDF.new
-    [sales_report, inventory_report, cash_flow_report].each do |report|
+    [ sales_report, inventory_report, cash_flow_report ].each do |report|
       combined_pdf << CombinePDF.parse(report)
     end
 

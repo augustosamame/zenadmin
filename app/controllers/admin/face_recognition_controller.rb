@@ -1,11 +1,11 @@
-require 'aws-sdk-rekognition'
+require "aws-sdk-rekognition"
 
 class Admin::FaceRecognitionController < Admin::AdminController
   skip_before_action :verify_authenticity_token
 
   def recognize
     client = Aws::Rekognition::Client.new
-    photo_data = params[:image].split(',')[1] # Remove data URL prefix
+    photo_data = params[:image].split(",")[1] # Remove data URL prefix
     image_bytes = Base64.decode64(photo_data)
 
     response = client.search_faces_by_image({
