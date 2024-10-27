@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus';
 import axios from 'axios';
 
 export default class extends Controller {
-  static targets = ['container', 'content', 'modalContainer', 'saveButton'];
+  static targets = ['container', 'content', 'modalContainer', 'saveButton', 'remainingAmount'];
 
   connect() {
     console.log("SellersModalController connected");
@@ -10,6 +10,23 @@ export default class extends Controller {
     console.log("Modal Container Target:", this.modalContainerTarget);
     this.selectedSellers = [];
     this.manualUpdate = false;
+    this.setupInputFields();
+  }
+
+  setupInputFields() {
+    this.element.querySelectorAll('.seller-percentage, .seller-amount').forEach(input => {
+      input.addEventListener('focus', this.handleInputFocus.bind(this));
+      input.addEventListener('blur', this.handleInputBlur.bind(this));
+    });
+  }
+
+  handleInputFocus(event) {
+    event.target.select();
+  }
+
+  handleInputBlur(event) {
+    const value = parseFloat(event.target.value) || 0;
+    event.target.value = value.toFixed(2);
   }
 
   clearSelections() {
@@ -52,37 +69,45 @@ export default class extends Controller {
   buildModalContent(sellers) {
     const totalAmount = this.getTotalAmount();
     return `
-    <div class="container p-4 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
-      <table class="w-full">
-        <thead>
-          <tr class="text-left text-gray-600 dark:text-gray-300">
-            <th class="py-2">Nombre</th>
-            <th class="py-2 text-center">Seleccionado</th>
-            <th class="py-2 text-center">%</th>
-            <th class="py-2 text-center">Monto S/ ${totalAmount.toFixed(2)}</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-gray-200 dark:divide-slate-600">
-          ${sellers.map(seller => `
-            <tr class="py-2" data-seller-id="${seller.id}">
-              <td class="py-2">
-                <span class="text-gray-800 dark:text-gray-200 truncate">${seller.name}</span>
-              </td>
-              <td class="py-2 text-center">
-                <input type="checkbox" class="seller-checkbox h-6 w-6 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-400 focus:ring-opacity-25 dark:bg-slate-600 dark:border-slate-500 dark:focus:ring-slate-500" data-action="change->pos--sellers-modal#toggleSeller">
-              </td>
-              <td class="py-2 text-center">
-                <input type="number" class="seller-percentage w-24 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" max="100" step="1" data-action="input->pos--sellers-modal#handlePercentageUpdate">
-              </td>
-              <td class="py-2 text-center">
-                <input type="number" class="seller-amount w-28 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" step="0.01" data-action="input->pos--sellers-modal#handleAmountUpdate">
-              </td>
+      <div class="container p-4 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+        <div class="mb-4">
+          <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+            Monto total: <span data-pos--sellers-modal-target="totalAmount">S/ ${totalAmount.toFixed(2)}</span>
+          </div>
+          <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
+            Monto restante: <span data-pos--sellers-modal-target="remainingAmount">S/ ${totalAmount.toFixed(2)}</span>
+          </div>
+        </div>
+        <table class="w-full">
+          <thead>
+            <tr class="text-left text-gray-600 dark:text-gray-300">
+              <th class="py-2">Nombre</th>
+              <th class="py-2 text-center">Seleccionado</th>
+              <th class="py-2 text-center">%</th>
+              <th class="py-2 text-center">S/</th>
             </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-slate-600">
+            ${sellers.map(seller => `
+              <tr class="py-2" data-seller-id="${seller.id}">
+                <td class="py-2">
+                  <span class="text-gray-800 dark:text-gray-200 truncate">${seller.name}</span>
+                </td>
+                <td class="py-2 text-center">
+                  <input type="checkbox" class="seller-checkbox h-6 w-6 text-green-500 bg-gray-100 border-gray-300 rounded focus:ring-green-400 focus:ring-opacity-25 dark:bg-slate-600 dark:border-slate-500 dark:focus:ring-slate-500" data-action="change->pos--sellers-modal#toggleSeller">
+                </td>
+                <td class="py-2 text-center">
+                  <input type="number" class="seller-percentage w-24 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" max="100" step="1" data-action="input->pos--sellers-modal#handlePercentageUpdate">
+                </td>
+                <td class="py-2 text-center">
+                  <input type="number" class="seller-amount w-28 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" step="0.01" data-action="input->pos--sellers-modal#handleAmountUpdate">
+                </td>
+              </tr>
+            `).join('')}
+          </tbody>
+        </table>
+      </div>
+    `;
   }
 
   restoreSavedSellers() {
@@ -122,13 +147,34 @@ export default class extends Controller {
 
     if (checkbox.checked) {
       this.selectedSellers.push(sellerId);
+      this.initializeInputs(row);
     } else {
       this.selectedSellers = this.selectedSellers.filter(id => id !== sellerId);
+      this.clearInputs(row);
     }
 
-    console.log("Selected Sellers:", this.selectedSellers);
-
     this.updateCommission();
+    this.updateRemainingAmount();
+  }
+
+  initializeInputs(row) {
+    const percentageInput = row.querySelector('.seller-percentage');
+    const amountInput = row.querySelector('.seller-amount');
+    
+    if (percentageInput && amountInput) {
+      percentageInput.value = '0.00';
+      amountInput.value = '0.00';
+    }
+  }
+
+  clearInputs(row) {
+    const percentageInput = row.querySelector('.seller-percentage');
+    const amountInput = row.querySelector('.seller-amount');
+    
+    if (percentageInput && amountInput) {
+      percentageInput.value = '0.00';
+      amountInput.value = '0.00';
+    }
   }
 
   updateCommission() {
@@ -150,6 +196,7 @@ export default class extends Controller {
         if (amountInput) amountInput.value = '0';
       }
     });
+    this.updateRemainingAmount();
   }
 
 saveSellers() {
@@ -173,7 +220,7 @@ saveSellers() {
 
   const totalPercentage = sellers.reduce((sum, seller) => sum + seller.percentage, 0);
   console.log('Total Percentage:', totalPercentage);
-  if (totalPercentage < 99.99) {
+  if (totalPercentage < 99.99 || totalPercentage > 100.01) {
     alert('El total de los porcentajes debe ser 100%.');
     return;
   }
@@ -201,7 +248,9 @@ saveSellers() {
         const totalAmount = this.getTotalAmount();
         const percentageValue = parseFloat(percentage) || 0;
         const amount = (totalAmount * percentageValue / 100).toFixed(2);
-        percentageInput.value = percentageValue.toFixed(2);
+        if (!this.manualUpdate) {
+          percentageInput.value = percentageValue.toFixed(2);
+        }
         amountInput.value = amount;
         console.log(`Updating amount for seller ${sellerId}: ${amount} (${percentageValue}% of ${totalAmount})`);
       }
@@ -218,7 +267,9 @@ saveSellers() {
         const amountValue = parseFloat(amount) || 0;
         const percentage = totalAmount > 0 ? ((amountValue / totalAmount) * 100).toFixed(2) : 0;
         percentageInput.value = percentage;
-        amountInput.value = amountValue.toFixed(2);
+        if (!this.manualUpdate) {
+          amountInput.value = amountValue.toFixed(2);
+        }
         console.log(`Updating percentage for seller ${sellerId}: ${percentage}% (${amountValue} of ${totalAmount})`);
       }
     }
@@ -254,26 +305,53 @@ saveSellers() {
     }
 
     this.updateAmount(sellerId, input.value);
+    this.updateRemainingAmount();
     this.manualUpdate = true;
   }
 
   handlePercentageUpdate(event) {
     const input = event.target;
     const sellerId = input.closest('tr').dataset.sellerId;
-    const percentage = parseFloat(input.value) || 0;
+    let percentage = input.value;
+
+    // Remove any non-numeric characters except for the decimal point
+    percentage = percentage.replace(/[^\d.]/g, '');
+
+    // Ensure only one decimal point
+    const parts = percentage.split('.');
+    if (parts.length > 2) {
+      percentage = parts[0] + '.' + parts.slice(1).join('');
+    }
+
+    // Update the input value
+    input.value = percentage;
 
     this.updateSellerSelection(sellerId);
     this.updateAmount(sellerId, percentage);
+    this.updateRemainingAmount();
     this.manualUpdate = true;
   }
 
   handleAmountUpdate(event) {
     const input = event.target;
     const sellerId = input.closest('tr').dataset.sellerId;
-    const amount = parseFloat(input.value) || 0;
+    let amount = input.value;
+
+    // Remove any non-numeric characters except for the decimal point
+    amount = amount.replace(/[^\d.]/g, '');
+
+    // Ensure only one decimal point
+    const parts = amount.split('.');
+    if (parts.length > 2) {
+      amount = parts[0] + '.' + parts.slice(1).join('');
+    }
+
+    // Update the input value
+    input.value = amount;
 
     this.updateSellerSelection(sellerId);
     this.updatePercentage(sellerId, amount);
+    this.updateRemainingAmount();
     this.manualUpdate = true;
   }
 
@@ -283,5 +361,17 @@ saveSellers() {
       const checkbox = this.modalContainerTarget.querySelector(`tr[data-seller-id="${sellerId}"] .seller-checkbox`);
       if (checkbox) checkbox.checked = true;
     }
+  }
+
+  updateRemainingAmount() {
+    const totalAmount = this.getTotalAmount();
+    console.log('Total Amount:', totalAmount);
+    const assignedAmount = this.selectedSellers.reduce((sum, id) => {
+      const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${id}"]`);
+      return sum + (parseFloat(row.querySelector('.seller-amount').value) || 0);
+    }, 0);
+    console.log('Assigned Amount:', assignedAmount);
+    const remainingAmount = totalAmount - assignedAmount;
+    this.remainingAmountTarget.textContent = `S/ ${remainingAmount.toFixed(2)}`;
   }
 }
