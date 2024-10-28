@@ -312,6 +312,9 @@ class Admin::ProductsController < Admin::AdminController
           tag.products&.map { |product| product.stock(@current_warehouse) || 0 }&.min
         end&.min
       end&.min || 0
+    rescue StandardError => e
+      Rails.logger.error "Error calculating pack stock: #{e.message}"
+      0
     end
 
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
