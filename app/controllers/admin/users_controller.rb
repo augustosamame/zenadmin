@@ -105,6 +105,12 @@ class Admin::UsersController < Admin::AdminController
     end
   end
 
+  def check_roles
+    user = User.find(params[:id])
+    has_role = params[:roles].any? { |role| user.has_role?(role) }
+    render json: { has_role: has_role }
+  end
+
   private
 
     def set_user

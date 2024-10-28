@@ -86,14 +86,17 @@
                       label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
         </div>
 
+        
         <div class="sm:col-span-2">
-          <%= f.input :target_commission, 
-                      label: 'Comisión por Meta (%)', 
-                      input_html: { 
-                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                        data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
-                      },
-                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+          <% if f.object.seller&.has_any_role?("supervisor", "store_manager") %>
+            <%= f.input :target_commission, 
+                        label: 'Comisión por Meta (%)', 
+                        input_html: { 
+                          class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                          data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
+                        },
+                        label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+          <% end %>
         </div>
       </div>
     </div>

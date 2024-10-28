@@ -55,6 +55,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
         data << {
           year_month_period: year_month_period,
           sales: sales_service.sales_for_period_and_seller,
+          location_name: seller&.location&.name,
           location_sales: sales_service.sales_for_period_and_location(seller.location)
         }
 

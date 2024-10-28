@@ -51,6 +51,7 @@ Rails.application.routes.draw do
       member do
         get "loyalty_info"
         patch "update_contact_info"
+        get "check_roles"
       end
     end
     get "sellers", to: "users#sellers"
