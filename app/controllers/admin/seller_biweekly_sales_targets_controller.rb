@@ -2,7 +2,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   before_action :set_seller_biweekly_sales_target, only: [ :show, :edit, :update, :destroy ]
 
   def index
-    @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.all.includes(:seller)
+    @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.all.includes([ :seller, :location ])
   end
 
   def show
@@ -17,9 +17,9 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
     @seller_biweekly_sales_target.user = current_user
 
     if @seller_biweekly_sales_target.save
-      redirect_to admin_seller_biweekly_sales_target_path(@seller_biweekly_sales_target), notice: "Seller biweekly sales target was successfully created."
+      redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron creadas exitosamente."
     else
-      render :new
+      render :new, status: :unprocessable_entity
     end
   end
 
@@ -28,15 +28,15 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
 
   def update
     if @seller_biweekly_sales_target.update(seller_biweekly_sales_target_params)
-      redirect_to admin_seller_biweekly_sales_target_path(@seller_biweekly_sales_target), notice: "Seller biweekly sales target was successfully updated."
+      redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron actualizadas exitosamente."
     else
-      render :edit
+      render :edit, status: :unprocessable_entity
     end
   end
 
   def destroy
     @seller_biweekly_sales_target.destroy
-    redirect_to admin_seller_biweekly_sales_targets_path, notice: "Seller biweekly sales target was successfully destroyed."
+    redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron eliminadas exitosamente."
   end
 
   def seller_data
@@ -73,7 +73,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def seller_biweekly_sales_target_params
-    params.require(:seller_biweekly_sales_target).permit(:seller_id, :year_month_period, :sales_target_cents, :target_commission, :status)
+    params.require(:seller_biweekly_sales_target).permit(:seller_id, :year_month_period, :sales_target, :location_id, :target_commission, :status)
   end
 
   def get_previous_period(year_month_period)

@@ -3,6 +3,7 @@ class CreateSellerBiweeklySalesTargets < ActiveRecord::Migration[7.2]
     create_table :seller_biweekly_sales_targets do |t|
       t.references :seller, null: false, foreign_key: { to_table: :users }
       t.references :user, null: false, foreign_key: { to_table: :users }
+      t.references :location, null: false, foreign_key: true
       t.string :year_month_period # e.g. 2024_08_I, 2024_08_II
       t.integer :sales_target_cents, null: false
       t.string :currency, default: "PEN", null: false
@@ -11,6 +12,6 @@ class CreateSellerBiweeklySalesTargets < ActiveRecord::Migration[7.2]
 
       t.timestamps
     end
-    add_index :seller_biweekly_sales_targets, [ :seller_id, :year_month_period ], unique: true, name: 'index_targets_on_seller_id_and_year_month_period'
+    add_index :seller_biweekly_sales_targets, [ :seller_id, :year_month_period, :location_id ], unique: true, name: 'index_targets_on_seller_id_and_period_and_location_id'
   end
 end

@@ -726,6 +726,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   create_table "seller_biweekly_sales_targets", force: :cascade do |t|
     t.bigint "seller_id", null: false
     t.bigint "user_id", null: false
+    t.bigint "location_id", null: false
     t.string "year_month_period"
     t.integer "sales_target_cents", null: false
     t.string "currency", default: "PEN", null: false
@@ -733,7 +734,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["seller_id", "year_month_period"], name: "index_targets_on_seller_id_and_year_month_period", unique: true
+    t.index ["location_id"], name: "index_seller_biweekly_sales_targets_on_location_id"
+    t.index ["seller_id", "year_month_period", "location_id"], name: "index_targets_on_seller_id_and_period_and_location_id", unique: true
     t.index ["seller_id"], name: "index_seller_biweekly_sales_targets_on_seller_id"
     t.index ["user_id"], name: "index_seller_biweekly_sales_targets_on_user_id"
   end
@@ -988,6 +990,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   add_foreign_key "requisitions", "locations"
   add_foreign_key "requisitions", "users"
   add_foreign_key "requisitions", "warehouses"
+  add_foreign_key "seller_biweekly_sales_targets", "locations"
   add_foreign_key "seller_biweekly_sales_targets", "users"
   add_foreign_key "seller_biweekly_sales_targets", "users", column: "seller_id"
   add_foreign_key "stock_transfer_lines", "products"

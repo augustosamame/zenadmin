@@ -242,10 +242,10 @@ NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { 
 NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer_partial_receipt', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard_alert: true, email: true })
 
-SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_I", currency: "PEN", target_commission: 5.0)
-SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_II", currency: "PEN", target_commission: 5.0)
-SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_I", currency: "PEN", target_commission: 5.0)
-SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_II", currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_I", location: location_1, currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_II", location: location_1, currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_I", location: location_1, currency: "PEN", target_commission: 5.0)
+SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_09_II", location: location_1, currency: "PEN", target_commission: 5.0)
 
 random_products = Product.order("RANDOM()").limit(4).pluck(:id)
 

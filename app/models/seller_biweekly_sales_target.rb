@@ -3,10 +3,10 @@ class SellerBiweeklySalesTarget < ApplicationRecord
 
   belongs_to :seller, class_name: "User"
   belongs_to :user
-
+  belongs_to :location
   monetize :sales_target_cents, with_model_currency: :currency
 
-  validates :year_month_period, presence: true, uniqueness: { scope: :seller_id }
+  validates :year_month_period, presence: true, uniqueness: { scope: [ :seller_id, :location_id ] }
   validates :sales_target_cents, presence: true, numericality: { greater_or_equal_to: 0 }
   validates :target_commission, presence: true, numericality: { greater_or_equal_to: 0, less_than_or_equal_to: 100 }
 

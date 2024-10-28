@@ -10,7 +10,7 @@ class Location < ApplicationRecord
   has_many :commission_ranges, -> { order(min_sales: :asc) }, dependent: :destroy
   has_many :orders
   has_many :user_attendance_logs
-
+  has_many :seller_biweekly_sales_targets
   validates :name, presence: true
   validates :email, presence: true
 
