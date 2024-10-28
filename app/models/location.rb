@@ -7,7 +7,7 @@ class Location < ApplicationRecord
   has_many :warehouses
   has_many :users
   has_many :cashiers, dependent: :destroy
-  has_many :commission_ranges, dependent: :destroy
+  has_many :commission_ranges, -> { order(min_sales: :asc) }, dependent: :destroy
   has_many :orders
   has_many :user_attendance_logs
 

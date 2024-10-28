@@ -12,9 +12,22 @@ class Admin::LocationsController < Admin::AdminController
   end
 
   def create
-    @location = Location.create(location_params)
-    redirect_to admin_locations_path
-  end
+    @location = Location.new(location_params)
+    if @location.save
+      if params[:location][:commission_ranges_attributes].present?
+        redirect_to admin_commission_ranges_path(location_id: @location.id)
+      else
+        redirect_to admin_locations_path
+      end
+    else
+      if params[:location][:commission_ranges_attributes].present?
+        @commission_range = @location.commission_ranges.first
+        render "admin/commission_ranges/new", status: :unprocessable_entity
+      else
+        render :new, status: :unprocessable_entity
+      end
+    end
+end
 
   def edit
     @location.commission_ranges.build if @location.commission_ranges.empty?
@@ -22,9 +35,22 @@ class Admin::LocationsController < Admin::AdminController
 
   def update
     if @location.update(location_params)
-      redirect_to admin_locations_path
+      if params[:location][:commission_ranges_attributes].present?
+        redirect_to admin_commission_ranges_path(location_id: @location.id)
+      else
+        redirect_to admin_locations_path
+      end
     else
-      render :edit
+      if params[:location][:commission_ranges_attributes].present?
+        @commission_range = @location.commission_ranges.first
+        redirect_to(
+          request.referer || edit_admin_commission_range_path(@commission_range),
+          status: :see_other,  # 303 status code
+          alert: @location.errors.full_messages.join(", ")
+        )
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
   end
 

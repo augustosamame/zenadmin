@@ -4,9 +4,9 @@ class Admin::CommissionRangesController < Admin::AdminController
   def index
     if params[:location_id].present?
       @location = Location.find_by(id: params[:location_id])
-      @commission_ranges = @location.commission_ranges
+      @commission_ranges = @location.commission_ranges.order(:min_sales)
     else
-      @commission_ranges = CommissionRange.all.includes(:location)
+      @commission_ranges = CommissionRange.all.includes(:location).order(:location_id, :min_sales)
     end
 
     @datatable_options = "resource_name:'CommissionRange';create_button:true;sort_0_asc;sort_1_asc;"
@@ -19,6 +19,8 @@ class Admin::CommissionRangesController < Admin::AdminController
 
   def new
     @commission_range = CommissionRange.new
+    period = Date.today.day <= 15 ? "I" : "II"
+    @commission_range.year_month_period = "#{Date.today.strftime('%Y_%m')}_#{period}"
     @location = params[:location_id].present? ? Location.find(params[:location_id]) : @current_location
   end
 
