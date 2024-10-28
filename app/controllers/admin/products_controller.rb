@@ -308,10 +308,10 @@ class Admin::ProductsController < Admin::AdminController
 
     def calculate_pack_stock(pack)
       pack.product_pack_items.map do |item|
-        item.tags.map do |tag|
-          tag.products.map { |product| product.stock(@current_warehouse) }.min
-        end.min
-      end.min || 0
+        item.tags&.map do |tag|
+          tag.products&.map { |product| product.stock(@current_warehouse) || 0 }&.min
+        end&.min
+      end&.min || 0
     end
 
     # TODO send partials along with JSON so that the HTML structure and classes are exactly like the ones rendered by the HTML datatable
