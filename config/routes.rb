@@ -16,6 +16,10 @@ Rails.application.routes.draw do
   # create a namespace for admin
   namespace :admin do
     resources :products do
+      collection do
+        get :bulk_tag
+        post :apply_bulk_tags
+      end
       resources :media, module: :admin
       post "evaluate_group_discount", on: :collection
       get "search", on: :collection

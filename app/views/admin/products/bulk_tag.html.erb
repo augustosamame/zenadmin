@@ -1,0 +1,85 @@
+<%= render "shared/admin/nav", { header_title: "Aplicar Etiquetas en Lote" } %>
+
+<div class="px-4 py-5" data-controller="bulk-tag">
+  <div class="mb-8 overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <%= form_tag apply_bulk_tags_admin_products_path, 
+                   method: :post, 
+                   data: { 
+                     'bulk-tag-target': 'form',
+                     action: 'submit->bulk-tag#handleSubmit'
+                   } do %>
+        
+        <div class="mb-6">
+          <label class="block mb-2 text-sm font-medium text-gray-700">Etiquetas a Aplicar</label>
+          <%= select_tag :tag_ids, 
+                        options_from_collection_for_select(Tag.active, :id, :name), 
+                        multiple: true,
+                        class: 'w-full',
+                        data: {
+                          controller: 'select',
+                          'select-placeholder-value': 'Selecciona las etiquetas...',
+                          'select-multi-select-value': true,
+                          'select-model-value': 'tag',
+                          'bulk-tag-target': 'tagSelect'
+                        } %>
+        </div>
+
+        <%= hidden_field_tag :selected_product_ids, '', data: { 'bulk-tag-target': 'selectedProducts' } %>
+
+        <div class="flex justify-end space-x-3">
+          <button type="submit" 
+                  class="inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                  data-bulk-tag-target="submitButton"
+                  disabled>
+            Aplicar Etiquetas (<span data-bulk-tag-target="selectedCount">0</span>)
+          </button>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg" 
+       data-controller="datatable" 
+       data-datatable-options-value="resource_name:'products';select_multi;paging:true">
+    <table id="datatable-element" class="min-w-full">
+      <thead>
+        <tr>
+          <th class="w-4 px-4 py-2">
+            <input type="checkbox" class="select-all" data-action="change->bulk-tag#toggleAll">
+          </th>
+          <th class="px-4 py-2 text-left">Codigo</th>
+          <th class="px-4 py-2 text-left">Imagen</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Etiquetas Actuales</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @products.each do |product| %>
+          <tr>
+            <td class="px-4 py-2">
+              <input type="checkbox" 
+                     class="select-item" 
+                     value="<%= product.id %>" 
+                     data-action="change->bulk-tag#toggleOne">
+            </td>
+            <td class="px-4 py-2"><%= product.custom_id %></td>
+            <td class="flex items-center px-4 py-2 space-x-3">
+              <%= image_tag product.smart_image(:thumb), alt: product.name, class: "rounded-full sm:w-10 w-14 sm:h-10 h-14" if product.media.present? %>
+            </td>
+            <td class="px-4 py-2"><%= product.name %></td>
+            <td class="px-4 py-2">
+              <div class="flex flex-wrap gap-1">
+                <% product.tags.each do |tag| %>
+                  <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                    <%= tag.name %>
+                  </span>
+                <% end %>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -10,6 +10,9 @@ application.register("attendance-form", AttendanceFormController)
 import AttendanceLogsController from "./attendance_logs_controller"
 application.register("attendance-logs", AttendanceLogsController)
 
+import BulkTagController from "./bulk_tag_controller"
+application.register("bulk-tag", BulkTagController)
+
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 

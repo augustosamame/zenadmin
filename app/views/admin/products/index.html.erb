@@ -1,5 +1,8 @@
 <%= render "shared/admin/nav", { header_title: "Productos - #{@current_warehouse&.name}" } do %>
   <%= render_select_warehouse_dropdown(current_user) %>
+  <%= link_to "Aplicar Etiquetas en Lote", 
+              bulk_tag_admin_products_path, 
+              class: "inline-flex items-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700" %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 

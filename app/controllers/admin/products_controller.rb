@@ -203,6 +203,31 @@ class Admin::ProductsController < Admin::AdminController
     end
   end
 
+  def bulk_tag
+    @products = Product.includes(:tags, :media).all
+  end
+
+  def apply_bulk_tags
+    product_ids = params[:selected_product_ids].split(",")
+    tag_ids = params[:tag_ids]
+
+    if product_ids.present? && tag_ids.present?
+      Product.transaction do
+        Product.where(id: product_ids).each do |product|
+          tag_ids.each do |tag_id|
+            product.taggings.find_or_create_by!(tag_id: tag_id)
+          end
+        end
+      end
+
+      flash[:notice] = "Etiquetas aplicadas exitosamente a #{product_ids.size} productos"
+    else
+      flash[:alert] = "Por favor selecciona productos y etiquetas"
+    end
+
+    redirect_to admin_products_path
+  end
+
   private
 
     def set_product
