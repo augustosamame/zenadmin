@@ -27,6 +27,10 @@ export default class extends Controller {
       optgroupLabelField: 'label',
       optgroupValueField: 'value',
       lockOptgroupOrder: true,
+      onItemAdd: function () {
+        this.setTextboxValue('');
+        this.refreshOptions(false);
+      },
       render: {
         optgroup_header: function (data, escape) {
           return '<div class="optgroup-header custom-optgroup-header">' + escape(data.label) + '</div>';
