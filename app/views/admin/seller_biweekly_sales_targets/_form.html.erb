@@ -1,7 +1,7 @@
 <%= simple_form_for [:admin, @seller_biweekly_sales_target], html: { class: 'space-y-8', data: { controller: 'seller-biweekly-sales-target-form' } } do |f| %>
   <%= f.error_notification %>
 
-  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+  <div class="bg-white shadow overflow-inherit sm:rounded-lg">
     <div class="px-4 py-5 sm:p-6">
       <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">
         Selección de Vendedor y Período
@@ -9,25 +9,31 @@
       <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
         <div class="sm:col-span-3">
           <%= f.association :seller,
-                            label: 'Vendedor',
-                            collection: User.with_role(:seller).where(internal: false), 
-                            prompt: "Selecciona un Vendedor", 
-                            input_html: { 
-                              class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                              data: { 'seller-biweekly-sales-target-form-target': 'sellerSelect' }
-                            },
-                            label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+                          label: 'Vendedor',
+                          collection: User.with_any_role("seller", "supervisor", "store_manager").where(internal: false), 
+                          prompt: "Selecciona un Vendedor", 
+                          input_html: { 
+                            class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                            data: { 
+                              controller: 'select',
+                              'seller-biweekly-sales-target-form-target': 'sellerSelect',
+                              'select-placeholder-value': 'Selecciona un Vendedor',
+                              'select-multi-select-value': false,
+                              'select-model-value': 'seller'
+                            }
+                          },
+                          label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
         </div>
 
         <div class="sm:col-span-3">
           <%= f.input :year_month_period, 
-                      label: 'Período',
-                      input_html: { 
-                        value: SellerBiweeklySalesTarget.generate_year_month_period(Date.current),
-                        readonly: true,
-                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
-                      },
-                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+                    label: 'Período',
+                    input_html: { 
+                      value: SellerBiweeklySalesTarget.generate_year_month_period(Date.current),
+                      readonly: true,
+                      class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                    },
+                    label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
         </div>
       </div>
     </div>
@@ -41,16 +47,16 @@
       <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
         <div class="sm:col-span-3">
           <%= f.input :reference_periods,
-                      label: 'Número de períodos anteriores a mostrar',
-                      input_html: { 
-                        value: 2,
-                        type: 'number',
-                        min: 1,
-                        max: 5,
-                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                        data: { 'seller-biweekly-sales-target-form-target': 'referencePeriods' }
-                      },
-                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+                    label: 'Número de períodos anteriores a mostrar',
+                    input_html: { 
+                      value: 2,
+                      type: 'number',
+                      min: 1,
+                      max: 5,
+                      class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                      data: { 'seller-biweekly-sales-target-form-target': 'referencePeriods' }
+                    },
+                    label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
         </div>
       </div>
       <div class="mt-4" data-seller-biweekly-sales-target-form-target="referenceData">
@@ -64,40 +70,122 @@
       <h3 class="mb-4 text-lg font-medium leading-6 text-gray-900">
         Información de Meta
       </h3>
-      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
-        <div class="sm:col-span-2">
-          <%= f.input :location_id, 
-                      label: 'Tienda',
-                      collection: Location.active.all,
-                      prompt: 'Selecciona una Tienda',
-                      input_html: { 
-                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                        data: { 'seller-biweekly-sales-target-form-target': 'salesTarget' }
-                      },
-                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
-        </div>
-        <div class="sm:col-span-2">
-          <%= f.input :sales_target, 
-                      label: 'Meta', 
-                      input_html: { 
-                        class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                        data: { 'seller-biweekly-sales-target-form-target': 'salesTarget' }
-                      },
-                      label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
-        </div>
+      
+      <div id="targets-container" data-seller-biweekly-sales-target-form-target="lines">
+        <% if @seller_biweekly_sales_targets.present? %>
+          <% @seller_biweekly_sales_targets.each do |target| %>
+            <div class="flex items-center mb-4 space-x-4 nested-fields" data-seller-biweekly-sales-target-form-target="line">
+              <!-- Location Field -->
+              <div class="sm:col-span-2">
+                <%= f.input :location_id, 
+                          label: 'Tienda',
+                          collection: Location.active.all,
+                          selected: target.location_id,
+                          input_html: { 
+                            name: 'seller_biweekly_sales_target[targets][][location_id]',
+                            value: target.location_id,
+                            class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                          },
+                          label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+              </div>
 
-        
-        <div class="sm:col-span-2">
-          <% if f.object.seller&.has_any_role?("supervisor", "store_manager") %>
-            <%= f.input :target_commission, 
-                        label: 'Comisión por Meta (%)', 
+              <!-- Sales Target Field -->
+              <div class="sm:col-span-2">
+                <%= f.input :sales_target, 
+                          label: 'Meta', 
+                          input_html: { 
+                            name: 'seller_biweekly_sales_target[targets][][sales_target]',
+                            value: target.sales_target,
+                            class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                          },
+                          label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+              </div>
+
+              <!-- Target Commission Field -->
+              <div class="sm:col-span-2">
+                <% if target.seller&.has_any_role?("supervisor", "store_manager") %>
+                  <%= f.input :target_commission, 
+                            label: 'Comisión por Meta (%)', 
+                            input_html: { 
+                              name: 'seller_biweekly_sales_target[targets][][target_commission]',
+                              value: target.target_commission,
+                              class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                              data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
+                            },
+                            label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+                <% end %>
+              </div>
+
+              <!-- Action Buttons -->
+              <div class="flex items-end space-x-2">
+                <button type="button" class="p-2 text-red-500 hover:text-red-700" data-action="click->seller-biweekly-sales-target-form#removeLine">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                  </svg>
+                </button>
+                <button type="button" class="p-2 text-green-500 hover:text-green-700" data-action="click->seller-biweekly-sales-target-form#addLine">
+                  <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          <% end %>
+        <% else %>
+          <div class="flex items-center mb-4 space-x-4 nested-fields" data-seller-biweekly-sales-target-form-target="line">
+            <!-- Location Field -->
+            <div class="sm:col-span-2">
+              <%= f.input :location_id, 
+                        label: 'Tienda',
+                        collection: Location.active.all,
+                        prompt: 'Selecciona una Tienda',
                         input_html: { 
-                          class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
-                          data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
+                          name: 'seller_biweekly_sales_target[targets][][location_id]',
+                          class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
                         },
                         label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
-          <% end %>
-        </div>
+            </div>
+
+            <!-- Sales Target Field -->
+            <div class="sm:col-span-2">
+              <%= f.input :sales_target, 
+                        label: 'Meta', 
+                        input_html: { 
+                          name: 'seller_biweekly_sales_target[targets][][sales_target]',
+                          class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm'
+                        },
+                        label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+            </div>
+
+            <!-- Target Commission Field -->
+            <div class="sm:col-span-2">
+              <% if f.object.seller&.has_any_role?("supervisor", "store_manager") %>
+                <%= f.input :target_commission, 
+                          label: 'Comisión por Meta (%)', 
+                          input_html: { 
+                            name: 'seller_biweekly_sales_target[targets][][target_commission]',
+                            class: 'mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm',
+                            data: { 'seller-biweekly-sales-target-form-target': 'targetCommission' }
+                          },
+                          label_html: { class: 'block text-sm font-medium text-gray-700 mb-1' } %>
+              <% end %>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-end space-x-2">
+              <button type="button" class="p-2 text-red-500 hover:text-red-700" data-action="click->seller-biweekly-sales-target-form#removeLine">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+                </svg>
+              </button>
+              <button type="button" class="p-2 text-green-500 hover:text-green-700" data-action="click->seller-biweekly-sales-target-form#addLine">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+              </button>
+            </div>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

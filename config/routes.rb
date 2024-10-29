@@ -131,6 +131,7 @@ Rails.application.routes.draw do
     resources :tags, only: [ :index, :new, :create, :edit, :update, :destroy ]
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
+    get "sales_ranking", to: "dashboards#sales_ranking"
     post "dashboards/set_location", to: "dashboards#set_location"
 
     get "reports/form", to: "reports#reports_form"

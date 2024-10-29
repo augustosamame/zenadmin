@@ -13,22 +13,88 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def create
-    @seller_biweekly_sales_target = SellerBiweeklySalesTarget.new(seller_biweekly_sales_target_params)
-    @seller_biweekly_sales_target.user = current_user
+    success = true
 
-    if @seller_biweekly_sales_target.save
-      redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron creadas exitosamente."
+    if params[:seller_biweekly_sales_target][:targets].present?
+      params[:seller_biweekly_sales_target][:targets].each do |target_params|
+        @seller_biweekly_sales_target = SellerBiweeklySalesTarget.new(
+          seller_id: params[:seller_biweekly_sales_target][:seller_id],
+          year_month_period: params[:seller_biweekly_sales_target][:year_month_period],
+          location_id: target_params[:location_id],
+          sales_target: target_params[:sales_target],
+          target_commission: target_params[:target_commission],
+          status: params[:seller_biweekly_sales_target][:status],
+          user: current_user
+        )
+
+        unless @seller_biweekly_sales_target.save
+          success = false
+          break
+        end
+      end
+    end
+
+    if success
+      redirect_to admin_seller_biweekly_sales_targets_path,
+        notice: "Metas Quincenales por Vendedor fueron creadas exitosamente."
     else
       render :new, status: :unprocessable_entity
     end
   end
 
   def edit
+    # Find all targets for this seller and period
+    @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.includes(:seller).where(
+      seller_id: @seller_biweekly_sales_target.seller_id,
+      year_month_period: @seller_biweekly_sales_target.year_month_period
+    )
   end
 
   def update
-    if @seller_biweekly_sales_target.update(seller_biweekly_sales_target_params)
-      redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron actualizadas exitosamente."
+    success = true
+
+    # Find all existing targets for this seller and period
+    existing_targets = SellerBiweeklySalesTarget.where(
+      seller_id: @seller_biweekly_sales_target.seller_id,
+      year_month_period: @seller_biweekly_sales_target.year_month_period
+    )
+
+    ActiveRecord::Base.transaction do
+      # Delete existing targets that aren't in the new targets array
+      if params[:seller_biweekly_sales_target][:targets].present?
+        new_location_ids = params[:seller_biweekly_sales_target][:targets].map { |t| t[:location_id].to_i }
+        existing_targets.where.not(location_id: new_location_ids).destroy_all
+
+        # Update or create targets
+        params[:seller_biweekly_sales_target][:targets].each do |target_params|
+          target = existing_targets.find_or_initialize_by(
+            location_id: target_params[:location_id],
+            seller_id: @seller_biweekly_sales_target.seller_id,
+            year_month_period: @seller_biweekly_sales_target.year_month_period
+          )
+
+          target.assign_attributes(
+            sales_target: target_params[:sales_target],
+            target_commission: target_params[:target_commission],
+            status: params[:seller_biweekly_sales_target][:status],
+            user: current_user
+          )
+
+          unless target.save
+            success = false
+            raise ActiveRecord::Rollback
+          end
+        end
+      else
+        # If no targets provided, remove all existing targets
+        existing_targets.destroy_all
+        success = false
+      end
+    end
+
+    if success
+      redirect_to admin_seller_biweekly_sales_targets_path,
+        notice: "Metas Quincenales por Vendedor fueron actualizadas exitosamente."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -74,7 +140,12 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def seller_biweekly_sales_target_params
-    params.require(:seller_biweekly_sales_target).permit(:seller_id, :year_month_period, :sales_target, :location_id, :target_commission, :status)
+    params.require(:seller_biweekly_sales_target).permit(
+      :seller_id,
+      :year_month_period,
+      :status,
+      targets: [ :location_id, :sales_target, :target_commission ]
+    )
   end
 
   def get_previous_period(year_month_period)

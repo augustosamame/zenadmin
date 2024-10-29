@@ -31,6 +31,7 @@ class User < ApplicationRecord
   validates :login, presence: true, uniqueness: true
 
   scope :with_role, ->(role_name) { joins(:roles).where(roles: { name: role_name }) }
+  scope :with_any_role, ->(*role_names) { joins(:roles).where(roles: { name: role_names }).distinct }
 
   accepts_nested_attributes_for :customer, allow_destroy: true
   accepts_nested_attributes_for :user_seller_photo, allow_destroy: true

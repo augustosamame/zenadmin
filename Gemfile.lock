@@ -132,8 +132,8 @@ GEM
     aws-sdk-kms (1.95.0)
       aws-sdk-core (~> 3, >= 3.210.0)
       aws-sigv4 (~> 1.5)
-    aws-sdk-rekognition (1.108.0)
-      aws-sdk-core (~> 3, >= 3.207.0)
+    aws-sdk-rekognition (1.109.0)
+      aws-sdk-core (~> 3, >= 3.210.0)
       aws-sigv4 (~> 1.5)
     aws-sdk-s3 (1.169.0)
       aws-sdk-core (~> 3, >= 3.210.0)
@@ -401,7 +401,7 @@ GEM
     rails-html-sanitizer (1.6.0)
       loofah (~> 2.21)
       nokogiri (~> 1.14)
-    rails-i18n (7.0.9)
+    rails-i18n (7.0.10)
       i18n (>= 0.7, < 2)
       railties (>= 6.0.0, < 8)
     rails_feather (0.1.0)
@@ -550,7 +550,7 @@ DEPENDENCIES
   aasm (~> 5.5.0)
   audited (~> 5.7.0)
   awesome_print
-  aws-sdk-rekognition (~> 1.108.0)
+  aws-sdk-rekognition (~> 1.109.0)
   aws-sdk-s3 (~> 1.169.0)
   bootsnap
   bootstrap-generators!
@@ -595,7 +595,7 @@ DEPENDENCIES
   rack-cors (~> 2.0.2)
   rails (~> 7.2.1.2)
   rails-admin-scaffold!
-  rails-i18n (~> 7.0.9)
+  rails-i18n (~> 7.0.10)
   rails_feather (~> 0.1.0)
   railsui!
   redis (>= 5.3)

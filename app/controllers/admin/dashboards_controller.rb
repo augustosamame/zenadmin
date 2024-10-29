@@ -14,6 +14,68 @@ class Admin::DashboardsController < Admin::AdminController
     set_seller_commissions_list
   end
 
+  def sales_ranking
+    @current_period = SellerBiweeklySalesTarget.current_year_month_period
+    seller_biweekly_sales_targets = SellerBiweeklySalesTarget.where(year_month_period: @current_period)
+    if seller_biweekly_sales_targets.blank?
+      # show the ranking of the last period
+      @current_period = SellerBiweeklySalesTarget.previous_year_month_period
+      seller_biweekly_sales_targets = SellerBiweeklySalesTarget.where(year_month_period: @current_period)
+    end
+    start_date, end_date = SellerBiweeklySalesTarget.period_date_range(@current_period)
+
+    @ranking = User.includes(:user_seller_photo)
+      .with_any_role("seller", "supervisor", "store_manager")
+      .joins(<<-SQL)
+        LEFT JOIN (
+          SELECT#{' '}
+            commissions.user_id,
+            SUM(commissions.sale_amount_cents) as total_sales_cents
+          FROM commissions
+          LEFT JOIN orders ON orders.id = commissions.order_id
+          WHERE orders.order_date BETWEEN '#{start_date}' AND '#{end_date}'
+          AND orders.status = 0
+          GROUP BY commissions.user_id
+        ) as commission_totals ON commission_totals.user_id = users.id
+        LEFT JOIN (
+          SELECT#{' '}
+            seller_id,
+            SUM(sales_target_cents) as total_target_cents
+          FROM seller_biweekly_sales_targets
+          WHERE year_month_period = '#{@current_period}'
+          GROUP BY seller_id
+        ) as target_totals ON target_totals.seller_id = users.id
+      SQL
+      .select(
+        "users.*",
+        "commission_totals.total_sales_cents",
+        "target_totals.total_target_cents",
+        "CASE
+          WHEN COALESCE(target_totals.total_target_cents, 0) > 0
+          THEN (COALESCE(commission_totals.total_sales_cents, 0)::float / COALESCE(target_totals.total_target_cents, 0)) * 100
+          ELSE 0
+        END as achievement_percentage"
+      )
+      .group(
+        "users.id",
+        "commission_totals.total_sales_cents",
+        "target_totals.total_target_cents"
+      )
+      .order("achievement_percentage DESC")
+      .map do |user|
+        data = {
+          id: user.id,
+          name: user.name,
+          photo_url: user.user_seller_photo&.seller_photo,
+          total_sales: Money.new(user.total_sales_cents || 0, "PEN"),
+          total_target: Money.new(user.total_target_cents || 0, "PEN"),
+          achievement_percentage: user.achievement_percentage&.round(2) || 0
+        }
+        Rails.logger.info "Seller Data: #{data.inspect}"
+        data
+      end
+  end
+
   def set_location
     @locations = Location.active.order(:name).pluck(:id, :name)
     location_id = params[:location_id]

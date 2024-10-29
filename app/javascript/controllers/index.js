@@ -139,6 +139,9 @@ application.register("report-date", ReportDateController)
 import RequisitionFormController from "./requisition_form_controller"
 application.register("requisition-form", RequisitionFormController)
 
+import SalesRankingController from "./sales_ranking_controller"
+application.register("sales-ranking", SalesRankingController)
+
 import SelectController from "./select_controller"
 application.register("select", SelectController)
 

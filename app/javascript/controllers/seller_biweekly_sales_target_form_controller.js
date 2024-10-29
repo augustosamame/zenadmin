@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["sellerSelect", "referencePeriods", "referenceData", "salesTarget"]
+  static targets = ["sellerSelect", "referencePeriods", "referenceData", "salesTarget", "lines", "line"]
   static optionalTargets = ["targetCommission"]
 
   connect() {
@@ -10,6 +10,26 @@ export default class extends Controller {
     }
     if (this.hasReferencePeriodsTarget) {
       this.referencePeriodsTarget.addEventListener('change', this.loadSellerData.bind(this))
+    }
+  }
+
+  addLine(event) {
+    event.preventDefault()
+    const template = this.lineTargets[0].cloneNode(true)
+
+    // Clear values
+    template.querySelectorAll('input[type="text"], input[type="number"], select').forEach(input => {
+      input.value = ''
+    })
+
+    // No need to update names since they're already using array notation
+    this.linesTarget.appendChild(template)
+  }
+
+  removeLine(event) {
+    event.preventDefault()
+    if (this.lineTargets.length > 1) {
+      event.target.closest('.nested-fields').remove()
     }
   }
 

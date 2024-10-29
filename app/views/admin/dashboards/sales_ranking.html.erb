@@ -1,0 +1,88 @@
+<%= render "shared/admin/nav", { header_title: "Ranking de Ventas - Período: #{@current_period}" } do %>
+<% end %>
+
+<div class="relative px-20 py-20" 
+     data-controller="sales-ranking"
+     data-sales-ranking-target="container">
+  <!-- Podium Section -->
+  <div class="flex items-end justify-center mb-12 space-x-4">
+    <!-- Second Place -->
+    <div class="flex flex-col items-center">
+      <% if @ranking[1].present? %>
+        <div class="<%= achievement_background(@ranking[1][:achievement_percentage]) %> rounded-lg p-4 text-center mb-4">
+           <%= image_tag @ranking[1][:photo_url], class: "w-24 h-24 rounded-full mx-auto mb-2" if @ranking[1][:photo_url].present? %>
+          <div class="font-bold"><%= @ranking[1][:name] %></div>
+          <div class="text-sm"><%= @ranking[1][:total_sales].format %></div>
+          <div class="text-sm"><%= number_to_percentage(@ranking[1][:achievement_percentage], precision: 2) %></div>
+        </div>
+        <div class="flex items-center justify-center w-32 text-2xl font-bold bg-gray-300 h-28">2</div>
+      <% end %>
+    </div>
+
+    <!-- First Place -->
+    <div class="flex flex-col items-center -mt-16">
+      <% if @ranking[0].present? %>
+        <div class="<%= achievement_background(@ranking[0][:achievement_percentage]) %> rounded-lg p-4 text-center mb-4">
+          <div class="relative">
+             <%= image_tag @ranking[0][:photo_url], class: "w-24 h-24 rounded-full mx-auto mb-2" if @ranking[0][:photo_url].present? %>
+            <div class="absolute -top-4 -right-4">
+              <i class="text-2xl text-yellow-400 fas fa-crown"></i>
+            </div>
+          </div>
+          <div class="text-lg font-bold"><%= @ranking[0][:name] %></div>
+          <div class="text-md"><%= @ranking[0][:total_sales].format %></div>
+          <div class="text-md"><%= number_to_percentage(@ranking[0][:achievement_percentage], precision: 2) %></div>
+        </div>
+        <div class="flex items-center justify-center w-32 text-3xl font-bold bg-gray-300 h-36">1</div>
+      <% end %>
+    </div>
+
+    <!-- Third Place -->
+    <div class="flex flex-col items-center mt-8">
+      <% if @ranking[2].present? %>
+        <div class="<%= achievement_background(@ranking[2][:achievement_percentage]) %> rounded-lg p-4 text-center mb-4">
+           <%= image_tag @ranking[2][:photo_url], class: "w-24 h-24 rounded-full mx-auto mb-2" if @ranking[2][:photo_url].present? %>
+          <div class="font-bold"><%= @ranking[2][:name] %></div>
+          <div class="text-sm"><%= @ranking[2][:total_sales].format %></div>
+          <div class="text-sm"><%= number_to_percentage(@ranking[2][:achievement_percentage], precision: 2) %></div>
+        </div>
+        <div class="flex items-center justify-center w-32 h-20 text-2xl font-bold bg-gray-300">3</div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Rest of Rankings Table -->
+  <div class="mt-8">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Posición</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Vendedor</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Ventas</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Meta</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">% Cumplimiento Meta</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @ranking.drop(3).each_with_index do |seller, index| %>
+          <tr class="<%= achievement_background(seller[:achievement_percentage]) %>">
+            <td class="px-6 py-4 whitespace-nowrap"><%= index + 4 %></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <% if seller[:photo_url].present? %>
+                  <%= image_tag seller[:photo_url], class: "w-8 h-8 rounded-full mr-2" %>
+                <% end %>
+                <%= seller[:name] %>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= seller[:total_sales].format %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= seller[:total_target].format %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= number_to_percentage(seller[:achievement_percentage], precision: 2) %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <%= audio_tag "victory.mp3", id: "victory-sound", preload: 'auto' %>
+</div>

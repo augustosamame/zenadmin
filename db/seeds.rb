@@ -27,6 +27,7 @@ Role.find_or_create_by!(name: 'admin')
 Role.find_or_create_by!(name: 'seller')
 Role.find_or_create_by!(name: 'supervisor')
 Role.find_or_create_by!(name: 'store_manager')
+Role.find_or_create_by!(name: 'store')
 Role.find_or_create_by!(name: 'warehouse_manager')
 Role.find_or_create_by!(name: 'customer')
 
@@ -59,14 +60,19 @@ location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: regio
 
 location_3 = Location.find_or_create_by!(name: 'Plaza Norte', region: region_default, email: "plazanorte@jardindelzen.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
 
+location_4 = Location.find_or_create_by!(name: 'Larcomar', region: region_default, email: "larcomar@jardindelzen.com", address: 'Av. La Marina 424, San Migual', phone: '900000010')
+
 storeuser1 = User.create!(email: 'jockeyplaza@aromaterapia.com.pe', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
-storeuser1.add_role('store_manager')
+storeuser1.add_role('store')
 
 storeuser2 = User.create!(email: 'sanmiguel@aromaterapia.com.pe', phone: "986976312", location_id: location_2.id, login: "sanmiguel@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
-storeuser2.add_role('store_manager')
+storeuser2.add_role('store')
 
 storeuser3 = User.create!(email: 'plazanorte@aromaterapia.com.pe', phone: "928855854", location_id: location_3.id, login: "plazanorte@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza Norte", internal: true)
-storeuser3.add_role('store_manager')
+storeuser3.add_role('store')
+
+storeuser4 = User.create!(email: 'larcomar@aromaterapia.com.pe', phone: "928855855", location_id: location_4.id, login: "larcomar@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Larcomar", internal: true)
+storeuser4.add_role('store')
 
 supervisor_1 = User.create!(email: 'supervisor@aromaterapia.com.pe', phone: "986976314", login: "supervisor@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Carmen", last_name: "Supervisor")
 supervisor_1.add_role('supervisor')
@@ -263,6 +269,6 @@ for i in 1..50
 end
 =end
 
-Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 50).call
+Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 5).call
 Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
 Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call

@@ -116,4 +116,15 @@ module AdminHelper
       notification.message_title
     end
   end
+
+  def achievement_background(percentage)
+    case
+    when percentage >= 100
+      "bg-amber-300"  # Rich golden
+    when percentage >= 75
+      "bg-green-300"  # Rich green
+    else
+      "bg-red-300"    # Rich red
+    end
+  end
 end
