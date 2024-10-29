@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus';
 
 export default class extends Controller {
-  static targets = ['draftButtonContainer'];
+  // static targets = ['draftButtonContainer'];
 
   connect() {
     console.log('Connected to the POS buttons controller!');
@@ -46,10 +46,10 @@ export default class extends Controller {
     const draftItemCount = draftData.order_items_attributes ? draftData.order_items_attributes.length : 0;
     
     if (currentItemCount === 0 && draftItemCount > 0) {
-      this.hideDraftButton();
+      // this.hideDraftButton();
       // this.showDraftButton();
     } else {
-      this.hideDraftButton();
+      // this.hideDraftButton();
     }
   }
 
@@ -66,7 +66,7 @@ export default class extends Controller {
       });
     }
 
-    this.hideDraftButton();
+    // this.hideDraftButton();
   }
 
   clearSelectedUser() {

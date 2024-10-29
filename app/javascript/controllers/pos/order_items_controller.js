@@ -131,7 +131,7 @@ export default class extends Controller {
     const buttonsElement = document.querySelector('[data-controller="pos--buttons"]');
     const buttonsController = this.application.getControllerForElementAndIdentifier(buttonsElement, 'pos--buttons');
     if (buttonsController) {
-      buttonsController.hideDraftButton();
+      // buttonsController.hideDraftButton();
     }
 
     if (product.isLoyaltyFree) {
