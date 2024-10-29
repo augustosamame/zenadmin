@@ -271,7 +271,7 @@ export default class extends Controller {
         custom_id: `PACK-${pack.id}-${product.id}`,
         name: product.name,
         price: product.price, // Use the original price
-        already_discounted: false, // It's not discounted at the item level
+        already_discounted: true, // It's not discounted at the item level
         quantity: product.quantity,
         isPackItem: true,
         packId: pack.id

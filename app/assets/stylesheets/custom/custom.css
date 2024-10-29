@@ -38,3 +38,7 @@
 .ts-dropdown .option {
   padding-left: 15px;
 }
+
+[data-item-already-discounted="true"] span {
+  @apply text-blue-600;
+}

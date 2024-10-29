@@ -255,6 +255,9 @@ export default class extends Controller {
   }
 
   evaluateGroupDiscount() {
+    // Reset only previous group discount flags
+    this.resetGroupDiscountFlags();
+
     const orderData = this.collectOrderData();
     const orderDataItemsAttributes = orderData.order_items_attributes;
     console.log('orderDataItemsAttributes:', orderDataItemsAttributes);
@@ -265,7 +268,7 @@ export default class extends Controller {
         qty: item.quantity,
         price: item.price
       }));
-    console.log('orderItemsArrayOfHashes:', orderItemsArrayOfHashes);
+
     fetch('/admin/products/evaluate_group_discount', {
       method: 'POST',
       headers: {
@@ -276,9 +279,17 @@ export default class extends Controller {
     })
       .then(response => response.json())
       .then(data => {
-        console.log('Group Discount Evaluation:', data);
-        console.log('Group Discount Names:', data.applied_discount_names);
-        // Update UI based on the response
+        if (data.discounted_product_ids) {
+          this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
+            const productId = item.dataset.productId;
+            if (data.discounted_product_ids.map(String).includes(productId)) {
+              console.log(`Marking product ${productId} as group discounted`);
+              item.setAttribute('data-item-already-discounted', 'true');
+              item.setAttribute('data-group-discount', 'true'); // Add this flag for group discounts
+            }
+          });
+        }
+
         this.applyGroupDiscount(data.total_discount_to_apply, data.applied_discount_names);
       })
       .catch(error => console.error('Error evaluating group discount:', error));
@@ -613,5 +624,12 @@ export default class extends Controller {
     this.itemsTarget.innerHTML = '';
     this.selectedItem = null;
     this.calculateTotal();
+  }
+
+  resetGroupDiscountFlags() {
+    this.itemsTarget.querySelectorAll('div.flex[data-group-discount="true"]').forEach(item => {
+      item.setAttribute('data-item-already-discounted', 'false');
+      item.removeAttribute('data-group-discount');
+    });
   }
 }

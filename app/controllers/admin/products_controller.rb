@@ -144,6 +144,7 @@ class Admin::ProductsController < Admin::AdminController
       total_discount_to_apply = 0
       number_of_qualifying_groups = 0
       applied_discount_counts = Hash.new(0)
+      discounted_product_ids = [] # Track which products received discounts
 
       current_group_discounts.each do |group_discount|
         applicable_product_ids = group_discount.matching_product_ids
@@ -171,6 +172,9 @@ class Admin::ProductsController < Admin::AdminController
           free_items = group.last(payed_quantity - free_quantity)
           free_items_price = free_items.sum { |item| item["price"] }
 
+          # Add the product IDs that received the discount
+          discounted_product_ids.concat(free_items.map { |item| item["product_id"] })
+
           total_discount_to_apply += free_items_price
           number_of_qualifying_groups += 1
           applied_discount_counts[group_discount.name] += 1
@@ -185,20 +189,23 @@ class Admin::ProductsController < Admin::AdminController
         render json: {
           number_of_qualifying_groups: number_of_qualifying_groups,
           total_discount_to_apply: total_discount_to_apply,
-          applied_discount_names: applied_discount_names
+          applied_discount_names: applied_discount_names,
+          discounted_product_ids: discounted_product_ids.uniq # Send back the unique product IDs
         }
       else
         render json: {
           number_of_qualifying_groups: 0,
           total_discount_to_apply: 0,
-          applied_discount_names: nil
+          applied_discount_names: nil,
+          discounted_product_ids: []
         }
       end
     else
       render json: {
         number_of_qualifying_groups: 0,
         total_discount_to_apply: 0,
-        applied_discount_names: nil
+        applied_discount_names: nil,
+        discounted_product_ids: []
       }
     end
   end
