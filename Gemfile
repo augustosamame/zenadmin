@@ -70,11 +70,11 @@ gem "geocoder", "~> 1.8.3"
 gem "kaminari", "~> 1.2.2"
 gem "web-push", "~> 3.0.1"
 gem "aasm", "~> 5.5.0"
-gem "rails-i18n", "~> 7.0.9"
+gem "rails-i18n", "~> 7.0.10"
 gem "prawn", "~> 2.5.0"
 gem "prawn-table", "~> 0.2.2"
 gem "combine_pdf", "~> 1.0.26"
-gem "aws-sdk-rekognition", "~> 1.108.0"
+gem "aws-sdk-rekognition", "~> 1.109.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
