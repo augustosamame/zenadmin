@@ -280,7 +280,7 @@ export default class extends Controller {
 
     // Apply the pack discount as a global discount
     if (packDiscount > 0) {
-      orderItemsController.addPackDiscount(pack.id, packDiscount, pack.name);
+      orderItemsController.addPackDiscount(pack.id, packDiscount, pack.name, selectedProducts.map(product => product.id));
     }
 
     // Close the modal

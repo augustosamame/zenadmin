@@ -163,26 +163,35 @@ export default class extends Controller {
     if (!this.selectedItem) return;
 
     const quantityElement = this.selectedItem.querySelector('[data-item-quantity]');
+    const originalQuantity = parseInt(quantityElement.textContent.trim());
     let currentQuantity = quantityElement.textContent.trim();
 
     // If the current quantity is '1' (default) and it's the first keypress, replace it with the new digit
     if (currentQuantity === '1' && this.isFirstKeyPress) {
       currentQuantity = value;
-      this.isFirstKeyPress = false; // Reset after the first keypress
+      this.isFirstKeyPress = false;
     } else {
       // Append the new digit to the current quantity
       currentQuantity += value;
     }
 
     // Ensure no leading zeros are present (except when the result is 0)
-    currentQuantity = parseInt(currentQuantity, 10).toString();
+    const newQuantity = parseInt(currentQuantity, 10);
+    currentQuantity = newQuantity.toString();
+
+    // Check if item is part of a pack and quantity is being reduced
+    const packId = this.selectedItem.getAttribute('data-pack-id');
+    if (packId && newQuantity < originalQuantity) {
+      console.log('removing pack discount due to quantity reduction:', this.selectedItem, 'packId:', packId);
+      this.removePackDiscount(packId);
+    }
 
     quantityElement.textContent = currentQuantity;
 
     // Update subtotal
     const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
     const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
-    subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
+    subtotalElement.textContent = `S/ ${(newQuantity * price).toFixed(2)}`;
 
     if (this.selectedItem.hasAttribute('data-combo-id')) {
       console.log('has Combo ID:', this.selectedItem.getAttribute('data-combo-id'), 'will check and update');
@@ -365,31 +374,42 @@ export default class extends Controller {
 
     const quantityElement = this.selectedItem.querySelector('[data-item-quantity]');
     let currentQuantity = quantityElement.textContent.trim();
+    const originalQuantity = parseInt(currentQuantity);
 
-    if (currentQuantity === '0') {
-      this.removeItemFromSelection(); // Remove item if quantity is already 0
-    } else {
-      if (currentQuantity.length > 1) {
-        currentQuantity = currentQuantity.slice(0, -1); // Remove the last digit
+    // If it's a single digit or first backspace press
+    if (currentQuantity.length === 1) {
+      if (this.isFirstKeyPress) {
+        currentQuantity = '0';
+        this.isFirstKeyPress = false;
       } else {
-        currentQuantity = '0'; // Set quantity to 0 if only one digit left
+        // Remove the item on second backspace press when quantity is 0
+        this.removeItemFromSelection();
+        return;
       }
-      quantityElement.textContent = currentQuantity;
-
-      // Update subtotal
-      const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
-      const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
-      subtotalElement.textContent = `S/ ${(parseInt(currentQuantity) * price).toFixed(2)}`;
-
-      if (this.selectedItem.hasAttribute('data-combo-id')) {
-        console.log('has Combo ID:', this.selectedItem.getAttribute('data-combo-id'), 'will check and update');
-        this.checkAndUpdateComboDiscount(this.selectedItem);
-      }
-
-      this.evaluateGroupDiscount();
-      this.calculateTotal();
-      this.saveDraft();
+    } else {
+      // Remove the last digit
+      currentQuantity = currentQuantity.slice(0, -1);
     }
+
+    const newQuantity = parseInt(currentQuantity);
+
+    // Check if item is part of a pack and quantity is being reduced
+    const packId = this.selectedItem.getAttribute('data-pack-id');
+    if (packId && newQuantity < originalQuantity) {
+      console.log('removing pack discount due to backspace:', this.selectedItem, 'packId:', packId);
+      this.removePackDiscount(packId);
+    }
+
+    quantityElement.textContent = currentQuantity;
+
+    // Update subtotal
+    const price = parseFloat(this.selectedItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
+    const subtotalElement = this.selectedItem.querySelector('[data-item-subtotal]');
+    subtotalElement.textContent = `S/ ${(newQuantity * price).toFixed(2)}`;
+
+    this.calculateTotal();
+    this.evaluateGroupDiscount();
+    this.saveDraft();
   }
 
   handleBackspaceForPrice() {
@@ -435,10 +455,52 @@ export default class extends Controller {
     this.saveDraft();
   }
 
-  addPackDiscount(packId, discountAmount, packName) {
-    this.packDiscounts = this.packDiscounts || new Map();
-    this.packDiscounts.set(packId, { amount: discountAmount, name: packName });
+  addPackDiscount(packId, discountAmount, packName, productIds) {
+    const packIdString = String(packId);
+    this.packDiscounts.set(packIdString, {
+      amount: discountAmount,
+      name: packName,
+      productIds: productIds
+    });
+
+    // Mark all products in this pack
+    productIds.forEach(productId => {
+      const item = this.itemsTarget.querySelector(`[data-product-id="${productId}"]`);
+      if (item) {
+        item.setAttribute('data-pack-id', packIdString);
+        item.setAttribute('data-item-already-discounted', 'true');
+      }
+    });
+
     this.calculateTotal();
+  }
+
+  removePackDiscount(packId) {
+    const packIdString = String(packId);
+    console.log('Removing pack discount for packId:', packIdString);
+    console.log('Current pack discounts:', this.packDiscounts);
+    console.log('Has pack discount?', this.packDiscounts.has(packIdString));
+    if (this.packDiscounts.has(packIdString)) {
+      console.log('pack discount found, removing');
+      // Remove the discount from the map
+      this.packDiscounts.delete(packIdString);
+      
+      // Reset all items that were part of this pack
+      this.itemsTarget.querySelectorAll(`[data-pack-id="${packIdString}"]`).forEach(item => {
+        item.removeAttribute('data-pack-id');
+        item.setAttribute('data-item-already-discounted', 'false');
+        
+        // Reset price to original price
+        const originalPrice = item.getAttribute('data-item-original-price');
+        const priceElement = item.querySelector('.editable-price');
+        priceElement.textContent = `S/ ${parseFloat(originalPrice).toFixed(2)}`;
+        
+        // Update subtotal
+        this.updateSubtotal(item);
+      });
+      
+      this.calculateTotal();
+    }
   }
 
   calculateTotal() {
@@ -553,8 +615,19 @@ export default class extends Controller {
       const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
       const isLoyaltyFree = item.hasAttribute('data-loyalty-free-product');
       const isDiscounted = item.getAttribute('data-item-already-discounted') === 'true';
+      const packId = item.getAttribute('data-pack-id');
 
-      orderItems.push({ id, name, custom_id, quantity, price, subtotal, isLoyaltyFree, isDiscounted });
+      orderItems.push({ 
+        id, 
+        name, 
+        custom_id, 
+        quantity, 
+        price, 
+        subtotal, 
+        isLoyaltyFree, 
+        isDiscounted,
+        packId // Include pack ID if present
+      });
     });
 
     return {
