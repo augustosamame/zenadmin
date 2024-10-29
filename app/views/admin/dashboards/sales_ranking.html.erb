@@ -22,11 +22,11 @@
     <!-- First Place -->
     <div class="flex flex-col items-center -mt-16">
       <% if @ranking[0].present? %>
-        <div class="<%= achievement_background(@ranking[0][:achievement_percentage]) %> rounded-lg p-4 text-center mb-4">
+        <div class="<%= achievement_background(@ranking[0][:achievement_percentage]) %> rounded-lg p-6 text-center mb-4">
           <div class="relative">
              <%= image_tag @ranking[0][:photo_url], class: "w-24 h-24 rounded-full mx-auto mb-2" if @ranking[0][:photo_url].present? %>
             <div class="absolute -top-4 -right-4">
-              <i class="text-2xl text-yellow-400 fas fa-crown"></i>
+              <i class="text-2xl text-red-400 fas fa-crown"></i>
             </div>
           </div>
           <div class="text-lg font-bold"><%= @ranking[0][:name] %></div>

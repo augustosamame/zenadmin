@@ -18,7 +18,6 @@ class Admin::DashboardsController < Admin::AdminController
     @current_period = SellerBiweeklySalesTarget.current_year_month_period
     seller_biweekly_sales_targets = SellerBiweeklySalesTarget.where(year_month_period: @current_period)
     if seller_biweekly_sales_targets.blank?
-      # show the ranking of the last period
       @current_period = SellerBiweeklySalesTarget.previous_year_month_period
       seller_biweekly_sales_targets = SellerBiweeklySalesTarget.where(year_month_period: @current_period)
     end
@@ -26,14 +25,14 @@ class Admin::DashboardsController < Admin::AdminController
 
     @ranking = User.includes(:user_seller_photo)
       .with_any_role("seller", "supervisor", "store_manager")
-      .joins(<<-SQL)
+      .joins(sanitize_sql_array([ <<-SQL, start_date, end_date, @current_period ]))
         LEFT JOIN (
           SELECT#{' '}
             commissions.user_id,
             SUM(commissions.sale_amount_cents) as total_sales_cents
           FROM commissions
           LEFT JOIN orders ON orders.id = commissions.order_id
-          WHERE orders.order_date BETWEEN '#{start_date}' AND '#{end_date}'
+          WHERE orders.order_date BETWEEN ? AND ?
           AND orders.status = 0
           GROUP BY commissions.user_id
         ) as commission_totals ON commission_totals.user_id = users.id
@@ -42,7 +41,7 @@ class Admin::DashboardsController < Admin::AdminController
             seller_id,
             SUM(sales_target_cents) as total_target_cents
           FROM seller_biweekly_sales_targets
-          WHERE year_month_period = '#{@current_period}'
+          WHERE year_month_period = ?
           GROUP BY seller_id
         ) as target_totals ON target_totals.seller_id = users.id
       SQL
@@ -125,6 +124,10 @@ class Admin::DashboardsController < Admin::AdminController
       else
         @seller_commissions_list = Commission.all.includes(user: :avatar_attachment, order: {}).order(created_at: :desc).limit(5)
       end
+    end
+
+    def sanitize_sql_array(array)
+      ActiveRecord::Base.send(:sanitize_sql_array, array)
     end
 
     def set_chart_data
