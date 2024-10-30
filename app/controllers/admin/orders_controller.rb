@@ -5,9 +5,9 @@ class Admin::OrdersController < Admin::AdminController
     respond_to do |format|
       format.html do
         if current_user.any_admin_or_supervisor?
-          @orders = Order.all
+          @orders = Order.includes([ :invoices ]).all
         else
-          @orders = Order.where(location_id: @current_location.id)
+          @orders = Order.includes([ :invoices ]).where(location_id: @current_location.id)
         end
         if @orders.size > 500
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"

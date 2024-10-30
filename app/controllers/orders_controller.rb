@@ -15,6 +15,32 @@ class OrdersController < ApplicationController
 
   def invoice_xml
     @order = Order.find(params[:id])
-    redirect_to @order.universal_xml_link, allow_other_host: true
+    xml_url = @order.universal_xml_link
+
+    # Validate the URL is from your trusted domain(s)
+    if trusted_invoice_url?(xml_url)
+      redirect_to xml_url, allow_other_host: true
+    else
+      render plain: "Invalid invoice URL", status: :bad_request
+    end
+  end
+
+  private
+
+  def trusted_invoice_url?(url)
+    return false if url.blank?
+
+    # Add your trusted domains here
+    trusted_domains = [
+      "www.nubefact.com",
+      "nubefact.com"
+    ]
+
+    begin
+      uri = URI.parse(url)
+      trusted_domains.any? { |domain| uri.host == domain }
+    rescue URI::InvalidURIError
+      false
+    end
   end
 end
