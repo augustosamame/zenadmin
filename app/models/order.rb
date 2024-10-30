@@ -91,6 +91,10 @@ class Order < ApplicationRecord
     "#{ENV["DOMAIN_URL"]}/invoice/#{self.id}"
   end
 
+  def universal_xml_link
+    "#{ENV["DOMAIN_URL"]}/invoice_xml/#{self.id}"
+  end
+
   def universal_invoice_show
     if self.last_issued_ok_invoice_urls.present?
       {

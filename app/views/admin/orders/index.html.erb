@@ -14,6 +14,7 @@
           <th class="px-4 py-2 text-left">Total Original</th>
           <th class="px-4 py-2 text-left">Descuento</th>
           <th class="px-4 py-2 text-left">Comprobante</th>
+          <th class="px-4 py-2 text-left">XML Comprobante</th>
           <th class="px-4 py-2 text-left">Estado Pago</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Ver</th>
@@ -31,9 +32,8 @@
             <td class="px-4 py-2"><%= format_currency(order.total_price) %></td>
             <td class="px-4 py-2"><%= format_currency(order.total_original_price) %></td>
             <td class="px-4 py-2"><%= format_currency(order.total_discount) %></td>
-            <td class="px-4 py-2"><%= show_invoice_actions(order) %>
-              
-            </td>
+            <td class="px-4 py-2"><%= show_invoice_actions(order, "pdf") %></td>
+            <td class="px-4 py-2"><%= show_invoice_actions(order, "xml") %></td>
             <td class="px-4 py-2"><%= order.translated_payment_status %></td>
             <td class="px-4 py-2"><%= order.translated_status %></td>
             <td class="px-4 py-2">

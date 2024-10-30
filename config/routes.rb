@@ -12,7 +12,7 @@ Rails.application.routes.draw do
   get "about", to: "page#about"
 
   get "invoice/:id", to: "orders#invoice", as: :invoice
-
+  get "invoice_xml/:id", to: "orders#invoice_xml", as: :invoice_xml
   # create a namespace for admin
   namespace :admin do
     resources :products do

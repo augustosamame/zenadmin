@@ -365,12 +365,10 @@ saveSellers() {
 
   updateRemainingAmount() {
     const totalAmount = this.getTotalAmount();
-    console.log('Total Amount:', totalAmount);
     const assignedAmount = this.selectedSellers.reduce((sum, id) => {
       const row = this.modalContainerTarget.querySelector(`tr[data-seller-id="${id}"]`);
       return sum + (parseFloat(row.querySelector('.seller-amount').value) || 0);
     }, 0);
-    console.log('Assigned Amount:', assignedAmount);
     const remainingAmount = totalAmount - assignedAmount;
     this.remainingAmountTarget.textContent = `S/ ${remainingAmount.toFixed(2)}`;
   }

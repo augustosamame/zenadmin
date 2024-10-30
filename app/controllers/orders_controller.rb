@@ -12,4 +12,9 @@ class OrdersController < ApplicationController
       render plain: "Ocurrió un error al generar el comprobante. Por favor, inténtelo de nuevo más tarde.", status: :internal_server_error
     end
   end
+
+  def invoice_xml
+    @order = Order.find(params[:id])
+    redirect_to @order.universal_xml_link, allow_other_host: true
+  end
 end
