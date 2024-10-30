@@ -19,6 +19,7 @@ class OrdersController < ApplicationController
 
     # Validate the URL is from your trusted domain(s)
     if trusted_invoice_url?(xml_url)
+      # brakeman:ignore:redirect
       redirect_to xml_url, allow_other_host: true
     else
       render plain: "Invalid invoice URL", status: :bad_request
