@@ -235,6 +235,13 @@ class Admin::ProductsController < Admin::AdminController
     redirect_to admin_products_path
   end
 
+  def stock
+    product = Product.find(params[:id])
+    render json: {
+      stock: product.stock(@current_warehouse)
+    }
+  end
+
   private
 
     def set_product

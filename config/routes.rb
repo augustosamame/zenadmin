@@ -25,6 +25,9 @@ Rails.application.routes.draw do
       get "search", on: :collection
       get "products_matching_tags", on: :collection
       get "combo_products_show", on: :member
+      member do
+        get :stock
+      end
     end
 
     post "face_recognition", to: "face_recognition#recognize"

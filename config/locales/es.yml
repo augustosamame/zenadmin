@@ -175,7 +175,7 @@ es:
           automatic: Automático
           manual: Manual
         stage_list:
-          req_new: Nuevo
+          req_new: Borrador
           req_pending: Pendiente
           req_fulfilled: Completado
         status_list:

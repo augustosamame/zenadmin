@@ -5,29 +5,53 @@ export default class extends Controller {
 
   connect() {
     console.log("Requisition form controller connected")
+    this.initializeProductSelects()
+  }
+
+  initializeProductSelects() {
+    this.element.querySelectorAll('select[data-controller="select"]').forEach(select => {
+      select.addEventListener('change', (event) => this.updateStockInfo(event))
+    })
+  }
+
+  updateStockInfo(event) {
+    const select = event.target
+    const productId = select.value
+    const lineItem = select.closest('.nested-fields')
+    const stockField = lineItem.querySelector('input[name*="[current_stock]"]')
+
+    if (productId) {
+      fetch(`/admin/products/${productId}/stock`)
+        .then(response => response.json())
+        .then(data => {
+          stockField.value = data.stock
+        })
+        .catch(error => console.error('Error fetching stock:', error))
+    } else {
+      stockField.value = ''
+    }
   }
 
   add(event) {
     event.preventDefault()
-
-    // Use the template to create a new line
     const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
     const newLine = document.createRange().createContextualFragment(content).firstElementChild
 
-    // Clean up Tom Select-specific elements and attributes in the new line
     newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove())
     newLine.querySelectorAll("input, select").forEach(input => {
       input.value = ""
       input.classList.remove("tomselected", "ts-hidden-accessible")
       input.removeAttribute("id")
-      input.style.display = '' // Ensure the original select is visible
+      input.style.display = ''
     })
 
-    // Append new line to the container
     this.linesTarget.appendChild(newLine)
-
-    // Initialize Tom Select for the new row's select element if needed
-    // this.initializeTomSelect(newLine.querySelector('select[data-controller="select"]'))
+    
+    // Initialize event listeners for the new line
+    const newSelect = newLine.querySelector('select[data-controller="select"]')
+    if (newSelect) {
+      newSelect.addEventListener('change', (event) => this.updateStockInfo(event))
+    }
   }
 
   remove(event) {
