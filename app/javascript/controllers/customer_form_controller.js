@@ -106,6 +106,10 @@ export default class extends Controller {
       this.facturaFieldsTarget.classList.remove('hidden');
     } else {
       this.facturaFieldsTarget.classList.add('hidden');
+      // Clear all factura-related fields
+      this.facturaRucTarget.value = '';
+      this.facturaRazonSocialTarget.value = '';
+      this.facturaDireccionTarget.value = '';
     }
   }
 
