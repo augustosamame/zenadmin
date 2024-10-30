@@ -5,7 +5,8 @@ export default class extends Controller {
   static values = {
     model: String,           // Model name for dynamic behavior
     multiSelect: Boolean,    // Toggle multi-select functionality
-    placeholder: String      // Placeholder text for the select input
+    placeholder: String,
+    maxOptions: { type: Number, default: 50 }      // Placeholder text for the select input
   };
 
   connect() {
@@ -27,6 +28,7 @@ export default class extends Controller {
       optgroupLabelField: 'label',
       optgroupValueField: 'value',
       lockOptgroupOrder: true,
+      maxOptions: this.maxOptionsValue,
       onItemAdd: function () {
         this.setTextboxValue('');
         this.refreshOptions(false);

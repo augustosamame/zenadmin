@@ -41,13 +41,13 @@
     <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
     <div id="requisition-form-lines" data-requisition-form-target="lines">
       <%= form.simple_fields_for :requisition_lines do |line_form| %>
-        <%= render 'requisition_line_fields', f: line_form %>
+        <%= render 'requisition_line_fields', f: line_form, all_products: @all_products %>
       <% end %>
     </div>
 
     <template data-requisition-form-target="template">
       <%= form.simple_fields_for :requisition_lines, RequisitionLine.new, child_index: 'NEW_RECORD' do |line_form| %>
-        <%= render 'requisition_line_fields', f: line_form %>
+        <%= render 'requisition_line_fields', f: line_form, all_products: @all_products %>
       <% end %>
     </template>
   </div>

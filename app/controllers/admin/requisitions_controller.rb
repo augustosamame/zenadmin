@@ -26,7 +26,24 @@ class Admin::RequisitionsController < Admin::AdminController
     @requisition = Requisition.new
     @requisition.user_id = current_user.id
     @requisition.requisition_date = Time.current
-    @requisition.requisition_lines.build
+    # @requisition.requisition_lines.build
+
+    negative_stock_products = Product.includes(:warehouse_inventories)
+                              .joins(:warehouse_inventories)
+                              .where(warehouse_inventories: {
+                                warehouse_id: @current_warehouse.id,
+                                stock: ...-1  # Using Ruby range syntax for "less than 0"
+                              })
+    negative_stock_products.each do |product|
+      current_stock = product.stock(@current_warehouse)
+      @requisition.requisition_lines.build(
+        product: product,
+        current_stock: current_stock,
+        presold_quantity: current_stock.abs,  # Convert negative stock to positive number
+        automatic_quantity: 0,
+        manual_quantity: current_stock.abs    # Set initial manual quantity to match deficit
+      )
+    end
   end
 
   def create
@@ -104,6 +121,7 @@ class Admin::RequisitionsController < Admin::AdminController
       @origin_locations = Location.where(id: @current_location.id)
     end
     @requisition_warehouses = Warehouse.where(is_main: true)
+    @all_products = Product.includes(:warehouse_inventories).order(:name)
   end
 
   def requisition_params
