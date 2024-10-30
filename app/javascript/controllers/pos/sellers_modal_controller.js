@@ -100,7 +100,12 @@ export default class extends Controller {
                   <input type="number" class="seller-percentage w-24 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" max="100" step="1" data-action="input->pos--sellers-modal#handlePercentageUpdate">
                 </td>
                 <td class="py-2 text-center">
-                  <input type="number" class="seller-amount w-28 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" value="0" min="0" step="0.01" data-action="input->pos--sellers-modal#handleAmountUpdate">
+                  <input type="text" 
+                         class="seller-amount w-28 text-center border border-gray-300 rounded dark:bg-slate-700 dark:border-slate-600 dark:text-white" 
+                         value="0.00" 
+                         inputmode="decimal"
+                         pattern="[0-9]*[.]?[0-9]{0,2}"
+                         data-action="input->pos--sellers-modal#handleAmountUpdate">
                 </td>
               </tr>
             `).join('')}
@@ -335,19 +340,27 @@ saveSellers() {
   handleAmountUpdate(event) {
     const input = event.target;
     const sellerId = input.closest('tr').dataset.sellerId;
+    const cursorPosition = input.selectionStart;
     let amount = input.value;
 
-    // Remove any non-numeric characters except for the decimal point
-    amount = amount.replace(/[^\d.]/g, '');
-
-    // Ensure only one decimal point
-    const parts = amount.split('.');
-    if (parts.length > 2) {
-      amount = parts[0] + '.' + parts.slice(1).join('');
+    // Allow decimal numbers with up to 2 decimal places
+    if (!/^\d*\.?\d{0,2}$/.test(amount)) {
+      // If invalid, revert to previous valid value
+      amount = amount.replace(/[^\d.]/g, '');
+      const parts = amount.split('.');
+      if (parts.length > 2) {
+        amount = parts[0] + '.' + parts.slice(1).join('');
+      }
+      if (parts[1]?.length > 2) {
+        amount = parts[0] + '.' + parts[1].slice(0, 2);
+      }
     }
 
     // Update the input value
     input.value = amount;
+    
+    // Restore cursor position
+    input.setSelectionRange(cursorPosition, cursorPosition);
 
     this.updateSellerSelection(sellerId);
     this.updatePercentage(sellerId, amount);
