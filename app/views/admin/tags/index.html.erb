@@ -11,6 +11,7 @@
           <tr>
             <th class="px-4 py-2 text-left">ID</th>
             <th class="px-4 py-2 text-left">Nombre</th>
+            <th class="px-4 py-2 text-left">Padre</th>
             <th class="px-4 py-2 text-left">Familia</th>
             <th class="px-4 py-2 text-left">Visible en Filtros</th>
             <th class="px-4 py-2 text-left">Estado</th>
@@ -22,6 +23,7 @@
             <tr>
               <td class="px-4 py-2"><%= tag.id %></td>
               <td class="px-4 py-2"><%= tag.name %></td>
+              <td class="px-4 py-2"><%= tag.parent_tag.name if tag.parent_tag %></td>
               <td class="px-4 py-2"><%= tag.translated_tag_type.titleize %></td>
               <td class="px-4 py-2"><%= tag.visible_filter ? "Sí" : "No" %></td>
               <td class="px-4 py-2"><%= tag.translated_status.titleize %></td>

@@ -149,8 +149,9 @@ es:
           discount: Descuento
           category: Categoría
           sub_category: Subcategoría
-          volume: Peso / Volumen
-          fragance: Fragancia
+          capacity: Capacidad
+          weight: Peso
+          fragance: Aroma
         status_list:
           active: Activo
           inactive: Inactivo

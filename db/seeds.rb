@@ -37,8 +37,8 @@ region_default = Region.find_or_create_by!(name: 'default')
 
 brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
 brand_2 = Brand.find_or_create_by!(name: 'Otros')
-category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
-category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
+# category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
+# category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
 
 vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti', region: region_default)
 vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price', region: region_default)
@@ -126,7 +126,7 @@ end
 # product_1.product_categories << category_1
 # product_1.product_categories << category_2
 
-tag_1 = Tag.find_or_create_by!(name: 'Nuevas Fragancias')
+# tag_1 = Tag.find_or_create_by!(name: 'Nuevas Fragancias')
 
 # Product.all.each do |product|
 #  WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
@@ -269,6 +269,79 @@ for i in 1..50
 end
 =end
 
-Services::Products::ProductImportService.new("productos_jardin_del_zen.csv", 5).call
-Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
-Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call
+Tag.find_or_create_by!(name: 'Jabones', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Cremas', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Aceites', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Sales de Baño', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Aceites Esenciales', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Aromatizadores', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Colonias Y Perfumes', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Accesorios', tag_type: 'category')
+
+Tag.find_or_create_by!(name: 'Exfoliantes', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Burbujas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones en Barra', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones de Rostro', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones Antique', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones Herbales', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones Aromandina', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones De Glicerina', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Espuma Exfoliante', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones Espumosos', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Antibacteriales', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+# Tag.find_or_create_by!(name: 'Cremas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Cremas'))
+Tag.find_or_create_by!(name: 'Lociones', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Cremas'))
+Tag.find_or_create_by!(name: 'Aceites Nutritivos', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aceites'))
+Tag.find_or_create_by!(name: 'Aceites Para Masajes', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aceites'))
+Tag.find_or_create_by!(name: 'Exfoliantes Oleosos', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aceites'))
+Tag.find_or_create_by!(name: 'Fragancias', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Velas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Difusores', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Inciensos', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Potpourri', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Bamboo', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Sprays', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+Tag.find_or_create_by!(name: 'Cajoneras', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Aromatizadores'))
+# Tag.find_or_create_by!(name: 'Accesorios', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Accesorios'))
+Tag.find_or_create_by!(name: 'Almohadillas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Accesorios'))
+Tag.find_or_create_by!(name: 'Almohadillas Terapéuticas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Accesorios'))
+Tag.find_or_create_by!(name: 'Almohadillas Ensueño', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Accesorios'))
+
+Tag.find_or_create_by!(name: 'Amor', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Felicidad', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Serenidad', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Tranquilidad', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Armonía', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Energía', tag_type: 'fragance')
+Tag.find_or_create_by!(name: 'Hierba Luisa', tag_type: 'fragance')
+Tag.find_or_create_by!(name: '10 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '20 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '30 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '50 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '60 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '100 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '120 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '150 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '173 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '180 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '200 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '240 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '520 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '550 ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '1 lt', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '33 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '60 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '66 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '80 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '100 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '180 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '190 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '200 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '400 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '520 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
+
+
+Services::Products::ProductImportService.new("productos_y_etiquetas_jardin_del_zen.csv", 5).call
+# Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
+# Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call

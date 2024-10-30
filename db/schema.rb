@@ -817,6 +817,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   end
 
   create_table "tags", force: :cascade do |t|
+    t.bigint "parent_tag_id"
     t.string "name", null: false
     t.integer "tag_type", default: 0
     t.boolean "visible_filter", default: false
@@ -824,6 +825,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["name"], name: "index_tags_on_name", unique: true
+    t.index ["parent_tag_id"], name: "index_tags_on_parent_tag_id"
+    t.index ["status"], name: "index_tags_on_status"
+    t.index ["tag_type"], name: "index_tags_on_tag_type"
+    t.index ["visible_filter"], name: "index_tags_on_visible_filter"
   end
 
   create_table "user_attendance_logs", force: :cascade do |t|
@@ -1002,6 +1007,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
   add_foreign_key "suppliers", "regions"
   add_foreign_key "taggings", "products"
   add_foreign_key "taggings", "tags"
+  add_foreign_key "tags", "tags", column: "parent_tag_id"
   add_foreign_key "user_attendance_logs", "locations"
   add_foreign_key "user_attendance_logs", "users"
   add_foreign_key "user_free_products", "loyalty_tiers"

@@ -11,6 +11,25 @@
       </div>
 
       <div>
+        <%= form.input :parent_tag_id, 
+          label: "Padre", 
+          collection: Tag.where(tag_type: "category").map { |tag| [tag.name, tag.id] }, 
+          as: :select,
+          include_blank: "Selecciona una categoría...",
+          input_html: { 
+            class: "form-select", 
+            data: { 
+              controller: "select",
+              select_placeholder_value: "Selecciona una categoría...",
+              select_multi_select_value: false,
+              select_model_value: "tag",
+              tag_form_target: "parent_tag" 
+            } 
+          }, 
+          label_html: { class: "form-label" } %>
+      </div>
+
+      <div>
         <%= form.input :tag_type, 
           label: "Familia", 
           collection: Tag.translated_tag_types.map { |translation, k, _v| [translation.titleize, k] }, 

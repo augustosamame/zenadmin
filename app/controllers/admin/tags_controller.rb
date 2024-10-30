@@ -2,8 +2,8 @@ class Admin::TagsController < Admin::AdminController
   before_action :set_tag, only: [ :edit, :update, :destroy ]
 
   def index
-    @tags = Tag.all
-    @datatable_options = "resource_name:'Tag';create_button:true;hide_0;sort_0_desc;"
+    @tags = Tag.includes(:parent_tag).order(created_at: :desc)
+    @datatable_options = "resource_name:'Tag';create_button:true;hide_0;sort_0_asc;"
   end
 
   def new
@@ -42,6 +42,6 @@ class Admin::TagsController < Admin::AdminController
     end
 
     def tag_params
-      params.require(:tag).permit(:name, :tag_type, :visible_filter, :status)
+      params.require(:tag).permit(:name, :tag_type, :visible_filter, :parent_tag_id, :status)
     end
 end
