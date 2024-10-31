@@ -46,7 +46,7 @@ module Services
           warehouse_inventory.stock += quantity_to_add
           warehouse_inventory.save!
           if line.received_quantity != line.quantity
-            Services::Notifications::CreateNotificationService.new(self, custom_strategy: "PartialStockTransfer").create
+            Services::Notifications::CreateNotificationService.new(stock_transfer, custom_strategy: "PartialStockTransfer").create
           end
           remove_in_transit_record(line) if stock_transfer.aasm.from_state == :in_transit
         end

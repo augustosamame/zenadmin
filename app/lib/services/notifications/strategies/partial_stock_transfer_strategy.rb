@@ -2,6 +2,10 @@ module Services
   module Notifications
     module Strategies
       class PartialStockTransferStrategy < BaseStrategy
+        # we override the notification type to use the correct one
+        def notification_type
+          "stock_transfer_partial_receipt"
+        end
         def title
           "Transferencia de Stock Incompleta #{object_identifier} desde #{origin_warehouse_name} a #{destination_warehouse_name}"
         end

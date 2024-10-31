@@ -207,7 +207,6 @@ export default class extends Controller {
 
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
     const totalDiscountAmount = parseFloat(this.totalDiscountTarget.textContent.replace(/\(S\/\s*|\)/g, ''));
-    const totalOriginalPrice = totalOrderAmount + totalDiscountAmount;
     let totalPayments = 0;
 
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
@@ -275,13 +274,16 @@ export default class extends Controller {
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
     const selectedSellers = JSON.parse(sellersButton.dataset.sellers || '[]');
 
+    console.log('totalOrderAmount', totalOrderAmount);
+    console.log('totalDiscountAmount', totalDiscountAmount);
+
     const orderData = {
       order: {
         stage: 'confirmed',
         user_id: selectedCustomerId,
         total_price: totalOrderAmount,
         total_discount: totalDiscountAmount,
-        total_original_price: totalOriginalPrice,
+        total_original_price: totalOrderAmount + totalDiscountAmount,
         shipping_price: 0,
         currency: 'PEN',
         wants_factura: selectedRuc && isRucChecked,
