@@ -342,6 +342,7 @@ Tag.find_or_create_by!(name: '520 gr', tag_type: 'weight')
 Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
 
 
-Services::Products::ProductImportService.new("productos_y_etiquetas_jardin_del_zen.csv", 5).call
+Services::Products::ProductImportService.new("productos_y_etiquetas_jardin_del_zen.csv").call
 # Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
 # Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call
+Services::Products::InitialStockImportService.new("jardin_del_zen_stock_and_price_report.csv").stock_and_prices
