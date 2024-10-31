@@ -17,12 +17,12 @@ module Services
       def create_products_and_tags
         CSV.foreach(@file_path, headers: true) do |row|
           product_name = row[0]
-          tag_category_name = row[1]
-          tag_sub_category_name = row[2]
-          tag_volume_name = row[3]
-          tag_weight_name = row[4]
-          tag_fragance_name = row[5]
-          tag_other_name = row[6]
+          tag_category_name = row[1].titleize
+          tag_sub_category_name = row[2].titleize
+          tag_volume_name = row[3].titleize
+          tag_weight_name = row[4].titleize
+          tag_fragance_name = row[5].titleize
+          tag_other_name = row[6].titleize
 
           # random_tag_type = Tag.tag_types.keys.sample
 

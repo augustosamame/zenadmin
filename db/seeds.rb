@@ -1,12 +1,4 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+
 setting_1 = Setting.find_or_create_by!(name: 'login_type', data_type: "type_string", internal: true, localized_name: "Tipo de Login", string_value: 'email')
 setting_2 = Setting.find_or_create_by!(name: 'track_inventory', data_type: "type_boolean", internal: true, localized_name: "Medición de Inventarios", boolean_value: true)
 setting_3 = Setting.find_or_create_by!(name: 'admin_2fa_required', data_type: "type_boolean", internal: false, localized_name: "Autenticación de 2 factores requerido para admin", boolean_value: false)
@@ -37,8 +29,7 @@ region_default = Region.find_or_create_by!(name: 'default')
 
 brand_1 = Brand.find_or_create_by!(name: 'Jardín del Zen')
 brand_2 = Brand.find_or_create_by!(name: 'Otros')
-# category_1 = ProductCategory.find_or_create_by!(name: 'Cremas Humectantes')
-# category_2 = ProductCategory.find_or_create_by!(name: 'Cremas Naturales', parent: category_1)
+
 
 vendor_1 = Purchases::Vendor.find_or_create_by!(name: 'Infanti', region: region_default)
 vendor_2 = Purchases::Vendor.find_or_create_by!(name: 'Fisher Price', region: region_default)
@@ -81,60 +72,6 @@ warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
 
 
-=begin
-
-4.times do
-  Product.transaction do
-    # Create a new Product
-    product = Product.new(
-      custom_id: Faker::Alphanumeric.alpha(number: 10),
-      name: Faker::Commerce.product_name,
-      brand_id: Brand.all.sample.id, # Assuming you have some brands in your database
-      description: Faker::Lorem.paragraph(sentence_count: 2),
-      permalink: Faker::Internet.slug,
-      discounted_price_cents: Faker::Number.between(from: 500, to: 90_000),
-      meta_keywords: Faker::Lorem.words(number: 5).join(', '),
-      meta_description: Faker::Lorem.sentence(word_count: 10),
-      stockable: Faker::Boolean.boolean,
-      available_at: Faker::Date.between(from: 2.days.ago, to: Date.current),
-      deleted_at: nil, # or `Faker::Date.between(from: 1.year.ago, to: 1.day.ago)` if you want some deleted products
-      product_order: Faker::Number.between(from: 1, to: 100),
-      status: "active",
-      weight: Faker::Number.decimal(l_digits: 2, r_digits: 2),
-      price_cents: Faker::Number.between(from: 1000, to: 10000),
-      sourceable: vendor_1,
-      brand: brand_1
-    )
-
-    # Attach a remote image URL to the product
-    media = Media.new(
-      file: URI.open(Faker::LoremFlickr.image(size: "300x300", search_terms: [ 'product' ])),  # Replace with your S3 URL
-      media_type: :default_image,  # Or any other media_type
-      mediable: product
-    )
-
-    # Save both product and media together
-    product.save!
-    media.save!
-  end
-end
-
-=end
-
-
-# Associate the product with categories
-# product_1.product_categories << category_1
-# product_1.product_categories << category_2
-
-# tag_1 = Tag.find_or_create_by!(name: 'Nuevas Fragancias')
-
-# Product.all.each do |product|
-#  WarehouseInventory.create!(product: product, warehouse: warehouse_1, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
-# end
-# Product.all.each do |product|
-#  WarehouseInventory.create!(product: product, warehouse: warehouse_2, stock: [ 0, 10, 20, 30, 40, 50 ].sample)
-# end
-
 PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarj Crédito / Débito')
 PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')
 PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
@@ -154,6 +91,10 @@ user1.add_role('super_admin')
 CommissionRange.find_or_create_by!(user: user1, min_sales: 0, max_sales: 2000, commission_percentage: 2, location: location_1, year_month_period: "2024_09_II")
 CommissionRange.find_or_create_by!(user: user1, min_sales: 2000, max_sales: 5000, commission_percentage: 3, location: location_1, year_month_period: "2024_09_II")
 CommissionRange.find_or_create_by!(user: user1, min_sales: 5000, commission_percentage: 4, location: location_1, year_month_period: "2024_09_II")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 0, commission_percentage: 7, location: location_4, year_month_period: "2024_11_I")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 7001, commission_percentage: 9, location: location_4, year_month_period: "2024_11_I")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 9501, commission_percentage: 13, location: location_4, year_month_period: "2024_11_I")
+CommissionRange.find_or_create_by!(user: user1, min_sales: 12001, commission_percentage: 15, location: location_4, year_month_period: "2024_11_I")
 
 useradmin1 = User.create!(email: 'aalvarino@aromaterapia.com.pe', phone: "986976366", login: "aalvarino@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Alicia", last_name: "Alvarino")
 useradmin1.add_role('super_admin')
@@ -234,6 +175,9 @@ invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer3, comprobante_t
 
 invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'factura', prefix: 'F019', next_number: 1)
 invseries7 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'boleta', prefix: 'B019', next_number: 1)
+invseries8 = InvoiceSeries.find_or_create_by!(invoicer: invoicer2, comprobante_type: 'factura', prefix: 'F017', next_number: 1)
+invseries9 = InvoiceSeries.find_or_create_by!(invoicer: invoicer3, comprobante_type: 'boleta', prefix: 'B017', next_number: 1)
+
 
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
@@ -242,6 +186,8 @@ InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: in
 InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries6, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries7, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
 
+InvoiceSeriesMapping.find_or_create_by!(location: location_4, invoice_series: invseries8, payment_method: PaymentMethod.find_by(name: 'card'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_4, invoice_series: invseries9, payment_method: PaymentMethod.find_by(name: 'cash'), default: false)
 NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard_alert: false, email: false })
@@ -260,19 +206,10 @@ LoyaltyTier.find_or_create_by!(name: 'Gold', requirements_orders_count: 30, requ
 LoyaltyTier.find_or_create_by!(name: 'Platinum', requirements_orders_count: 40, requirements_total_amount: 4000, discount_percentage: 0.20, free_product_id: random_products[2])
 LoyaltyTier.find_or_create_by!(name: 'Diamond', requirements_orders_count: 50, requirements_total_amount: 5000, discount_percentage: 0.25, free_product_id: random_products[3])
 
-=begin
-for i in 1..50
-  days_ago = rand(1..30)
-  sales_price_cents = rand(1000..10000)
-  created_time = Time.current - days_ago.days
-  Order.create!(user_id: generic_customer.id, seller_id: storeuser2.id, location_id: location_2.id, total_price_cents: sales_price_cents, total_discount_cents: 0, shipping_price_cents: 0, payment_status: 'paid', created_at: created_time, updated_at: created_time, order_date: created_time)
-end
-=end
-
 Tag.find_or_create_by!(name: 'Jabones', tag_type: 'category')
 Tag.find_or_create_by!(name: 'Cremas', tag_type: 'category')
 Tag.find_or_create_by!(name: 'Aceites', tag_type: 'category')
-Tag.find_or_create_by!(name: 'Sales de Baño', tag_type: 'category')
+Tag.find_or_create_by!(name: 'Sales De Baño', tag_type: 'category')
 Tag.find_or_create_by!(name: 'Aceites Esenciales', tag_type: 'category')
 Tag.find_or_create_by!(name: 'Aromatizadores', tag_type: 'category')
 Tag.find_or_create_by!(name: 'Colonias Y Perfumes', tag_type: 'category')
@@ -280,8 +217,8 @@ Tag.find_or_create_by!(name: 'Accesorios', tag_type: 'category')
 
 Tag.find_or_create_by!(name: 'Exfoliantes', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
 Tag.find_or_create_by!(name: 'Burbujas', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
-Tag.find_or_create_by!(name: 'Jabones en Barra', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
-Tag.find_or_create_by!(name: 'Jabones de Rostro', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones En Barra', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
+Tag.find_or_create_by!(name: 'Jabones De Rostro', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
 Tag.find_or_create_by!(name: 'Jabones Antique', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
 Tag.find_or_create_by!(name: 'Jabones Herbales', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
 Tag.find_or_create_by!(name: 'Jabones Aromandina', tag_type: 'sub_category', parent_tag: Tag.find_by(name: 'Jabones'))
@@ -314,31 +251,31 @@ Tag.find_or_create_by!(name: 'Tranquilidad', tag_type: 'fragance')
 Tag.find_or_create_by!(name: 'Armonía', tag_type: 'fragance')
 Tag.find_or_create_by!(name: 'Energía', tag_type: 'fragance')
 Tag.find_or_create_by!(name: 'Hierba Luisa', tag_type: 'fragance')
-Tag.find_or_create_by!(name: '10 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '20 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '30 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '50 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '60 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '100 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '120 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '150 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '173 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '180 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '200 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '240 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '520 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '550 ml', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '1 lt', tag_type: 'capacity')
-Tag.find_or_create_by!(name: '33 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '60 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '66 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '80 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '100 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '180 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '190 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '200 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '400 gr', tag_type: 'weight')
-Tag.find_or_create_by!(name: '520 gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '10 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '20 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '30 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '50 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '60 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '100 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '120 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '150 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '173 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '180 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '200 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '240 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '520 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '550 Ml', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '1 Lt', tag_type: 'capacity')
+Tag.find_or_create_by!(name: '33 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '60 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '66 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '80 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '100 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '180 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '190 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '200 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '400 Gr', tag_type: 'weight')
+Tag.find_or_create_by!(name: '520 Gr', tag_type: 'weight')
 Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
 
 
