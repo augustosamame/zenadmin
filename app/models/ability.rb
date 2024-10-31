@@ -17,8 +17,6 @@ class Ability
     elsif user.has_role?("supervisor")
       can :manage, :all
     elsif user.has_role?("store_manager")
-
-    elsif user.has_role?("store")
       can :manage, User, roles: { name: "customer" }
       can :read, Customer
       can :read, Location, id: user.location_id
@@ -38,6 +36,8 @@ class Ability
       can :manage, StockTransfer, destination_warehouse: { location_id: user.location_id }
       can :manage, StockTransferLine, stock_transfer: { destination_warehouse: { location_id: user.location_id } }
       can :read, Notification
+    elsif user.has_role?("store")
+      can :manage, :all
     elsif user.has_role?("customer")
       can :read, Customer, user_id: user.id
       can :read, Order, customer_id: user.customer_id
