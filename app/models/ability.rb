@@ -7,6 +7,40 @@ class Ability
     user ||= User.new # guest user (not logged in)
     if user.has_any_role?("admin", "super_admin")
       can :manage, :all
+    elsif user.has_role?("warehouse_manager")
+      can :manage, WarehouseInventory
+      can :manage, StockTransfer
+      can :manage, InTransitStock
+      can :manage, StockTransferLine
+      can :manage, StockTransferPartialReceipt
+      can :manage, StockTransferLineItem
+    elsif user.has_role?("supervisor")
+      can :manage, :all
+    elsif user.has_role?("store_manager")
+
+    elsif user.has_role?("store")
+      can :manage, User, roles: { name: "customer" }
+      can :read, Customer
+      can :read, Location, id: user.location_id
+      can :read, Commission
+      can :read, PaymentMethod
+      can :read, Product
+      can :read, Discount
+      can :read, ProductPack
+      can :manage, Order, location_id: user.location_id
+      can :manage, OrderItem, order: { location_id: user.location_id }
+      can :manage, Cashier, location_id: user.location_id
+      can :manage, CashierShift, cashier: { location_id: user.location_id }
+      can :manage, Payment, order: { location_id: user.location_id }
+      can :manage, Invoice, order: { location_id: user.location_id }
+      can :manage, StockTransfer, origin_warehouse: { location_id: user.location_id }
+      can :manage, StockTransferLine, stock_transfer: { origin_warehouse: { location_id: user.location_id } }
+      can :manage, StockTransfer, destination_warehouse: { location_id: user.location_id }
+      can :manage, StockTransferLine, stock_transfer: { destination_warehouse: { location_id: user.location_id } }
+      can :read, Notification
+    elsif user.has_role?("customer")
+      can :read, Customer, user_id: user.id
+      can :read, Order, customer_id: user.customer_id
     elsif user.has_role?("seller")
       can :read, Product
       can :read, Media

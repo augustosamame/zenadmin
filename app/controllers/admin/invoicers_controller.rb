@@ -2,13 +2,16 @@ class Admin::InvoicersController < Admin::AdminController
   before_action :set_invoicer, only: [ :show, :edit, :update, :destroy ]
 
   def index
+    authorize! :read, Invoicer
     @invoicers = Invoicer.all.order(id: :asc)
   end
 
   def show
+    authorize! :read, @invoicer
   end
 
   def new
+    authorize! :create, Invoicer
     @invoicer = Invoicer.new
   end
 
@@ -22,6 +25,7 @@ class Admin::InvoicersController < Admin::AdminController
   end
 
   def edit
+    authorize! :update, @invoicer
   end
 
   def update
@@ -33,11 +37,13 @@ class Admin::InvoicersController < Admin::AdminController
   end
 
   def destroy
+    authorize! :destroy, @invoicer
     @invoicer.destroy
     redirect_to admin_invoicers_path, notice: "Invoicer was successfully destroyed."
   end
 
   def invoice_series
+    authorize! :read, Invoicer
     @invoicer = Invoicer.find(params[:id])
     render json: @invoicer.invoice_series.map { |series| { id: series.id, prefix: series.prefix } }
   end

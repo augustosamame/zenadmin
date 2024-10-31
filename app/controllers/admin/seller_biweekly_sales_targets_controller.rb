@@ -2,17 +2,21 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   before_action :set_seller_biweekly_sales_target, only: [ :show, :edit, :update, :destroy ]
 
   def index
+    authorize! :read, SellerBiweeklySalesTarget
     @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.all.includes([ :seller, :location ])
   end
 
   def show
+    authorize! :read, @seller_biweekly_sales_target
   end
 
   def new
+    authorize! :create, SellerBiweeklySalesTarget
     @seller_biweekly_sales_target = SellerBiweeklySalesTarget.new
   end
 
   def create
+    authorize! :create, SellerBiweeklySalesTarget
     success = true
 
     if params[:seller_biweekly_sales_target][:targets].present?
@@ -43,6 +47,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def edit
+    authorize! :update, @seller_biweekly_sales_target
     # Find all targets for this seller and period
     @seller_biweekly_sales_targets = SellerBiweeklySalesTarget.includes(:seller).where(
       seller_id: @seller_biweekly_sales_target.seller_id,
@@ -51,6 +56,7 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def update
+    authorize! :update, @seller_biweekly_sales_target
     success = true
 
     # Find all existing targets for this seller and period
@@ -101,11 +107,13 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
   end
 
   def destroy
+    authorize! :destroy, @seller_biweekly_sales_target
     @seller_biweekly_sales_target.destroy
     redirect_to admin_seller_biweekly_sales_targets_path, notice: "Metas Quincenales por Vendedor fueron eliminadas exitosamente."
   end
 
   def seller_data
+    authorize! :read, SellerBiweeklySalesTarget
     seller = User.find(params[:seller_id])
     reference_periods = params[:reference_periods].to_i
     current_period = SellerBiweeklySalesTarget.generate_year_month_period(Date.current)

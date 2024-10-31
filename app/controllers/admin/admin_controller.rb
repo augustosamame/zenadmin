@@ -7,6 +7,13 @@ class Admin::AdminController < ApplicationController
   before_action :force_temp_password_change
   before_action :check_for_admin_login_as_token
 
+  rescue_from CanCan::AccessDenied do |exception|
+    respond_to do |format|
+      format.html { redirect_to admin_sales_dashboard_path, alert: "No tienes permiso para acceder a esta página." }
+      format.json { render json: { error: "Acceso denegado" }, status: :forbidden }
+    end
+  end
+
   def set_current_objects
     @current_location = Location.find_by(id: session[:current_location_id] || current_user&.location_id || Location.first.id)
     session[:current_location_id] = @current_location.id

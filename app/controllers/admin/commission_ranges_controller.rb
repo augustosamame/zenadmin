@@ -2,6 +2,7 @@ class Admin::CommissionRangesController < Admin::AdminController
   before_action :set_commission_range, only: [ :edit, :update, :destroy ]
 
   def index
+    authorize! :read, CommissionRange
     if params[:location_id].present?
       @location = Location.find_by(id: params[:location_id])
       @commission_ranges = @location.commission_ranges.order(:min_sales)
@@ -18,6 +19,7 @@ class Admin::CommissionRangesController < Admin::AdminController
   end
 
   def new
+    authorize! :create, CommissionRange
     @commission_range = CommissionRange.new
     period = Date.today.day <= 15 ? "I" : "II"
     @commission_range.year_month_period = "#{Date.today.strftime('%Y_%m')}_#{period}"
@@ -25,22 +27,26 @@ class Admin::CommissionRangesController < Admin::AdminController
   end
 
   def create
+    authorize! :create, CommissionRange
     @commission_range = CommissionRange.create(commission_range_params)
     redirect_to admin_commission_ranges_path
   end
 
   def edit
+    authorize! :update, @commission_range
     set_commission_range
     @location = @commission_range.location
   end
 
   def update
+    authorize! :update, @commission_range
     set_commission_range
     @commission_range.update(commission_range_params)
     redirect_to admin_commission_ranges_path
   end
 
   def destroy
+    authorize! :destroy, @commission_range
     set_commission_range
     @commission_range.destroy
     redirect_to admin_commission_ranges_path

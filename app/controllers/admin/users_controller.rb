@@ -2,6 +2,7 @@ class Admin::UsersController < Admin::AdminController
   before_action :set_user, only: %i[edit update destroy update_contact_info loyalty_info]
 
   def index
+    authorize! :read, User
     respond_to do |format|
       format.html do
         # @users = User.includes([ :location ]).where(internal: false).where.not(id: Customer.pluck(:user_id))
@@ -24,12 +25,14 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def new
+    authorize! :create, User
     @user = User.new
     @user.build_user_seller_photo
     @user.build_customer
   end
 
   def create
+    authorize! :create, User
     @user = User.new(user_params)
     @user.password = SecureRandom.alphanumeric(8)
     if @user.save
@@ -45,10 +48,12 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def edit
+    authorize! :update, @user
     @user.build_user_seller_photo unless @user.user_seller_photo
   end
 
   def update
+    authorize! :update, @user
     if @user.update(user_params)
       register_face_with_aws(@user)
       redirect_to admin_users_path, notice: "User updated successfully"
@@ -58,6 +63,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def destroy
+    authorize! :destroy, @user
     if @user.destroy
       redirect_to admin_users_path, notice: "User deleted successfully"
     else
@@ -66,6 +72,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def create_customer
+    authorize! :create, User
     user = User.new(user_params)
     user.password = SecureRandom.alphanumeric(8)
     if user.save
@@ -76,6 +83,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def sellers
+    authorize! :read, User
     sellers = User.with_role("seller").where(internal: false, location_id: params[:location_id] || @current_location&.id)
     supervisors = User.with_role("supervisor")
 
@@ -85,6 +93,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def loyalty_info
+    authorize! :read, @user
     if @user.email == "generic_customer@devtechperu.com"
       render json: nil
     else
@@ -94,6 +103,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def update_contact_info
+    authorize! :update, @user
     if @user.update(user_params)
       if params[:order_to_email].present?
         @order = Order.find(params[:order_to_email])
@@ -106,6 +116,7 @@ class Admin::UsersController < Admin::AdminController
   end
 
   def check_roles
+    authorize! :read, User
     user = User.find(params[:id])
     has_role = params[:roles].any? { |role| user.has_role?(role) }
     render json: { has_role: has_role }

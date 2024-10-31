@@ -78,6 +78,7 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def pos
+    authorize! :create, Order
     @order = Order.new
     @can_create_unpaid_orders = $global_settings[:pos_can_create_unpaid_orders]
     if @current_cashier_shift.blank? || @current_cashier_shift.status == "closed"

@@ -2,16 +2,19 @@ class Admin::LocationsController < Admin::AdminController
   before_action :set_location, only: [ :edit, :update, :destroy, :commission_ranges ]
 
   def index
+    authorize! :read, Location
     @locations = Location.all
     @datatable_options = "resource_name:'Location';create_button:true;sort_0_desc;"
   end
 
   def new
+    authorize! :create, Location
     @location = Location.new
     @location.commission_ranges.build
   end
 
   def create
+    authorize! :create, Location
     @location = Location.new(location_params)
     if @location.save
       if params[:location][:commission_ranges_attributes].present?
@@ -30,10 +33,12 @@ class Admin::LocationsController < Admin::AdminController
 end
 
   def edit
+    authorize! :update, @location
     @location.commission_ranges.build if @location.commission_ranges.empty?
   end
 
   def update
+    authorize! :update, @location
     if @location.update(location_params)
       if params[:location][:commission_ranges_attributes].present?
         redirect_to admin_commission_ranges_path(location_id: @location.id)
@@ -55,11 +60,13 @@ end
   end
 
   def destroy
+    authorize! :destroy, @location
     @location.destroy
     redirect_to admin_locations_path
   end
 
   def commission_ranges
+    authorize! :read, @location
     @commission_ranges = @location.commission_ranges
 
     respond_to do |format|
