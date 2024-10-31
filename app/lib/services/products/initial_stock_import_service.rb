@@ -70,12 +70,7 @@ module Services
           stock_transfer.finish_transfer!
         end
         # set price to zero for products with stock 0 in warehouse 1 and price 40
-        product_ids = WarehouseInventory.where(warehouse: warehouse_1, stock: 0)
-                               .joins(:product)
-                               .where(products: { price_cents: 4000 })
-                               .pluck(:product_id)
-
-        Product.where(id: product_ids).update_all(price_cents: 0, discounted_price_cents: 0)
+        Product.where(price_cents: 4000).update_all(price_cents: 0, discounted_price_cents: 0)
       end
 
       def call

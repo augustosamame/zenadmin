@@ -1,7 +1,7 @@
 <%= render "shared/admin/nav", { header_title: "Aplicar Etiquetas en Lote" } %>
 
 <div class="px-4 py-5" data-controller="bulk-tag">
-  <div class="mb-8 overflow-hidden bg-white shadow sm:rounded-lg">
+  <div class="mb-8 bg-white shadow overflow-inherit sm:rounded-lg">
     <div class="px-4 py-5 sm:p-6">
       <%= form_tag apply_bulk_tags_admin_products_path, 
                    method: :post, 
