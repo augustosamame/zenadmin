@@ -4,16 +4,39 @@
 <div class="px-4 mb-16" data-controller="datatable attendance-logs" data-datatable-options-value="<%= @datatable_options %>">
   <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <div class="flex items-center justify-between mb-4">
-      <% if current_user.any_admin_or_supervisor? %>
-        <div>
-          <%= form_tag admin_user_attendance_logs_path, method: :get, class: "flex items-center w-64", data: { action: "change->attendance-logs#refreshTable" } do %>
+      <div class="flex items-center gap-4">
+        <% if current_user.any_admin_or_supervisor? %>
+          <%= form_tag admin_user_attendance_logs_path, method: :get, class: "flex items-center gap-4", 
+              data: { action: "submit->attendance-logs#refreshTable" } do %>
             <%= select_tag :location_id, 
                          options_from_collection_for_select(@locations, :id, :name, params[:location_id]), 
                          prompt: "Todas las ubicaciones",
-                         class: "form-select mr-2" %>
+                         class: "form-select w-[220px] max-w-[220px]",
+                         data: { action: "change->attendance-logs#refreshTable" } %>
+            
+            <div class="flex items-center gap-2">
+              <%= datetime_field_tag :begin_datetime, 
+                                   params[:begin_datetime], 
+                                   class: "form-input",
+                                   placeholder: "Fecha inicial" %>
+              <%= datetime_field_tag :end_datetime, 
+                                   params[:end_datetime], 
+                                   class: "form-input",
+                                   placeholder: "Fecha final" %>
+            </div>
+            
+            <%= submit_tag "Filtrar", class: "btn btn-primary" %>
+            
+            <% if params[:location_id].present? || params[:begin_datetime].present? || params[:end_datetime].present? %>
+              <%= link_to admin_user_attendance_logs_path, 
+                class: "btn btn-secondary w-[300px] max-w-[160px]", 
+                  data: { action: "attendance-logs#removeFilters" } do %>
+                <i class="mr-1 fas fa-times"></i> Quitar Filtros
+              <% end %>
+            <% end %>
           <% end %>
-        </div>
-      <% end %>
+        <% end %>
+      </div>
     </div>
 
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">

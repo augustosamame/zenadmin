@@ -5,22 +5,27 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
   def index
     if current_user.any_admin_or_supervisor?
       locations_ids = Location.all.pluck(:id)
-      @user_attendance_logs = UserAttendanceLog.includes(:user, :location).where(location_id: locations_ids).order(status: :asc)
+      @user_attendance_logs = UserAttendanceLog.includes(:user, :location)
+                                             .where(location_id: locations_ids)
+                                             .order(status: :asc)
     else
       locations_ids = [ current_user.location_id ]
-      @user_attendance_logs = UserAttendanceLog.includes(:user, :location).where(location_id: locations_ids).order(status: :asc)
+      @user_attendance_logs = UserAttendanceLog.includes(:user, :location)
+                                             .where(location_id: locations_ids)
+                                             .order(status: :asc)
     end
+
     @locations = Location.where(id: locations_ids)
 
-    if params[:location_id].present?
-      @user_attendance_logs = @user_attendance_logs.where(location_id: params[:location_id])
-    end
+    # Apply filters
+    @user_attendance_logs = apply_filters(@user_attendance_logs)
 
-    @datatable_options = "server_side:false;resource_name:'UserAttendanceLog';sort_4_asc;sort_1_asc;"
+    @datatable_options = build_datatable_options
 
     respond_to do |format|
       format.html
       format.json { render json: @user_attendance_logs }
+      format.csv { send_data generate_csv, filename: "asistencias_#{Time.current.strftime('%Y%m%d')}.csv" }
     end
   end
 
@@ -242,5 +247,82 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
 
     def set_location
       @location = Location.find(params[:location_id])
+    end
+
+    def apply_filters(scope)
+      scope = scope.where(location_id: params[:location_id]) if params[:location_id].present?
+
+      if params[:begin_datetime].present?
+        scope = scope.where("checkin >= ?", params[:begin_datetime])
+      end
+
+      if params[:end_datetime].present?
+        scope = scope.where("checkin <= ?", params[:end_datetime])
+      end
+
+      scope
+    end
+
+    def build_datatable_options
+      options = [ "server_side:false", "resource_name:'UserAttendanceLog'", "sort_4_asc", "sort_1_asc" ]
+
+      # Build the export URL with current filters
+      export_url = admin_user_attendance_logs_path(format: :csv)
+      export_url += "?#{filter_params.to_query}" if filter_params.present?
+
+      # Add export buttons with filtered data
+      options << "buttons:[
+        'copy',
+        {
+          extend: 'csv',
+          filename: 'asistencias_#{Time.current.strftime('%Y%m%d')}',
+          exportOptions: {
+            columns: ':visible'
+          },
+          action: function(e, dt, button, config) {
+            window.location = '#{export_url}';
+          }
+        },
+        {
+          extend: 'print',
+          exportOptions: {
+            columns: ':visible'
+          },
+          customize: function(win) {
+            // Get the current filtered data
+            var filteredData = dt.rows({ search: 'applied' }).data();
+            // Update the print view to only show filtered data
+            $(win.document.body).find('table tbody tr').each(function(index) {
+              if (index >= filteredData.length) {
+                $(this).remove();
+              }
+            });
+          }
+        }
+      ]"
+
+      options.join(";")
+    end
+
+    def generate_csv
+      require "csv"
+
+      CSV.generate(headers: true) do |csv|
+        csv << [ "Vendedor", "Ubicación", "Hora de Check-in", "Hora de Check-out", "Estado" ]
+
+        @user_attendance_logs.each do |log|
+          csv << [
+            log.user.name,
+            log.location.name,
+            log.checkin.strftime("%d/%m/%Y %H:%M"),
+            log.checkout&.strftime("%d/%m/%Y %H:%M") || "",
+            log.checkout.nil? ? "Activo" : "Cerrado"
+          ]
+        end
+      end
+    end
+
+    def filter_params
+      params.permit(:location_id, :begin_datetime, :end_datetime).to_h
     end
 end
