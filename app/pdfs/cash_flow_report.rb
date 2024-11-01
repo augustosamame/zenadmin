@@ -113,7 +113,7 @@ class CashFlowReport < Prawn::Document
         move_down 10
 
         seller_totals = Commission.joins(:user)
-              .where(created_at: @start_date..@end_date)
+              .where(created_at: start_date..end_date)
               .group("users.id")
               .sum(:sale_amount_cents)
               .transform_values { |cents| cents / 100.0 }  # Convert cents to dollars
