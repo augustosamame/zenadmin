@@ -64,7 +64,14 @@ class Admin::ReportsController < Admin::AdminController
                                     .where(created_at: @date.beginning_of_day..@date.end_of_day)
                                     .where(cashiers: { id: @current_cashier.id })
                                     .order(id: :asc)
-    CashFlowReport.new(@date, @date, @location, @cashier_shifts, @current_cashier, current_user).render
+    @seller_totals = Commission.joins(:user)
+              .where(created_at:  @date.beginning_of_day..@date.end_of_day)
+              .group("users.id")
+              .sum(:sale_amount_cents)
+              .transform_values { |cents| cents / 100.0 }  # Convert cents to dollars
+              .sort_by { |_, total| -total }
+
+    CashFlowReport.new(@date, @date, @location, @cashier_shifts, @current_cashier, current_user, @seller_totals).render
   end
 
   def generate_consolidated_report

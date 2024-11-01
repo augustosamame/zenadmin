@@ -79,6 +79,7 @@ PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectiv
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 PaymentMethod.find_or_create_by!(name: 'miles', description: 'Millas')
+PaymentMethod.find_or_create_by!(name: 'apps', description: 'Rappi / PedidosYa')
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')

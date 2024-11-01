@@ -3,13 +3,14 @@ require "prawn/table"
 
 class CashFlowReport < Prawn::Document
   include AdminHelper
-  def initialize(start_date, end_date, location, cashier_shifts, current_cashier, current_user)
+  def initialize(start_date, end_date, location, cashier_shifts, current_cashier, current_user, seller_totals)
     @start_date = start_date
     @end_date = end_date
     @location = location
     @cashier_shifts = cashier_shifts
     @current_cashier = current_cashier
     @current_user = current_user
+    @seller_totals = seller_totals
     @content_height = measure_content
     super(page_size: [ 222, @content_height + 10 ], margin: [ 5, 5, 5, 5 ]) # Add a small buffer
     generate_content
@@ -31,6 +32,7 @@ class CashFlowReport < Prawn::Document
       start_date = @start_date
       end_date = @end_date
       cashier_shifts = @cashier_shifts
+      seller_totals = @seller_totals
       location = @location
       current_cashier = @current_cashier
       current_user = @current_user
@@ -111,17 +113,6 @@ class CashFlowReport < Prawn::Document
         move_down 20
         text "Total de Ventas por Vendedor:", size: 10, style: :bold
         move_down 10
-
-        seller_totals = Commission.joins(:user)
-              .where(created_at: start_date..end_date)
-              .group("users.id")
-              .sum(:sale_amount_cents)
-              .transform_values { |cents| cents / 100.0 }  # Convert cents to dollars
-              .sort_by { |_, total| -total }
-
-        Rails.logger.info("Seller totals: #{seller_totals}")
-        Rails.logger.info("Start date: #{start_date}")
-        Rails.logger.info("End date: #{end_date}")
 
         seller_totals.each do |seller_id, total|
           seller = User.find(seller_id)
