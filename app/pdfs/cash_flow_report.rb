@@ -119,6 +119,10 @@ class CashFlowReport < Prawn::Document
               .transform_values { |cents| cents / 100.0 }  # Convert cents to dollars
               .sort_by { |_, total| -total }
 
+        Rails.logger.info("Seller totals: #{seller_totals}")
+        Rails.logger.info("Start date: #{start_date}")
+        Rails.logger.info("End date: #{end_date}")
+
         seller_totals.each do |seller_id, total|
           seller = User.find(seller_id)
           text "#{seller.name}: S/ #{sprintf("%.2f", total)}", size: 9
