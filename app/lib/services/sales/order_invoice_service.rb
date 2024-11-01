@@ -58,6 +58,8 @@ module Services
         }
 
         response = Integrations::Nubefact.new.emitir_comprobante(invoice_data_hash.to_json)
+        Rails.logger.info("Response: #{response.parsed_response}")
+        Rails.logger.info("Response text: #{response.parsed_response["response_text"]}")
 
         invoice = Invoice.new(
             order: @order,
