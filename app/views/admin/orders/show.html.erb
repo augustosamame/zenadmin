@@ -107,6 +107,7 @@
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tx #</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
@@ -115,6 +116,7 @@
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= friendly_date(current_user, payment.created_at) %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.payment_method.description %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(payment.amount) %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.processor_transacion_id %></td>
           </tr>
         <% end %>
       </tbody>

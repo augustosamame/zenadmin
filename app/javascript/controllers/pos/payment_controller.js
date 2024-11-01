@@ -147,7 +147,7 @@ export default class extends Controller {
   <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
 `;
 
-    if (methodName === "card") {
+    if (methodName === "card" || methodName === "wallet") {
       gridColumns = 'grid-cols-[2fr_2fr_1fr_auto]';
       innerHtml = `
     <span class="self-center mr-2 w-full">${method}</span>
@@ -258,7 +258,7 @@ export default class extends Controller {
         payable_type: 'Order',
       };
 
-      if (paymentMethod === 'card') {
+      if (paymentMethod === 'card' || paymentMethod === 'wallet') {
         const txInput = paymentElement.querySelector('.tx-input');
         if (txInput) {
           payment.processor_transacion_id = txInput.value;
