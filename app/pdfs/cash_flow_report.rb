@@ -99,6 +99,8 @@ class CashFlowReport < Prawn::Document
         move_down 10
       end
       move_down 10
+      text "Total: S/ #{sprintf("%.2f", global_totals.values.sum)}", size: 10, style: :bold
+      move_down 10
       text "Totales por medio de pago:", size: 10, style: :bold
       move_down 5
       global_totals.each do |payment_method, total|
