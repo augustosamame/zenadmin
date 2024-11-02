@@ -48,7 +48,7 @@ export default class extends Controller {
       stateSave: true,
       ordering: true,
       fixedHeader: true,
-      responsive: true,
+      responsive: false,
       processing: true,
       language: { url: languageUrl },
       pagingType: 'simple_numbers',
@@ -58,7 +58,9 @@ export default class extends Controller {
         top2Start: { buttons: [] },
         top2End: { buttons: ['csv', 'print'] }
       },
-      order: []
+      order: [],
+      scrollX: true,  // Add this option
+      scrollCollapse: true  // Add this option
     };
   }
 
