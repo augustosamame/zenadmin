@@ -10,6 +10,9 @@ application.register("attendance-form", AttendanceFormController)
 import AttendanceLogsController from "./attendance_logs_controller"
 application.register("attendance-logs", AttendanceLogsController)
 
+import AutoSubmitController from "./auto_submit_controller"
+application.register("auto-submit", AutoSubmitController)
+
 import BulkTagController from "./bulk_tag_controller"
 application.register("bulk-tag", BulkTagController)
 

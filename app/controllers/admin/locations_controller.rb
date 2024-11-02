@@ -30,7 +30,7 @@ class Admin::LocationsController < Admin::AdminController
         render :new, status: :unprocessable_entity
       end
     end
-end
+  end
 
   def edit
     authorize! :update, @location
@@ -72,6 +72,42 @@ end
     respond_to do |format|
       format.json { render json: @commission_ranges }
     end
+  end
+
+  def sales_targets
+    authorize! :read, Location
+    @locations = current_user.any_admin_or_supervisor? ? Location.all : [ @current_location ]
+    @current_chosen_location = params[:location_id].present? ? Location.find(params[:location_id]) : @current_location
+    @current_period = CommissionRange.current_year_month_period
+
+    # Get commission ranges for current location
+    @commission_ranges = @current_chosen_location.commission_ranges
+      .where(year_month_period: @current_period)
+      .order(:min_sales)
+
+    # Get date range for current period
+    date_range = SellerBiweeklySalesTarget.period_datetime_range(@current_period)
+
+    # Calculate total sales for current period
+    @total_sales = Order.all
+      .where(location: @current_chosen_location)
+      .where(order_date: date_range[0]..date_range[1])
+      .sum(:total_price_cents) / 100.0
+
+    # Find active commission range based on total sales
+    @active_commission_range = CommissionRange.find_commission_for_sales(
+      @total_sales,
+      @current_chosen_location,
+      Date.current
+    )
+
+    # Get seller targets for current period
+    @seller_targets = SellerBiweeklySalesTarget
+      .includes(:seller)
+      .where(location: @current_chosen_location, year_month_period: @current_period)
+      .order("users.first_name, users.last_name")
+
+    @total_seller_target = @seller_targets.sum(:sales_target_cents) / 100.0
   end
 
   private

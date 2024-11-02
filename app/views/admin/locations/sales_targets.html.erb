@@ -1,0 +1,87 @@
+<%= render "shared/admin/nav", { header_title: "Metas de Ventas - #{@current_chosen_location.name}" } do %>
+  <% if current_user.any_admin_or_supervisor? %>
+    <div class="flex items-center space-x-4">
+      <%= form_tag sales_targets_admin_locations_path, method: :get, class: "flex items-center space-x-2 w-56" do %>
+        <%= select_tag :location_id, 
+            options_from_collection_for_select(@locations, :id, :name, @current_chosen_location.id),
+            class: "form-select rounded-md border-gray-300",
+            data: { 
+              controller: "auto-submit"
+            } %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <%# Commission Ranges Section %>
+  <div class="p-6 mb-8 bg-white rounded-lg shadow">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold">Rangos de Comisión</h2>
+      <div class="text-right">
+        <p class="text-sm text-gray-600">Ventas Totales del Periodo</p>
+        <p class="text-2xl font-bold text-primary-600"><%= format_currency(@total_sales) %></p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rango Mínimo</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Rango Máximo</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Comisión %</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @commission_ranges.each do |range| %>
+            <tr class="<%= 'bg-green-50' if range == @active_commission_range %>">
+              <td class="px-6 py-4"><%= format_currency(range.min_sales) %></td>
+              <td class="px-6 py-4"><%= range.max_sales ? format_currency(range.max_sales) : 'Sin límite' %></td>
+              <td class="px-6 py-4"><%= number_to_percentage(range.commission_percentage, precision: 2) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%# Seller Targets Section %>
+  <div class="p-6 bg-white rounded-lg shadow">
+    <div class="flex items-center justify-between mb-6">
+      <h2 class="text-xl font-semibold">Meta de Tienda</h2>
+      <div class="text-right">
+        <p class="text-sm text-gray-600">Meta Total para el Periodo</p>
+        <p class="text-2xl font-bold text-primary-600"><%= format_currency(@total_seller_target) %></p>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Vendedor</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Meta de Ventas</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Comisión Meta</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @seller_targets.each do |target| %>
+            <tr>
+              <td class="px-6 py-4"><%= target.seller.name %></td>
+              <td class="px-6 py-4"><%= format_currency(target.sales_target) %></td>
+              <td class="px-6 py-4"><%= number_to_percentage(target.target_commission, precision: 2) %></td>
+              <td class="px-6 py-4">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                  <%= target.completed? ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+                  <%= target.translated_status %>
+                </span>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

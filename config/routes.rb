@@ -85,6 +85,9 @@ Rails.application.routes.draw do
       member do
         get :commission_ranges
       end
+      collection do
+        get :sales_targets
+      end
     end
     resources :commission_ranges
     resources :seller_biweekly_sales_targets do

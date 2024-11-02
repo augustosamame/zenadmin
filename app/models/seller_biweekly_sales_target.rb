@@ -47,6 +47,28 @@ class SellerBiweeklySalesTarget < ApplicationRecord
     end
   end
 
+  def self.period_datetime_range(period)
+    year = period.split("_")[0].to_i
+    month = period.split("_")[1].to_i
+    period_number = period.split("_")[2]
+
+    date = Date.new(year, month, 1)
+
+    if period_number == "I"
+      # First period: 1st to 15th
+      [
+        date.beginning_of_month.beginning_of_day,
+        (date.beginning_of_month + 14.days).end_of_day
+      ]
+    else
+      # Second period: 16th to end of month
+      [
+        (date.beginning_of_month + 15.days).beginning_of_day,
+        date.end_of_month.end_of_day
+      ]
+    end
+  end
+
   def self.previous_year_month_period
     current_date = Date.current
 
