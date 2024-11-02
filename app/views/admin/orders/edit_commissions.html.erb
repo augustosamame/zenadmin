@@ -1,0 +1,7 @@
+<%= render "shared/admin/nav", { header_title: "Editar Comisiones - Venta ##{@order.custom_id}" } do %>
+  <%= link_to "Volver a Venta", admin_order_path(@order), class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <%= render 'commission_form' %>
+</div>

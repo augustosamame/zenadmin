@@ -42,3 +42,16 @@
 [data-item-already-discounted="true"] span {
   @apply text-blue-600;
 }
+
+.ts-dropdown {
+  z-index: 100 !important;
+}
+
+.ts-wrapper {
+  position: relative !important;
+  z-index: 50 !important;
+}
+
+.ts-wrapper.focus {
+  z-index: 51 !important;
+}

@@ -125,7 +125,14 @@
 
   <!-- Sellers -->
   <div class="mt-8">
-    <h4 class="mb-4 text-lg font-medium text-gray-900">Vendedores</h4>
+    <div class="flex items-center justify-between mb-4">
+      <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
+      <% if current_user.any_admin_or_supervisor? %>
+        <%= link_to "Modificar Comisiones", 
+                    edit_admin_order_path(@order), 
+                    class: "btn btn-primary" %>
+      <% end %>
+    </div>
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -146,4 +153,5 @@
         <% end %>
       </tbody>
     </table>
+  </div>
 </div>

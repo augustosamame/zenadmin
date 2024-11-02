@@ -220,7 +220,7 @@ saveSellers() {
     const percentage = parseFloat(row.querySelector('.seller-percentage').value) || 0;
     const amount = parseFloat(row.querySelector('.seller-amount').value) || 0;
 
-    return { id, percentage, amount };
+    return { id, user_id: id, percentage, amount };
   });
 
   const totalPercentage = sellers.reduce((sum, seller) => sum + seller.percentage, 0);

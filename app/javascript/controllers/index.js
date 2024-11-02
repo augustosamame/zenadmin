@@ -103,6 +103,9 @@ application.register("nested-form", NestedFormController)
 import ObjectActionsDropdownController from "./object_actions_dropdown_controller"
 application.register("object-actions-dropdown", ObjectActionsDropdownController)
 
+import OrderCommissionFormController from "./order_commission_form_controller"
+application.register("order-commission-form", OrderCommissionFormController)
+
 import OrderShowController from "./order_show_controller"
 application.register("order-show", OrderShowController)
 

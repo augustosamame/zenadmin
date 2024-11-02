@@ -104,24 +104,35 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def edit
-    @order = Order.includes(commissions: :user).find(params[:id])
-    @commissions = @order.commissions
+    @order = Order.includes(:commissions).find(params[:id])
+    render :edit_commissions
   end
 
   def update
     @order = Order.includes(commissions: :user).find(params[:id])
-    if @order.update(order_params)
-      Services::Sales::OrderCommissionService.new(@order).recalculate_commissions
+
+    # Filter out any empty or zero percentage commissions
+    filtered_params = order_params
+    if filtered_params[:commissions_attributes].present?
+      filtered_params[:commissions_attributes].reject! do |_, commission|
+        commission[:percentage].to_f.zero? || commission[:user_id].blank?
+      end
+    end
+
+    if Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(
+      filtered_params[:commissions_attributes]&.values || []
+    )
       redirect_to admin_order_path(@order), notice: "Comisiones actualizadas exitosamente."
     else
-      render :edit, status: :unprocessable_entity
+      flash.now[:error] = "Error al actualizar las comisiones."
+      render :edit_commissions, status: :unprocessable_entity
     end
   end
 
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id ], sellers_attributes: [ :id, :percentage ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :currency, :status, :user_id, :order_id ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id

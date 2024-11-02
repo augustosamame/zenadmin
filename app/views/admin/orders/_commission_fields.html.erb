@@ -1,0 +1,62 @@
+<div class="relative flex items-center justify-between mb-4 space-x-6 nested-fields" 
+     data-order-commission-form-target="line"
+     style="overflow: visible;">
+  <div class="flex items-center flex-shrink-0" style="position: relative; z-index: 50;">
+    <%= f.label :user_id, "Vendedor", class: "form-label mr-2 w-24 text-right" %>
+    <select data-controller="select"
+            data-select-model-value="User"
+            data-select-multi-select-value="false"
+            data-select-placeholder-value="Selecciona un vendedor"
+            name="<%= f.object_name %>[user_id]" 
+            class="w-72 form-input"
+            style="position: relative;">
+      <option value="">Selecciona un vendedor</option>
+      <% User.with_role(:seller).each do |user| %>
+        <option value="<%= user.id %>" <%= 'selected' if f.object.user_id == user.id %>><%= user.name %></option>
+      <% end %>
+    </select>
+  </div>
+
+  <div class="flex items-center space-x-6">
+    <div class="flex items-center flex-shrink-0">
+      <%= f.label :percentage, "% Venta", class: "form-label mr-2 w-20 text-right" %>
+      <%= f.number_field :percentage, 
+          class: "form-input w-24",
+          step: "0.01",
+          min: "0",
+          max: "100",
+          data: {
+            action: "input->order-commission-form#updateAmount",
+            order_commission_form_target: "percentageInput"
+          } %>
+    </div>
+
+    <div class="flex items-center flex-shrink-0">
+      <%= f.label :sale_amount, "Monto", class: "form-label mr-2 w-20 text-right" %>
+      <%= f.number_field :sale_amount, 
+          class: "form-input w-36",
+          step: "0.01",
+          min: "0",
+          data: {
+            action: "input->order-commission-form#updatePercentage",
+            order_commission_form_target: "amountInput"
+          } %>
+    </div>
+  </div>
+
+  <%= f.hidden_field :_destroy %>
+
+  <div class="flex items-center flex-shrink-0 space-x-2">
+    <button type="button" class="p-2 text-red-500 hover:text-red-700" data-action="click->order-commission-form#removeCommission">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+      </svg>
+    </button>
+    
+    <button type="button" class="p-2 text-green-500 hover:text-green-700" data-action="click->order-commission-form#addCommission">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+      </svg>
+    </button>
+  </div>
+</div>

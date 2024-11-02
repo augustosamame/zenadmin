@@ -5,33 +5,43 @@ module Services
         @order = order
       end
 
-      def calculate_and_save_commissions(sellers_hash)
-        # If any commissions for this order are already paid out, skip the calculation
-        return if @order.commissions.joins(:commission_payout).exists?
+      def calculate_and_save_commissions(sellers_array)
+        return false if sellers_array.blank?
+        return false if @order.commissions.joins(:commission_payout).exists?
 
-        @order.commissions.destroy_all
+        ActiveRecord::Base.transaction do
+          @order.commissions.destroy_all
 
-        sellers = sellers_hash
+          sellers_array.each do |seller_data|
+            next if seller_data[:percentage].to_f.zero? || seller_data[:user_id].blank?
 
-        sellers.each do |seller_data|
-          seller_comission_percentage = CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: @order.location).sales_on_month_for_location, @order.location, @order.order_date)&.commission_percentage || 0
+            seller_commission_percentage = CommissionRange.find_commission_for_sales(
+              Services::Queries::SalesSearchService.new(location: @order.location).sales_on_month_for_location,
+              @order.location,
+              @order.order_date
+            )&.commission_percentage || 0
 
-          seller_id = seller_data[:user_id] || seller_data[:id]
-          percentage = seller_data[:percentage]
-          seller = User.find(seller_id)
-          sale_amount_cents = @order.total_price_cents * (percentage.to_f / 100)
+            seller = User.find(seller_data[:user_id])
+            percentage = seller_data[:percentage].to_f
 
-          amount_cents = ((sale_amount_cents * (seller_comission_percentage / 100))/1.18)
+            sale_amount_cents = (@order.total_price_cents * (percentage / 100.0)).round
+            amount_cents = ((sale_amount_cents * (seller_commission_percentage / 100.0)) / 1.18).round
 
-          Commission.create!(
-            user: seller,
-            order: @order,
-            sale_amount_cents: sale_amount_cents,
-            amount_cents: amount_cents,
-            percentage: percentage,
-            status: @order.paid? ? :status_order_paid : :status_order_unpaid
-          )
+            new_commission = Commission.create!(
+              user: seller,
+              order: @order,
+              sale_amount_cents: sale_amount_cents,
+              amount_cents: amount_cents,
+              percentage: percentage,
+              status: @order.paid? ? :status_order_paid : :status_order_unpaid
+            )
+          end
         end
+
+        true
+      rescue => e
+        Rails.logger.error "Error calculating commissions: #{e.message}"
+        false
       end
 
       # run this to calculate up to date commission amounts as the location commission rate may have changed if they reached a different range
