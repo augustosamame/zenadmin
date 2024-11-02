@@ -53,6 +53,7 @@ Rails.application.routes.draw do
         get "pos"
       end
     end
+    resources :payments, only: [ :index ]
     resources :payment_methods
     resources :users do
       member do

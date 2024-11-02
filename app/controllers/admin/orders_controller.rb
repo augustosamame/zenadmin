@@ -52,7 +52,7 @@ class Admin::OrdersController < Admin::AdminController
       if @order.save!
         if order_params[:payments_attributes]
           order_params[:payments_attributes].each do |payment|
-            @order.payments.create!(payment.merge(payable: @order, cashier_shift: @current_cashier_shift))
+            @order.payments.create!(payment.merge(payable: @order, cashier_shift: @current_cashier_shift, status: @order.origin == "pos" ? "paid" : "pending"))
           end
         end
         if order_params[:sellers_attributes].present?

@@ -11,6 +11,9 @@ class Payment < ApplicationRecord
   belongs_to :region
   belongs_to :payable, polymorphic: true, autosave: true, required: true
   belongs_to :cashier_shift
+  has_one :cashier, through: :cashier_shift
+  has_one :location, through: :cashier
+  belongs_to :order, optional: true
   has_one :cashier_transaction, as: :transactable, dependent: :destroy
 
   enum :status, { pending: 0, paid: 1, partially_paid: 2, cancelled: 3 }
@@ -24,6 +27,9 @@ class Payment < ApplicationRecord
   before_validation :set_payment_date
 
   after_create :create_cashier_transaction
+
+  scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
+
 
   def set_payment_date
     self.payment_date = Time.zone.now if self.payment_date.nil?
