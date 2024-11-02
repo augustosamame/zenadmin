@@ -1,15 +1,13 @@
 <div class="relative flex items-center justify-between mb-4 space-x-6 nested-fields" 
-     data-order-commission-form-target="line"
-     style="overflow: visible;">
-  <div class="flex items-center flex-shrink-0" style="position: relative; z-index: 50;">
+     data-order-commission-form-target="line">
+  <div class="flex items-center flex-shrink-0">
     <%= f.label :user_id, "Vendedor", class: "form-label mr-2 w-24 text-right" %>
     <select data-controller="select"
             data-select-model-value="User"
             data-select-multi-select-value="false"
             data-select-placeholder-value="Selecciona un vendedor"
             name="<%= f.object_name %>[user_id]" 
-            class="w-72 form-input"
-            style="position: relative;">
+            class="w-72 form-input">
       <option value="">Selecciona un vendedor</option>
       <% User.with_role(:seller).each do |user| %>
         <option value="<%= user.id %>" <%= 'selected' if f.object.user_id == user.id %>><%= user.name %></option>

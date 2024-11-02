@@ -43,15 +43,33 @@
   @apply text-blue-600;
 }
 
+/* Tom Select */
+
 .ts-dropdown {
-  z-index: 100 !important;
+  z-index: 1000 !important;
+  /* Increased z-index */
 }
 
 .ts-wrapper {
   position: relative !important;
-  z-index: 50 !important;
+  z-index: auto !important;
+  /* Changed from 50 to auto */
 }
 
 .ts-wrapper.focus {
-  z-index: 51 !important;
+  z-index: 1001 !important;
+  /* Higher than dropdown */
+}
+
+/* Add this new style for the nested fields container */
+.nested-fields {
+  position: relative;
+  z-index: auto;
+  /* Let z-index stack naturally */
+}
+
+/* Add this to ensure focused selects appear above others */
+.nested-fields:focus-within {
+  z-index: 1002 !important;
+  /* Higher than both dropdown and wrapper */
 }
