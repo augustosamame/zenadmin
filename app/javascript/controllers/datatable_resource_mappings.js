@@ -111,5 +111,10 @@ export const resourceMappings = {
     buttonText: "Crear Pack de Productos",
     buttonUrl: "/admin/product_packs/new",
     ajaxUrl: "/admin/product_packs.json"
+  },
+  Payment: {
+    buttonText: "Crear Pago",
+    buttonUrl: "/admin/payments/new",
+    ajaxUrl: "/admin/payments.json"
   }
 }

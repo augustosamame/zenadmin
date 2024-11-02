@@ -36,7 +36,14 @@ class Payment < ApplicationRecord
   end
 
   def description
-    "Pago de #{payable_type.underscore.humanize} #{payable_id}"
+    payable_name = case payable_type.underscore
+    when "order"
+      "Venta #{payable&.custom_id}"
+    else
+      "#{payable_type.underscore.humanize} #{payable&.custom_id}"
+    end
+
+    "Pago de #{payable_name}"
   end
 
   def payable_attributes=(attributes)
