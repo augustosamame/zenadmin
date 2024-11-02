@@ -4,27 +4,45 @@ module Services
       def initialize(location: nil, seller: nil, date_range: nil, year_month_period: nil)
         @location = location
         @seller = seller
-        @date_range = date_range || (Time.current.beginning_of_month..Time.current.end_of_month) # Default to current month
         @year_month_period = year_month_period
       end
 
-      def sales_on_month_for_location
-        @sales_on_month_for_location = Order.where(location: @location, created_at: @date_range).where.not(status: :pending).sum(:total_price_cents) / 100
-      end
-
       def sales_for_period_and_seller
-        return 0 unless @seller && @year_month_period
+        return [] unless @seller && @year_month_period
         start_date, end_date = date_range_for_period(@year_month_period)
-        Order.active.paid.where(seller: @seller, created_at: start_date.beginning_of_day..end_date.end_of_day)
-             .sum(:total_price_cents)
+
+        Commission.joins(order: :location)
+          .where(user: @seller)
+          .where(orders: { created_at: start_date.beginning_of_day..end_date.end_of_day })
+          .where(orders: { status: :active, payment_status: :paid })
+          .group(:location_id, "locations.name")
+          .pluck("orders.location_id", "locations.name", "SUM(orders.total_price_cents)")
+          .map do |location_id, location_name, total_cents|
+            {
+              location_id: location_id,
+              location_name: location_name,
+              seller_sales: total_cents
+            }
+          end
       end
 
-      def sales_for_period_and_location(location = nil)
-        location ||= @location
-        return 0 unless location && @year_month_period
+      def sales_for_period_and_location(locations)
+        return {} unless locations.any? && @year_month_period
         start_date, end_date = date_range_for_period(@year_month_period)
-        Order.active.paid.where(location: location, created_at: start_date.beginning_of_day..end_date.end_of_day)
-             .sum(:total_price_cents)
+
+        Order.active.paid
+          .where(location_id: locations)
+          .where(created_at: start_date.beginning_of_day..end_date.end_of_day)
+          .group(:location_id)
+          .sum(:total_price_cents)
+      end
+
+      def sales_on_month_for_location
+        return 0 unless @location
+        Order.active.paid
+          .where(location: @location)
+          .where(created_at: @date_range)
+          .sum(:total_price_cents)
       end
 
       private

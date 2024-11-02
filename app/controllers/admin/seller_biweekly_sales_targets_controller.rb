@@ -126,12 +126,24 @@ class Admin::SellerBiweeklySalesTargetsController < Admin::AdminController
         next if year_month_period >= current_period # Skip current and future periods
 
         sales_service = Services::Queries::SalesSearchService.new(seller: seller, year_month_period: year_month_period)
-        data << {
-          year_month_period: year_month_period,
-          sales: sales_service.sales_for_period_and_seller,
-          location_name: seller&.location&.name,
-          location_sales: sales_service.sales_for_period_and_location(seller.location)
-        }
+        seller_sales_by_location = sales_service.sales_for_period_and_seller
+
+        # Get all location IDs where seller had sales
+        location_ids = seller_sales_by_location.map { |s| s[:location_id] }
+
+        # Get total sales for each location
+        location_total_sales = sales_service.sales_for_period_and_location(location_ids)
+
+        # Combine the data
+        seller_sales_by_location.each do |location_data|
+          data << {
+            year_month_period: year_month_period,
+            location_id: location_data[:location_id],
+            location_name: location_data[:location_name],
+            sales: location_data[:seller_sales],
+            location_sales: location_total_sales[location_data[:location_id]]
+          }
+        end
 
         break if data.size >= reference_periods
       end
