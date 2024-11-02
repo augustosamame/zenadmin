@@ -12,11 +12,13 @@
     
     <div data-discount-form-target="globalFields">
       <%= form.input :discount_percentage, label: "Descuento %", input_html: { class: "form-input", step: 0.01 }, label_html: { class: "form-label" } %>
+      <%= form.input :discount_fixed_amount, label: "Descuento S/", input_html: { class: "form-input", step: 0.01 }, label_html: { class: "form-label" } %>
     </div>
     
     <div data-discount-form-target="groupFields" class="hidden">
       <%= form.input :group_discount_payed_quantity, label: "Cantidad Total", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
       <%= form.input :group_discount_free_quantity, label: "Cantidad que se paga", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+      <%= form.input :group_discount_percentage_off, label: "Descuento %", input_html: { class: "form-input", step: 0.01 }, label_html: { class: "form-label" } %>
     </div>
     
     <%= form.input :start_datetime, label: "Fecha de Inicio", as: :datetime, html5: true, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
@@ -41,7 +43,7 @@
     <div class="mt-8">
       <h3 class="mb-4 text-lg font-semibold">Productos que coinciden</h3>
       <div data-dynamic-product-filter-target="productsTable" data-url="<%= matching_products_admin_discounts_path %>">
-        <%= render 'matching_products', products: Product.none %>
+        <%= render 'matching_products', products: Product.includes(:media).none %>
       </div>
     </div>
   </div>

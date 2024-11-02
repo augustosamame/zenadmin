@@ -144,7 +144,7 @@ class Admin::ProductsController < Admin::AdminController
       total_discount_to_apply = 0
       number_of_qualifying_groups = 0
       applied_discount_counts = Hash.new(0)
-      discounted_product_ids = [] # Track which products received discounts
+      discounted_product_ids = []
 
       current_group_discounts.each do |group_discount|
         applicable_product_ids = group_discount.matching_product_ids
@@ -166,16 +166,24 @@ class Admin::ProductsController < Admin::AdminController
         sorted_items = expanded_items.sort_by { |item| -item["price"] }
         payed_quantity = group_discount.group_discount_payed_quantity
         free_quantity = group_discount.group_discount_free_quantity
+        percentage_off = group_discount.group_discount_percentage_off
 
         while sorted_items.size >= payed_quantity
           group = sorted_items.shift(payed_quantity)
           free_items = group.last(payed_quantity - free_quantity)
           free_items_price = free_items.sum { |item| item["price"] }
 
-          # Add the product IDs that received the discount
-          discounted_product_ids.concat(free_items.map { |item| item["product_id"] })
+          # Calculate discount based on percentage_off or full price
+          discount_amount = if percentage_off.to_i > 0
+                            # Apply percentage discount
+                            free_items_price * (percentage_off / 100.0)
+          else
+                            # Apply full price discount
+                            free_items_price
+          end
 
-          total_discount_to_apply += free_items_price
+          discounted_product_ids.concat(free_items.map { |item| item["product_id"] })
+          total_discount_to_apply += discount_amount
           number_of_qualifying_groups += 1
           applied_discount_counts[group_discount.name] += 1
         end
@@ -190,7 +198,7 @@ class Admin::ProductsController < Admin::AdminController
           number_of_qualifying_groups: number_of_qualifying_groups,
           total_discount_to_apply: total_discount_to_apply,
           applied_discount_names: applied_discount_names,
-          discounted_product_ids: discounted_product_ids.uniq # Send back the unique product IDs
+          discounted_product_ids: discounted_product_ids.uniq
         }
       else
         render json: {
@@ -272,10 +280,20 @@ class Admin::ProductsController < Admin::AdminController
 
     def product_to_json(product, applicable_discounts)
       discount = applicable_discounts.find { |d| d.matching_product_ids.include?(product.id) }
+      original_price = product.price_cents / 100.0
+
       discounted_price = if discount
-        (product.price_cents * (1 - discount.discount_percentage / 100.0) / 100.0).round(2)
+        if discount.discount_percentage.present?
+          # Apply percentage discount
+          (original_price * (1 - discount.discount_percentage / 100.0)).round(2)
+        elsif discount.discount_fixed_amount.present?
+          # Apply fixed amount discount
+          [ original_price - (discount.discount_fixed_amount), 0 ].max.round(2)
+        else
+          original_price
+        end
       else
-        (product.price_cents / 100.0)
+        original_price
       end
 
       {
@@ -283,7 +301,7 @@ class Admin::ProductsController < Admin::AdminController
         custom_id: product.custom_id,
         name: product.name,
         image: product.smart_image(:small),
-        original_price: (product.price_cents / 100.0).to_f,
+        original_price: original_price.to_f,
         discounted_price: discounted_price.to_f,
         price: discounted_price.to_f,
         stock: product.stock(@current_warehouse),

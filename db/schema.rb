@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -268,6 +268,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_10_26_185159) do
     t.integer "matching_product_ids", default: [], array: true
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "group_discount_percentage_off", precision: 5, scale: 2
     t.index ["discount_type"], name: "index_discounts_on_discount_type"
     t.index ["end_datetime"], name: "index_discounts_on_end_datetime"
     t.index ["matching_product_ids"], name: "index_discounts_on_matching_product_ids", using: :gin

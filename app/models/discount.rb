@@ -11,11 +11,24 @@ class Discount < ApplicationRecord
   has_many :discount_filters, dependent: :destroy
   has_many :tags, through: :discount_filters, source: :filterable, source_type: "Tag"
 
+  before_validation :normalize_group_discount_percentage
+
   validates :name, presence: true
-  validates :discount_percentage, presence: true, numericality: { greater_than: 0, less_than_or_equal_to: 100 }, if: :type_global?
+  validates :discount_percentage,
+            numericality: { greater_than: 0, less_than_or_equal_to: 100 },
+            if: -> { type_global? && discount_percentage.present? }
+
+  validates :discount_fixed_amount,
+            numericality: { greater_than: 0 },
+            if: -> { type_global? && discount_fixed_amount.present? }
+
   validates :group_discount_payed_quantity, presence: true, numericality: { greater_than: 0 }, if: :type_group?
   validates :group_discount_free_quantity, presence: true, numericality: { greater_than: 0 }, if: :type_group?
   validate :group_discount_payed_quantity_greater_than_free_quantity, if: :type_group?
+
+  validate :validate_global_discount_type, if: :type_global?
+
+
   validates :start_datetime, presence: true
   validates :end_datetime, presence: true
   validate :end_datetime_after_start_datetime
@@ -40,6 +53,18 @@ class Discount < ApplicationRecord
 
   private
 
+  def normalize_group_discount_percentage
+    if type_group?
+      if group_discount_percentage_off.present?
+        if group_discount_percentage_off >= 100
+          self.group_discount_percentage_off = nil
+        elsif group_discount_percentage_off <= 0
+          self.group_discount_percentage_off = nil
+        end
+      end
+    end
+  end
+
   def end_datetime_after_start_datetime
     return if end_datetime.blank? || start_datetime.blank?
 
@@ -52,5 +77,13 @@ class Discount < ApplicationRecord
     return if group_discount_payed_quantity.blank? || group_discount_free_quantity.blank?
 
     errors.add(:group_discount_payed_quantity, "debe ser mayor que la cantidad que se paga") if group_discount_payed_quantity <= group_discount_free_quantity
+  end
+
+  def validate_global_discount_type
+    if discount_percentage.present? && discount_fixed_amount.present?
+      errors.add(:base, "Solo puede especificar porcentaje de descuento o monto fijo, no ambos")
+    elsif discount_percentage.blank? && discount_fixed_amount.blank?
+      errors.add(:base, "Debe especificar porcentaje de descuento o monto fijo")
+    end
   end
 end

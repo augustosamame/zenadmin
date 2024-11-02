@@ -59,7 +59,7 @@ class Admin::DiscountsController < Admin::AdminController
   end
 
   def discount_params
-    params.require(:discount).permit(:name, :discount_type, :discount_percentage, :group_discount_payed_quantity, :group_discount_free_quantity, :start_datetime, :end_datetime, :status)
+    params.require(:discount).permit(:name, :discount_type, :discount_percentage, :discount_fixed_amount, :group_discount_percentage_off, :group_discount_payed_quantity, :group_discount_free_quantity, :start_datetime, :end_datetime, :status)
   end
 
   def create_or_update_filters

@@ -508,46 +508,53 @@ export default class extends Controller {
     const items = this.itemsTarget.querySelectorAll('div.flex');
 
     if (items.length === 0) {
-      // No items in the order
       this.discountRowTarget.classList.add('hidden');
       this.totalTarget.textContent = 'S/ 0.00';
       return;
     }
 
+    // Calculate subtotal
     items.forEach(item => {
       const itemSubtotalElement = item.querySelector('[data-item-subtotal]');
       if (itemSubtotalElement) {
-        const itemSubtotal = parseFloat(itemSubtotalElement.textContent.replace('S/ ', ''));
-        if (!isNaN(itemSubtotal)) {
-          subtotal += itemSubtotal;
-        }
+        const itemSubtotal = parseFloat(itemSubtotalElement.textContent.replace('S/ ', '')) || 0;
+        subtotal += itemSubtotal;
       }
     });
 
-    const totalComboDiscount = Array.from(this.comboDiscounts.values()).reduce((sum, discount) => sum + discount, 0);
+    // Ensure all discount values are numbers
+    const totalComboDiscount = Array.from(this.comboDiscounts.values())
+      .reduce((sum, discount) => sum + (parseFloat(discount) || 0), 0);
 
-    const subtotalAfterGroupDiscount = subtotal - this.groupDiscountAmount;
+    const groupDiscountAmount = parseFloat(this.groupDiscountAmount) || 0;
+    const subtotalAfterGroupDiscount = subtotal - groupDiscountAmount;
 
     let totalPackDiscount = 0;
     this.packDiscounts.forEach((discount, packId) => {
-      totalPackDiscount += discount.amount;
-      // You might want to display each pack discount separately in the UI
-      // For example:
-      // this.addDiscountRow(`Descuento Pack: ${discount.name}`, discount.amount);
+      totalPackDiscount += parseFloat(discount.amount) || 0;
     });
 
-    // Apply combo discount, pack discount and percentage discount
-    const percentageDiscount = subtotalAfterGroupDiscount * (this.discountPercentage / 100);
-    const totalDiscountAmount = totalComboDiscount + percentageDiscount + this.groupDiscountAmount + totalPackDiscount;
+    // Calculate percentage discount
+    const discountPercentage = parseFloat(this.discountPercentage) || 0;
+    const percentageDiscount = subtotalAfterGroupDiscount * (discountPercentage / 100);
+
+    // Calculate total discount
+    const totalDiscountAmount = (
+      totalComboDiscount +
+      percentageDiscount +
+      groupDiscountAmount +
+      totalPackDiscount
+    );
 
     const totalAfterDiscounts = subtotal - totalDiscountAmount;
 
     // Update discount row
     if (totalDiscountAmount > 0) {
+      console.log('totalDiscountAmount:', totalDiscountAmount);
       this.discountRowTarget.classList.remove('hidden');
       this.discountAmountTarget.textContent = `(S/ ${totalDiscountAmount.toFixed(2)})`;
 
-      if (this.groupDiscountNames.length > 0) {
+      if (this.groupDiscountNames && this.groupDiscountNames.length > 0) {
         const discountNamesString = this.groupDiscountNames.join(', ');
         this.discountNameTarget.textContent = `Descuento: ${discountNamesString}`;
       } else {
@@ -560,16 +567,16 @@ export default class extends Controller {
     // Update total
     this.totalTarget.textContent = `S/ ${totalAfterDiscounts.toFixed(2)}`;
 
-    console.log('Subtotal:', subtotal);
-    console.log('Total Combo Discount:', totalComboDiscount);
-    console.log('Percentage Discount:', percentageDiscount);
-    console.log('Group Discount:', this.groupDiscountAmount);
-    console.log('Total Discount:', totalDiscountAmount);
-    console.log('Total after discounts:', totalAfterDiscounts);
-
-    // Uncomment if you want to dispatch an event with the updated total
-    // const event = new CustomEvent('orderTotalUpdated', { detail: { total: totalAfterDiscounts } });
-    // window.dispatchEvent(event);
+    // Debug logging
+    console.log({
+      subtotal,
+      totalComboDiscount,
+      percentageDiscount,
+      groupDiscountAmount,
+      totalPackDiscount,
+      totalDiscountAmount,
+      totalAfterDiscounts
+    });
   }
 
   addDraftItem(item) {

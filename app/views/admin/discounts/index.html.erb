@@ -29,9 +29,17 @@
             <td class="px-4 py-2"><%= discount.translated_discount_type.titleize %></td>
             <td class="px-4 py-2">
               <% if discount.type_global? %>
-                <%= number_to_percentage(discount.discount_percentage, precision: 2) %>
+                <% if discount.discount_fixed_amount.present? %>
+                  <%= "S/ #{discount.discount_fixed_amount}" %>
+                <% else %>
+                  <%= "#{number_to_percentage(discount.discount_percentage, precision: 2)}" %>
+                <% end %>
               <% elsif discount.type_group? %>
-                <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity}" %>
+                <% if discount.group_discount_percentage_off.present? %>
+                  <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity} con #{number_to_percentage(discount.group_discount_percentage_off, precision: 2)} de descuento" %>
+                <% else %>
+                  <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity}" %>
+                <% end %>
               <% end %>
             </td>
             <td class="px-4 py-2"><%= discount.start_datetime.strftime("%Y-%m-%d %H:%M") %></td>
