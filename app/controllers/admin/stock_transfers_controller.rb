@@ -6,11 +6,19 @@ class Admin::StockTransfersController < Admin::AdminController
       format.html do
         if current_user.any_admin_or_supervisor?
           @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user).order(id: :desc)
+          @default_object_options_array = [
+            { event_name: "show", label: "Ver", icon: "eye" },
+            { event_name: "edit", label: "Editar", icon: "pencil" },
+            { event_name: "delete", label: "Eliminar", icon: "trash" }
+          ]
         else
           @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user)
                                 .where(origin_warehouse: { id: @current_warehouse.id })
                                 .or(StockTransfer.where(destination_warehouse: { id: @current_warehouse.id }))
                                 .order(id: :desc)
+          @default_object_options_array = [
+            { event_name: "show", label: "Ver", icon: "eye" }
+          ]
         end
 
         if @stock_transfers.size > 50

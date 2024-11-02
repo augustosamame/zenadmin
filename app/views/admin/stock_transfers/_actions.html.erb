@@ -9,12 +9,21 @@
       <% default_object_options_array.each do |option| %>
         <li>
           <% if option[:event_name] == 'edit' %>
-            <%= link_to edit_admin_stock_transfer_path(stock_transfer), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
-              <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
-              <span><%= option[:label] %></span>
+            <% if current_user.any_admin? %>
+              <%= link_to edit_admin_stock_transfer_path(stock_transfer), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+                <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                <span><%= option[:label] %></span>
+              <% end %>
             <% end %>
           <% elsif option[:event_name] == 'delete' %>
-            <%= link_to admin_stock_transfer_path(stock_transfer), data: { turbo_method: :delete, turbo_confirm: 'Está seguro?' }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+            <% if current_user.any_admin? %>
+              <%= link_to admin_stock_transfer_path(stock_transfer), data: { turbo_method: :delete, turbo_confirm: 'Está seguro?' }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+                <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+                <span><%= option[:label] %></span>
+              <% end %>
+            <% end %>
+          <% elsif option[:event_name] == 'show' %>
+            <%= link_to admin_stock_transfer_path(stock_transfer), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
               <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
               <span><%= option[:label] %></span>
             <% end %>

@@ -1,0 +1,127 @@
+<% content_for :body_classes, "text-slate-800 dark:bg-slate-900 dark:text-slate-100 bg-white" %>
+
+<%= render "shared/admin/nav", { header_title: "Transferencia de Stock" } %>
+<div class="container px-4 mx-auto my-8">
+  <!-- Header -->
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-slate-900 dark:text-slate-100">
+      <%= @stock_transfer.is_adjustment? ? "Ajuste de Stock" : "Transferencia de Stock" %> 
+      <%= @stock_transfer.custom_id %>
+    </h1>
+  </div>
+
+  <!-- Main Content -->
+  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <!-- Header Section -->
+    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+      <!-- Transfer Date -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Fecha de Traslado</label>
+        <p class="text-slate-900 dark:text-slate-100">
+          <%= friendly_date(current_user, @stock_transfer.transfer_date) %>
+        </p>
+      </div>
+
+      <!-- Origin Warehouse -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">
+          <%= @stock_transfer.is_adjustment? ? "Almacén Ajustado" : "Almacén de Origen" %>
+        </label>
+        <p class="text-slate-900 dark:text-slate-100">
+          <%= @stock_transfer.origin_warehouse&.name || "Inventario Inicial" %>
+        </p>
+      </div>
+
+      <% if @stock_transfer.is_adjustment? %>
+        <!-- Adjustment Type -->
+        <div>
+          <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Tipo de Ajuste</label>
+          <p class="text-slate-900 dark:text-slate-100">
+            <%= @stock_transfer.translated_adjustment_type %>
+          </p>
+        </div>
+      <% else %>
+        <!-- Destination Warehouse -->
+        <div>
+          <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Almacén de Destino</label>
+          <p class="text-slate-900 dark:text-slate-100">
+            <%= @stock_transfer.destination_warehouse&.name %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Additional Info -->
+    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+      <% if $global_settings[:show_sunat_guia_for_stock_transfers] && @stock_transfer.guia.present? %>
+        <div>
+          <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Número de Guía</label>
+          <p class="text-slate-900 dark:text-slate-100"><%= @stock_transfer.guia %></p>
+        </div>
+      <% end %>
+
+      <!-- Status and Stage -->
+      <div>
+        <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Estado</label>
+        <p class="text-slate-900 dark:text-slate-100">
+          <%= @stock_transfer.translated_status %> / <%= translated_stage(@stock_transfer.stage) %>
+        </p>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <% if @stock_transfer.comments.present? %>
+      <div class="mb-6">
+        <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Comentarios</label>
+        <p class="p-3 rounded-lg bg-slate-50 text-slate-900 dark:bg-slate-700/50 dark:text-slate-100">
+          <%= @stock_transfer.comments %>
+        </p>
+      </div>
+    <% end %>
+
+    <!-- Products Section -->
+    <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+      <h2 class="mb-4 text-lg font-medium text-slate-900 dark:text-slate-100">Productos</h2>
+      
+      <div class="overflow-x-auto">
+        <table class="w-full">
+          <thead>
+            <tr class="text-left border-b dark:border-slate-600">
+              <th class="pb-2 font-medium text-slate-700 dark:text-slate-300">Producto</th>
+              <th class="pb-2 font-medium text-slate-700 dark:text-slate-300">Cantidad</th>
+              <% if @stock_transfer.complete? %>
+                <th class="pb-2 font-medium text-slate-700 dark:text-slate-300">Cantidad Recibida</th>
+              <% end %>
+            </tr>
+          </thead>
+          <tbody>
+            <% @stock_transfer.stock_transfer_lines.includes(:product).each do |line| %>
+              <tr class="border-b dark:border-slate-600">
+                <td class="py-3 text-slate-900 dark:text-slate-100">
+                  <%= line.product.name %>
+                </td>
+                <td class="py-3 text-slate-900 dark:text-slate-100">
+                  <%= line.quantity %>
+                </td>
+                <% if @stock_transfer.complete? %>
+                  <td class="py-3 text-slate-900 dark:text-slate-100">
+                    <%= line.received_quantity || line.quantity %>
+                  </td>
+                <% end %>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer Actions -->
+    <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+      <%= link_to "Volver", admin_stock_transfers_path, class: "btn btn-secondary" %>
+      
+      <% if @stock_transfer.pending? %>
+        <%= link_to "Editar", edit_admin_stock_transfer_path(@stock_transfer), class: "btn btn-primary" %>
+      <% end %>
+    </div>
+  </div>
+</div>
