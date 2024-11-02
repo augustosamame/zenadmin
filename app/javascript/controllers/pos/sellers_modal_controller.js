@@ -68,6 +68,12 @@ export default class extends Controller {
 
   buildModalContent(sellers) {
     const totalAmount = this.getTotalAmount();
+    const savedSellers = JSON.parse(document.querySelector('[data-action="click->pos--sellers-modal#open"]').dataset.sellers || '[]');
+    
+    // Calculate already assigned amount
+    const assignedAmount = savedSellers.reduce((sum, seller) => sum + (parseFloat(seller.amount) || 0), 0);
+    const remainingAmount = totalAmount - assignedAmount;
+
     return `
       <div class="container p-4 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
         <div class="mb-4">
@@ -75,7 +81,7 @@ export default class extends Controller {
             Monto total: <span data-pos--sellers-modal-target="totalAmount">S/ ${totalAmount.toFixed(2)}</span>
           </div>
           <div class="text-lg font-semibold text-gray-700 dark:text-gray-300">
-            Monto restante: <span data-pos--sellers-modal-target="remainingAmount">S/ ${totalAmount.toFixed(2)}</span>
+            Monto restante: <span data-pos--sellers-modal-target="remainingAmount">S/ ${remainingAmount.toFixed(2)}</span>
           </div>
         </div>
         <table class="w-full">
@@ -124,12 +130,15 @@ export default class extends Controller {
       const checkbox = row.querySelector('.seller-checkbox');
       checkbox.checked = true;
       const percentageInput = row.querySelector('.seller-percentage');
+      const amountInput = row.querySelector('.seller-amount');
       const savedSeller = savedSellers.find(seller => seller.id === id);
+      
       percentageInput.value = savedSeller.percentage;
-      this.updateAmount(id, savedSeller.percentage);
+      amountInput.value = savedSeller.amount.toFixed(2);
     });
 
     this.updateCommission();
+    this.updateRemainingAmount();
   }
 
   toggleSeller(event) {
