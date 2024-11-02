@@ -12,29 +12,29 @@
                          action: "change->report-date#updateReportDates"
                        } %>
   </div>
-  <div class="flex space-x-4">
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "inline", data: { turbo: false }) do %>
+  <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
+    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
       <%= hidden_field_tag :report_type, "ventas" %>
       <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Ventas", class: "px-4 py-2 bg-primary-500 text-white rounded hover:bg-blue-600 cursor-pointer" %>
+      <%= submit_tag "Reporte de Ventas", class: "w-full sm:w-auto px-4 py-2 bg-primary-500 text-white rounded hover:bg-blue-600 cursor-pointer" %>
     <% end %>
 
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "inline", data: { turbo: false }) do %>
+    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
       <%= hidden_field_tag :report_type, "inventario" %>
       <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Inventario", class: "px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer" %>
+      <%= submit_tag "Reporte de Inventario", class: "w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer" %>
     <% end %>
 
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "inline", data: { turbo: false }) do %>
+    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
       <%= hidden_field_tag :report_type, "caja" %>
       <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Caja", class: "px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 cursor-pointer" %>
+      <%= submit_tag "Reporte de Caja", class: "w-full sm:w-auto px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 cursor-pointer" %>
     <% end %>
 
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "inline", data: { turbo: false }) do %>
+    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
       <%= hidden_field_tag :report_type, "consolidado" %>
       <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte Consolidado", class: "px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer" %>
+      <%= submit_tag "Reporte Consolidado", class: "w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer" %>
     <% end %>
   </div>
 </div>
