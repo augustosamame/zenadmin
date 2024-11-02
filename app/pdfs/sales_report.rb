@@ -81,10 +81,10 @@ class SalesReport < Prawn::Document
 
         move_down 10
         if order.total_discount > 0
-          text "Subtotal: S/ #{sprintf("%.2f", order.original_price)}", size: 9, align: :right, style: :bold
-          move_down 10
+          text "Subtotal: S/ #{sprintf("%.2f", (order.total_price + order.total_discount))}", size: 9, align: :right, style: :bold
+          move_down 5
           text "Descuento: S/ #{sprintf("%.2f", order.total_discount)}", size: 9, align: :right, style: :bold
-          move_down 10
+          move_down 5
           text "Total: S/ #{sprintf("%.2f", order.total_price)}", size: 9, align: :right, style: :bold
         else
           text "Total: S/ #{sprintf("%.2f", order.total_price)}", size: 9, align: :right, style: :bold
