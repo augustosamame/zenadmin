@@ -31,10 +31,10 @@
                 class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
                 data: { 
                   webcam_target: "userIdInput",
-                  controller: "tom-select",
-                  tom_select_options_value: { 
-                    placeholder: "Seleccione un vendedor"
-                  }.to_json,
+                  controller: "select",
+                  select_model_value: "User",
+                  select_multi_select_value: false,
+                  select_placeholder_value: "Seleccione un vendedor",
                   action: "change->attendance-form#checkAttendanceStatus"
                 },
                 disabled: user_attendance_log.persisted?
