@@ -17,6 +17,7 @@
           <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Tipo de Ajuste</th>
           <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Etapa</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
       </thead>
@@ -32,7 +33,8 @@
             <td class="px-4 py-2"><%= stock_transfer.total_products %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, stock_transfer.transfer_date) %></td>
             <td class="px-4 py-2"><%= stock_transfer.adjustment_type %></td>
-            <td class="px-4 py-2"><%= stock_transfer.status %></td>
+            <td class="px-4 py-2"><%= stock_transfer.translated_status %></td>
+            <td class="px-4 py-2"><%= translated_stage(stock_transfer.stage) %></td>
             <td class="px-4 py-2">
               <%= render partial: "admin/stock_transfers/actions", locals: { stock_transfer: stock_transfer, default_object_options_array: @default_object_options_array } %>
               

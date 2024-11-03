@@ -30,6 +30,8 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
   def create
     differences = params[:differences]
     results = params[:results]
+    responsible_user = User.find(params[:responsible_user_id])
+
     if results[:differences_count] == 0
       message = "No se encontraron diferencias en el inventario"
     else
@@ -37,19 +39,21 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     end
 
     stock_transfers = []
+    main_warehouse_id = Warehouse.find_by!(is_main: true).id
 
     differences.each do |difference|
       stock_adjustment = difference[:stock_qty] - difference[:actual_qty]
       if stock_adjustment > 0 # missing stock
         stock_transfer = StockTransfer.create!(
-          user_id: current_user.id,
+          user_id: responsible_user.id,
           comments: "Ajuste de inventario",
           is_adjustment: true,
           adjustment_type: difference[:adjustment_type],
-          stage: :complete,
+          stage: :pending,
           status: :active,
           transfer_date: Time.current,
           origin_warehouse_id: difference[:warehouse_id],
+          # destination_warehouse_id: main_warehouse_id,
           stock_transfer_lines_attributes: [
             {
               product_id: difference[:product_id],
@@ -65,18 +69,19 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
       else
         # extra stock
         stock_transfer = StockTransfer.create!(
-          user_id: current_user.id,
+          user_id: responsible_user.id,
           comments: "Ajuste de inventario",
           is_adjustment: true,
           adjustment_type: difference[:adjustment_type],
-          stage: :complete,
+          stage: :pending,
           status: :active,
           transfer_date: Time.current,
-          destination_warehouse_id: difference[:warehouse_id],
+          origin_warehouse_id: difference[:warehouse_id],
+          # destination_warehouse_id: difference[:warehouse_id],
           stock_transfer_lines_attributes: [
             {
               product_id: difference[:product_id],
-              quantity: stock_adjustment.abs
+              quantity: -(stock_adjustment.abs)
             }
           ]
         )
@@ -88,8 +93,33 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
       end
     end
 
-    Services::Inventory::PeriodicInventoryService.create_manual_snapshot(warehouse: @current_warehouse, user: current_user, stock_transfer_ids: stock_transfers.pluck(:id))
+    Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
+      warehouse: @current_warehouse,
+      user: responsible_user,
+      stock_transfer_ids: stock_transfers.pluck(:id)
+    )
 
-    render partial: "admin/inventory/periodic_inventories/stock_adjustments", locals: { stock_transfers: stock_transfers, message: message }
+    render partial: "admin/inventory/periodic_inventories/stock_adjustments",
+           locals: { stock_transfers: stock_transfers, message: message }
+  end
+
+  def print_inventory_list
+    @products = Product
+      .includes(:warehouse_inventories)
+      .left_joins(:warehouse_inventories)
+      .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
+      .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
+      .order(:name)
+
+    pdf_content = InventoryListReport.new(
+      Time.current,
+      @current_warehouse,
+      @products
+    ).render
+
+    send_data pdf_content,
+      filename: "hoja_inventario_#{Time.current.strftime('%Y_%m_%d')}.pdf",
+      type: "application/pdf",
+      disposition: "inline"
   end
 end

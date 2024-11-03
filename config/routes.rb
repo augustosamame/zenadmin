@@ -103,7 +103,11 @@ Rails.application.routes.draw do
     namespace :inventory do
       get "kardex", to: "kardex#show"
       get "fetch_kardex_movements", to: "kardex#fetch_kardex_movements"
-      resources :periodic_inventories, only: [ :index, :new, :create, :show ]
+      resources :periodic_inventories, only: [ :index, :new, :create, :show ] do
+        collection do
+          post :print_inventory_list
+        end
+      end
     end
 
     resources :stock_transfers do

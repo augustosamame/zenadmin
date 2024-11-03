@@ -5,7 +5,7 @@ class Admin::StockTransfersController < Admin::AdminController
     respond_to do |format|
       format.html do
         if current_user.any_admin_or_supervisor?
-          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user).order(id: :desc)
+          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user).where(is_adjustment: false).order(id: :desc)
           @default_object_options_array = [
             { event_name: "show", label: "Ver", icon: "eye" },
             { event_name: "edit", label: "Editar", icon: "pencil" },
@@ -15,6 +15,7 @@ class Admin::StockTransfersController < Admin::AdminController
           @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user)
                                 .where(origin_warehouse: { id: @current_warehouse.id })
                                 .or(StockTransfer.where(destination_warehouse: { id: @current_warehouse.id }))
+                                .where(is_adjustment: false)
                                 .order(id: :desc)
           @default_object_options_array = [
             { event_name: "show", label: "Ver", icon: "eye" }

@@ -2,7 +2,9 @@ class StockTransferLine < ApplicationRecord
   belongs_to :stock_transfer
   belongs_to :product
 
-  validates :quantity, numericality: { greater_than: 0 }
+  delegate :is_adjustment?, to: :stock_transfer
+
+  validates :quantity, numericality: { greater_than: 0 }, unless: :is_adjustment?
   before_save :set_received_quantity
 
   private

@@ -3,6 +3,7 @@ import axios from "axios"
 
 export default class extends Controller {
   static targets = ["stock", "actualStock", "matchButton", "adjustmentType", "row", "processButton"]
+  static values = { warehouseId: String }
 
   connect() {
     console.log("InventoryController connected")
@@ -39,55 +40,97 @@ export default class extends Controller {
     }
   }
 
-  processInventory(event) {
-    event.preventDefault()
+  getSelectedUserId() {
+    return document.querySelector('select[name="responsible_user_id"]').value
+  }
 
-    const rows = this.rowTargets
-    const differences = []
-
-    for (const row of rows) {
-      const stock = parseInt(row.querySelector("[data-inventory-target='stock']").textContent.trim(), 10)
-      const actualStockInput = row.querySelector("[data-inventory-target='actualStock']")
-      const adjustmentTypeSelect = row.querySelector("[data-inventory-target='adjustmentType']")
-
-      if (!actualStockInput.value) {
-        alert("Debe llenar todos los campos de stock físico")
-        return
-      }
-
-      const actualStock = parseInt(actualStockInput.value, 10)
-      if (stock !== actualStock) {
-        const productId = row.dataset.productId
-        const adjustmentType = adjustmentTypeSelect.value
-
-        differences.push({
-          warehouse_id: this.element.dataset.warehouseId,
-          product_id: productId,
-          stock_qty: stock,
-          actual_qty: actualStock,
-          adjustment_type: adjustmentType
-        })
-      }
+  async processInventory(event) {
+    const userId = this.element.querySelector('select[name="responsible_user_id"]').value
+    if (!userId) {
+      alert("Por favor seleccione un usuario responsable")
+      return
     }
 
-    // add a results object to the differences array
+    const differences = this.rowTargets
+      .filter(row => {
+        const stock = parseInt(row.querySelector("[data-inventory-target='stock']").textContent.trim(), 10)
+        const actualStockInput = row.querySelector("[data-inventory-target='actualStock']")
+        const adjustmentTypeSelect = row.querySelector("[data-inventory-target='adjustmentType']")
+
+        if (!actualStockInput.value) {
+          alert("Debe llenar todos los campos de stock físico")
+          return false
+        }
+
+        const actualStock = parseInt(actualStockInput.value, 10)
+        if (stock !== actualStock) {
+          const productId = row.dataset.productId
+          const adjustmentType = adjustmentTypeSelect.value
+
+          return {
+            warehouse_id: this.element.dataset.warehouseId,
+            product_id: productId,
+            stock_qty: stock,
+            actual_qty: actualStock,
+            adjustment_type: adjustmentType,
+            responsible_user_id: userId
+          }
+        }
+
+        return false
+      })
+      .map(row => {
+        const stock = parseInt(row.querySelector("[data-inventory-target='stock']").textContent.trim(), 10)
+        const actualStockInput = row.querySelector("[data-inventory-target='actualStock']")
+        const adjustmentTypeSelect = row.querySelector("[data-inventory-target='adjustmentType']")
+
+        if (!actualStockInput.value) {
+          alert("Debe llenar todos los campos de stock físico")
+          return false
+        }
+
+        const actualStock = parseInt(actualStockInput.value, 10)
+        if (stock !== actualStock) {
+          const productId = row.dataset.productId
+          const adjustmentType = adjustmentTypeSelect.value
+
+          return {
+            warehouse_id: this.element.dataset.warehouseId,
+            product_id: productId,
+            stock_qty: stock,
+            actual_qty: actualStock,
+            adjustment_type: adjustmentType,
+            responsible_user_id: userId
+          }
+        }
+
+        return false
+      })
+
+    // Add results object back
     const results = {
       warehouse_id: this.element.dataset.warehouseId,
       differences_count: differences.length
     }
 
-    axios.post('/admin/inventory/periodic_inventories', { differences, results }, {
-      headers: {
-        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+    axios.post('/admin/inventory/periodic_inventories', 
+      { 
+        differences, 
+        results,
+        responsible_user_id: userId 
+      }, 
+      {
+        headers: {
+          'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+        }
       }
-    })
-    .then(response => {
-      // Handle the response, e.g., show the table of stock transfers created
-      this.processButtonTarget.classList.add("hidden")
-      document.getElementById('inventory-results').innerHTML = response.data
-    })
-    .catch(error => {
-      console.error('Error processing inventory:', error)
-    })
+    )
+      .then(response => {
+        this.processButtonTarget.classList.add("hidden")
+        document.getElementById('inventory-results').innerHTML = response.data
+      })
+      .catch(error => {
+        console.error('Error processing inventory:', error)
+      })
   }
 }
