@@ -165,7 +165,7 @@ class Admin::DashboardsController < Admin::AdminController
           daily_bars << { x: timestamp, y: sales }  # Changed to show daily sales
         end
 
-        max_commission_range = @commission_ranges.map { |range| range.max_sales || range.min_sales * 1.2 }.max
+        max_commission_range = @commission_ranges.map { |range| range.max_sales || range.min_sales }.max
         max_sales = [ cumulative_sales.last&.dig(:y) || 0, max_commission_range || 0 ].max
         max_y_axis = (max_sales * 1.1).round(-2) # 10% higher than the max value, rounded to nearest 100
 
