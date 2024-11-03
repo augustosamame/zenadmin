@@ -1,5 +1,5 @@
 class NotificationSetting < ApplicationRecord
-  TRIGGER_TYPES = %w[order preorder stock_transfer stock_transfer_partial_receipt requisition].freeze
+  TRIGGER_TYPES = %w[order preorder stock_transfer stock_transfer_partial_receipt missing_stock_periodic_inventory requisition].freeze
 
   validates :trigger_type, presence: true, uniqueness: true, inclusion: { in: TRIGGER_TYPES }
   validates :media, presence: true

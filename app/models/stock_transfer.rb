@@ -11,6 +11,9 @@ class StockTransfer < ApplicationRecord
   has_many :stock_transfer_lines, dependent: :destroy
   has_many :products, through: :stock_transfer_lines
 
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
+
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
   enum :adjustment_type, { devolucion: 0, perdida_o_robo: 1, rotura: 2, venta_incorrecta: 3, otros: 4 }

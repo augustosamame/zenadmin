@@ -1,0 +1,35 @@
+<p>Hola Admin,</p>
+
+<p>Se ha realizado un inventario periódico con diferencias.</p>
+
+<p>El inventario periódico #<%= @periodic_inventory.object_identifier %> tiene diferencias.</p>
+
+<%= spacer(16) %>
+
+<p>Los productos con diferencias son:</p>
+
+<table class="mb-0" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Producto</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Diferencia</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @periodic_inventory.differences.each do |difference| %>
+      <% if difference[:quantity] != 0 %>
+        <tr>
+          <td style="padding: 8px; border: 1px solid #ddd;"><%= difference[:product].name %></td>
+          <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= difference[:quantity] %></td>
+        </tr>
+      <% end %> 
+    <% end %>
+  </tbody>
+</table>
+
+<p>Se han generado ajustes de inventario para los productos con diferencias. Estos ajustes deben ser confirmados por un admin para poder ser aplicados al inventario.</p>
+
+<%= spacer(16) %>
+
+<p>Puede realizar las confirmaciones de ajustes de inventario en el siguiente enlace: <%= link_to "Ajustes de Inventario", index_stock_adjustments_admin_stock_transfers_url, target: "_blank" %></p>
+

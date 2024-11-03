@@ -36,6 +36,8 @@ class Order < ApplicationRecord
 
   has_many :preorders, dependent: :destroy
 
+  has_many :notifications, as: :notifiable, dependent: :destroy
+
   before_create :set_defaults
 
   # Update commissions when the order is marked as paid

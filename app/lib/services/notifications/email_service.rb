@@ -11,7 +11,9 @@ module Services
         when "Order"
           # AdminMailer.with(notification: @notification).order.deliver_now
         when "StockTransfer"
-          AdminMailer.with(notification: @notification).partial_stock_transfer.deliver_now
+          AdminMailer.with(notification: @notification).partial_stock_transfer.deliver_later
+        when "PeriodicInventory"
+          AdminMailer.with(notification: @notification).missing_stock_periodic_inventory.deliver_later
         end
       end
     end

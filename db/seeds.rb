@@ -193,6 +193,7 @@ NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notificat
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer', media: { notification_feed: true, dashboard_alert: false, email: false })
 NotificationSetting.find_or_create_by!(trigger_type: 'stock_transfer_partial_receipt', media: { notification_feed: true, dashboard_alert: true, email: true })
+NotificationSetting.find_or_create_by!(trigger_type: 'missing_stock_periodic_inventory', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'requisition', media: { notification_feed: true, dashboard_alert: true, email: true })
 
 SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: supervisor_1, sales_target_cents: 100000, year_month_period: "2024_08_I", location: location_1, currency: "PEN", target_commission: 5.0)

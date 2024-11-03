@@ -32,12 +32,6 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     results = params[:results]
     responsible_user = User.find(params[:responsible_user_id])
 
-    if results[:differences_count] == 0
-      message = "No se encontraron diferencias en el inventario"
-    else
-      message = "Se han creado #{results[:differences_count]} transferencias de inventario"
-    end
-
     stock_transfers = []
     # main_warehouse_id = Warehouse.find_by!(is_main: true).id
 
@@ -93,11 +87,18 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
       end
     end
 
-    Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
+    periodic_inventory = Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
       warehouse: @current_warehouse,
       user: responsible_user,
       stock_transfer_ids: stock_transfers.pluck(:id)
     )
+
+    if results[:differences_count] == 0
+      message = "No se encontraron diferencias en el inventario"
+    else
+      message = "Se han creado #{results[:differences_count]} ajustes de inventario por las diferencias encontradas"
+      Services::Notifications::CreateNotificationService.new(periodic_inventory, custom_strategy: "MissingStockPeriodicInventory").create
+    end
 
     render partial: "admin/inventory/periodic_inventories/stock_adjustments",
            locals: { stock_transfers: stock_transfers, message: message }

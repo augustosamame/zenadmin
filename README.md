@@ -102,6 +102,23 @@ Our application uses a flexible and extensible notification system to keep users
 5. User Interaction:
    Notifications can be marked as read, clicked, or opened, allowing for tracking of user engagement with notifications.
 
+6. How to create a new notification object?
+
+  create the strategy model
+  add the trigger type to the NotificationSetting model
+  add the notification setting record for the new trigger type
+  add the notifiable relationship to the model that will trigger the notification
+  go into each delivery method service (ex. EmailService) and add the logic to send the notification to the frontend
+
+7. How to send notifications?
+   Notifications are sent by the `CreateNotificationService` service. Example code:
+
+   Services::Notifications::CreateNotificationService.new(stock_transfer, custom_strategy: "PartialStockTransfer").create
+
+   if no custom_strategy is needed:
+
+   Services::Notifications::CreateNotificationService.new(self).create (where self is an Order instance for example)
+
 This architecture provides a scalable and maintainable way to handle notifications across the application, with the flexibility to add new notification types and delivery methods as needed.
 
 * MultiTenancy
