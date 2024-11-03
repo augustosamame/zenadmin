@@ -1,14 +1,26 @@
 class Admin::DashboardsController < Admin::AdminController
   def sales_dashboard
-    @locations = Location.active.order(:name).pluck(:id, :name)
-    @selected_location_id = session[:location_id]
-    if @selected_location_id.present?
-      @selected_location = Location.find_by(id: @selected_location_id)
-      @selected_location_name = @selected_location ? @selected_location.name : "Todas"
-    else
-      @selected_location = nil
-      @selected_location_name = "Todas"
+    # Set current location as default for non-admin users
+    unless current_user.any_admin_or_supervisor?
+      session[:location_id] = @current_location.id
     end
+
+    # Only load locations for admin/supervisor
+    @locations = if current_user.any_admin_or_supervisor?
+      Location.active.order(:name).pluck(:id, :name)
+    else
+      [ [ @current_location.id, @current_location.name ] ]
+    end
+
+    @selected_location_id = session[:location_id]
+    @selected_location = if current_user.any_admin_or_supervisor?
+      Location.find_by(id: @selected_location_id)
+    else
+      @current_location
+    end
+
+    @selected_location_name = @selected_location&.name || "Todas"
+
     set_sales_variables
     set_chart_data
     set_seller_commissions_list
@@ -76,7 +88,8 @@ class Admin::DashboardsController < Admin::AdminController
   end
 
   def set_location
-    @locations = Location.active.order(:name).pluck(:id, :name)
+    return head :forbidden unless current_user.any_admin_or_supervisor?
+
     location_id = params[:location_id]
 
     if location_id.present? && location_id != ""
@@ -105,7 +118,6 @@ class Admin::DashboardsController < Admin::AdminController
           turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_list")
         ]
       end
-      format.html { redirect_to admin_sales_dashboard_path }
     end
   end
 
