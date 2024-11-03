@@ -1,13 +1,26 @@
 # app/controllers/admin/reports_controller.rb
 class Admin::ReportsController < Admin::AdminController
   def reports_form
-    # This action will render the form
+    # Use session date if available, otherwise use params or current date
+    @selected_date = session[:selected_report_date] || params[:date] || Date.current
+    Rails.logger.debug "Reports form loaded with date: #{@selected_date}"
   end
 
   def generate
-    @date = params[:date].present? ? Date.parse(params[:date]) : Date.current
+    # Save the date to session when generating report
+    @date = if params[:date].present?
+      parsed_date = Date.parse(params[:date])
+      session[:selected_report_date] = parsed_date
+      Rails.logger.debug "Saving date to session: #{parsed_date}"
+      parsed_date
+    else
+      Date.current
+    end
+
     @location = params[:location].present? ? params[:location] : @current_location
     report_type = params[:report_type]
+
+    Rails.logger.debug "Generating report for date: #{@date}, type: #{report_type}"
 
     respond_to do |format|
       format.html do
@@ -52,10 +65,11 @@ class Admin::ReportsController < Admin::AdminController
 
   def generate_inventory_report
     @stock_transfers = StockTransfer.where(created_at: @date.beginning_of_day..@date.end_of_day)
-                                   .where(origin_warehouse_id: @current_warehouse.id)
-                                   .includes(:stock_transfer_lines)
-                                   .order(id: :asc)
-    @total_quantity_out = @stock_transfers.joins(:stock_transfer_lines).sum("stock_transfer_lines.quantity")
+                                  .where(origin_warehouse_id: @current_warehouse.id)
+                                  .includes(:stock_transfer_lines)
+                                  .order(id: :asc)
+    @total_quantity_out = @stock_transfers.joins(:stock_transfer_lines)
+                                        .sum("ABS(stock_transfer_lines.quantity)")
     InventoryOutReport.new(@date, @date, @location, @stock_transfers, @total_quantity_out, @current_warehouse, current_user).render
   end
 

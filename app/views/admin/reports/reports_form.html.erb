@@ -6,35 +6,23 @@
   <h1 class="mb-4 text-2xl font-bold">Generar Reportes Diarios</h1>
   <div class="w-48 mb-4">
     <%= label_tag :date, "Seleccionar Fecha:", class: "block text-sm font-medium text-gray-700" %>
-    <%= date_field_tag :date, Date.current, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50", 
-                       data: { 
-                         report_date_target: "date",
-                         action: "change->report-date#updateReportDates"
-                       } %>
+    <%= date_field_tag :date, 
+        @selected_date, 
+        class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50", 
+        data: { 
+          report_date_target: "datePicker",
+          action: "change->report-date#dateChanged"
+        } %>
   </div>
+
   <div class="flex flex-col space-y-4 sm:flex-row sm:space-y-0 sm:space-x-4">
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
-      <%= hidden_field_tag :report_type, "ventas" %>
-      <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Ventas", class: "w-full sm:w-auto px-4 py-2 bg-primary-500 text-white rounded hover:bg-blue-600 cursor-pointer" %>
-    <% end %>
-
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
-      <%= hidden_field_tag :report_type, "inventario" %>
-      <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Inventario", class: "w-full sm:w-auto px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer" %>
-    <% end %>
-
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
-      <%= hidden_field_tag :report_type, "caja" %>
-      <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte de Caja", class: "w-full sm:w-auto px-4 py-2 bg-yellow-500 text-white rounded hover:bg-yellow-600 cursor-pointer" %>
-    <% end %>
-
-    <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
-      <%= hidden_field_tag :report_type, "consolidado" %>
-      <%= hidden_field_tag :date, Date.current, data: { report_date_target: "reportDate" } %>
-      <%= submit_tag "Reporte Consolidado", class: "w-full sm:w-auto px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 cursor-pointer" %>
+    <% ["ventas", "inventario", "caja", "consolidado"].each do |report_type| %>
+      <%= form_tag(admin_reports_generate_path(format: :pdf), method: :post, class: "w-full sm:w-auto", data: { turbo: false }) do %>
+        <%= hidden_field_tag :report_type, report_type %>
+        <%= hidden_field_tag :date, @selected_date, data: { report_date_target: "hiddenDate" } %>
+        <%= submit_tag "Reporte de #{report_type.titleize}", 
+            class: "w-full sm:w-auto px-4 py-2 text-white rounded hover:opacity-80 cursor-pointer #{report_button_class(report_type)}" %>
+      <% end %>
     <% end %>
   </div>
 </div>

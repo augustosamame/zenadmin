@@ -55,9 +55,13 @@ class InventoryOutReport < Prawn::Document
 
       stock_transfers.each do |stock_transfer|
         text_box "Transferencia ##{stock_transfer.custom_id}", size: 10, style: :bold, at: [ 0, cursor ], width: 130
-        text_box "Hora: #{stock_transfer.transfer_date.strftime("%H:%M")}", size: 10, at: [ 130, cursor ], width: 80, align: :right
+        text_box "Hora: #{stock_transfer&.transfer_date&.strftime("%H:%M")}", size: 10, at: [ 130, cursor ], width: 80, align: :right
         move_down 15
-        text_box "Destino: #{stock_transfer.destination_warehouse.name}", size: 8, at: [ 0, cursor ], width: 200
+        if stock_transfer&.is_adjustment?
+          text_box "Ajuste de Inventario", size: 8, at: [ 0, cursor ], width: 200
+        else
+          text_box "Destino: #{stock_transfer&.destination_warehouse&.name}", size: 8, at: [ 0, cursor ], width: 200
+        end
         move_down 15
 
         stock_transfer_lines_data = [ [ "Producto", "Cant" ] ] +
