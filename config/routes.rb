@@ -118,6 +118,7 @@ Rails.application.routes.draw do
         patch :set_to_in_transit
         get :initiate_receive
         post :execute_receive
+        patch :adjustment_stock_transfer_admin_confirm
       end
     end
     resources :in_transit_stocks

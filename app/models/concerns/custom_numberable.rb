@@ -3,12 +3,13 @@ module CustomNumberable
   extend ActiveSupport::Concern
 
   included do
-    before_validation :set_custom_id
+    before_validation :set_custom_id, on: :create
   end
 
   private
 
   def set_custom_id
+    return if self.custom_id.present?
     # Get the record type dynamically from the model class name
     record_type = CustomNumbering.record_type_for_model(self.class.name)
 

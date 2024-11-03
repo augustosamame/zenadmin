@@ -27,7 +27,7 @@ module Services
             sale_amount_cents = (@order.total_price_cents * (percentage / 100.0)).round
             amount_cents = ((sale_amount_cents * (seller_commission_percentage / 100.0)) / 1.18).round
 
-            new_commission = Commission.create!(
+            Commission.create!(
               user: seller,
               order: @order,
               sale_amount_cents: sale_amount_cents,

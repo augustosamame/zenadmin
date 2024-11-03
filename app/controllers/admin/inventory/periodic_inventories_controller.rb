@@ -39,7 +39,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     end
 
     stock_transfers = []
-    main_warehouse_id = Warehouse.find_by!(is_main: true).id
+    # main_warehouse_id = Warehouse.find_by!(is_main: true).id
 
     differences.each do |difference|
       stock_adjustment = difference[:stock_qty] - difference[:actual_qty]

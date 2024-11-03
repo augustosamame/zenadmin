@@ -45,6 +45,13 @@ class Admin::StockTransfersController < Admin::AdminController
         else
           @datatable_options = "resource_name:'StockAdjustment'; sort_0_desc;"
         end
+        if current_user.any_admin_or_supervisor?
+          @default_object_options_array = [
+            { event_name: "confirm", label: "Confirmar", icon: "check" }
+          ]
+        else
+          @default_object_options_array = []
+        end
       end
 
       format.json do
@@ -151,6 +158,25 @@ class Admin::StockTransfersController < Admin::AdminController
     redirect_to admin_stock_transfers_path, notice: "La transferencia de Stock se recibió correctamente."
   rescue ActiveRecord::RecordInvalid => e
     redirect_to initiate_receive_admin_stock_transfer_path(@stock_transfer), alert: "Error al recibir la transferencia de Stock. (#{e.message})"
+  end
+
+  def adjustment_stock_transfer_admin_confirm
+    @stock_transfer = StockTransfer.find(params[:id])
+
+    if @stock_transfer.may_finish_transfer?
+      if @stock_transfer.finish_transfer!
+        flash[:notice] = "El ajuste de inventario fue confirmado exitosamente."
+      else
+        flash[:alert] = "Error al confirmar el ajuste de inventario."
+      end
+    else
+      flash[:alert] = "Este ajuste no puede ser confirmado en su estado actual."
+    end
+
+    respond_to do |format|
+      format.html { redirect_to index_stock_adjustments_admin_stock_transfers_path }
+      format.turbo_stream { render turbo_stream: turbo_stream.append_all("body", "<script>window.location.reload();</script>") }
+    end
   end
 
   private
