@@ -147,7 +147,7 @@ class Admin::DashboardsController < Admin::AdminController
         @commission_ranges = CommissionRange.where(location_id: @selected_location.id).order(:min_sales)
 
         start_date = Date.current.beginning_of_month
-        end_date = Date.current
+        end_date = Date.current + 1.day
 
         daily_sales = filtered_orders.where(order_date: start_date..end_date)
                                     .group("DATE(order_date)")
@@ -165,14 +165,14 @@ class Admin::DashboardsController < Admin::AdminController
           daily_bars << { x: timestamp, y: sales }  # Changed to show daily sales
         end
 
-        max_commission_range = @commission_ranges.map { |range| range.max_sales || range.min_sales * 2 }.max
+        max_commission_range = @commission_ranges.map { |range| range.max_sales || range.min_sales * 1.2 }.max
         max_sales = [ cumulative_sales.last&.dig(:y) || 0, max_commission_range || 0 ].max
         max_y_axis = (max_sales * 1.1).round(-2) # 10% higher than the max value, rounded to nearest 100
 
         @team_goals = {
           series: [
             {
-              name: "Ventas diarias acumuladas",
+              name: "Ventas diarias",
               type: "column",
               data: daily_bars
             },
@@ -184,7 +184,7 @@ class Admin::DashboardsController < Admin::AdminController
           ],
           annotations: {
             yaxis: @commission_ranges.map do |range|
-              target_value = (range.max_sales || range.min_sales * 2).round(2)
+              target_value = (range.max_sales || range.min_sales * 1.2).round(2)
               {
                 y: target_value,
                 borderColor: "#00E396",
