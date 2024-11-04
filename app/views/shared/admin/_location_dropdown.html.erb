@@ -19,7 +19,12 @@
     <% end %>
   </div>
 <% else %>
-  <div class="text-sm text-slate-600">
-    <%= @current_location&.name %>
+  <div class="flex items-center space-x-2 bg-primary-500">
+    <div class="flex items-center space-x-2">
+      <div class="flex items-center px-4 py-2 space-x-2 text-white rounded-lg bg-primary-500">
+        <%= icon "building-storefront", classes: "stroke-current w-4 h-4" %>
+        <span><%= @current_location&.name %></span>
+      </div>
+    </div>
   </div>
 <% end %>

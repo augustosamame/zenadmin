@@ -1,4 +1,5 @@
-<%= render "shared/admin/nav", { header_title: "Pagos - #{@current_location&.name}" } do %>
+<%= render "shared/admin/nav", { header_title: "Pagos#{@current_location ? " - #{@current_location.name}" : ''}" } do %>
+  <%= render "shared/admin/location_dropdown" %>
   <%= render "shared/admin/create_dropdown" %>
 <% end %>
 
@@ -7,6 +8,9 @@
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
+          <% if current_user.any_admin_or_supervisor? %>
+            <th class="px-4 py-2 text-left">Tienda</th>
+          <% end %>
           <th class="px-4 py-2 text-left">Número</th>
           <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Comprador</th>
@@ -21,6 +25,9 @@
       <tbody>
         <% @payments.each do |payment| %>
           <tr>
+            <% if current_user.any_admin_or_supervisor? %>
+              <td class="px-4 py-2"><%= payment&.location&.name %></td>
+            <% end %>
             <td class="px-4 py-2"><%= payment.custom_id %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, payment.payment_date) %></td>
             <td class="px-4 py-2"><%= payment&.payable&.user&.name %></td>
@@ -28,7 +35,7 @@
             <td class="px-4 py-2"><%= format_currency(payment.amount) %></td>
             <td class="px-4 py-2"><%= payment.processor_transacion_id %></td>
             <td class="px-4 py-2"><%= payment.translated_status %></td>
-            <td class="px-4 py-2"><%= payment.payable_type %></td>
+            <td class="px-4 py-2"><%= translated_payable_type(payment.payable_type) %></td>
             <td class="px-4 py-2"><%= payment.payable&.custom_id %></td>
           </tr>
         <% end %>

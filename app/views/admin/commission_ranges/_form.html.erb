@@ -3,7 +3,7 @@
 
   <!-- Location Details -->
   <div class="mb-5">
-    <%= select_tag 'location_id', options_for_select(Location.active.all.collect { |l| [l.name, l.id] }, location.id), prompt: "Select a Location", class: "form-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm", data: { action: 'change->commission-range-form#locationChanged' } %>
+    <%= select_tag 'location_id', options_for_select(Location.active.all.collect { |l| [l.name, l.id] }, location.id), prompt: "Selecciona la Tienda", class: "form-input block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm", data: { action: 'change->commission-range-form#locationChanged' } %>
   </div>
 
   <!-- Hidden Input to Track the Selected Location -->

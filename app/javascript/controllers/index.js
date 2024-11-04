@@ -28,9 +28,6 @@ application.register("combo-select", ComboSelectController)
 import CommissionRangeFormController from "./commission_range_form_controller"
 application.register("commission-range-form", CommissionRangeFormController)
 
-import CommissionRangeIndexController from "./commission_range_index_controller"
-application.register("commission-range-index", CommissionRangeIndexController)
-
 import CustomModalController from "./custom_modal_controller"
 application.register("custom-modal", CustomModalController)
 

@@ -73,6 +73,15 @@ module AdminHelper
     end
   end
 
+  def translated_payable_type(payable_type)
+    case payable_type
+    when "Order"
+      "Venta"
+    else
+      payable_type
+    end
+  end
+
   def seller_comission_percentage(location)
     CommissionRange.find_commission_for_sales(Services::Queries::SalesSearchService.new(location: location).sales_on_month_for_location, location, Time.current)&.commission_percentage || 0
   end

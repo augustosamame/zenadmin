@@ -4,12 +4,14 @@ class Admin::PaymentsController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        if current_user.any_admin_or_supervisor?
-          @payments = Payment.includes(:payment_method, payable: :user).all.order(id: :desc)
+        @payments = if @current_location
+          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+                .joins(cashier_shift: { cashier: :location })
+                .where(cashiers: { location_id: @current_location.id })
+                .order(id: :desc)
         else
-          @payments = Payment.includes(:payment_method, payable: :user)
-                             .for_location(@current_location)
-                             .order(id: :desc)
+          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+                .order(id: :desc)
         end
 
         if @payments.size > 500

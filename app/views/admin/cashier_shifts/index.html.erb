@@ -1,5 +1,5 @@
 <%= render "shared/admin/nav", { header_title: @header_title } do %>
-  <%= link_to 'Abrir Nuevo Turno', new_admin_cashier_shift_path, class: 'btn btn-primary' %>
+  <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
@@ -8,6 +8,9 @@
       <thead>
         <tr>
           <!-- <th class="px-4 py-2 text-left">Cajero</th> -->
+          <% if current_user.any_admin_or_supervisor? %>
+            <th class="px-4 py-2 text-left">Tienda</th>
+          <% end %>
           <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Hora de Inicio</th>
           <th class="px-4 py-2 text-left">Abierto Por</th>
@@ -22,6 +25,9 @@
         <% @cashier_shifts.each do |cashier_shift| %>
           <tr>
             <!-- <td class="px-4 py-2"><%= cashier_shift.cashier.name %></td> -->
+            <% if current_user.any_admin_or_supervisor? %>
+              <td class="px-4 py-2"><%= cashier_shift&.location&.name %></td>
+            <% end %>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.date, false) %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.opened_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.opened_by&.name %></td>

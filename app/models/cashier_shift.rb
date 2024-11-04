@@ -10,6 +10,8 @@ class CashierShift < ApplicationRecord
   has_many :cash_inflows, through: :cashier_transactions, source: :transactable, source_type: "CashInflow"
   has_many :cash_outflows, through: :cashier_transactions, source: :transactable, source_type: "CashOutflow"
 
+  has_one :location, through: :cashier
+
   enum :status, { open: 0, closed: 1 }
   translate_enum :status
 

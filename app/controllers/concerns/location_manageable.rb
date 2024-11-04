@@ -32,7 +32,7 @@ module LocationManageable
 
   def available_locations
     if current_user&.any_admin_or_supervisor?
-      Location.active.order(:name)
+      Location.active.order(:id)
     else
       Location.active.where(id: current_user&.location_id)
     end
