@@ -3,6 +3,7 @@ class Admin::CashierTransactionsController < Admin::AdminController
   before_action :build_transactable, only: [ :new, :create ]
 
   def new
+    @elligible_users = User.with_any_role(:seller, :admin, :super_admin, :supervisor)
   end
 
   def create
@@ -11,6 +12,7 @@ class Admin::CashierTransactionsController < Admin::AdminController
     if @cashier_transaction.save
       redirect_to admin_cashier_shift_path(@cashier_transaction.cashier_shift), notice: "Transaction successfully created."
     else
+      @elligible_users = User.with_any_role(:seller, :admin, :super_admin, :supervisor)
       render :new, status: :unprocessable_entity
     end
   end
