@@ -1,0 +1,25 @@
+<% if current_user.any_admin_or_supervisor? %>
+  <div class="flex items-center space-x-4">
+    <%= form_tag request.path, method: :get, class: "flex items-center space-x-2 w-56" do %>
+      <%= select_tag :location_id,
+          options_from_collection_for_select(@locations, :id, :name, @current_location&.id),
+          { 
+            prompt: (!controller.send(:requires_location_for_current_action?) ? "Todas" : nil),
+            class: "form-select rounded-md border-gray-300",
+            data: { 
+              controller: "location-select",
+              action: "change->location-select#submit"
+            }
+          } %>
+      
+      <%# Preserve existing query parameters %>
+      <% request.query_parameters.except(:location_id).each do |key, value| %>
+        <%= hidden_field_tag key, value %>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="text-sm text-slate-600">
+    <%= @current_location&.name %>
+  </div>
+<% end %>

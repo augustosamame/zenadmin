@@ -10,9 +10,6 @@ application.register("attendance-form", AttendanceFormController)
 import AttendanceLogsController from "./attendance_logs_controller"
 application.register("attendance-logs", AttendanceLogsController)
 
-import AutoSubmitController from "./auto_submit_controller"
-application.register("auto-submit", AutoSubmitController)
-
 import BulkTagController from "./bulk_tag_controller"
 application.register("bulk-tag", BulkTagController)
 
@@ -87,6 +84,9 @@ application.register("invoice-series-mapping", InvoiceSeriesMappingController)
 
 import LoaderController from "./loader_controller"
 application.register("loader", LoaderController)
+
+import LocationSelectController from "./location_select_controller"
+application.register("location-select", LocationSelectController)
 
 import LoyaltyTierFormController from "./loyalty_tier_form_controller"
 application.register("loyalty-tier-form", LoyaltyTierFormController)

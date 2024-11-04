@@ -1,16 +1,5 @@
-<%= render "shared/admin/nav", { header_title: "Metas de Ventas - #{@current_chosen_location.name}" } do %>
-  <% if current_user.any_admin_or_supervisor? %>
-    <div class="flex items-center space-x-4">
-      <%= form_tag sales_targets_admin_locations_path, method: :get, class: "flex items-center space-x-2 w-56" do %>
-        <%= select_tag :location_id, 
-            options_from_collection_for_select(@locations, :id, :name, @current_chosen_location.id),
-            class: "form-select rounded-md border-gray-300",
-            data: { 
-              controller: "auto-submit"
-            } %>
-      <% end %>
-    </div>
-  <% end %>
+<%= render "shared/admin/nav", { header_title: "Metas de Ventas - #{@current_location.name}" } do %>
+  <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
 <div class="container px-4 py-8 mx-auto">

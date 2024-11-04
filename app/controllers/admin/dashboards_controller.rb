@@ -1,25 +1,6 @@
 class Admin::DashboardsController < Admin::AdminController
   def sales_dashboard
-    # Set current location as default for non-admin users
-    unless current_user.any_admin_or_supervisor?
-      session[:location_id] = @current_location.id
-    end
-
-    # Only load locations for admin/supervisor
-    @locations = if current_user.any_admin_or_supervisor?
-      Location.active.order(:name).pluck(:id, :name)
-    else
-      [ [ @current_location.id, @current_location.name ] ]
-    end
-
-    @selected_location_id = session[:location_id]
-    @selected_location = if current_user.any_admin_or_supervisor?
-      Location.find_by(id: @selected_location_id)
-    else
-      @current_location
-    end
-
-    @selected_location_name = @selected_location&.name || "Todas"
+    @selected_location = @current_location
 
     set_sales_variables
     set_chart_data
