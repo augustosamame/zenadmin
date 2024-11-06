@@ -10,10 +10,10 @@ class Admin::OrdersController < Admin::AdminController
             Order.includes([ :invoices, :location ]).all.order(id: :desc)
           end
 
-        if @orders.size > 500
-          @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;"
+        if @orders.size > 1000
+          @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
         else
-          @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;"
+          @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
         end
       end
 

@@ -8,6 +8,7 @@
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
+          <th class="px-4 py-2 text-left">ID</th>
           <% if current_user.any_admin_or_supervisor? %>
             <th class="px-4 py-2 text-left">Tienda</th>
           <% end %>
@@ -30,6 +31,7 @@
       <tbody>
         <% @orders.each do |order| %>
           <tr>
+            <td class="px-4 py-2"><%= order.id %></td>
             <% if current_user.any_admin_or_supervisor? %>
               <td class="px-4 py-2"><%= order.location.name %></td>
             <% end %>
