@@ -224,13 +224,13 @@ class Admin::DashboardsController < Admin::AdminController
 
     def set_sales_daily_average_this_month_variables
       Rails.logger.info("Setting sales daily average variables")
-      days_this_month = Time.days_in_month(Time.zone.now.month)
+      days_so_far_this_month = Time.zone.now.day
       days_last_month = Time.days_in_month(1.month.ago.month)
 
       sales_amount_this_month = (filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0).round(2)
       sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0).round(2)
 
-      @sales_daily_average_this_month = (sales_amount_this_month / days_this_month).round(2)
+      @sales_daily_average_this_month = (sales_amount_this_month / days_so_far_this_month).round(2)
       @sales_daily_average_last_month = (sales_amount_last_month / days_last_month).round(2)
       @sales_daily_average_change_since_last_month = (@sales_daily_average_this_month - @sales_daily_average_last_month).round(2)
       @sales_daily_average_change_since_last_month = format_change(@sales_daily_average_change_since_last_month)
