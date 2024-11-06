@@ -60,7 +60,7 @@ class Admin::OrdersController < Admin::AdminController
           Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
         end
         Services::Inventory::OrderItemService.new(@order).update_inventory
-        GenerateEinvoice.perform_async(@order.id)
+        GenerateEinvoice.perform_async(@order.id) if ENV["RAILS_ENV"] == "production"
 
         session.delete(:draft_order)
         render json: { status: "success", id: @order.id, message: "Order created successfully.", universal_invoice_link: @order.universal_invoice_link, order_data: @order.as_json(include: [ :user ]) }
