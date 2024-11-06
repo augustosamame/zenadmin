@@ -130,9 +130,10 @@ class Admin::DashboardsController < Admin::AdminController
         start_date = Date.current.beginning_of_month
         end_date = Date.current + 1.day
 
-        daily_sales = filtered_orders.where(order_date: start_date..end_date)
-                                    .group("DATE(order_date)")
-                                    .sum(:total_price_cents)
+        orders = filtered_orders.where(order_date: start_date..end_date)
+        daily_sales = orders.map { |order| [ order.order_date.to_date, order.total_price_cents ] }
+                    .group_by { |date, _| date }
+                    .transform_values { |vals| vals.sum { |_, price| price } }
 
         cumulative_sales = []
         daily_bars = []
