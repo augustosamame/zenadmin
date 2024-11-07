@@ -97,7 +97,7 @@ group :development do
   gem "bootstrap-generators", github: "WorkBravely/bootstrap-generators", branch: "master"
   gem "rails-admin-scaffold", github: "augustosamame/rails-admin-scaffold", branch: "master"
 
-  gem "capistrano", "~> 3.19.1", require: false
+  gem "capistrano", "~> 3.19.2", require: false
   gem "capistrano-rails", "~> 1.6.3", require: false
   gem "capistrano-rails-console", require: false
   gem "capistrano-yarn"
