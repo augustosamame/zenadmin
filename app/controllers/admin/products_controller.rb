@@ -346,9 +346,9 @@ class Admin::ProductsController < Admin::AdminController
         custom_id: product.custom_id,
         name: product.name,
         image: product.smart_image(:small),
-        original_price: original_price,
-        discounted_price: discounted_price,
-        price: discounted_price,
+        original_price: original_price.to_f,
+        discounted_price: discounted_price.to_f,
+        price: discounted_price.to_f,
         stock: product.stock(@current_warehouse),
         type: "Product"
       }
