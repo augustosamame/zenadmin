@@ -94,31 +94,78 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def search
-    if params[:query].blank?
-      @products = Product.active.without_tests.includes(:warehouse_inventories).all
-      @combo_products = ComboProduct.all
-      @product_packs = ProductPack.all
+    @results = if params[:query].blank?
+      # Use a union query for better performance
+      base_products = Product.active
+                          .without_tests
+                          .includes(:warehouse_inventories, :media)
+                          .limit(50)
+                          .select("id, 'Product' as type, custom_id, name, price_cents, discounted_price_cents")
+
+      base_combos = ComboProduct.active
+                              .includes(:product_1, :product_2)
+                              .select("id, 'ComboProduct' as type, name, price_cents")
+
+      base_packs = ProductPack.active
+                            .includes(product_pack_items: { tags: { products: :media } })
+                            .select("id, 'ProductPack' as type, name, price_cents")
+
+      [ base_products, base_combos, base_packs ]
+    elsif params[:query].length <= 50
+      # Use materialized index for search
+      products = Product.active
+                      .without_tests
+                      .includes(:warehouse_inventories, :media)
+                      .search_by_custom_id_and_name(params[:query])
+                      .select("id, 'Product' as type, custom_id, name, price_cents, discounted_price_cents")
+
+      combos = ComboProduct.active
+                          .includes(:product_1, :product_2)
+                          .where("name ILIKE ?", "%#{params[:query]}%")
+                          .select("id, 'ComboProduct' as type, name, price_cents")
+
+      packs = ProductPack.active
+                        .includes(product_pack_items: { tags: { products: :media } })
+                        .where("name ILIKE ?", "%#{params[:query]}%")
+                        .select("id, 'ProductPack' as type, name, price_cents")
+
+      [ products, combos, packs ]
     else
-      if params[:query].length <= 50
-        @products = Product.active.without_tests.search_by_custom_id_and_name(params[:query])
-        @combo_products = ComboProduct.where("name ILIKE ?", "%#{params[:query]}%")
-        @product_packs = ProductPack.where("name ILIKE ?", "%#{params[:query]}%")
-      else
-        @products = []
-        @combo_products = []
-        @product_packs = []
-      end
+      [ [], [], [] ]
     end
 
-    # Apply applicable global discounts
-    product_ids = @products.pluck(:id)
-    applicable_discounts = Discount.active.current.type_global.where("matching_product_ids && ARRAY[?]::integer[]", product_ids)
+    # Fetch all necessary data in parallel
+    products, combos, packs = @results
 
-    combined_results = (
-      @products.map { |product| product_to_json(product, applicable_discounts) } +
-      @combo_products.map { |combo| combo_to_json(combo) } +
-      @product_packs.map { |pack| product_pack_to_json(pack) }
-    )
+    # Fetch discounts in parallel for products
+    product_ids = products.map(&:id)
+    applicable_discounts = if product_ids.any?
+      Discount.active
+            .current
+            .type_global
+            .where("matching_product_ids && ARRAY[?]::integer[]", product_ids)
+            .index_by(&:id)
+    else
+      {}
+    end
+
+    # Build response using bulk operations
+    combined_results = []
+
+    # Process products
+    products.each do |product|
+      combined_results << product_to_json(product, applicable_discounts)
+    end
+
+    # Process combos
+    combos.each do |combo|
+      combined_results << combo_to_json(combo)
+    end
+
+    # Process packs
+    packs.each do |pack|
+      combined_results << product_pack_to_json(pack)
+    end
 
     render json: combined_results
   end
@@ -279,16 +326,14 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def product_to_json(product, applicable_discounts)
-      discount = applicable_discounts.find { |d| d.matching_product_ids.include?(product.id) }
       original_price = product.price_cents / 100.0
+      discount = applicable_discounts.values.find { |d| d.matching_product_ids.include?(product.id) }
 
       discounted_price = if discount
         if discount.discount_percentage.present?
-          # Apply percentage discount
           (original_price * (1 - discount.discount_percentage / 100.0)).round(2)
         elsif discount.discount_fixed_amount.present?
-          # Apply fixed amount discount
-          [ original_price - (discount.discount_fixed_amount), 0 ].max.round(2)
+          [ original_price - discount.discount_fixed_amount, 0 ].max.round(2)
         else
           original_price
         end
@@ -301,9 +346,9 @@ class Admin::ProductsController < Admin::AdminController
         custom_id: product.custom_id,
         name: product.name,
         image: product.smart_image(:small),
-        original_price: original_price.to_f,
-        discounted_price: discounted_price.to_f,
-        price: discounted_price.to_f,
+        original_price: original_price,
+        discounted_price: discounted_price,
+        price: discounted_price,
         stock: product.stock(@current_warehouse),
         type: "Product"
       }
@@ -330,33 +375,32 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def combo_to_json(combo)
-      puts "combo: #{combo.inspect}"
       {
         id: combo.id,
         custom_id: "COMBO-#{combo.id}",
         name: combo.name,
-        image: combo.product_1.smart_image(:small),
-        price: combo.price.to_f,
+        image: combo.product_1&.smart_image(:small),
+        price: combo.price_cents / 100.0,
         stock: combo.stock(@current_warehouse),
         type: "ComboProduct",
         combo_details: {
-          normal_price: combo.normal_price.to_f,
-          price: combo.price.to_f,
-          discount: (combo.normal_price - combo.price).to_f,
+          normal_price: combo.normal_price_cents / 100.0,
+          price: combo.price_cents / 100.0,
+          discount: (combo.normal_price_cents - combo.price_cents) / 100.0,
           products: [
             {
-              id: combo.product_1.id,
-              custom_id: combo.product_1.custom_id,
-              name: combo.product_1.name,
+              id: combo.product_1&.id,
+              custom_id: combo.product_1&.custom_id,
+              name: combo.product_1&.name,
               quantity: combo.qty_1,
-              regular_price: combo.product_1.price.to_f
+              regular_price: combo.product_1&.price_cents.to_f / 100.0
             },
             {
-              id: combo.product_2.id,
-              custom_id: combo.product_2.custom_id,
-              name: combo.product_2.name,
+              id: combo.product_2&.id,
+              custom_id: combo.product_2&.custom_id,
+              name: combo.product_2&.name,
               quantity: combo.qty_2,
-              regular_price: combo.product_2.price.to_f
+              regular_price: combo.product_2&.price_cents.to_f / 100.0
             }
           ]
         }
