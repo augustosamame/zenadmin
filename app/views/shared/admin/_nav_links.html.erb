@@ -114,6 +114,11 @@
     <li>
       <%= nav_link_to "Pedidos", send("admin_requisitions_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if current_user.any_admin? %>
+      <li>
+        <%= nav_link_to "Mínimos, Máximos y Factores de Reposición", send("admin_min_max_and_factors_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+    <% end %>
   </ul>
 </li>
 <li data-controller="dropdown" class="relative">

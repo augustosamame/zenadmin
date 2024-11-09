@@ -110,6 +110,8 @@ Rails.application.routes.draw do
       end
     end
 
+    get "min_max_and_factors", to: "min_max_and_factors#index"
+
     resources :stock_transfers do
       collection do
         get "index_stock_adjustments"

@@ -47,7 +47,6 @@
             <td class="px-4 py-2"><%= product.status %></td>
 
             <td class="px-4 py-2">
-              <%= current_user.any_admin? %>
               <%= render "admin/products/actions", product: product, warehouse: @current_warehouse, show_admin_actions: current_user.any_admin? %>
             </td>
             
