@@ -18,7 +18,7 @@
           <span>Ver Kardex</span>
         <% end %>
       </li>
-      <% if current_user.any_admin? %>
+      
         <li>
           <%= link_to edit_admin_product_path(product), class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
             <!-- Inline SVG for the pencil icon -->
@@ -37,7 +37,7 @@
             <span>Eliminar Producto</span>
           <% end %>
         </li>
-      <% end %>
+      
     </ul>
   </div>
 <% end %>
