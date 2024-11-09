@@ -47,7 +47,7 @@
             <td class="px-4 py-2"><%= product.status %></td>
 
             <td class="px-4 py-2">
-              <%= render "admin/products/actions", product: product, warehouse: @current_warehouse %>
+              <%= render "admin/products/actions", product: product, warehouse: @current_warehouse, current_user: current_user %>
             </td>
             
           </tr>
