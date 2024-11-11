@@ -165,4 +165,19 @@ module AdminHelper
       "bg-red-300"    # Rich red
     end
   end
+
+  def translated_requisition_stage(stage)
+    case stage
+    when "req_draft"
+      "Borrador"
+    when "req_submitted"
+      "Enviado"
+    when "req_planned"
+      "Planificado"
+    when "req_pending"
+      "Pendiente"
+    when "req_fulfilled"
+      "Cumplido"
+    end
+  end
 end

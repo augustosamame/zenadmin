@@ -104,11 +104,11 @@ Our application uses a flexible and extensible notification system to keep users
 
 6. How to create a new notification object?
 
-  create the strategy model
-  add the trigger type to the NotificationSetting model
-  add the notification setting record for the new trigger type
-  add the notifiable relationship to the model that will trigger the notification
-  go into each delivery method service (ex. EmailService) and add the logic to send the notification to the frontend
+  a) go to strategies folder and create the strategy for the model (ex. OrderStrategy or a custom strategy if needed: PartialStockTransferStrategy)
+  b) add the trigger type to the NotificationSetting model constant array TRIGGER_TYPES
+  c) create a notification_setting record for the new trigger type
+  d) add the notifiable relationship to the model that will trigger the notification (has_many :notifications, as: :notifiable, dependent: :destroy)
+  e) go into each relevant delivery method service based on the NotificationSetting record (ex. EmailService) and add the logic to send the corresponding notification to the frontend
 
 7. How to send notifications?
    Notifications are sent by the `CreateNotificationService` service. Example code:

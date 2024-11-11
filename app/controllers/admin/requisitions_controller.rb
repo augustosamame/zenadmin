@@ -10,7 +10,7 @@ class Admin::RequisitionsController < Admin::AdminController
         else
           @requisitions = Requisition.where(location: @current_location).includes(:location, :warehouse, :user).order(id: :desc)
         end
-        @datatable_options = "resource_name:'Requisition'; sort_0_desc;"
+        @datatable_options = "resource_name:'Requisition'; sort_0_desc; hide_0;"
       end
 
       format.json do
@@ -20,6 +20,16 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = RequisitionPdf.new(@requisition, current_user)
+        send_data pdf.render,
+                  filename: "pedido_#{@requisition.custom_id}.pdf",
+                  type: "application/pdf",
+                  disposition: "inline"
+      end
+    end
   end
 
   def new
@@ -51,9 +61,44 @@ class Admin::RequisitionsController < Admin::AdminController
     @requisition.user_id = current_user.id
     @requisition.requisition_type = "manual"
 
-    if @requisition.save
-      redirect_to admin_requisitions_path, notice: "El pedido se creó correctamente."
-    else
+    begin
+      Requisition.transaction do
+        if @requisition.save
+          action = params[:commit] || params[:debug_commit_value]
+          Rails.logger.info "Action to perform: #{action}"
+
+          case action
+          when "submit_to_warehouse"
+            Rails.logger.info "Attempting to submit new requisition to warehouse"
+            if @requisition.may_submit?
+              @requisition.submit!
+              Rails.logger.info "Successfully submitted requisition"
+              flash[:notice] = "El pedido se creó y envió al Almacén Principal correctamente."
+            else
+              Rails.logger.error "Cannot submit - current stage: #{@requisition.stage}"
+              raise AASM::InvalidTransition.new("No se puede enviar el pedido en su estado actual")
+            end
+          else
+            Rails.logger.info "Saving as draft"
+            flash[:notice] = "El pedido se guardó como borrador correctamente."
+          end
+
+          redirect_to admin_requisitions_path
+        else
+          Rails.logger.error "Creation failed: #{@requisition.errors.full_messages}"
+          set_locations_and_warehouses
+          render :new, status: :unprocessable_entity
+        end
+      end
+    rescue AASM::InvalidTransition => e
+      Rails.logger.error "AASM transition error: #{e.message}"
+      flash.now[:alert] = e.message
+      set_locations_and_warehouses
+      render :new, status: :unprocessable_entity
+    rescue StandardError => e
+      Rails.logger.error "Unexpected error: #{e.message}"
+      flash.now[:alert] = "Error al crear el pedido: #{e.message}"
+      set_locations_and_warehouses
       render :new, status: :unprocessable_entity
     end
   end
@@ -62,9 +107,58 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def update
-    if @requisition.update(requisition_params)
-      redirect_to admin_requisitions_path, notice: "El pedido se actualizó correctamente."
-    else
+    Rails.logger.info "=== Starting Requisition Update ==="
+    Rails.logger.info "Current requisition stage: #{@requisition.stage}"
+
+    begin
+      Requisition.transaction do
+        permitted_params = requisition_params
+
+        if @requisition.update(permitted_params)
+          Rails.logger.info "Basic update successful"
+          action = params[:commit] || params[:debug_commit_value]
+          Rails.logger.info "Action to perform: #{action}"
+
+          case action
+          when "submit_to_warehouse"
+            Rails.logger.info "Attempting to submit requisition to warehouse"
+            if @requisition.req_draft? && @requisition.may_submit?
+              @requisition.submit!
+              Rails.logger.info "Successfully submitted requisition"
+              flash[:notice] = "Pedido enviado al Almacén Principal correctamente."
+            else
+              Rails.logger.error "Cannot submit - current stage: #{@requisition.stage}"
+              raise AASM::InvalidTransition.new("No se puede enviar el pedido en su estado actual")
+            end
+          when "plan"
+            Rails.logger.info "Attempting to plan requisition"
+            if @requisition.req_submitted? && @requisition.may_plan?
+              @requisition.plan!
+              flash[:notice] = "Pedido planificado correctamente."
+            else
+              raise AASM::InvalidTransition.new("No se puede planificar el pedido en su estado actual")
+            end
+          else
+            Rails.logger.info "No special action requested, normal update"
+            flash[:notice] = "Pedido actualizado correctamente."
+          end
+
+          redirect_to admin_requisitions_path
+        else
+          Rails.logger.error "Update failed: #{@requisition.errors.full_messages}"
+          set_locations_and_warehouses
+          render :edit, status: :unprocessable_entity
+        end
+      end
+    rescue AASM::InvalidTransition => e
+      Rails.logger.error "AASM transition error: #{e.message}"
+      flash.now[:alert] = e.message
+      set_locations_and_warehouses
+      render :edit, status: :unprocessable_entity
+    rescue StandardError => e
+      Rails.logger.error "Unexpected error: #{e.message}"
+      flash.now[:alert] = "Error al actualizar el pedido: #{e.message}"
+      set_locations_and_warehouses
       render :edit, status: :unprocessable_entity
     end
   end
@@ -125,6 +219,24 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def requisition_params
-    params.require(:requisition).permit(:location_id, :warehouse_id, :requisition_date, :comments, :stage, :status, :requisition_type, requisition_lines_attributes: [ :id, :product_id, :automatic_quantity, :presold_quantity, :manual_quantity, :supplied_quantity, :status, :_destroy ])
+    params.require(:requisition).permit(
+      :location_id,
+      :warehouse_id,
+      :requisition_date,
+      :comments,
+      :status,
+      :requisition_type,
+      requisition_lines_attributes: [
+        :id,
+        :product_id,
+        :automatic_quantity,
+        :presold_quantity,
+        :manual_quantity,
+        :planned_quantity,
+        :supplied_quantity,
+        :status,
+        :_destroy
+      ]
+    )
   end
 end

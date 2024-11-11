@@ -27,7 +27,8 @@
       <%= f.number_field :current_stock, 
                         class: "form-input w-16 text-sm no-spinner #{'text-red-600 font-semibold' if f.object.current_stock.to_i < 0}", 
                         step: 1, 
-                        readonly: true, 
+                        readonly: true,
+                        disabled: true,
                         tabindex: -1,
                         value: f.object.current_stock %>
     </div>
@@ -55,8 +56,28 @@
       <%= f.number_field :manual_quantity, 
                         class: "form-input w-16 text-sm no-spinner", 
                         step: 1,
+                        readonly: (!@requisition.req_draft? && !@requisition.req_submitted?),
                         value: f.object.manual_quantity %>
     </div>
+
+    <% if current_user.any_admin_or_warehouse_manager? && !@requisition.req_draft? %>
+
+      <div class="flex items-center justify-end w-1/4">
+        <%= f.label :planned_quantity, "Planificado", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
+        <%= f.number_field :planned_quantity, 
+                          class: "form-input w-16 text-sm no-spinner", 
+                          step: 1,
+                          value: f.object.planned_quantity %>
+      </div>
+    <% elsif @requisition.req_planned? || @requisition.req_pending? || @requisition.req_fulfilled? %>
+      <div class="flex items-center justify-end w-1/4">
+        <%= f.label :planned_quantity, "Planificado", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
+        <%= f.number_field :planned_quantity, 
+                          class: "form-input w-16 text-sm no-spinner", 
+                          readonly: true,
+                          value: f.object.planned_quantity %>
+      </div>
+    <% end %>
 
     <!-- Action Buttons -->
     <div class="flex items-center justify-end w-1/6 space-x-2">

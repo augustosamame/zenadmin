@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_11_002013) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -592,6 +592,26 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
     t.index ["product_id"], name: "index_product_categories_products_on_product_id"
   end
 
+  create_table "product_min_max_period_multipliers", force: :cascade do |t|
+    t.bigint "product_min_max_stock_id", null: false
+    t.string "year_month_period", null: false
+    t.decimal "multiplier", default: "1.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_min_max_stock_id"], name: "idx_on_product_min_max_stock_id_e21693921d"
+  end
+
+  create_table "product_min_max_stocks", force: :cascade do |t|
+    t.bigint "product_id", null: false
+    t.bigint "warehouse_id", null: false
+    t.integer "min_stock"
+    t.integer "max_stock"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_product_min_max_stocks_on_product_id"
+    t.index ["warehouse_id"], name: "index_product_min_max_stocks_on_warehouse_id"
+  end
+
   create_table "product_pack_items", force: :cascade do |t|
     t.bigint "product_pack_id", null: false
     t.integer "quantity", default: 1, null: false
@@ -695,6 +715,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "planned_quantity"
     t.index ["product_id"], name: "index_requisition_lines_on_product_id"
     t.index ["requisition_id"], name: "index_requisition_lines_on_requisition_id"
   end
@@ -704,7 +725,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
     t.bigint "location_id", null: false
     t.bigint "warehouse_id", null: false
     t.string "custom_id", null: false
-    t.string "stage", default: "req_pending"
+    t.string "stage", default: "req_draft"
     t.datetime "requisition_date", null: false
     t.text "comments"
     t.integer "requisition_type", default: 0, null: false
@@ -985,6 +1006,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_02_014713) do
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"
+  add_foreign_key "product_min_max_period_multipliers", "product_min_max_stocks"
+  add_foreign_key "product_min_max_stocks", "products"
+  add_foreign_key "product_min_max_stocks", "warehouses"
   add_foreign_key "product_pack_items", "product_packs"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"

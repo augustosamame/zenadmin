@@ -103,14 +103,14 @@ Rails.application.routes.draw do
     namespace :inventory do
       get "kardex", to: "kardex#show"
       get "fetch_kardex_movements", to: "kardex#fetch_kardex_movements"
+      get "product_min_max_stocks", to: "product_min_max_stocks#index"
+      post "product_min_max_stocks", to: "product_min_max_stocks#create"
       resources :periodic_inventories, only: [ :index, :new, :create, :show ] do
         collection do
           post :print_inventory_list
         end
       end
     end
-
-    get "min_max_and_factors", to: "min_max_and_factors#index"
 
     resources :stock_transfers do
       collection do

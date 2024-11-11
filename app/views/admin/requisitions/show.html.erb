@@ -31,11 +31,11 @@
         </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Etapa</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @requisition.stage %></dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= translated_requisition_stage(@requisition.stage) %></dd>
         </div>
         <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Estado</dt>
-          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @requisition.status %></dd>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @requisition.translated_status %></dd>
         </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Comentarios</dt>
@@ -54,20 +54,20 @@
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Automática</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Prevendida</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Manual</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Suministrada</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Pedida</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Planificada</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
-        <% @requisition.requisition_lines.each do |line| %>
+        <% @requisition.requisition_lines.includes(:product).each do |line| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.product.name %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.automatic_quantity %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.presold_quantity %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.manual_quantity %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.supplied_quantity %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.status %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.planned_quantity %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.translated_status %></td>
           </tr>
         <% end %>
       </tbody>
@@ -76,9 +76,13 @@
 
   <!-- Actions -->
   <div class="flex items-center justify-end mt-8 space-x-4">
-    <%= link_to "Editar", edit_admin_requisition_path(@requisition), class: "btn btn-secondary" %>
-    <% if @requisition.req_pending? %>
-      <%= button_to "Cumplir Pedido", fulfill_admin_requisition_path(@requisition), method: :patch, class: "btn btn-primary", data: { confirm: "¿Estás seguro de que quieres cumplir este pedido?" } %>
+    <% if @requisition.req_planned? %>
+      <%= link_to "Imprimir PDF", admin_requisition_path(@requisition, format: :pdf), class: "btn btn-secondary", target: "_blank" %>
+    <% else %>
+      <%= link_to "Editar", edit_admin_requisition_path(@requisition), class: "btn btn-secondary" %>
+    <% end %>
+    <% if @requisition.req_submitted? %>
+      <%= link_to "Planificar Pedido", edit_admin_requisition_path(@requisition), class: "btn btn-primary" %>
     <% end %>
   </div>
 </div>

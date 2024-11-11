@@ -14,6 +14,8 @@ module Services
           AdminMailer.with(notification: @notification).partial_stock_transfer.deliver_later
         when "PeriodicInventory"
           AdminMailer.with(notification: @notification).missing_stock_periodic_inventory.deliver_later
+        when "Requisition"
+          AdminMailer.with(notification: @notification).requisition.deliver_later
         end
       end
     end

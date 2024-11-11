@@ -1,11 +1,18 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form", "template"]
+  static targets = ["line", "lines", "form", "template", "debugCommit"]
 
   connect() {
     console.log("Requisition form controller connected")
     this.initializeProductSelects()
+  }
+
+  logCommit(event) {
+    console.log("Submit button clicked:", event.target.value)
+    if (this.hasDebugCommitTarget) {
+      this.debugCommitTarget.value = event.target.value
+    }
   }
 
   initializeProductSelects() {
@@ -72,13 +79,29 @@ export default class extends Controller {
 
   submitForm(event) {
     event.preventDefault()
+    console.log("Form submission intercepted")
 
-    console.log("Form submission intercepted, updating indices...")
+    // Get the submit button that was clicked
+    const submitButton = event.submitter
+    console.log("Submit button clicked:", submitButton?.value)
 
-    // Update all indices before submitting the form
+    // Update indices before submitting
     this.updateIndices()
 
-    // Now submit the form programmatically
+    // Create or update the commit input
+    let commitInput = this.formTarget.querySelector('input[name="commit"]')
+    if (!commitInput) {
+      commitInput = document.createElement('input')
+      commitInput.type = 'hidden'
+      commitInput.name = 'commit'
+      this.formTarget.appendChild(commitInput)
+    }
+
+    // Set the commit value from the button that was clicked
+    commitInput.value = submitButton?.value || ''
+    console.log("Setting commit value to:", commitInput.value)
+
+    // Now submit the form
     this.formTarget.submit()
   }
 

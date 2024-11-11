@@ -91,6 +91,9 @@ application.register("loyalty-tier-form", LoyaltyTierFormController)
 import MediaUploadController from "./media_upload_controller"
 application.register("media-upload", MediaUploadController)
 
+import MinMaxStockController from "./min_max_stock_controller"
+application.register("min-max-stock", MinMaxStockController)
+
 import ModalController from "./modal_controller"
 application.register("modal", ModalController)
 

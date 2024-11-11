@@ -1,0 +1,33 @@
+<p>Hola,</p>
+
+<p>Se ha realizado un pedido de productos de la tienda <strong><%= @requisition.location.name %></strong>.</p>
+
+<%= spacer(16) %>
+
+<p>Los productos pedidos son:</p>
+
+<table class="mb-0" style="width: 100%; border-collapse: collapse;">
+  <thead>
+    <tr style="background-color: #f2f2f2;">
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: left;">Producto</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Cantidad Automática</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Cantidad Prevendida</th>
+      <th style="padding: 8px; border: 1px solid #ddd; text-align: right;">Cantidad Solicitada</th>
+    </tr>
+  </thead>
+  <tbody>
+    <% @requisition.requisition_lines.each do |line| %>
+      <tr>
+        <td style="padding: 8px; border: 1px solid #ddd;"><%= line&.product&.name %></td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.automatic_quantity %></td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.presold_quantity %></td>
+        <td style="padding: 8px; border: 1px solid #ddd; text-align: right;"><%= line.manual_quantity %></td>
+      </tr>
+    <% end %>
+  </tbody>
+</table>
+
+<%= spacer(16) %>
+
+<p>Puede revisar el pedido en el siguiente enlace para procesarlo: <%= link_to "Pedido ##{@requisition.custom_id}", admin_requisition_url(@requisition), target: "_blank" %></p>
+

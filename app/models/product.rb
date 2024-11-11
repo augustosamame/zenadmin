@@ -21,6 +21,7 @@ class Product < ApplicationRecord
   has_many :preorders
   has_many :combo_products_as_product_1, class_name: "ComboProduct", foreign_key: "product_1_id"
   has_many :combo_products_as_product_2, class_name: "ComboProduct", foreign_key: "product_2_id"
+  has_many :product_min_max_stocks, dependent: :destroy
 
 
   enum :status, { active: 0, inactive: 1 }

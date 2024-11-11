@@ -1,4 +1,6 @@
 class RequisitionLine < ApplicationRecord
+  include TranslateEnum
+
   belongs_to :requisition
   belongs_to :product
 
@@ -8,7 +10,7 @@ class RequisitionLine < ApplicationRecord
   validates :manual_quantity, presence: true, numericality: { greater_than_or_equal_to: 0 }
 
   enum :status, { pending: 0, fulfilled: 1 }
-
+  translate_enum :status
   attr_accessor :current_stock
 
   before_validation :set_automatic_and_presold_quantities_if_blank

@@ -1,0 +1,34 @@
+<div class="flex items-center space-x-2 nested-fields" data-min-max-stock-target="multiplierFields">
+  <select name="min_max_stocks[][period_multipliers][][year_month_period]"
+          class="block w-32 rounded-md form-select border-slate-300 focus:border-primary-500 focus:ring-primary-500"
+          data-min-max-stock-target="periodSelect">
+    <% 
+      start_date = Date.current.beginning_of_month
+      end_date = start_date + 11.months
+      
+      (start_date..end_date).select { |d| d.day == 1 }.each do |date|
+        half = date.month <= 15 ? 'I' : 'II'
+        formatted_date = date.strftime("%Y-%m")
+        value = "#{formatted_date}-#{half}"
+        display_text = "#{formatted_date}-#{half}"
+    %>
+      <option value="<%= value %>">
+        <%= display_text %>
+      </option>
+    <% end %>
+  </select>
+  
+  <%= number_field_tag "min_max_stocks[][period_multipliers][][multiplier]",
+      nil,
+      class: "block w-20 rounded-md form-input border-slate-300 focus:border-primary-500 focus:ring-primary-500",
+      step: "0.1",
+      min: 0,
+      placeholder: "1.5",
+      data: { "min-max-stock-target": "multiplierInput" } %>
+      
+  <button type="button" 
+          class="p-2 text-red-500 hover:text-red-600"
+          data-action="click->min-max-stock#removePeriodMultiplier">
+    <%= icon "trash", classes: "w-5 h-5" %>
+  </button>
+</div>

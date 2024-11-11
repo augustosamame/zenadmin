@@ -1,4 +1,7 @@
 <%= simple_form_for([:admin, @requisition], html: { data: { controller: "requisition-form", action: "submit->requisition-form#submitForm", requisition_form_target: "form" } }) do |form| %>
+
+  <%= hidden_field_tag :debug_commit_value, '', data: { requisition_form_target: "debugCommit" } %>
+  
   <!-- Header Section -->
   <div class="p-6 mb-2 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
 
@@ -54,7 +57,57 @@
 
   <!-- Form Actions -->
   <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
-    <%= form.button :submit, @requisition.new_record? ? "Crear Pedido" : "Actualizar Pedido", class: "btn btn-primary" %>
-    <%= link_to "Cancelar", admin_requisitions_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+    <% if @current_warehouse.is_main? && @requisition.req_submitted? %>
+      <button type="submit" 
+          name="commit" 
+          value="plan" 
+          class="btn btn-primary"
+          data-action="click->requisition-form#logCommit">
+        Planificar Pedido
+      </button>
+    <% elsif current_user.has_any_role?("store", "store_manager") %>
+      <% if @requisition.req_draft? %>
+        <button type="submit" 
+            name="commit" 
+            value="save_draft" 
+            class="mr-2 btn btn-secondary"
+            data-action="click->requisition-form#logCommit">
+          Guardar como Borrador
+        </button>
+        <button type="submit" 
+            name="commit" 
+            value="submit_to_warehouse" 
+            class="btn btn-primary"
+            data-action="click->requisition-form#logCommit">
+          Enviar Pedido a Almacén Principal
+        </button>
+      <% else %>
+        <button type="submit" 
+                name="commit" 
+                value="update" 
+                class="btn btn-primary"
+                data-action="click->requisition-form#logCommit">
+          Actualizar Pedido
+        </button>
+      <% end %>
+    <% else %>
+      <button type="submit" 
+              name="commit" 
+              value="update" 
+              class="btn btn-primary"
+              data-action="click->requisition-form#logCommit">
+        <%= @requisition.new_record? ? "Crear Pedido" : "Actualizar Pedido" %>
+      </button>
+      <button type="submit" 
+            name="commit" 
+            value="submit_to_warehouse" 
+            class="btn btn-primary"
+            data-action="click->requisition-form#logCommit">
+        Enviar Pedido a Almacén Principal
+      </button>
+    <% end %>
+    
+    <%= link_to "Cancelar", admin_requisitions_path, 
+        class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
   </div>
 <% end %>

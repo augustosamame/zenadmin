@@ -175,12 +175,18 @@ es:
           automatic: Automático
           manual: Manual
         stage_list:
-          req_new: Borrador
+          req_draft: Borrador
+          req_submitted: Por Procesar
+          req_planned: Planificado
           req_pending: Pendiente
           req_fulfilled: Completado
         status_list:
           active: Activo
           inactive: Inactivo
+      requisition_line:
+        status_list:
+          pending: Pendiente
+          fulfilled: Cumplido
       product_pack:
         status_list:
           active: Activo
