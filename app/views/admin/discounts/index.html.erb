@@ -1,6 +1,6 @@
 <%# app/views/admin/discounts/index.html.erb %>
 <%= render "shared/admin/nav", { header_title: "Descuentos" } do %>
-  <%= render "shared/admin/create_dropdown" %>
+<%= render "shared/admin/create_dropdown" %>
 <% end %>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
@@ -23,46 +23,51 @@
       </thead>
       <tbody>
         <% @discounts.each do |discount| %>
-          <tr>
-            <td class="px-4 py-2"><%= discount.id %></td>
-            <td class="px-4 py-2"><%= discount.name %></td>
-            <td class="px-4 py-2"><%= discount.translated_discount_type.titleize %></td>
-            <td class="px-4 py-2">
-              <% if discount.type_global? %>
-                <% if discount.discount_fixed_amount.present? %>
-                  <%= "S/ #{discount.discount_fixed_amount}" %>
-                <% else %>
-                  <%= "#{number_to_percentage(discount.discount_percentage, precision: 2)}" %>
-                <% end %>
-              <% elsif discount.type_group? %>
-                <% if discount.group_discount_percentage_off.present? %>
-                  <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity} con #{number_to_percentage(discount.group_discount_percentage_off, precision: 2)} de descuento" %>
-                <% else %>
-                  <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity}" %>
-                <% end %>
+        <tr>
+          <td class="px-4 py-2"><%= discount.id %></td>
+          <td class="px-4 py-2"><%= discount.name %></td>
+          <td class="px-4 py-2"><%= discount.translated_discount_type.titleize %></td>
+          <td class="px-4 py-2">
+            <% if discount.type_global? %>
+            <% if discount.discount_fixed_amount.present? %>
+            <%= "S/ #{discount.discount_fixed_amount}" %>
+            <% else %>
+            <%= "#{number_to_percentage(discount.discount_percentage, precision: 2)}" %>
+            <% end %>
+            <% elsif discount.type_group? %>
+            <% if discount.group_discount_percentage_off.present? %>
+            <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity} con #{number_to_percentage(discount.group_discount_percentage_off, precision: 2)} de descuento" %>
+            <% else %>
+            <%= "Paga #{discount.group_discount_payed_quantity}, Lleva #{discount.group_discount_free_quantity}" %>
+            <% end %>
+            <% end %>
+          </td>
+          <td class="px-4 py-2"><%= discount.start_datetime.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="px-4 py-2"><%= discount.end_datetime.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="px-4 py-2"><%= discount.status.titleize %></td>
+          <td class="px-4 py-2"><%= discount.is_current? ? "Vigente" : "No Vigente" %></td>
+          <td class="px-4 py-2"><%= discount.matching_product_ids.count %></td>
+          <td class="px-4 py-2">
+            <div class="flex flex-wrap gap-1">
+              <% discount.tags.each do |tag| %>
+              <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                <%= tag.name %>
+              </span>
               <% end %>
-            </td>
-            <td class="px-4 py-2"><%= discount.start_datetime.strftime("%Y-%m-%d %H:%M") %></td>
-            <td class="px-4 py-2"><%= discount.end_datetime.strftime("%Y-%m-%d %H:%M") %></td>
-            <td class="px-4 py-2"><%= discount.status.titleize %></td>
-            <td class="px-4 py-2"><%= discount.is_current? ? "Vigente" : "No Vigente" %></td>
-            <td class="px-4 py-2"><%= discount.matching_product_ids.count %></td>
-            <td class="px-4 py-2">
-              <div class="flex flex-wrap gap-1">
-                <% discount.tags.each do |tag| %>
-                  <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
-                    <%= tag.name %>
-                  </span>
-                <% end %>
-              </div>
-            </td>
-            <td class="px-4 py-2">
+            </div>
+          </td>
+          <td class="px-4 py-2">
+            <% if current_user.store_or_store_manager? %>
+              <%= link_to "Ver", admin_discount_path(discount), class: "text-blue-500 hover:underline mr-2" %>
+            <% end %>
+            <% if current_user.any_admin_or_supervisor? %>
               <%= link_to "Editar", edit_admin_discount_path(discount), class: "text-blue-500 hover:underline mr-2" %>
               <%= form_with(url: admin_discount_path(discount), method: :delete, class: "inline", data: { turbo: false }) do |f| %>
                 <%= f.submit "Eliminar", class: "text-red-500 hover:underline cursor-pointer bg-transparent border-none", onclick: "return confirm('¿Está seguro?');" %>
               <% end %>
-            </td>
-          </tr>
+            <% end %>
+          </td>
+        </tr>
         <% end %>
       </tbody>
     </table>

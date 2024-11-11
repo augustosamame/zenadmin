@@ -51,6 +51,14 @@ class Discount < ApplicationRecord
     self.update_column(:matching_product_ids, matching_products.distinct.pluck(:id))
   end
 
+  def matching_products
+    return Product.none if matching_product_ids.blank?
+
+    Product.includes(:media)
+           .where(id: matching_product_ids)
+           .order(:name)
+  end
+
   private
 
   def normalize_group_discount_percentage

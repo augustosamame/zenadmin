@@ -134,14 +134,12 @@
         <%= nav_link_to "Etiquetas", send("admin_tags_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
       </li>
     <% end %>
-    <% if current_user.any_admin_or_supervisor? %>
     <li>
       <%= nav_link_to "Descuentos", send("admin_discounts_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
       <%= nav_link_to "Packs de Productos", send("admin_product_packs_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
-    <% end %>
   </ul>
 </li>
 <li data-controller="dropdown" class="relative">

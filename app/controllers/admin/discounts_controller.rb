@@ -1,10 +1,14 @@
 # app/controllers/admin/discounts_controller.rb
 class Admin::DiscountsController < Admin::AdminController
-  before_action :set_discount, only: [ :edit, :update, :destroy ]
+  before_action :set_discount, only: [ :show, :edit, :update, :destroy ]
 
   def index
     @discounts = Discount.all.includes(:tags)
-    @datatable_options = "resource_name:'Discount';create_button:true;hide_0;sort_0_desc;"
+    if current_user.any_admin_or_supervisor?
+      @datatable_options = "resource_name:'Discount';create_button:true;hide_0;sort_0_desc;"
+    else
+      @datatable_options = "resource_name:'Discount';create_button:false;hide_0;sort_0_desc;"
+    end
   end
 
   def new
@@ -32,6 +36,9 @@ class Admin::DiscountsController < Admin::AdminController
     else
       render turbo_stream: turbo_stream.replace("discount_form", partial: "form", locals: { discount: @discount })
     end
+  end
+
+  def show
   end
 
   def edit

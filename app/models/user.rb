@@ -84,6 +84,10 @@ class User < ApplicationRecord
     self.roles.where(name: [ "admin", "super_admin", "warehouse_manager" ]).any?
   end
 
+  def store_or_store_manager?
+    self.roles.where(name: [ "store_manager", "store" ]).any?
+  end
+
   def roles_names
     self.roles.pluck(:name).join(", ")
   end
