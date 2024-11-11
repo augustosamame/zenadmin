@@ -270,17 +270,22 @@ export default class extends Controller {
         id: product.id,
         custom_id: `PACK-${pack.id}-${product.id}`,
         name: product.name,
-        price: product.price, // Use the original price
-        already_discounted: true, // It's not discounted at the item level
+        price: product.price,
+        already_discounted: true,
         quantity: product.quantity,
         isPackItem: true,
         packId: pack.id
       });
     });
 
-    // Apply the pack discount as a global discount
+    // Apply the pack discount
     if (packDiscount > 0) {
-      orderItemsController.addPackDiscount(pack.id, packDiscount, pack.name, selectedProducts.map(product => product.id));
+      orderItemsController.addPackDiscount(
+        pack.id, 
+        packDiscount, 
+        pack.name, 
+        selectedProducts.map(product => product.id)
+      );
     }
 
     // Close the modal

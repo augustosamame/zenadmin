@@ -29,6 +29,8 @@ export default class extends Controller {
     this.groupDiscountAmount = 0;
     this.groupDiscountNames = [];
     this.packDiscounts = new Map();
+    this.packDiscountInstances = new Map(); // New map to track pack instances
+    this.nextPackInstanceId = 1; // Counter for generating unique instance IDs
   }
 
   setupLoyaltyEventListeners() {
@@ -456,18 +458,21 @@ export default class extends Controller {
   }
 
   addPackDiscount(packId, discountAmount, packName, productIds) {
-    const packIdString = String(packId);
-    this.packDiscounts.set(packIdString, {
+    // Generate a unique instance ID for this pack
+    const instanceId = `${packId}-${this.nextPackInstanceId++}`;
+    
+    this.packDiscounts.set(instanceId, {
       amount: discountAmount,
       name: packName,
-      productIds: productIds
+      productIds: productIds,
+      packId: packId // Store original packId for reference
     });
 
-    // Mark all products in this pack
+    // Mark all products in this pack with the instance ID
     productIds.forEach(productId => {
-      const item = this.itemsTarget.querySelector(`[data-product-id="${productId}"]`);
+      const item = this.itemsTarget.querySelector(`[data-product-id="${productId}"][data-pack-id="${packId}"]`);
       if (item) {
-        item.setAttribute('data-pack-id', packIdString);
+        item.setAttribute('data-pack-instance', instanceId);
         item.setAttribute('data-item-already-discounted', 'true');
       }
     });
@@ -475,32 +480,38 @@ export default class extends Controller {
     this.calculateTotal();
   }
 
-  removePackDiscount(packId) {
-    const packIdString = String(packId);
-    console.log('Removing pack discount for packId:', packIdString);
-    console.log('Current pack discounts:', this.packDiscounts);
-    console.log('Has pack discount?', this.packDiscounts.has(packIdString));
-    if (this.packDiscounts.has(packIdString)) {
-      console.log('pack discount found, removing');
-      // Remove the discount from the map
-      this.packDiscounts.delete(packIdString);
+  removePackDiscount(packId, instanceId) {
+    if (instanceId && this.packDiscounts.has(instanceId)) {
+      // Remove specific instance
+      this.packDiscounts.delete(instanceId);
       
-      // Reset all items that were part of this pack
-      this.itemsTarget.querySelectorAll(`[data-pack-id="${packIdString}"]`).forEach(item => {
-        item.removeAttribute('data-pack-id');
-        item.setAttribute('data-item-already-discounted', 'false');
-        
-        // Reset price to original price
-        const originalPrice = item.getAttribute('data-item-original-price');
-        const priceElement = item.querySelector('.editable-price');
-        priceElement.textContent = `S/ ${parseFloat(originalPrice).toFixed(2)}`;
-        
-        // Update subtotal
-        this.updateSubtotal(item);
-      });
-      
-      this.calculateTotal();
+      // Reset items for this specific instance
+      this.itemsTarget.querySelectorAll(`[data-pack-instance="${instanceId}"]`)
+        .forEach(this.resetPackItem.bind(this));
+    } else {
+      // Remove all instances of this pack (fallback behavior)
+      for (const [key, value] of this.packDiscounts.entries()) {
+        if (value.packId === packId) {
+          this.packDiscounts.delete(key);
+          this.itemsTarget.querySelectorAll(`[data-pack-instance="${key}"]`)
+            .forEach(this.resetPackItem.bind(this));
+        }
+      }
     }
+    
+    this.calculateTotal();
+  }
+
+  resetPackItem(item) {
+    item.removeAttribute('data-pack-instance');
+    item.removeAttribute('data-pack-id');
+    item.setAttribute('data-item-already-discounted', 'false');
+    
+    const originalPrice = item.getAttribute('data-item-original-price');
+    const priceElement = item.querySelector('.editable-price');
+    priceElement.textContent = `S/ ${parseFloat(originalPrice).toFixed(2)}`;
+    
+    this.updateSubtotal(item);
   }
 
   calculateTotal() {
@@ -530,7 +541,7 @@ export default class extends Controller {
     const subtotalAfterGroupDiscount = subtotal - groupDiscountAmount;
 
     let totalPackDiscount = 0;
-    this.packDiscounts.forEach((discount, packId) => {
+    this.packDiscounts.forEach((discount) => {
       totalPackDiscount += parseFloat(discount.amount) || 0;
     });
 
