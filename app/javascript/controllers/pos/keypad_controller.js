@@ -7,14 +7,37 @@ export default class extends Controller {
   connect() {
     console.log('Connected to KeypadController!');
     this.currentMode = 'quantity';
+    this.setupKeyboardListener();
+  }
+
+  setupKeyboardListener() {
+    document.addEventListener('keydown', this.handleKeyboardInput.bind(this));
+  }
+
+  handleKeyboardInput(event) {
+    // Only process keyboard input if we're in price mode
+    if (this.currentMode !== 'price') return;
+
+    const orderItemsController = this.getOrderItemsController();
+    if (!orderItemsController || !orderItemsController.selectedItem) return;
+
+    // Prevent default behavior for these keys when we're handling them
+    if (this.isValidInput(event.key)) {
+      event.preventDefault();
+    }
+
+    if (event.key === 'Backspace') {
+      orderItemsController.handleBackspaceForPrice();
+    } else if (event.key === '.') {
+      orderItemsController.handleDecimalPoint();
+    } else if (this.isNumeric(event.key)) {
+      orderItemsController.handleKeypadForPrice(event.key);
+    }
   }
 
   handleKeypad(event) {
     const value = event.currentTarget.textContent.trim();
-    const orderItemsController = this.application.getControllerForElementAndIdentifier(
-      document.querySelector('[data-controller="pos--order-items"]'),
-      'pos--order-items'
-    );
+    const orderItemsController = this.getOrderItemsController();
 
     if (orderItemsController) {
       if (value === '⌫' || value === 'backspace') {
@@ -37,6 +60,26 @@ export default class extends Controller {
         }
       }
     }
+  }
+
+  // Helper methods
+  getOrderItemsController() {
+    return this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="pos--order-items"]'),
+      'pos--order-items'
+    );
+  }
+
+  isNumeric(key) {
+    return /^\d$/.test(key);
+  }
+
+  isValidInput(key) {
+    return this.isNumeric(key) || key === 'Backspace' || key === '.';
+  }
+
+  disconnect() {
+    document.removeEventListener('keydown', this.handleKeyboardInput.bind(this));
   }
 
   selectQuantityMode() {
