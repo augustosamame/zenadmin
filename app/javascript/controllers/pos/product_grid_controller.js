@@ -18,7 +18,7 @@ export default class extends Controller {
     const query = this.searchTarget.value.trim()
     // Trim the query and check again
     
-    if (query.length >= 7) {
+    if (query.length >= 7 && query.startsWith('PRO')) {
       console.log('Searching for exact match:', query)
       this.findExactMatch(query)
     } else {
