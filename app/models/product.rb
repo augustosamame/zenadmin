@@ -44,6 +44,12 @@ class Product < ApplicationRecord
     joins(:tags).where(tags: { name: tag_name })
   }
 
+  def self.tagged_with(tags)
+    joins(:taggings)
+      .where(taggings: { tag_id: tags.map(&:id) })
+      .distinct
+  end
+
   scope :without_tests, -> { where(is_test_product: false) }
 
   before_validation :set_permalink

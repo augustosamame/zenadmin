@@ -1,0 +1,91 @@
+<%= render "shared/admin/nav", { header_title: "Pack de Productos: #{@product_pack.name}" } do %>
+<%= link_to "Volver a Packs", admin_product_packs_path, class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles del Pack</h3>
+    </div>
+
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Nombre del Pack</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @product_pack.name %></dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Precio Reducido del Pack</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= format_currency(@product_pack.price) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Estado</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @product_pack.translated_status %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Pack Items Section -->
+  <div class="mt-8">
+    <div class="p-6 bg-white shadow sm:rounded-lg">
+      <h3 class="mb-4 text-lg font-semibold">Productos en Pack</h3>
+
+      <div class="overflow-hidden border border-gray-200 sm:rounded-lg">
+        <table class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Etiquetas
+              </th>
+              <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Cantidad
+              </th>
+              <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">
+                Productos Incluidos
+              </th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-gray-200">
+            <% @product_pack.product_pack_items.includes(:tags).each do |item| %>
+            <tr>
+              <td class="px-6 py-4">
+                <div class="flex flex-wrap gap-2">
+                  <% item.tags.each do |tag| %>
+                  <span class="px-2 py-1 text-sm text-white bg-blue-500 rounded-full">
+                    <%= tag.name %>
+                  </span>
+                  <% end %>
+                </div>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                <%= item.quantity %>
+              </td>
+              <td class="px-6 py-4">
+                <div class="text-sm text-gray-900">
+                  <% Product.tagged_with(item.tags).each do |product| %>
+                  <div class="mb-1">
+                    <%= product.name %> - <%= format_currency(product.price) %>
+                  </div>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center py-6 mt-6 space-x-4">
+    <%= link_to "Volver", admin_product_packs_path, class: "btn btn-secondary" %>
+  </div>
+</div>

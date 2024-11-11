@@ -3,7 +3,11 @@ class Admin::ProductPacksController < Admin::AdminController
 
   def index
     @product_packs = ProductPack.order(created_at: :desc)
-    @datatable_options = "server_side:false;resource_name:'ProductPack';create_button:true;sort_0_desc;"
+    if current_user.any_admin_or_supervisor?
+      @datatable_options = "server_side:false;resource_name:'ProductPack';create_button:true;sort_0_desc;"
+    else
+      @datatable_options = "server_side:false;resource_name:'ProductPack';create_button:false;sort_0_desc;"
+    end
   end
 
   def show

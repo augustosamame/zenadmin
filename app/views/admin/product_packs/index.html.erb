@@ -1,5 +1,5 @@
 <%= render "shared/admin/nav", { header_title: "Packs de Productos" } do %>
-  <%= render "shared/admin/create_dropdown" %>
+<%= render "shared/admin/create_dropdown" %>
 <% end %>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
@@ -16,31 +16,36 @@
       </thead>
       <tbody>
         <% @product_packs.each do |product_pack| %>
-          <tr>
-            <td class="px-4 py-2"><%= product_pack.name %></td>
-            <td class="px-4 py-2">
-              <% product_pack.product_pack_items.includes(:tags).each do |item| %>
-                <div class="mb-2">
-                  <span class="font-medium"><%= item.quantity %>x</span>
-                  <div class="flex flex-wrap gap-1 mt-1">
-                    <% item.tags.each do |tag| %>
-                      <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
-                        <%= tag.name %>
-                      </span>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </td>
-            <td class="px-4 py-2"><%= format_currency(product_pack.price) %></td>
-            <td class="px-4 py-2"><%= product_pack.translated_status %></td>
-            <td class="px-4 py-2">
-              <%= link_to 'Editar', edit_admin_product_pack_path(product_pack), class: "btn btn-sm btn-primary" %>
-              <%= form_with(url: admin_product_pack_path(product_pack), method: :delete, class: "inline", data: { turbo: false }) do |f| %>
-                <%= f.submit "Eliminar", class: "btn btn-sm btn-danger", onclick: "return confirm('¿Está seguro?');" %>
-              <% end %>
-            </td>
-          </tr>
+        <tr>
+          <td class="px-4 py-2"><%= product_pack.name %></td>
+          <td class="px-4 py-2">
+            <% product_pack.product_pack_items.includes(:tags).each do |item| %>
+            <div class="mb-2">
+              <span class="font-medium"><%= item.quantity %>x</span>
+              <div class="flex flex-wrap gap-1 mt-1">
+                <% item.tags.each do |tag| %>
+                <span class="px-2 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
+                  <%= tag.name %>
+                </span>
+                <% end %>
+              </div>
+            </div>
+            <% end %>
+          </td>
+          <td class="px-4 py-2"><%= format_currency(product_pack.price) %></td>
+          <td class="px-4 py-2"><%= product_pack.translated_status %></td>
+          <td class="px-4 py-2">
+            <% if current_user.store_or_store_manager? %>
+              <%= link_to 'Ver', admin_product_pack_path(product_pack), class: "btn btn-sm btn-primary" %>
+            <% end %>
+            <% if current_user.any_admin_or_supervisor? %>
+            <%= link_to 'Editar', edit_admin_product_pack_path(product_pack), class: "btn btn-sm btn-primary" %>
+            <%= form_with(url: admin_product_pack_path(product_pack), method: :delete, class: "inline", data: { turbo: false }) do |f| %>
+            <%= f.submit "Eliminar", class: "btn btn-sm btn-danger", onclick: "return confirm('¿Está seguro?');" %>
+            <% end %>
+            <% end %>
+          </td>
+        </tr>
         <% end %>
       </tbody>
     </table>

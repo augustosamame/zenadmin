@@ -1,0 +1,117 @@
+<%= render "shared/admin/nav", { header_title: "Descuento: #{@discount.name}" } do %>
+<%= link_to "Volver a Descuentos", admin_discounts_path, class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles del Descuento</h3>
+    </div>
+
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Nombre</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @discount.name %></dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Tipo de Descuento</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @discount.translated_discount_type %>
+          </dd>
+        </div>
+
+        <% if @discount.type_global? %>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Descuento %</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= number_to_percentage(@discount.discount_percentage, precision: 2) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Descuento Monto Fijo</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= format_currency(@discount.discount_fixed_amount) %>
+          </dd>
+        </div>
+        <% end %>
+
+        <% if @discount.type_group? %>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Cantidad Total</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @discount.group_discount_payed_quantity %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Cantidad que se paga</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @discount.group_discount_free_quantity %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Descuento %</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= number_to_percentage(@discount.group_discount_percentage_off, precision: 2) %>
+          </dd>
+        </div>
+        <% end %>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Fecha de Inicio</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= friendly_date(current_user, @discount.start_datetime) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Fecha de Fin</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= friendly_date(current_user, @discount.end_datetime) %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Estado</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @discount.translated_status %>
+          </dd>
+        </div>
+
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Etiquetas</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <% if @discount.tags.any? %>
+            <div class="flex flex-wrap gap-2">
+              <% @discount.tags.each do |tag| %>
+              <span class="px-2 py-1 text-sm text-white bg-blue-500 rounded-full">
+                <%= tag.name %>
+              </span>
+              <% end %>
+            </div>
+            <% else %>
+            <span class="text-gray-500">Sin etiquetas</span>
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+
+  <!-- Matching Products Section -->
+  <div class="mt-8">
+    <div class="p-6 bg-white shadow sm:rounded-lg">
+      <h3 class="mb-4 text-lg font-semibold">Productos que coinciden</h3>
+      <%= render 'matching_products', products: @discount.matching_products %>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center py-6 mt-6 space-x-4">
+    <%= link_to "Volver", admin_discounts_path, class: "btn btn-secondary" %>
+  </div>
+</div>
