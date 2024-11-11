@@ -202,8 +202,16 @@ export default class extends Controller {
     this.remainingLabelTarget.textContent = remaining >= 0 ? 'Remaining:' : 'Cambio:';
   }
 
-  saveOrder() {
-    console.log('Saving order...');
+  saveOrder(event) {
+    const button = event.currentTarget;
+    if (button.disabled) return;
+
+    button.disabled = true;
+    button.classList.add('opacity-50', 'cursor-not-allowed');
+    button.innerHTML = '<span class="spinner"></span> Procesando...';
+
+    // Store the original text to restore it if there's an error
+    const originalText = 'Crear Venta';
 
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
     const totalDiscountAmount = parseFloat(this.totalDiscountTarget.textContent.replace(/\(S\/\s*|\)/g, ''));
@@ -277,6 +285,9 @@ export default class extends Controller {
     console.log('totalOrderAmount', totalOrderAmount);
     console.log('totalDiscountAmount', totalDiscountAmount);
 
+    // Generate a unique request ID
+    this.requestId = Date.now().toString();
+
     const orderData = {
       order: {
         stage: 'confirmed',
@@ -291,7 +302,8 @@ export default class extends Controller {
         seller_note: comment,
         order_items_attributes: orderItemsAttributes,
         payments_attributes: payments,
-        sellers_attributes: selectedSellers
+        sellers_attributes: selectedSellers,
+        request_id: this.requestId
       }
     };
 
@@ -309,6 +321,7 @@ export default class extends Controller {
             errorMessage = `Hubo un error al guardar la venta: ${response.data.errors.join(', ')}`;
           }
           this.showErrorModal('Error', errorMessage);
+          this.resetButton(button, originalText);
           return;
         }
 
@@ -320,7 +333,14 @@ export default class extends Controller {
         this.showErrorModal('Error', 'Hubo un error al guardar la venta. Por favor, inténtalo de nuevo.', [
           { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
         ]);
+        this.resetButton(button, originalText);
       });
+  }
+
+  resetButton(button, originalText) {
+    button.disabled = false;
+    button.classList.remove('opacity-50', 'cursor-not-allowed');
+    button.innerHTML = originalText;
   }
 
   showPostSaleModal(orderData) {

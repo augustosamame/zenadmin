@@ -1,6 +1,8 @@
 class Admin::OrdersController < Admin::AdminController
   include MoneyRails::ActionViewExtension
 
+  before_action :check_duplicate_order, only: [ :create ]
+
   def index
     respond_to do |format|
       format.html do
@@ -133,7 +135,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id
@@ -194,5 +196,24 @@ class Admin::OrdersController < Admin::AdminController
           ]
         end
       }
+    end
+
+    def check_duplicate_order
+      return unless params[:request_id]
+
+      # Check for recent orders with the same request_id
+      recent_duplicate = Order.where(request_id: params[:request_id])
+                            .where("created_at > ?", 1.minute.ago)
+                            .first
+
+      if recent_duplicate
+        render json: {
+          status: "error",
+          errors: [ "Esta orden ya fue procesada." ],
+          duplicate: true,
+          original_order_id: recent_duplicate.id
+        }, status: :unprocessable_entity
+        nil
+      end
     end
 end

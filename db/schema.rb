@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_11_002013) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -481,12 +481,24 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_002013) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "request_id"
+    t.integer "preorder_id"
+    t.boolean "fast_payment_flag", default: false
+    t.boolean "fast_stock_transfer_flag", default: false
+    t.boolean "is_credit_sale", default: false
+    t.integer "price_list_id"
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
+    t.index ["fast_payment_flag"], name: "index_orders_on_fast_payment_flag"
+    t.index ["fast_stock_transfer_flag"], name: "index_orders_on_fast_stock_transfer_flag"
+    t.index ["is_credit_sale"], name: "index_orders_on_is_credit_sale"
     t.index ["location_id", "status", "order_date", "seller_id"], name: "idx_on_location_id_status_order_date_seller_id_3f1145d763"
     t.index ["location_id"], name: "index_orders_on_location_id"
+    t.index ["preorder_id"], name: "index_orders_on_preorder_id"
+    t.index ["price_list_id"], name: "index_orders_on_price_list_id"
     t.index ["region_id"], name: "index_orders_on_region_id"
+    t.index ["request_id"], name: "index_orders_on_request_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
