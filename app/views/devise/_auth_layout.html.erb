@@ -1,9 +1,9 @@
-<div class="sm:h-[calc(100vh_-_52px)] pt-10 sm:pt-0 flex flex-col items-center justify-center bg-cover bg-center px-4" style="background-image: url('<%= asset_url('fusion.png')%>')" >
+<div class="sm:h-[calc(100vh_-_52px)] pt-10 sm:pt-0 flex flex-col items-center justify-center bg-cover bg-center px-4" style="background-image: url('<%= asset_url('fusion.png')%>')">
   <div class="sm:flex-1 flex flex-col justify-center sm:w-[428px] w-full">
     <div>
       <div class="flex justify-center">
         <%= link_to root_path do %>
-          <%= image_tag "logo_jardin_del_zen.png", class: "w-60 h-auto" %>
+        <%= image_tag $global_settings[:logo_path], class: "w-60 h-auto" %>
         <% end %>
       </div>
 
@@ -19,15 +19,15 @@
         %>
 
         <%- if devise_mapping.omniauthable? && %w{ registrations sessions }.include?(controller_name) %>
-          <hr class="my-6"/>
-          <%- resource_class.omniauth_providers.each do |provider| %>
-            <div class="my-2">
-            <%= button_to omniauth_authorize_path(resource_name, provider), class: "btn btn-white w-full", data: { turbo: false } do %>
-              <%= inline_svg "omniauth/#{provider.gsub(/\s+/, '').downcase}.svg", class: "mr-2 w-5 h-5" %>
-              <span>"Sign in with <%= OmniAuth::Utils.camelize(provider) %></span>
-            <% end %>
-            </div>
+        <hr class="my-6" />
+        <%- resource_class.omniauth_providers.each do |provider| %>
+        <div class="my-2">
+          <%= button_to omniauth_authorize_path(resource_name, provider), class: "btn btn-white w-full", data: { turbo: false } do %>
+          <%= inline_svg "omniauth/#{provider.gsub(/\s+/, '').downcase}.svg", class: "mr-2 w-5 h-5" %>
+          <span>"Sign in with <%= OmniAuth::Utils.camelize(provider) %></span>
           <% end %>
+        </div>
+        <% end %>
         <% end %>
       </div>
 

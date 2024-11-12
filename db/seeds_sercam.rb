@@ -17,10 +17,14 @@ settings = [
   { name: 'multiple_invoicers_based_on_location_and_payment_method', data_type: 'type_boolean', internal: true, localized_name: 'Múltiples razones sociales por tienda y por medio de pago', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'max_total_sale_without_customer', data_type: 'type_integer', internal: false, localized_name: 'Maximo total de venta sin cliente', string_value: nil, integer_value: 700, float_value: nil, datetime_value: nil, boolean_value: nil, hash_value: nil, status: 'active' },
   { name: 'sales_attributed_to_seller', data_type: 'type_boolean', internal: false, localized_name: 'Ventas comisionables por vendedor', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
-  { name: 'sellers_can_checkin', data_type: 'type_boolean', internal: false, localized_name: 'Vendedores pueden registrar asistencia', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_seller_checkin', data_type: 'type_boolean', internal: false, localized_name: 'Registro de asistencia de vendedores', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'feature_flag_commission_ranges', data_type: 'type_boolean', internal: false, localized_name: 'Comisiones por rango de ventas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'feature_flag_loyalty', data_type: 'type_boolean', internal: false, localized_name: 'Programa de fidelidad', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
-  { name: 'multiple_cashiers_per_location', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples cajeros por ubicación', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' }
+  { name: 'multiple_cashiers_per_location', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples cajeros por ubicación', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_purchases', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de compras activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
+  { name: 'logo_path', data_type: 'type_string', internal: false, localized_name: 'Ruta del logo', string_value: "logo_grupo_sercam.png", integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: nil, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_discounts', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de descuentos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_product_packs', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de paquetes de productos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' }
 ]
 
 begin
@@ -91,6 +95,7 @@ PaymentMethod.find_or_create_by!(name: 'banco_bcp', description: 'Banco BCP')
 PaymentMethod.find_or_create_by!(name: 'banco_interbank', description: 'Banco Interbank')
 PaymentMethod.find_or_create_by!(name: 'banco_de_la_nacion', description: 'Banco de la Nación')
 PaymentMethod.find_or_create_by!(name: 'banco_bbva', description: 'Banco BBVA')
+PaymentMethod.find_or_create_by!(name: 'credit', description: 'Crédito')
 
 setting_ecommerce_active = Setting.find_by(name: 'ecommerce_active')
 if setting_ecommerce_active&.boolean_value == true
@@ -156,3 +161,5 @@ Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
 
 product_1 = Product.find_or_create_by!(name: 'Cemento APU', description: "Cemento APU", price_cents: 2200, discounted_price_cents: 2200, brand: Brand.first)
 product_1.add_tag(Tag.find_by(name: 'Cementos'))
+product_2 = Product.find_or_create_by!(name: 'Cemento Sol', description: "Cemento Sol", price_cents: 2400, discounted_price_cents: 2400, brand: Brand.first)
+product_2.add_tag(Tag.find_by(name: 'Cementos'))

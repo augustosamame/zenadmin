@@ -1,42 +1,43 @@
 <%= render "shared/admin/nav", { header_title: "Tablero de Ventas" } do %>
-  <%= render "shared/admin/location_dropdown" %>
+<%= render "shared/admin/location_dropdown" %>
 <% end %>
 
 <%= turbo_frame_tag "sales_dashboard" do %>
-  <div data-controller="dashboards--auto-refresh" data-dashboards--auto-refresh-interval-value="100000">
+<div data-controller="dashboards--auto-refresh" data-dashboards--auto-refresh-interval-value="100000">
 
   <%= turbo_stream_from "sales_dashboard" %>
 
-    <div class="px-4">
-      <div class="container grid grid-cols-12 gap-4 mx-auto mt-4 mb-24 md:gap-6">
+  <div class="px-4">
+    <div class="container grid grid-cols-12 gap-4 mx-auto mt-4 mb-24 md:gap-6">
 
-        <%= render "sales_count" %>
-        <%= render "sales_amount" %>
-        <%= render "sales_amount_this_month" %>
-        <%= render "sales_average_per_day_this_month" %>
+      <%= render "sales_count" %>
+      <%= render "sales_amount" %>
+      <%= render "sales_amount_this_month" %>
+      <%= render "sales_average_per_day_this_month" %>
 
-        <%= render "separator" %>
+      <%= render "separator" %>
 
-        <%= render "commission_targets_graph" %>
+      <%= render "commission_targets_graph" %>
 
-        <div
-          class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
-          <div class="flex items-center justify-between">
-            <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Notificaciones</h4>
-            <%= link_to "Ver Todas", "#", class: "font-medium text-sm hover:text-primary-600 text-slate-600 dark:text-slate-400 dark:hover:text-primary-300" %>
-          </div>
-
-          <%= turbo_stream_from "notifications" %>
-          <%= render "sales_dashboard_notification_feed" %>
+      <div class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
+        <div class="flex items-center justify-between">
+          <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Notificaciones</h4>
+          <%= link_to "Ver Todas", "#", class: "font-medium text-sm hover:text-primary-600 text-slate-600 dark:text-slate-400 dark:hover:text-primary-300" %>
         </div>
 
-        <%= render "separator" %>
-
-        <%= render "seller_commissions_list" %>
-
+        <%= turbo_stream_from "notifications" %>
+        <%= render "sales_dashboard_notification_feed" %>
       </div>
+
+      <%= render "separator" %>
+
+      <% if $global_settings[:feature_flag_commission_ranges] %>
+        <%= render "seller_commissions_list" %>
+      <% end %>
+
     </div>
   </div>
+</div>
 <% end %>
 
 <%= audio_tag "notification_feed_alert.mp3", id: "notification-sound", preload: 'auto' %>

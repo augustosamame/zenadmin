@@ -14,7 +14,9 @@ Rails.application.config.after_initialize do
     { name: :audited_active, default: true, data_type: "type_boolean", localized_name: "Se generan tablas de auditoría", internal: true },
     { name: :negative_stocks_allowed, default: true, data_type: "type_boolean", localized_name: "Se permiten stocks negativos", internal: true },
     { name: :stock_transfers_have_in_transit_step, default: true, data_type: "type_boolean", localized_name: "Las transferencias de stock tienen un paso intermedio En Tránsito", internal: true },
-    { name: :show_sunat_guia_for_stock_transfers, default: false, data_type: "type_boolean", localized_name: "Mostrar guías de remisión SUNAT en transferencias de stock", internal: true }
+    { name: :feature_flag_purchases, default: false, data_type: "type_boolean", localized_name: "Módulo de compras activo 2", internal: true },
+    { name: :show_sunat_guia_for_stock_transfers, default: false, data_type: "type_boolean", localized_name: "Módulo de compras activo", internal: true },
+    { name: :logo_path, default: "logo_jardin_del_zen.png", data_type: "type_string", localized_name: "Ruta del logo", internal: false }
   ]
 
   def load_global_settings

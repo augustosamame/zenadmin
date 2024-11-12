@@ -2,14 +2,34 @@ import { Controller } from '@hotwired/stimulus'
 import axios from 'axios'
 
 export default class extends Controller {
-  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion'];
+  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion', 'paymentSection', 'automaticDelivery'];
 
   connect() {
     console.log('Connected to PaymentController!');
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-    this.canCreateUnpaidOrders = this.element.dataset.posCanCreateUnpaidOrders === 'true';
+    // Get the setting from data attribute
+    this.settingAllowsUnpaidOrders = this.element.dataset.posCanCreateUnpaidOrders === 'true';
+
+    // Initialize based on checkbox if it exists, otherwise use setting
+    const automaticPaymentCheckbox = document.getElementById('automatic-payment');
+    this.canCreateUnpaidOrders = automaticPaymentCheckbox ?
+      automaticPaymentCheckbox.checked :
+      this.settingAllowsUnpaidOrders;
+
     this.maxTotalSaleWithoutCustomer = parseFloat(document.getElementById('max-total-sale-without-customer').dataset.value);
+    this.orderPaymentStatus = 'unpaid';
     console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
+  }
+
+  togglePaymentSection(event) {
+    const showPaymentSection = event.target.checked;
+    if (showPaymentSection) {
+      this.paymentSectionTarget.classList.remove('hidden');
+      this.fetchPaymentMethods();
+    } else {
+      this.paymentSectionTarget.classList.add('hidden');
+      this.paymentListTarget.innerHTML = '';
+    }
   }
 
   getRucData(customerId) {
@@ -142,22 +162,35 @@ export default class extends Controller {
 
     let gridColumns = 'grid-cols-[2fr_1fr_auto]';
     let innerHtml = `
-  <span class="self-center mr-2 w-full">${method}</span>
-  <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-full" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-  <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
-`;
+      <span class="self-center mr-2 w-full">${method}</span>
+      <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-full" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+      <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
+    `;
 
     if (methodName === "card" || methodName === "wallet") {
       gridColumns = 'grid-cols-[2fr_2fr_1fr_auto]';
       innerHtml = `
-    <span class="self-center mr-2 w-full">${method}</span>
-    <div class="flex items-center w-full">
-      <label for="tx${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Tx #</label>
-      <input type="text" id="tx${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tx-input" >
-    </div>
-    <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-    <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
-  `;
+        <span class="self-center mr-2 w-full">${method}</span>
+        <div class="flex items-center w-full">
+          <label for="tx${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Tx #</label>
+          <input type="text" id="tx${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tx-input" >
+        </div>
+        <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+        <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
+      `;
+    }
+
+    if (methodName === 'credit') {
+      gridColumns = 'grid-cols-[2fr_2fr_1fr_auto]';
+      innerHtml = `
+        <span class="self-center mr-2 w-full">${method}</span>
+        <div class="flex items-center w-full">
+          <label for="credit-date${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Fecha Cuota</label>
+          <input type="date" id="credit-date${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 credit-date-input" >
+        </div>
+        <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+        <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
+      `;
     }
 
     paymentElement.classList.add(gridColumns);
@@ -199,7 +232,7 @@ export default class extends Controller {
       ? `S/ ${remaining.toFixed(2)}`
       : `Cambio: S/ ${(remaining * -1).toFixed(2)}`;
 
-    this.remainingLabelTarget.textContent = remaining >= 0 ? 'Remaining:' : 'Cambio:';
+    this.remainingLabelTarget.textContent = remaining >= 0 ? 'Restante:' : 'Cambio:';
   }
 
   saveOrder(event) {
@@ -220,6 +253,10 @@ export default class extends Controller {
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
       totalPayments += parseFloat(input.value);
     });
+
+    if (!(totalPayments < totalOrderAmount)) {
+      this.orderPaymentStatus = 'paid';
+    }
 
     if (!this.canCreateUnpaidOrders && totalPayments < totalOrderAmount) {
       this.showErrorModal(
@@ -273,6 +310,13 @@ export default class extends Controller {
         }
       }
 
+      if (paymentMethod === 'credit') {
+        const creditDateInput = paymentElement.querySelector('.credit-date-input');
+        if (creditDateInput) {
+          payment.credit_date = creditDateInput.value;
+        }
+      }
+
       payments.push(payment);
     });
 
@@ -280,7 +324,7 @@ export default class extends Controller {
     console.log('selectedCustomerId', selectedCustomerId);
     const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');
-    const selectedSellers = JSON.parse(sellersButton.dataset.sellers || '[]');
+    const selectedSellers = sellersButton ? JSON.parse(sellersButton.dataset.sellers || '[]') : [];
 
     console.log('totalOrderAmount', totalOrderAmount);
     console.log('totalDiscountAmount', totalDiscountAmount);
@@ -298,12 +342,13 @@ export default class extends Controller {
         shipping_price: 0,
         currency: 'PEN',
         wants_factura: selectedRuc && isRucChecked,
-        payment_status: 'paid',
+        payment_status: this.orderPaymentStatus,
         seller_note: comment,
         order_items_attributes: orderItemsAttributes,
         payments_attributes: payments,
         sellers_attributes: selectedSellers,
-        request_id: this.requestId
+        request_id: this.requestId,
+        fast_stock_transfer_flag: this.automaticDeliveryTarget.checked
       }
     };
 
