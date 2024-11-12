@@ -73,7 +73,7 @@ gem "aasm", "~> 5.5.0"
 gem "rails-i18n", "~> 7.0.10"
 gem "prawn", "~> 2.5.0"
 gem "prawn-table", "~> 0.2.2"
-gem "combine_pdf", "~> 1.0.26"
+gem "combine_pdf", "~> 1.0.27"
 gem "aws-sdk-rekognition", "~> 1.109.0"
 
 group :development, :test do
