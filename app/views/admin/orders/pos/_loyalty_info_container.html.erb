@@ -1,5 +1,7 @@
-<div id="loyalty-info-container" class="p-4 mb-4 bg-white rounded-lg shadow-md dark:bg-gray-800" data-controller="pos--loyalty-info">
-  <div data-pos--loyalty-info-target="content">
-    <!-- Loyalty info will be loaded here -->
+<% if $global_settings[:feature_flag_loyalty_program] %>
+  <div id="loyalty-info-container" class="p-4 mb-4 bg-white rounded-lg shadow-md dark:bg-gray-800" data-controller="pos--loyalty-info">
+    <div data-pos--loyalty-info-target="content">
+      <!-- Loyalty info will be loaded here -->
+    </div>
   </div>
-</div>
+<% end %>

@@ -25,7 +25,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
 
     orders = OrderItem
       .joins(order: { location: :warehouses }) # Join order_items to orders, then to locations, then to warehouses
-      .where(product_id: product.id) # Filter by the product_id
+      .where(product_id: product.id, order: { fast_stock_transfer_flag: true }) # Filter by the product_id and location_id and only show if fast_stock_transfer_flag is true
       .where(warehouses: { id: selected_warehouse.id }) # Filter to include only matching warehouse
       .where("warehouses.id = (SELECT id FROM warehouses WHERE warehouses.location_id = locations.id ORDER BY warehouses.created_at LIMIT 1)") # Ensure it's the first warehouse
       .includes(:order) # Eager load orders to prevent N+1 queries

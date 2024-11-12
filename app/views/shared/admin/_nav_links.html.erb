@@ -1,66 +1,70 @@
 <li data-controller="dropdown" class="relative">
-    <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
-      Tableros
-    </button>
-    <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
-      <li>
-        <%= nav_link_to "Ventas", send("admin_sales_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <% if current_user.any_admin? || current_user.has_role?("supervisor") || current_user.has_role?("store") %>
-        <li>
-          <%= nav_link_to "Rankings", send("admin_sales_ranking_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-      <% end %>
-    </ul>
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Tableros
+  </button>
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Ventas", send("admin_sales_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% if $global_settings[:feature_flag_commission_ranges] %>
+    <% if current_user.any_admin? || current_user.has_role?("supervisor") || current_user.has_role?("store") %>
+    <li>
+      <%= nav_link_to "Rankings", send("admin_sales_ranking_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
+    <% end %>
+  </ul>
 </li>
 <li>
   <%= nav_link_to "Venta POS", send("pos_admin_orders_path"), class: "nav-link bg-primary-500 text-white px-6 py-2 rounded hover:bg-blue-600 whitespace-nowrap w-full text-center" %>
 </li>
 <% if current_user.any_admin_or_supervisor? %>
-  <li data-controller="dropdown" class="relative">
-    <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
-      Admin
-    </button>
-    <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
-      <li>
-        <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <% if current_user.any_admin? %>
-        <li>
-          <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-        <li>
-          <%= nav_link_to "Tiendas", send("admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-        <li>
-          <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-        <li>
-          <%= nav_link_to "Metas de Ventas", send("admin_seller_biweekly_sales_targets_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-        <li>
-          <%= nav_link_to "Rangos de Loyalty", send("admin_loyalty_tiers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-        </li>
-      <% end %>
-    </ul>
-  </li>
+<li data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Admin
+  </button>
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% if current_user.any_admin? %>
+    <li>
+      <%= nav_link_to "Métodos de Pago", send("admin_payment_methods_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Tiendas", send("admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% if $global_settings[:feature_flag_commission_ranges] %>
+    <li>
+      <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Metas de Ventas", send("admin_seller_biweekly_sales_targets_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Rangos de Loyalty", send("admin_loyalty_tiers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
+    <% end %>
+  </ul>
+</li>
 
-  <li data-controller="dropdown" class="relative">
-    <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
-      Facturación
-    </button>
-    <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
-      <li>
-        <%= nav_link_to "Razones Sociales", send("admin_invoicers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Series de Comprobantes", send("admin_invoice_series_index_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-      <li>
-        <%= nav_link_to "Mapeo de Series", send("admin_invoice_series_mappings_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
-    </ul>
-  </li>
+<li data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Facturación
+  </button>
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Razones Sociales", send("admin_invoicers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Series de Comprobantes", send("admin_invoice_series_index_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Mapeo de Series", send("admin_invoice_series_mappings_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+  </ul>
+</li>
 <% end %>
 
 <li data-controller="dropdown" class="relative">
@@ -80,21 +84,28 @@
     <li>
       <%= nav_link_to "Clientes", send("admin_customers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:feature_flag_commission_ranges] %>
     <li>
       <%= nav_link_to "Metas", send("sales_targets_admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <li>
       <%= nav_link_to "Comisiones", send("admin_commissions_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% end %>
   </ul>
 </li>
 
-<% if $global_settings[:feature_flag_purchase] %>
-  <li data-controller="dropdown" class="relative">
-    <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
-      Compras
-    </button>
-  </li>
+<% if $global_settings[:feature_flag_purchases] %>
+<li data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
+    Compras
+  </button>
+  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+    <li>
+      <%= nav_link_to "Inventarios", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+  </ul>
+</li>
 <% end %>
 
 <li data-controller="dropdown" class="relative">
@@ -124,9 +135,9 @@
       <%= nav_link_to "Pedidos", send("admin_requisitions_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% if current_user.any_admin? %>
-      <li>
-        <%= nav_link_to "Mínimos, Máximos y Factores de Reposición", send("admin_inventory_product_min_max_stocks_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
+    <li>
+      <%= nav_link_to "Mínimos, Máximos y Factores de Reposición", send("admin_inventory_product_min_max_stocks_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
     <% end %>
   </ul>
 </li>
@@ -139,18 +150,23 @@
       <%= nav_link_to "Productos", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% if current_user.any_admin? %>
-      <li>
-        <%= nav_link_to "Etiquetas", send("admin_tags_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
-      </li>
+    <li>
+      <%= nav_link_to "Etiquetas", send("admin_tags_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
     <% end %>
+    <% if $global_settings[:feature_flag_discounts] %>
     <li>
       <%= nav_link_to "Descuentos", send("admin_discounts_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% end %>
+    <% if $global_settings[:feature_flag_product_packs] %>
     <li>
       <%= nav_link_to "Packs de Productos", send("admin_product_packs_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% end %>
   </ul>
 </li>
+<% if $global_settings[:feature_flag_seller_checkin] %>
 <li data-controller="dropdown" class="relative">
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Asistencia
@@ -164,6 +180,7 @@
     </li>
   </ul>
 </li>
+<% end %>
 <li data-controller="dropdown" class="relative">
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Reportes
