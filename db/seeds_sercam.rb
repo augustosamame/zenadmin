@@ -20,7 +20,8 @@ settings = [
   { name: 'sellers_can_checkin', data_type: 'type_boolean', internal: false, localized_name: 'Vendedores pueden registrar asistencia', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'feature_flag_commission_ranges', data_type: 'type_boolean', internal: false, localized_name: 'Comisiones por rango de ventas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'feature_flag_loyalty', data_type: 'type_boolean', internal: false, localized_name: 'Programa de fidelidad', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
-  { name: 'multiple_cashiers_per_location', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples cajeros por ubicación', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' }
+  { name: 'multiple_cashiers_per_location', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples cajeros por ubicación', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_purchase', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de compras activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
 ]
 
 begin

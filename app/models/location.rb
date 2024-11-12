@@ -24,6 +24,8 @@ class Location < ApplicationRecord
   def create_warehouse_and_cashier
     Warehouse.create!(name: "Almacén #{self.name}", location: self)
     Cashier.create!(name: "Caja Ventas #{self.name}", location: self)
-    Cashier.create!(name: "Caja Chica #{self.name}", location: self)
+    if $global_settings[:multiple_cashiers_per_location].boolean_value
+      Cashier.create!(name: "Caja Chica #{self.name}", location: self)
+    end
   end
 end
