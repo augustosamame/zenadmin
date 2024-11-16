@@ -1,24 +1,24 @@
 <div data-pos--payment-target="paymentContainer" class="flex flex-col hidden h-full">
 
 
-  <div class="flex flex-col space-y-4 mb-4">
-    <% if $global_settings[:pos_can_create_unpaid_orders] %>
+  <div class="flex flex-col mb-4 space-y-4">
+    
     <div class="flex items-center space-x-2">
-      <input type="checkbox" id="automatic-payment" class="form-checkbox h-5 w-5 text-blue-600" checked data-action="change->pos--payment#togglePaymentSection">
+      <input type="checkbox" id="automatic-payment" class="w-5 h-5 text-blue-600 form-checkbox" checked data-action="change->pos--payment#togglePaymentSection">
       <label for="automatic-payment" class="text-sm font-medium text-gray-700 dark:text-gray-200">
         Pago Automático
       </label>
     </div>
-    <% end %>
+    
 
-    <% if $global_settings[:pos_can_create_orders_without_stock_transfers] %>
+    
     <div class="flex items-center space-x-2">
-      <input type="checkbox" id="automatic-delivery" class="form-checkbox h-5 w-5 text-blue-600" checked data-pos--payment-target="automaticDelivery">
+      <input type="checkbox" id="automatic-delivery" class="w-5 h-5 text-blue-600 form-checkbox" checked data-pos--payment-target="automaticDelivery">
       <label for="automatic-delivery" class="text-sm font-medium text-gray-700 dark:text-gray-200">
         Entrega Automática
       </label>
     </div>
-    <% end %>
+    
   </div>
 
   <div data-pos--payment-target="paymentSection">
