@@ -17,7 +17,7 @@ export default class extends Controller {
   searchProducts() {
     const query = this.searchTarget.value.trim()
     // Trim the query and check again
-    
+
     if (query.length >= 7 && query.startsWith('PRO')) {
       console.log('Searching for exact match:', query)
       this.findExactMatch(query)
@@ -91,19 +91,19 @@ export default class extends Controller {
       // Centering the image within the container
       productElement.innerHTML = `
         <div class="flex justify-center">
-          <img src="${product.image}" alt="${product.name}" class="object-cover h-24 w-24 mb-2">
+          <img src="${product.image || ''}" alt="${product.name || ''}" class="object-cover h-24 w-24 mb-2">
         </div>
-        <span class="block text-sm">${product.custom_id}</span>
-        <span class="block text-sm">${product.name}</span>
+        <span class="block text-sm">${product.custom_id || ''}</span>
+        <span class="block text-sm">${product.name || ''}</span>
         <div class="flex justify-between text-sm">
           ${product.original_price !== product.discounted_price
-                ? `<span class="text-red-500">
-                <del class="text-gray-500">S/ ${product.original_price.toFixed(2)}</del>
-                S/ ${product.discounted_price.toFixed(2)}
+          ? `<span class="text-red-500">
+                <del class="text-gray-500">S/ ${(product.original_price || 0).toFixed(2)}</del>
+                S/ ${(product.discounted_price || 0).toFixed(2)}
               </span>`
-                : `<span class="text-gray-500">S/ ${product.price.toFixed(2)}</span>`
-              }
-          <span class="text-gray-500">Stock: ${product.stock}</span>
+          : `<span class="text-gray-500">S/ ${(product.price || 0).toFixed(2)}</span>`
+        }
+          <span class="text-gray-500">Stock: ${product.stock || 0}</span>
         </div>
       `;
 
@@ -156,7 +156,7 @@ export default class extends Controller {
       // Calculate and apply the discount
       const discountAmount = comboDetails.discount;
       if (discountAmount > 0) {
-      orderItemsController.addComboDiscount(comboId, discountAmount);
+        orderItemsController.addComboDiscount(comboId, discountAmount);
       }
     } else if (item.type === "ProductPack") {
       // Handle product pack
@@ -281,9 +281,9 @@ export default class extends Controller {
     // Apply the pack discount
     if (packDiscount > 0) {
       orderItemsController.addPackDiscount(
-        pack.id, 
-        packDiscount, 
-        pack.name, 
+        pack.id,
+        packDiscount,
+        pack.name,
         selectedProducts.map(product => product.id)
       );
     }
