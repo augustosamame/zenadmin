@@ -7,11 +7,19 @@ export default class extends Controller {
   connect() {
     console.log('Connected to KeypadController!');
     this.currentMode = 'quantity';
-    this.setupKeyboardListener();
+    this.processingKeyboard = false;
+    this.boundKeyboardHandler = this.handleKeyboardInput.bind(this);
   }
 
-  setupKeyboardListener() {
-    document.addEventListener('keydown', this.handleKeyboardInput.bind(this));
+  enableKeyboardListener() {
+    console.log('Enabling keyboard listener');
+    this.disableKeyboardListener();
+    document.addEventListener('keydown', this.boundKeyboardHandler);
+  }
+
+  disableKeyboardListener() {
+    console.log('Disabling keyboard listener');
+    document.removeEventListener('keydown', this.boundKeyboardHandler);
   }
 
   handleKeyboardInput(event) {
@@ -24,6 +32,7 @@ export default class extends Controller {
     // Prevent default behavior for these keys when we're handling them
     if (this.isValidInput(event.key)) {
       event.preventDefault();
+      event.stopPropagation();
     }
 
     if (event.key === 'Backspace') {
@@ -79,7 +88,7 @@ export default class extends Controller {
   }
 
   disconnect() {
-    document.removeEventListener('keydown', this.handleKeyboardInput.bind(this));
+    this.disableKeyboardListener();
   }
 
   selectQuantityMode() {

@@ -31,6 +31,33 @@ export default class extends Controller {
     this.packDiscounts = new Map();
     this.packDiscountInstances = new Map(); // New map to track pack instances
     this.nextPackInstanceId = 1; // Counter for generating unique instance IDs
+
+    document.addEventListener('click', (event) => {
+      // Don't deselect if clicking within:
+      // 1. Order items
+      // 2. Keypad container
+      // 3. Keypad buttons
+      // 4. Mode buttons (Precio/Cant)
+      const isClickInOrderItems = event.target.closest('[data-pos--order-items-target="items"]');
+      const isClickInKeypad = event.target.closest('[data-controller="pos--keypad"]');
+      const isClickOnKeypadButton = event.target.closest('.keypad-button');
+      const isClickOnModeButton = event.target.closest('[data-action*="pos--keypad#select"]');
+      const isClickInProductGrid = event.target.closest('[data-controller="pos--product-grid"]');
+
+
+      if (!isClickInOrderItems &&
+        !isClickInKeypad &&
+        !isClickOnKeypadButton &&
+        !isClickOnModeButton &&
+        !isClickInProductGrid) {
+        this.deselectItem();
+      }
+    });
+  }
+
+  disconnect() {
+    // Remove the click listener when controller disconnects
+    document.removeEventListener('click', this.handleBackgroundClick);
   }
 
   setupLoyaltyEventListeners() {
@@ -121,12 +148,12 @@ export default class extends Controller {
 
   addItem(product) {
     const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.custom_id}"]`);
-    
+
     if (existingItem) {
       this.updateExistingItem(existingItem, product);
     } else {
       this.addNewItem(product);
-      this.selectItem({ currentTarget: this.itemsTarget.lastChild });
+      this.selectItem({ currentTarget: this.itemsTarget.lastElementChild });
       this.currentMode = 'quantity'; // Default to quantity mode
     }
 
@@ -137,7 +164,7 @@ export default class extends Controller {
     }
 
     if (product.isLoyaltyFree) {
-      const itemElement = existingItem || this.itemsTarget.lastChild;
+      const itemElement = existingItem || this.itemsTarget.lastElementChild;
       itemElement.setAttribute('data-item-loyalty-free', 'true');
     }
 
@@ -158,6 +185,33 @@ export default class extends Controller {
     // Mark the first keypress
     this.isFirstKeyPress = true;
     this.startingNewPrice = true;
+
+    const keypadController = this.application.getControllerForElementAndIdentifier(
+      document.querySelector('[data-controller="pos--keypad"]'),
+      'pos--keypad'
+    );
+
+    if (keypadController) {
+      keypadController.enableKeyboardListener();
+    }
+  }
+
+  // Add this method to handle deselection
+  deselectItem() {
+    if (this.selectedItem) {
+      this.selectedItem.classList.remove('bg-blue-100');
+      this.selectedItem = null;
+
+      // Disable keyboard listener when deselecting
+      const keypadController = this.application.getControllerForElementAndIdentifier(
+        document.querySelector('[data-controller="pos--keypad"]'),
+        'pos--keypad'
+      );
+
+      if (keypadController) {
+        keypadController.disableKeyboardListener();
+      }
+    }
   }
 
   updateQuantity(value) {
@@ -324,7 +378,7 @@ export default class extends Controller {
     }
 
     this.selectedItem.remove();
-    this.selectedItem = null;
+    this.deselectItem()
     this.calculateTotal();
     this.evaluateGroupDiscount();
     this.saveDraft();
@@ -442,7 +496,7 @@ export default class extends Controller {
     this.calculateTotal();
     this.saveDraft();
   }
-  
+
   removeItemFromSelection() {
     console.log('removing item:', this.selectedItem);
     if (this.selectedItem.hasAttribute('data-combo-id')) {
@@ -451,7 +505,7 @@ export default class extends Controller {
 
     if (!this.selectedItem) return;
     this.selectedItem.remove();
-    this.selectedItem = null;
+    this.deselectItem();
     this.evaluateGroupDiscount();
     this.calculateTotal();
     this.saveDraft();
@@ -460,7 +514,7 @@ export default class extends Controller {
   addPackDiscount(packId, discountAmount, packName, productIds) {
     // Generate a unique instance ID for this pack
     const instanceId = `${packId}-${this.nextPackInstanceId++}`;
-    
+
     this.packDiscounts.set(instanceId, {
       amount: discountAmount,
       name: packName,
@@ -484,7 +538,7 @@ export default class extends Controller {
     if (instanceId && this.packDiscounts.has(instanceId)) {
       // Remove specific instance
       this.packDiscounts.delete(instanceId);
-      
+
       // Reset items for this specific instance
       this.itemsTarget.querySelectorAll(`[data-pack-instance="${instanceId}"]`)
         .forEach(this.resetPackItem.bind(this));
@@ -498,7 +552,7 @@ export default class extends Controller {
         }
       }
     }
-    
+
     this.calculateTotal();
   }
 
@@ -506,11 +560,11 @@ export default class extends Controller {
     item.removeAttribute('data-pack-instance');
     item.removeAttribute('data-pack-id');
     item.setAttribute('data-item-already-discounted', 'false');
-    
+
     const originalPrice = item.getAttribute('data-item-original-price');
     const priceElement = item.querySelector('.editable-price');
     priceElement.textContent = `S/ ${parseFloat(originalPrice).toFixed(2)}`;
-    
+
     this.updateSubtotal(item);
   }
 
@@ -635,14 +689,14 @@ export default class extends Controller {
       const isDiscounted = item.getAttribute('data-item-already-discounted') === 'true';
       const packId = item.getAttribute('data-pack-id');
 
-      orderItems.push({ 
-        id, 
-        name, 
-        custom_id, 
-        quantity, 
-        price, 
-        subtotal, 
-        isLoyaltyFree, 
+      orderItems.push({
+        id,
+        name,
+        custom_id,
+        quantity,
+        price,
+        subtotal,
+        isLoyaltyFree,
         isDiscounted,
         packId // Include pack ID if present
       });
