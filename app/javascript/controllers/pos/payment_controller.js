@@ -264,6 +264,7 @@ export default class extends Controller {
         'El monto total de los métodos de pago debe coincidir con el monto total del pedido.',
         [{ label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }]
       );
+      this.resetButton(button, originalText);
       return;
     }
 
