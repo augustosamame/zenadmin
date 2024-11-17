@@ -17,7 +17,7 @@
        <%= render 'shared/admin/customer_table_modal' %>
      </div>
 
-     <% if $global_settings[:sales_attributed_to_seller] %>
+     <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
 
      <div data-controller="pos--sellers-modal">
        <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--sellers-modal#open">
