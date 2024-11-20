@@ -7,7 +7,7 @@ when "sercam"
 end
 
 if File.exist?(client_seed_file)
-  puts "Loading seed data for client Sercam..."
+  puts "Loading seed data for client #{ENV["CURRENT_ORGANIZATION"]}..."
   load client_seed_file
 else
   puts "Warning: No seed file found at #{client_seed_file}"

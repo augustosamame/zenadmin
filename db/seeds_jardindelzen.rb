@@ -23,6 +23,8 @@ setting_21 = Setting.find_or_create_by!(name: 'feature_flag_seller_checkin', dat
 setting_22 = Setting.find_or_create_by!(name: 'feature_flag_commission_ranges', data_type: 'type_boolean', internal: false, localized_name: 'Comisiones por rango de ventas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 setting_23 = Setting.find_or_create_by!(name: 'feature_flag_sales_attributed_to_seller', data_type: 'type_boolean', internal: false, localized_name: 'Ventas comisionables por vendedor', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 setting_24 = Setting.find_or_create_by!(name: 'pos_can_create_orders_without_stock_transfers', data_type: 'type_boolean', internal: false, localized_name: 'Ventas por ubicación', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
+setting_25 = Setting.find_or_create_by!(name: 'feature_flag_birthday_discount', data_type: 'type_boolean', internal: false, localized_name: 'Descuento cumpleañero Activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
+setting_26 = Setting.find_or_create_by!(name: 'birthday_discount_percentage', data_type: 'type_integer', internal: false, localized_name: '% de descuento cumpleañero', string_value: nil, integer_value: 10, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 
 Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')
@@ -55,15 +57,21 @@ location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: regi
 
 warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
 
-location_1 = Location.find_or_create_by!(name: 'Jockey Plaza', region: region_default, email: "jockeyplaza@devtechperu.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
+location_1 = Location.find_or_create_by!(name: 'Jockey', region: region_default, email: "jockey@devtechperu.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
-location_2 = Location.find_or_create_by!(name: 'Plaza San Miguel', region: region_default, email: "sanmiguel@devtechperu.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
+location_2 = Location.find_or_create_by!(name: 'San Miguel', region: region_default, email: "sanmiguel@devtechperu.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
 
 location_3 = Location.find_or_create_by!(name: 'Plaza Norte', region: region_default, email: "plazanorte@jardindelzen.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
 
 location_4 = Location.find_or_create_by!(name: 'Larcomar', region: region_default, email: "larcomar@jardindelzen.com", address: 'Av. La Marina 424, San Migual', phone: '900000010')
 
-storeuser1 = User.create!(email: 'jockeyplaza@aromaterapia.com.pe', phone: "986976311", location_id: location_1.id, login: "jockeyplaza@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
+location_5 = Location.find_or_create_by!(name: 'Chacarilla', region: region_default, email: "chacarilla@jardindelzen.com", address: 'Av. La Marina 424, San Migual', phone: '900000011')
+
+location_6 = Location.find_or_create_by!(name: 'Mall Del Sur', region: region_default, email: "mall_del_sur@jardindelzen.com", address: 'Av. La Marina 424, San Migual', phone: '900000012')
+
+location_7 = Location.find_or_create_by!(name: 'Ica', region: region_default, email: "ica@jardindelzen.com", address: 'Av. La Marina 424, San Migual', phone: '900000013')
+
+storeuser1 = User.create!(email: 'jockeyplaza@aromaterapia.com.pe', phone: "986976311", location_id: location_1.id, login: "jockey@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Jockey Plaza", internal: true)
 storeuser1.add_role('store')
 
 storeuser2 = User.create!(email: 'sanmiguel@aromaterapia.com.pe', phone: "986976312", location_id: location_2.id, login: "sanmiguel@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Plaza San Miguel", internal: true)
@@ -74,6 +82,15 @@ storeuser3.add_role('store')
 
 storeuser4 = User.create!(email: 'larcomar@aromaterapia.com.pe', phone: "928855855", location_id: location_4.id, login: "larcomar@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Larcomar", internal: true)
 storeuser4.add_role('store')
+
+storeuser5 = User.create!(email: 'chacarilla@aromaterapia.com.pe', phone: "928855856", location_id: location_5.id, login: "chacarilla@aromaterapia.com.pe", require_password_change: "12345678", password: "12345678", first_name: "Tienda", last_name: "Chacarilla", internal: true)
+storeuser5.add_role('store')
+
+storeuser6 = User.create!(email: 'mall_del_sur@aromaterapia.com.pe', phone: "928855857", location_id: location_6.id, login: "mall_del_sur@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Mall Del Sur", internal: true)
+storeuser6.add_role('store')
+
+storeuser7 = User.create!(email: 'ica@aromaterapia.com.pe', phone: "928855858", location_id: location_7.id, login: "ica@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Ica", internal: true)
+storeuser7.add_role('store')
 
 supervisor_1 = User.create!(email: 'supervisor@aromaterapia.com.pe', phone: "986976314", login: "supervisor@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Carmen", last_name: "Supervisor")
 supervisor_1.add_role('supervisor')
@@ -89,7 +106,8 @@ PaymentMethod.find_or_create_by!(name: 'pagoefectivo', description: 'Pagoefectiv
 PaymentMethod.find_or_create_by!(name: 'note', description: 'Nota de Crédito')
 PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 PaymentMethod.find_or_create_by!(name: 'miles', description: 'Millas')
-PaymentMethod.find_or_create_by!(name: 'apps', description: 'Rappi / PedidosYa')
+PaymentMethod.find_or_create_by!(name: 'rappi', description: 'Rappi')
+PaymentMethod.find_or_create_by!(name: 'pedidosya', description: 'PedidosYa')
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')
@@ -213,7 +231,7 @@ SellerBiweeklySalesTarget.find_or_create_by!(user: useradmin2, seller: superviso
 
 random_products = Product.order("RANDOM()").limit(4).pluck(:id)
 
-LoyaltyTier.find_or_create_by!(name: 'Silver', requirements_orders_count: 20, requirements_total_amount: 2000, discount_percentage: 0.10, free_product_id: random_sercamsrls[0])
+LoyaltyTier.find_or_create_by!(name: 'Silver', requirements_orders_count: 20, requirements_total_amount: 2000, discount_percentage: 0.10, free_product_id: random_products[0])
 LoyaltyTier.find_or_create_by!(name: 'Gold', requirements_orders_count: 30, requirements_total_amount: 3000, discount_percentage: 0.15, free_product_id: random_products[1])
 LoyaltyTier.find_or_create_by!(name: 'Platinum', requirements_orders_count: 40, requirements_total_amount: 4000, discount_percentage: 0.20, free_product_id: random_products[2])
 LoyaltyTier.find_or_create_by!(name: 'Diamond', requirements_orders_count: 50, requirements_total_amount: 5000, discount_percentage: 0.25, free_product_id: random_products[3])
@@ -295,3 +313,5 @@ Services::Products::ProductImportService.new("productos_y_etiquetas_jardin_del_z
 # Services::Products::InitialStockImportService.new("stock_location_id_3.csv").call
 # Services::Products::ImportProductPricesService.new("reporte_de_precios.csv").call
 Services::Products::InitialStockImportService.new("jardin_del_zen_stock_and_price_report.csv").stock_and_prices
+
+Services::Products::InitialStockImportService.new("plaza_norte.csv", 1, "Plaza Norte").stocks_only

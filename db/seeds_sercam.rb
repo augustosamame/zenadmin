@@ -24,7 +24,9 @@ settings = [
   { name: 'feature_flag_purchases', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de compras activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
   { name: 'logo_path', data_type: 'type_string', internal: false, localized_name: 'Ruta del logo', string_value: "logo_grupo_sercam.png", integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: nil, hash_value: nil, status: 'active' },
   { name: 'feature_flag_discounts', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de descuentos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
-  { name: 'feature_flag_product_packs', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de paquetes de productos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' }
+  { name: 'feature_flag_product_packs', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de paquetes de productos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_birthday_discount', data_type: 'type_boolean', internal: false, localized_name: 'Descuento cumpleañero Activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
+  { name: 'birthday_discount_percentage', data_type: 'type_integer', internal: false, localized_name: '% de descuento cumpleañero', string_value: nil, integer_value: 0, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
 ]
 
 begin
