@@ -54,7 +54,7 @@ class Admin::ReportsController < Admin::AdminController
   private
 
   def generate_sales_report
-    @orders = Order.where(order_date: @date.beginning_of_day..@date.end_of_day)
+    @orders = Order.where(location: @location, order_date: @date.beginning_of_day..@date.end_of_day)
                    .includes(order_items: :product, user: {})
                    .order(id: :asc)
     @total_sales = Order.where(id: @orders.pluck(:id)).sum(:total_price_cents) / 100.0
@@ -75,15 +75,18 @@ class Admin::ReportsController < Admin::AdminController
 
   def generate_cash_flow_report
     @cashier_shifts = CashierShift.joins(:cashier)
-                                    .where(created_at: @date.beginning_of_day..@date.end_of_day)
-                                    .where(cashiers: { id: @current_cashier.id })
-                                    .order(id: :asc)
+                             .where(cashiers: { location_id: @location.id })
+                             .where(created_at: @date.beginning_of_day..@date.end_of_day)
+                             .where(cashiers: { id: @current_cashier.id })
+                             .order(id: :asc)
     @seller_totals = Commission.joins(:user)
-              .where(created_at:  @date.beginning_of_day..@date.end_of_day)
-              .group("users.id")
-              .sum(:sale_amount_cents)
-              .transform_values { |cents| cents / 100.0 }  # Convert cents to dollars
-              .sort_by { |_, total| -total }
+                          .joins(:order)
+                          .where(orders: { location: @location })
+                          .where(commissions: { created_at: @date.beginning_of_day..@date.end_of_day })
+                          .group("users.id")
+                          .sum(:sale_amount_cents)
+                          .transform_values { |cents| cents / 100.0 }
+                          .sort_by { |_, total| -total }
 
     CashFlowReport.new(@date, @date, @location, @cashier_shifts, @current_cashier, current_user, @seller_totals).render
   end
