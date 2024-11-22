@@ -28,7 +28,7 @@ module Services
             end
           end
         else
-          @order.update(payment_status: :unpaid)
+          @order.update_columns(payment_status: :unpaid)
         end
         @order.order_is_paid_activities if @order.paid?
       end

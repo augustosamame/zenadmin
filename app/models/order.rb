@@ -40,8 +40,8 @@ class Order < ApplicationRecord
 
   before_create :set_defaults
 
-  # after_commit :create_notification
-  # after_create_commit :refresh_dashboard_metrics
+  after_commit :create_notification
+  after_create_commit :refresh_dashboard_metrics
   after_commit :reevaluate_payment_status
 
   validates :user_id, :location_id, :region_id, presence: true
