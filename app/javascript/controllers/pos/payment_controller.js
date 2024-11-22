@@ -314,7 +314,7 @@ export default class extends Controller {
       if (paymentMethod === 'credit') {
         const creditDateInput = paymentElement.querySelector('.credit-date-input');
         if (creditDateInput) {
-          payment.credit_date = creditDateInput.value;
+          payment.due_date = creditDateInput.value;
         }
       }
 

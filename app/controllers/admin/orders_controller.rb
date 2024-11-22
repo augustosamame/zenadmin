@@ -53,9 +53,16 @@ class Admin::OrdersController < Admin::AdminController
       end
 
       if @order.save!
+        credit_payment_method = PaymentMethod.find_by(name: "credit")
         if order_params[:payments_attributes]
           order_params[:payments_attributes].each do |payment|
-            @order.payments.create!(payment.merge(payable: @order, cashier_shift: @current_cashier_shift, status: @order.origin == "pos" ? "paid" : "pending"))
+            @order.payments.create!(
+              payment.merge(
+                payable: @order,
+                cashier_shift: @current_cashier_shift,
+                status: @order.origin == "pos" && payment[:payment_method_id]&.to_i != credit_payment_method.id ? "paid" : "pending"
+              )
+            )
           end
         end
         if order_params[:sellers_attributes].present?
@@ -137,7 +144,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id

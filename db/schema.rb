@@ -10,11 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_22_193940) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
   enable_extension "unaccent"
+
+  create_table "account_receivable_payments", force: :cascade do |t|
+    t.bigint "account_receivable_id", null: false
+    t.bigint "payment_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_receivable_id"], name: "index_account_receivable_payments_on_account_receivable_id"
+    t.index ["payment_id"], name: "index_account_receivable_payments_on_payment_id"
+  end
+
+  create_table "account_receivables", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "payment_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.datetime "due_date"
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_account_receivables_on_order_id"
+    t.index ["payment_id"], name: "index_account_receivables_on_payment_id"
+    t.index ["user_id"], name: "index_account_receivables_on_user_id"
+  end
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -528,6 +557,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "due_date"
     t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_payments_on_custom_id", unique: true
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
@@ -960,6 +990,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.index ["region_id"], name: "index_warehouses_on_region_id"
   end
 
+  add_foreign_key "account_receivable_payments", "account_receivables"
+  add_foreign_key "account_receivable_payments", "payments"
+  add_foreign_key "account_receivables", "orders"
+  add_foreign_key "account_receivables", "payments"
+  add_foreign_key "account_receivables", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "cash_inflows", "cashier_shifts"

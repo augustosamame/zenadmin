@@ -40,13 +40,9 @@ class Order < ApplicationRecord
 
   before_create :set_defaults
 
-  # Update commissions when the order is marked as paid
-  after_commit :update_commissions_status, if: :paid?
-  after_commit :update_loyalty_tier, if: :paid?, on: [ :create, :update, :destroy ]
-  after_commit :update_free_product_availability, if: :paid?, on: [ :create ]
-  after_commit :create_notification
-  after_create_commit :refresh_dashboard_metrics
-
+  # after_commit :create_notification
+  # after_create_commit :refresh_dashboard_metrics
+  after_commit :reevaluate_payment_status
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -135,11 +131,21 @@ class Order < ApplicationRecord
     self.invoices&.sunat_success&.issued&.last
   end
 
-  private
+  def reevaluate_payment_status
+    Services::Sales::OrderCreditService.new(self).reevaluate_payment_status
+  end
 
-    def update_commissions_status
-      commissions.status_order_unpaid.update_all(status: :status_order_paid)
-    end
+  def order_is_paid_activities
+    update_commissions_status if $global_settings[:feature_flag_sales_attributed_to_seller]
+    update_loyalty_tier if $global_settings[:feature_flag_loyalty_program]
+    update_free_product_availability if $global_settings[:feature_flag_loyalty_program]
+  end
+
+  def update_commissions_status
+    commissions.status_order_unpaid.update_all(status: :status_order_paid)
+  end
+
+  private
 
     def create_notification
       Services::Notifications::CreateNotificationService.new(self).create

@@ -44,7 +44,8 @@ class Admin::PaymentsController < Admin::AdminController
       :payment_date,
       :comment,
       :status,
-      :processor_transacion_id
+      :processor_transacion_id,
+      :due_date
     )
   end
 
