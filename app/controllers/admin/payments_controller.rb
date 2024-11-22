@@ -14,7 +14,7 @@ class Admin::PaymentsController < Admin::AdminController
                 .order(id: :desc)
         end
 
-        if @payments.size > 500
+        if @payments.size > 2000
           @datatable_options = "server_side:true;resource_name:'Payment';create_button:false;sort_0_desc;"
         else
           @datatable_options = "server_side:false;resource_name:'Payment';create_button:false;sort_0_desc;"
