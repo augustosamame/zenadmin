@@ -1,0 +1,38 @@
+<%= render "shared/admin/nav", { header_title: "Estado de Cuenta de Clientes" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Id</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Email</th>
+          <th class="px-4 py-2 text-left">Móvil</th>
+          <th class="px-4 py-2 text-left">Tienda</th>
+          <th class="px-4 py-2 text-left">Roles</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @users.each do |user| %>
+          <tr>
+            <td class="px-4 py-2"><%= user.id %></td>
+            <td class="px-4 py-2"><%= user.name %></td>
+            <td class="px-4 py-2"><%= user.email %></td>
+            <td class="px-4 py-2"><%= user.phone %></td>
+            <td class="px-4 py-2"><%= user.location&.name %></td>
+            <td class="px-4 py-2"><%= user.roles&.pluck(:name)&.to_s %></td>
+            <td class="px-4 py-2"><%= user.translated_status %></td>
+            <td class="px-4 py-2">
+              <%= link_to 'Estado de Cuenta', admin_account_receivables_path(user_id: user.id), class: 'btn btn-secondary' %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

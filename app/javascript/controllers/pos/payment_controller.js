@@ -4,6 +4,10 @@ import axios from 'axios'
 export default class extends Controller {
   static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion', 'paymentSection', 'automaticDelivery'];
 
+  static values = {
+    creditPaymentMethodId: Number
+  }
+
   connect() {
     console.log('Connected to PaymentController!');
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -18,6 +22,7 @@ export default class extends Controller {
 
     this.maxTotalSaleWithoutCustomer = parseFloat(document.getElementById('max-total-sale-without-customer').dataset.value);
     this.orderPaymentStatus = 'unpaid';
+    this.creditPaymentMethodId = parseInt(this.element.dataset.creditPaymentMethodId);
     console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
   }
 
@@ -294,6 +299,17 @@ export default class extends Controller {
     });
 
     const payments = [];
+    // No payments, and we can create unpaid orders
+    if (this.paymentListTarget.querySelectorAll('.payment-amount').length === 0 && this.canCreateUnpaidOrders) {
+      const payment = {
+        amount_cents: parseInt(totalOrderAmount * 100, 10),
+        payment_method_id: this.creditPaymentMethodId,
+        user_id: 1, // Use the selected customer's ID instead of hardcoding to 1
+        payable_type: 'Order'
+      };
+      payments.push(payment);
+    }
+    // There are payments (regular flow)
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
       const paymentElement = input.closest('div');
       const paymentMethod = paymentElement.dataset.methodName;

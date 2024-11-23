@@ -53,7 +53,7 @@ Rails.application.routes.draw do
         get "pos"
       end
     end
-    resources :payments, only: [ :index ]
+    resources :payments, only: [ :index, :show ]
     resources :payment_methods
     resources :users do
       member do
@@ -147,6 +147,18 @@ Rails.application.routes.draw do
     resources :invoice_series_mappings
 
     resources :tags, only: [ :index, :new, :create, :edit, :update, :destroy ]
+
+    resources :account_receivables, only: [ :index, :show ] do
+      get "users_index", on: :collection
+      get "payments_calendar", on: :collection
+    end
+
+    resources :account_receivable_payments, only: [ :new, :create ] do
+    collection do
+      get :success
+        get :error
+      end
+    end
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     get "sales_ranking", to: "dashboards#sales_ranking"

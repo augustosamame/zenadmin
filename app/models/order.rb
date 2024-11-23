@@ -27,6 +27,7 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
   has_many :payments, as: :payable, dependent: :destroy
+  has_many :account_receivables, dependent: :destroy
 
   has_many :commissions, dependent: :destroy
   has_many :commission_payouts, through: :commissions
@@ -42,7 +43,7 @@ class Order < ApplicationRecord
 
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
-  after_commit :reevaluate_payment_status
+  after_commit :reevaluate_payment_status, on: [ :create, :update ]
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true

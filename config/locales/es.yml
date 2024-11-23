@@ -191,3 +191,9 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      account_receivable:
+        status_list:
+          pending: Pendiente
+          partially_paid: Parcialmente pagado
+          paid: Pagado
+          cancelled: Cancelado

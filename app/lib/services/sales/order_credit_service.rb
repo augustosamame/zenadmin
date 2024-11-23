@@ -7,6 +7,7 @@ module Services
       end
 
       def reevaluate_payment_status
+        return if @order.destroyed? || @order.marked_for_destruction?
         payments = @order.payments
         if payments.any?
           credit_payments = payments.where(payment_method: @credit_payment_method)
@@ -14,9 +15,9 @@ module Services
           if credit_payments.any?
             paid_amount = non_credit_payments.sum(:amount_cents)
             if paid_amount > 0
-              @order.update_columns(payment_status: :partially_paid)
+              @order.update_columns(payment_status: :partially_paid, is_credit_sale: true)
             else
-              @order.update_columns(payment_status: :unpaid)
+              @order.update_columns(payment_status: :unpaid, is_credit_sale: true)
             end
             create_credit_receivable
           else
@@ -24,11 +25,20 @@ module Services
             if payment_amount >= @order.total_price_cents
               @order.update_columns(payment_status: :paid)
             else
-              @order.update_columns(payment_status: :partially_paid)
+              @order.update_columns(payment_status: :partially_paid, is_credit_sale: true)
             end
           end
         else
-          @order.update_columns(payment_status: :unpaid)
+          @order.update_columns(payment_status: :unpaid, is_credit_sale: true)
+          Payment.create!(
+            payment_method: @credit_payment_method,
+            cashier_shift: @order.cashier_shift,
+            user: @order.user,
+            payable: @order,
+            amount_cents: @order.total_price_cents,
+            currency: @order.currency
+          )
+          create_credit_receivable
         end
         @order.order_is_paid_activities if @order.paid?
       end

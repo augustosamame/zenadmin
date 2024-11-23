@@ -15,6 +15,8 @@ class Payment < ApplicationRecord
   has_one :location, through: :cashier
   belongs_to :order, optional: true
   has_one :cashier_transaction, as: :transactable, dependent: :destroy
+  has_many :account_receivables, dependent: :destroy
+  has_many :account_receivable_payments, dependent: :destroy
 
   enum :status, { pending: 0, paid: 1, partially_paid: 2, cancelled: 3 }
   translate_enum :status
@@ -25,14 +27,22 @@ class Payment < ApplicationRecord
   validates :payable, presence: true
 
   before_validation :set_payment_date
+  before_validation :set_cashier_shift
 
   after_create :create_cashier_transaction
 
   scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
 
+  def order
+    payable if payable_type == "Order"
+  end
 
   def set_payment_date
     self.payment_date = Time.zone.now if self.payment_date.nil?
+  end
+
+  def set_cashier_shift
+    self.cashier_shift = cashier_shift_id.present? ? cashier_shift : CashierShift.open&.last
   end
 
   def description
