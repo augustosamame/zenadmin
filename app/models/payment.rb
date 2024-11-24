@@ -9,7 +9,8 @@ class Payment < ApplicationRecord
   belongs_to :payment_method
   belongs_to :user
   belongs_to :region
-  belongs_to :payable, polymorphic: true, autosave: true, required: true
+  # belongs_to :payable, polymorphic: true, autosave: true, required: true
+  belongs_to :payable, polymorphic: true, autosave: true, optional: true
   belongs_to :cashier_shift
   has_one :cashier, through: :cashier_shift
   has_one :location, through: :cashier
@@ -23,8 +24,9 @@ class Payment < ApplicationRecord
 
   monetize :amount_cents, with_model_currency: :currency
 
-  validates :payment_method_id, :user_id, :payable_id, :payable_type, :amount_cents, :payment_date, presence: true
-  validates :payable, presence: true
+  # validates :payment_method_id, :user_id, :payable_id, :payable_type, :amount_cents, :payment_date, presence: true
+  validates :payment_method_id, :user_id, :amount_cents, :payment_date, presence: true
+  # validates :payable, presence: true
 
   before_validation :set_payment_date
   before_validation :set_cashier_shift

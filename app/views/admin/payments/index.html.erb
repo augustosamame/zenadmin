@@ -13,7 +13,7 @@
           <% end %>
           <th class="px-4 py-2 text-left">Número</th>
           <th class="px-4 py-2 text-left">Fecha</th>
-          <th class="px-4 py-2 text-left">Comprador</th>
+          <th class="px-4 py-2 text-left">Cliente</th>
           <th class="px-4 py-2 text-left">Método de Pago</th>
           <th class="px-4 py-2 text-left">Monto</th>
           <th class="px-4 py-2 text-left">Tx #</th>
@@ -30,7 +30,7 @@
             <% end %>
             <td class="px-4 py-2"><%= payment.custom_id %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, payment.payment_date) %></td>
-            <td class="px-4 py-2"><%= payment&.payable&.user&.name %></td>
+            <td class="px-4 py-2"><%= payment.payable ? payment&.payable&.user&.name : payment.user&.name %></td>
             <td class="px-4 py-2"><%= payment.payment_method.description %></td>
             <td class="px-4 py-2"><%= format_currency(payment.amount) %></td>
             <td class="px-4 py-2"><%= payment.processor_transacion_id %></td>

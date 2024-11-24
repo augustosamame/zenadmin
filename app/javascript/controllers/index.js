@@ -112,6 +112,9 @@ application.register("order-commission-form", OrderCommissionFormController)
 import OrderShowController from "./order_show_controller"
 application.register("order-show", OrderShowController)
 
+import PaymentFormController from "./payment_form_controller"
+application.register("payment-form", PaymentFormController)
+
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
 

@@ -43,7 +43,8 @@ class Order < ApplicationRecord
 
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
-  after_commit :reevaluate_payment_status, on: [ :create, :update ]
+  after_commit :evaluate_payment_status, on: [ :create ]
+  after_commit :reevaluate_payment_status, on: [ :update ]
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -53,6 +54,8 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :payments, allow_destroy: true
   accepts_nested_attributes_for :commissions, allow_destroy: true
+
+  scope :unpaid_or_partially_paid, -> { where(payment_status: [ :unpaid, :partially_paid ]) }
 
   pg_search_scope :search_by_customer_name,
                   associated_against: {
@@ -132,8 +135,12 @@ class Order < ApplicationRecord
     self.invoices&.sunat_success&.issued&.last
   end
 
+  def evaluate_payment_status
+    Services::Sales::OrderCreditService.new(self).evaluate_payment_status(operation: :create)
+  end
+
   def reevaluate_payment_status
-    Services::Sales::OrderCreditService.new(self).reevaluate_payment_status
+    Services::Sales::OrderCreditService.new(self).evaluate_payment_status(operation: :update)
   end
 
   def order_is_paid_activities

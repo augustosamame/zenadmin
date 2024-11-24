@@ -19,10 +19,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
     authorize! :read, AccountReceivable
     if params[:user_id].present?
       @account_receivables = AccountReceivable.where(user_id: params[:user_id])
-      @unapplied_payments = Payment.where(payable_type: "Order")
-                                .joins("INNER JOIN orders ON orders.id = payments.payable_id")
-                                .where(orders: { user_id: params[:user_id], is_credit_sale: true })
-                                .where(account_receivable_id: nil, status: "paid")
+      @unapplied_payments = Payment.includes([ :cashier_shift ]).where(user_id: params[:user_id], account_receivable_id: nil, status: "paid").order(id: :desc)
       @applied_payments = Payment.where(payable_type: "Order")
                                 .joins("INNER JOIN orders ON orders.id = payments.payable_id")
                                 .where(orders: { user_id: params[:user_id], is_credit_sale: true })
@@ -31,7 +28,8 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
       @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
-      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid
+      @total_pending_previous_period = 0
+      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
     else
       raise "User ID is required"
     end

@@ -53,13 +53,14 @@ Rails.application.routes.draw do
         get "pos"
       end
     end
-    resources :payments, only: [ :index, :show ]
+    resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
     resources :users do
       member do
         get "loyalty_info"
         patch "update_contact_info"
         get "check_roles"
+        get "unpaid_orders"
       end
     end
     get "sellers", to: "users#sellers"

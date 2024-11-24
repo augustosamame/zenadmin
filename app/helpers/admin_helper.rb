@@ -77,6 +77,8 @@ module AdminHelper
     case payable_type
     when "Order"
       "Venta"
+    when nil
+      ""
     else
       payable_type
     end

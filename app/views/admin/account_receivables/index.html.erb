@@ -5,36 +5,45 @@
 <div class="px-4 md:px-10 mx-auto my-2">
   <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
     <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-bold dark:text-gray-200">Total Ventas</h3>
+      <h3 class="text-lg font-bold dark:text-gray-200">Total Ventas en el Período</h3>
       <p class="text-2xl font-bold dark:text-gray-100">
         S/ <%= number_with_precision(@total_sales, precision: 2) %>
       </p>
     </div>
     
     <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-bold dark:text-gray-200">Total Ventas al Crédito</h3>
+      <h3 class="text-lg font-bold dark:text-gray-200">Total Ventas al Crédito en el Período</h3>
       <p class="text-2xl font-bold dark:text-gray-100">
         S/ <%= number_with_precision(@total_credit_sales, precision: 2) %>
       </p>
     </div>
     
     <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
-      <h3 class="text-lg font-bold dark:text-gray-200">Total Pagado</h3>
+      <h3 class="text-lg font-bold dark:text-gray-200">Total Pagado a Cuenta en el Período</h3>
       <p class="text-2xl font-bold dark:text-gray-100">
         S/ <%= number_with_precision(@total_paid, precision: 2) %>
+      </p>
+    </div>
+
+    <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
+      <h3 class="text-lg font-bold dark:text-gray-200">
+        <%= "Saldo Anterior" %>
+      </h3>
+      <p class="text-2xl font-bold dark:text-gray-100">
+        S/ <%= number_with_precision(@total_pending_previous_period, precision: 2) %>
       </p>
     </div>
     
     <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
       <h3 class="text-lg font-bold dark:text-gray-200">
-        <%= "Total Saldo #{@total_pending < 0 ? 'A Favor' : 'Pendiente'}" %>
+        <%= "Total Saldo Actual #{@total_pending < 0 ? 'A Favor' : 'Pendiente'}" %>
       </h3>
       <p class="text-2xl font-bold dark:text-gray-100">
         S/ <%= number_with_precision(@total_pending, precision: 2) %>
       </p>
     </div>
     
-    <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm col-span-2 md:col-span-2">
+    <div class="bg-gray-100 dark:bg-slate-700 p-4 rounded-lg shadow-sm">
       <h3 class="text-lg font-bold mb-2 dark:text-gray-200">Ver Calendario de Vencimientos</h3>
       <%= link_to "Calendario de Vencimientos", 
           payments_calendar_admin_account_receivables_path(user_id: @account_receivables.first&.user&.id), 
@@ -61,16 +70,20 @@
         </tr>
       </thead>
       <tbody>
-        <% @unapplied_payments.includes(:user, :order, :payment_method).each do |payment| %>
+        <% @unapplied_payments.includes(:user, :payment_method).each do |payment| %>
           <tr class="<%= 'bg-red-50 dark:bg-red-950' if payment.due_date&.past? && payment.pending? %>">
             <td class="px-4 py-2"><%= l(payment.payment_date, format: :short) %></td>
             <td class="px-4 py-2"><%= payment.custom_id %></td>
-            <td class="px-4 py-2"><%= payment.payment_method.name %></td>
+            <td class="px-4 py-2"><%= payment.payment_method.description %></td>
             <td class="px-4 py-2"><%= payment.cashier_shift&.cashier&.name %></td>
             <td class="px-4 py-2"><%= payment.user.name %></td>
             <td class="px-4 py-2">
-            <%= link_to payment.order.custom_id, admin_order_path(payment.order), 
-                  class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" %>
+              <% if payment.order.present? %>
+                <%= link_to payment&.order&.custom_id, admin_order_path(payment&.order), 
+                    class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" %>
+              <% else %>
+                <span class="text-gray-400 dark:text-gray-600">No disponible</span>
+              <% end %>
             </td>
             <td class="px-4 py-2">S/ <%= number_with_precision(payment.amount, precision: 2) %></td>
             <td class="px-4 py-2"><%= payment.translated_status %></td>
@@ -81,11 +94,9 @@
                   <i class="fas fa-eye mr-1"></i> Ver
                 <% end %>
                 
-                <% if payment.pending? %>
-                  <%= link_to new_admin_account_receivable_payment_path(account_receivable_id: payment.payable_id), 
-                      class: "btn btn-success" do %>
-                    <i class="fas fa-dollar-sign mr-1"></i> Aplicar
-                  <% end %>
+                <%= link_to new_admin_account_receivable_payment_path(account_receivable_id: payment.payable_id), 
+                    class: "btn btn-secondary" do %>
+                  <i class="fas fa-dollar-sign mr-1"></i> Aplicar
                 <% end %>
               </div>
             </td>
@@ -99,14 +110,14 @@
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
   <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
-      <h3 class="text-lg font-bold mb-2">Ventas al Crédito</h3>
+      <h3 class="text-lg font-bold mb-2">Cuentas por Cobrar</h3>
       <thead>
         <tr>
-          <th class="px-4 py-2 text-left">Cliente</th>
+          <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Venta</th>
           <th class="px-4 py-2 text-left">Comprobante</th>
-          <th class="px-4 py-2 text-left">Monto Original</th>
-          <th class="px-4 py-2 text-left">Monto Pagado</th>
+          <th class="px-4 py-2 text-left">Cuota</th>
+          <th class="px-4 py-2 text-left">A cuenta</th>
           <th class="px-4 py-2 text-left">Saldo</th>
           <th class="px-4 py-2 text-left">Fecha Vencimiento</th>
           <th class="px-4 py-2 text-left">Estado</th>
@@ -114,9 +125,11 @@
         </tr>
       </thead>
       <tbody>
-        <% @account_receivables.includes(:user, :order, :payments).each do |receivable| %>
+        <% @account_receivables.includes(:order).each do |receivable| %>
           <tr class="<%= 'bg-red-50 dark:bg-red-950' if receivable.due_date&.past? && receivable.pending? %>">
-            <td class="px-4 py-2"><%= receivable.user.name %></td>
+            <td class="px-4 py-2">
+              <%= l(receivable.created_at, format: :short) %>
+            </td>
             <td class="px-4 py-2">
               <%= link_to receivable.order.custom_id, admin_order_path(receivable.order), 
                   class: "text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-200" %>

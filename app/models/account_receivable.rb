@@ -18,7 +18,7 @@ class AccountReceivable < ApplicationRecord
   after_create :set_due_date
 
   def remaining_balance
-    amount - payments.sum(:amount_cents) / 100.0
+    (amount_cents - payments.sum(:amount_cents)) / 100.0
   end
 
   private

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_22_193940) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -544,8 +544,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_22_193940) do
     t.bigint "payment_method_id", null: false
     t.bigint "user_id", null: false
     t.bigint "region_id", null: false
-    t.string "payable_type", null: false
-    t.bigint "payable_id", null: false
+    t.string "payable_type"
+    t.bigint "payable_id"
     t.bigint "cashier_shift_id", null: false
     t.string "custom_id", null: false
     t.integer "payment_request_id"
