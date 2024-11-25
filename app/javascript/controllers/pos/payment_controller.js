@@ -4,6 +4,10 @@ import axios from 'axios'
 export default class extends Controller {
   static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion', 'paymentSection', 'automaticDelivery'];
 
+  static values = {
+    creditPaymentMethodId: Number
+  }
+
   connect() {
     console.log('Connected to PaymentController!');
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
@@ -18,6 +22,7 @@ export default class extends Controller {
 
     this.maxTotalSaleWithoutCustomer = parseFloat(document.getElementById('max-total-sale-without-customer').dataset.value);
     this.orderPaymentStatus = 'unpaid';
+    this.creditPaymentMethodId = parseInt(this.element.dataset.creditPaymentMethodId);
     console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
   }
 
@@ -137,6 +142,7 @@ export default class extends Controller {
           );
           button.textContent = method.description;
           button.dataset.method = method.name;
+          button.dataset.methodType = method.payment_method_type;
           button.dataset.description = method.description;
           button.dataset.id = method.id;
           button.addEventListener('click', this.addPayment.bind(this));
@@ -151,6 +157,7 @@ export default class extends Controller {
   addPayment(event) {
     const method = event.currentTarget.dataset.description;
     const methodName = event.currentTarget.dataset.method;
+    const methodType = event.currentTarget.dataset.methodType;
     const methodId = event.currentTarget.dataset.id;
     let remaining = parseFloat(this.remainingAmountTarget.textContent.replace('S/', ''));
     const paymentAmount = remaining > 0 ? remaining : 0;
@@ -159,6 +166,7 @@ export default class extends Controller {
     paymentElement.classList.add('grid', 'gap-2', 'p-2', 'bg-white', 'rounded', 'shadow-md', 'mb-2', 'dark:bg-gray-700');
     paymentElement.dataset.methodId = methodId;
     paymentElement.dataset.methodName = methodName;
+    paymentElement.dataset.methodType = methodType;
 
     let gridColumns = 'grid-cols-[2fr_1fr_auto]';
     let innerHtml = `
@@ -167,7 +175,7 @@ export default class extends Controller {
       <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
     `;
 
-    if (methodName === "card" || methodName === "wallet") {
+    if (methodName === "card" || methodName === "wallet" || methodType === "bank") {
       gridColumns = 'grid-cols-[2fr_2fr_1fr_auto]';
       innerHtml = `
         <span class="self-center mr-2 w-full">${method}</span>
@@ -294,9 +302,21 @@ export default class extends Controller {
     });
 
     const payments = [];
+    // No payments, and we can create unpaid orders
+    if (this.paymentListTarget.querySelectorAll('.payment-amount').length === 0 && this.canCreateUnpaidOrders) {
+      const payment = {
+        amount_cents: parseInt(totalOrderAmount * 100, 10),
+        payment_method_id: this.creditPaymentMethodId,
+        user_id: 1, // Use the selected customer's ID instead of hardcoding to 1
+        payable_type: 'Order'
+      };
+      payments.push(payment);
+    }
+    // There are payments (regular flow)
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {
       const paymentElement = input.closest('div');
       const paymentMethod = paymentElement.dataset.methodName;
+      const methodType = paymentElement.dataset.methodType;
       const payment = {
         amount_cents: parseInt(input.value * 100, 10),
         payment_method_id: paymentElement.dataset.methodId,
@@ -304,7 +324,7 @@ export default class extends Controller {
         payable_type: 'Order',
       };
 
-      if (paymentMethod === 'card' || paymentMethod === 'wallet') {
+      if (paymentMethod === 'card' || paymentMethod === 'wallet' || methodType === 'bank') {
         const txInput = paymentElement.querySelector('.tx-input');
         if (txInput) {
           payment.processor_transacion_id = txInput.value;
@@ -314,7 +334,7 @@ export default class extends Controller {
       if (paymentMethod === 'credit') {
         const creditDateInput = paymentElement.querySelector('.credit-date-input');
         if (creditDateInput) {
-          payment.credit_date = creditDateInput.value;
+          payment.due_date = creditDateInput.value;
         }
       }
 

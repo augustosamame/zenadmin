@@ -116,5 +116,10 @@ export const resourceMappings = {
     buttonText: "Crear Pago",
     buttonUrl: "/admin/payments/new",
     ajaxUrl: "/admin/payments.json"
+  },
+  AccountReceivable: {
+    buttonText: "Crear Cuenta por Cobrar",
+    buttonUrl: "/admin/account_receivables/new",
+    ajaxUrl: "/admin/account_receivables.json"
   }
 }

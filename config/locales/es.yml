@@ -116,6 +116,10 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+        payment_method_type_list:
+          standard: Normal
+          bank: Banco
+          credit: Crédito
       payment:
         status_list:
           pending: Pendiente
@@ -191,3 +195,10 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      account_receivable:
+        status_list:
+          pending: Pendiente
+          partially_paid: Parcialmente pagado
+          paid: Pagado
+          cancelled: Cancelado
+          overdue: Vencido

@@ -10,11 +10,40 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_24_172913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
   enable_extension "unaccent"
+
+  create_table "account_receivable_payments", force: :cascade do |t|
+    t.bigint "account_receivable_id", null: false
+    t.bigint "payment_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_receivable_id"], name: "index_account_receivable_payments_on_account_receivable_id"
+    t.index ["payment_id"], name: "index_account_receivable_payments_on_payment_id"
+  end
+
+  create_table "account_receivables", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "order_id", null: false
+    t.bigint "payment_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.datetime "due_date"
+    t.text "notes"
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["order_id"], name: "index_account_receivables_on_order_id"
+    t.index ["payment_id"], name: "index_account_receivables_on_payment_id"
+    t.index ["user_id"], name: "index_account_receivables_on_user_id"
+  end
 
   create_table "action_text_rich_texts", force: :cascade do |t|
     t.string "name", null: false
@@ -94,9 +123,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cash_inflow_type"], name: "index_cash_inflows_on_cash_inflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_inflows_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_cash_inflows_on_custom_id", unique: true
+    t.index ["processor_transacion_id"], name: "index_cash_inflows_on_processor_transacion_id"
     t.index ["received_by_id"], name: "index_cash_inflows_on_received_by_id"
   end
 
@@ -111,10 +142,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cash_outflow_type"], name: "index_cash_outflows_on_cash_outflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_outflows_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_cash_outflows_on_custom_id", unique: true
     t.index ["paid_to_id"], name: "index_cash_outflows_on_paid_to_id"
+    t.index ["processor_transacion_id"], name: "index_cash_outflows_on_processor_transacion_id"
   end
 
   create_table "cashier_shifts", force: :cascade do |t|
@@ -142,8 +175,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.string "currency", default: "PEN", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cashier_shift_id"], name: "index_cashier_transactions_on_cashier_shift_id"
     t.index ["payment_method_id"], name: "index_cashier_transactions_on_payment_method_id"
+    t.index ["processor_transacion_id"], name: "index_cashier_transactions_on_processor_transacion_id"
     t.index ["transactable_type", "transactable_id"], name: "index_cashier_transactions_on_transactable"
   end
 
@@ -153,6 +188,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "cashier_type", default: 0
+    t.index ["cashier_type"], name: "index_cashiers_on_cashier_type"
     t.index ["location_id"], name: "index_cashiers_on_location_id"
   end
 
@@ -509,14 +546,17 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "payment_method_type", default: 0
+    t.string "cashier_name"
+    t.index ["payment_method_type"], name: "index_payment_methods_on_payment_method_type"
   end
 
   create_table "payments", force: :cascade do |t|
     t.bigint "payment_method_id", null: false
     t.bigint "user_id", null: false
     t.bigint "region_id", null: false
-    t.string "payable_type", null: false
-    t.bigint "payable_id", null: false
+    t.string "payable_type"
+    t.bigint "payable_id"
     t.bigint "cashier_shift_id", null: false
     t.string "custom_id", null: false
     t.integer "payment_request_id"
@@ -528,6 +568,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "due_date"
+    t.integer "account_receivable_id"
     t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_payments_on_custom_id", unique: true
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
@@ -960,6 +1002,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_11_225430) do
     t.index ["region_id"], name: "index_warehouses_on_region_id"
   end
 
+  add_foreign_key "account_receivable_payments", "account_receivables"
+  add_foreign_key "account_receivable_payments", "payments"
+  add_foreign_key "account_receivables", "orders"
+  add_foreign_key "account_receivables", "payments"
+  add_foreign_key "account_receivables", "users"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "cash_inflows", "cashier_shifts"

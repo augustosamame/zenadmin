@@ -27,6 +27,7 @@ class Order < ApplicationRecord
   has_many :order_items, dependent: :destroy
   has_many :products, through: :order_items
   has_many :payments, as: :payable, dependent: :destroy
+  has_many :account_receivables, dependent: :destroy
 
   has_many :commissions, dependent: :destroy
   has_many :commission_payouts, through: :commissions
@@ -40,13 +41,10 @@ class Order < ApplicationRecord
 
   before_create :set_defaults
 
-  # Update commissions when the order is marked as paid
-  after_commit :update_commissions_status, if: :paid?
-  after_commit :update_loyalty_tier, if: :paid?, on: [ :create, :update, :destroy ]
-  after_commit :update_free_product_availability, if: :paid?, on: [ :create ]
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
-
+  after_commit :evaluate_payment_status, on: [ :create ]
+  after_commit :reevaluate_payment_status, on: [ :update ]
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -56,6 +54,8 @@ class Order < ApplicationRecord
   accepts_nested_attributes_for :order_items, allow_destroy: true
   accepts_nested_attributes_for :payments, allow_destroy: true
   accepts_nested_attributes_for :commissions, allow_destroy: true
+
+  scope :unpaid_or_partially_paid, -> { where(payment_status: [ :unpaid, :partially_paid ]) }
 
   pg_search_scope :search_by_customer_name,
                   associated_against: {
@@ -135,11 +135,25 @@ class Order < ApplicationRecord
     self.invoices&.sunat_success&.issued&.last
   end
 
-  private
+  def evaluate_payment_status
+    Services::Sales::OrderCreditService.new(self).evaluate_payment_status(operation: :create)
+  end
 
-    def update_commissions_status
-      commissions.status_order_unpaid.update_all(status: :status_order_paid)
-    end
+  def reevaluate_payment_status
+    Services::Sales::OrderCreditService.new(self).evaluate_payment_status(operation: :update)
+  end
+
+  def order_is_paid_activities
+    update_commissions_status if $global_settings[:feature_flag_sales_attributed_to_seller]
+    update_loyalty_tier if $global_settings[:feature_flag_loyalty_program]
+    update_free_product_availability if $global_settings[:feature_flag_loyalty_program]
+  end
+
+  def update_commissions_status
+    commissions.status_order_unpaid.update_all(status: :status_order_paid)
+  end
+
+  private
 
     def create_notification
       Services::Notifications::CreateNotificationService.new(self).create

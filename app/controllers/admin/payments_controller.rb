@@ -5,19 +5,20 @@ class Admin::PaymentsController < Admin::AdminController
     respond_to do |format|
       format.html do
         @payments = if @current_location
-          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+          Payment.includes([ :user, :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
                 .joins(cashier_shift: { cashier: :location })
                 .where(cashiers: { location_id: @current_location.id })
                 .order(id: :desc)
         else
-          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+          Payment.includes([ :user, :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
                 .order(id: :desc)
         end
 
+        create_button = $global_settings[:pos_can_create_unpaid_orders]
         if @payments.size > 2000
-          @datatable_options = "server_side:true;resource_name:'Payment';create_button:false;sort_0_desc;"
+          @datatable_options = "server_side:true;resource_name:'Payment';create_button:#{create_button};sort_1_desc;"
         else
-          @datatable_options = "server_side:false;resource_name:'Payment';create_button:false;sort_0_desc;"
+          @datatable_options = "server_side:false;resource_name:'Payment';create_button:#{create_button};sort_1_desc;"
         end
       end
 
@@ -29,6 +30,22 @@ class Admin::PaymentsController < Admin::AdminController
 
   def show
     @payment = Payment.includes(:payment_method, :payable).find(params[:id])
+  end
+
+  def new
+    @payment = Payment.new
+    generic_customer = User.find_by(email: "generic_customer@devtechperu.com")
+    @customer_users = User.with_role("customer") - [ generic_customer ]
+  end
+
+  def create
+    @payment = Payment.new(payment_params)
+    @payment.status = "paid"
+    if @payment.save!
+      redirect_to admin_payments_path
+    else
+      render :new, status: :unprocessable_entity
+    end
   end
 
   private
@@ -44,7 +61,8 @@ class Admin::PaymentsController < Admin::AdminController
       :payment_date,
       :comment,
       :status,
-      :processor_transacion_id
+      :processor_transacion_id,
+      :due_date
     )
   end
 

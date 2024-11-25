@@ -7,7 +7,7 @@
 <div id="max-total-sale-without-customer" data-value="<%= $global_settings[:max_total_sale_without_customer] %>" style="display: none;"></div>
 
 <!-- Container to adjust layout for mobile and desktop -->
-<div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>">
+<div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>" data-credit-payment-method-id="<%= PaymentMethod.find_by(name: 'credit')&.id %>">
 
   <!-- Product Grid and Payment Container Section (on top for mobile, on right for desktop) -->
   <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto">

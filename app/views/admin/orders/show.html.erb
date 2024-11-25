@@ -106,6 +106,9 @@
         <tr>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método</th>
+          <% if $global_settings[:pos_can_create_unpaid_orders] %>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha de Pago</th>
+          <% end %>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tx #</th>
         </tr>
@@ -115,6 +118,9 @@
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= friendly_date(current_user, payment.created_at) %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.payment_method.description %></td>
+            <% if $global_settings[:pos_can_create_unpaid_orders] %>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= friendly_date(current_user, payment.due_date) %></td>
+            <% end %>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(payment.amount) %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment.processor_transacion_id %></td>
           </tr>
@@ -123,35 +129,38 @@
     </table>
   </div>
 
-  <!-- Sellers -->
-  <div class="mt-8">
-    <div class="flex items-center justify-between mb-4">
-      <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
-      <% if current_user.any_admin_or_supervisor? %>
-        <%= link_to "Modificar Comisiones", 
-                    edit_admin_order_path(@order), 
-                    class: "btn btn-primary" %>
-      <% end %>
-    </div>
-    <table class="min-w-full divide-y divide-gray-200">
-      <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Porcentaje</th>
-          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Venta</th>
-        </tr>
-      </thead>
-      <tbody class="bg-white divide-y divide-gray-200">
-        <% @order.commissions.each do |commission| %>
-          <tr>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.name %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.email %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_percentage(commission.percentage, precision: 2) %></td>
-            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission.sale_amount) %></td>
-          </tr>
+  <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
+    <!-- Sellers -->
+    <div class="mt-8">
+      <div class="flex items-center justify-between mb-4">
+        <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
+        <% if current_user.any_admin_or_supervisor? %>
+          <%= link_to "Modificar Comisiones", 
+                      edit_admin_order_path(@order), 
+                      class: "btn btn-primary" %>
         <% end %>
-      </tbody>
-    </table>
-  </div>
+      </div>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Porcentaje</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Venta</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @order.commissions.each do |commission| %>
+            <tr>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission.user.email %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= number_to_percentage(commission.percentage, precision: 2) %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission.sale_amount) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  <% end %>
+
 </div>

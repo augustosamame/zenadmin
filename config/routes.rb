@@ -53,13 +53,14 @@ Rails.application.routes.draw do
         get "pos"
       end
     end
-    resources :payments, only: [ :index ]
+    resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
     resources :users do
       member do
         get "loyalty_info"
         patch "update_contact_info"
         get "check_roles"
+        get "unpaid_orders"
       end
     end
     get "sellers", to: "users#sellers"
@@ -148,9 +149,28 @@ Rails.application.routes.draw do
 
     resources :tags, only: [ :index, :new, :create, :edit, :update, :destroy ]
 
+    resources :account_receivables, only: [ :index, :show ] do
+      get "users_index", on: :collection
+      get "payments_calendar", on: :collection
+    end
+
+    resources :account_receivable_payments, only: [ :new, :create ] do
+    collection do
+      get :success
+        get :error
+      end
+    end
+
     get "sales_dashboard", to: "dashboards#sales_dashboard"
+    get "cashiers_dashboard", to: "dashboards#cashiers_dashboard"
     get "sales_ranking", to: "dashboards#sales_ranking"
     post "dashboards/set_location", to: "dashboards#set_location"
+
+    resources :dashboards, only: [] do
+      collection do
+        get :payments_calendar
+      end
+    end
 
     get "reports/form", to: "reports#reports_form"
     post "reports/generate", to: "reports#generate"

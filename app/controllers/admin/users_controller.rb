@@ -122,6 +122,25 @@ class Admin::UsersController < Admin::AdminController
     render json: { has_role: has_role }
   end
 
+  def unpaid_orders
+    user = User.find(params[:id])
+    orders = Order.includes(:user)
+                .unpaid_or_partially_paid
+                .where(user: user)
+                .order(id: :desc)
+                .map do |order|
+      {
+        id: order.id,
+        custom_id: order.custom_id,
+        user_name: order.user.name,
+        formatted_price: view_context.humanized_money_with_symbol(order.total_price)
+      }
+    end
+
+    Rails.logger.debug "Sending orders: #{orders.inspect}" # Debug log
+    render json: orders
+  end
+
   private
 
     def set_user

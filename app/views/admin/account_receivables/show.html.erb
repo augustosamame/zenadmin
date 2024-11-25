@@ -1,0 +1,155 @@
+<%= render "shared/admin/nav", { header_title: "Cuenta por Cobrar" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="container px-4 py-6 mx-auto">
+  <div class="bg-white rounded-lg shadow-sm dark:bg-slate-800">
+    <!-- Header Section -->
+    <div class="p-6 border-b dark:border-slate-600">
+      <div class="flex items-center justify-between">
+        <h2 class="text-xl font-semibold text-slate-900 dark:text-slate-100">
+          Detalles de la Cuenta por Cobrar #<%= @account_receivable.id %>
+        </h2>
+        <div class="flex space-x-2">
+          <%= link_to admin_account_receivables_path(user_id: @account_receivable.user_id), class: "btn btn-secondary" do %>
+            <i class="mr-1 fas fa-arrow-left"></i> Volver
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Info Section -->
+    <div class="grid grid-cols-1 gap-6 p-6 md:grid-cols-2">
+      <!-- Left Column -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Cliente</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100"><%= @account_receivable.user&.name || 'N/A' %></p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Cuota</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            <%= number_to_currency(@account_receivable.amount, unit: "S/") %>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">A Cuenta</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            S/ <%= number_with_precision(@account_receivable.payments.sum(:amount_cents) / 100.0, precision: 2) %>
+          </p>
+        </div>
+
+
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Saldo Pendiente</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            S/ <%= number_with_precision(@account_receivable.remaining_balance, precision: 2) %>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Estado</h3>
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+            <%= @account_receivable.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+            <%= @account_receivable.translated_status.titleize %>
+          </span>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div class="space-y-4">
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Fecha de Emisión</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            <%= l(@account_receivable.created_at, format: :long) %>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Fecha de Vencimiento</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            <%= l(@account_receivable.due_date, format: :long) %>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Venta</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            <%= @account_receivable.order.custom_id %>
+          </p>
+        </div>
+
+        <div>
+          <h3 class="text-sm font-medium text-slate-500 dark:text-slate-400">Notas</h3>
+          <p class="mt-1 text-slate-900 dark:text-slate-100">
+            <%= @account_receivable.notes || 'Sin notas' %>
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payments Section -->
+    <div class="p-6 border-t dark:border-slate-600">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100">Pagos Registrados</h3>
+        <%= link_to new_admin_account_receivable_payment_path(account_receivable_id: @account_receivable.id), 
+            class: "btn btn-primary" do %>
+          <i class="mr-1 fas fa-plus"></i> Nuevo Pago
+        <% end %>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-600">
+          <thead>
+            <tr>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Fecha</th>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Referencia</th>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Método</th>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Monto</th>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Tx #</th>
+              <th class="px-4 py-3 text-xs font-medium tracking-wider text-left uppercase text-slate-500 dark:text-slate-400">Acciones</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 dark:divide-slate-600">
+            <% @account_receivable.payments.order(payment_date: :desc).each do |payment| %>
+              <tr class="hover:bg-slate-50 dark:hover:bg-slate-700/25">
+                <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
+                  <%= l(payment.payment_date, format: :long) %>
+                </td>
+                <td class="px-4 py-3 text-sm text-slate-900 dark:text-slate-100">
+                  <%= payment.custom_id %>
+                </td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
+                  <%= payment.payment_method.description %>
+                </td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
+                  <%= number_to_currency(payment.amount, unit: "S/") %>
+                </td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
+                  <%= payment.processor_transacion_id %>
+                </td>
+                <td class="px-4 py-3 text-sm whitespace-nowrap text-slate-900 dark:text-slate-100">
+                  <div class="flex space-x-2">
+                    <%= link_to edit_admin_account_receivable_payment_path(payment), 
+                        class: "text-blue-500 hover:text-blue-700" do %>
+                      <i class="fas fa-edit"></i>
+                    <% end %>
+                    <%= button_to admin_account_receivable_payment_path(payment), 
+                        method: :delete,
+                        class: "text-red-500 hover:text-red-700",
+                        data: { confirm: "¿Está seguro de eliminar este pago?" } do %>
+                      <i class="fas fa-trash"></i>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>

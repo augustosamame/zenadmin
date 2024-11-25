@@ -8,6 +8,8 @@ class Cashier < ApplicationRecord
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
 
+  enum :cashier_type, { standard: 0, bank: 1 }
+
   def old_current_shift(current_user)
     open_shift = cashier_shifts.find_or_initialize_by(status: :open)
     if open_shift.new_record?

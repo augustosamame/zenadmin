@@ -1,6 +1,13 @@
 <%= simple_form_for([:admin, @cashier_transaction], html: { class: "space-y-4" }) do |f| %>
   <%= render 'shared/form_errors', model: @cashier_transaction %>
   <%= hidden_field_tag :transactable_type, params[:transactable_type] %>
+  <%= hidden_field_tag :cashier_shift_id, @cashier_shift.id %>
+  <%= f.input :currency, as: :hidden, input_html: { value: 'PEN' } %>
+
+  <% if params[:transactable_type].in?(['CashInflow', 'CashOutflow']) %>
+    <%= f.input :processor_transacion_id, as: :hidden, 
+                input_html: { value: params.dig(:transactable, :processor_transacion_id) } %>
+  <% end %>
 
   <div>
     <div class="relative mt-1 rounded-md shadow-sm">
@@ -13,19 +20,23 @@
 
   <%= f.input :payment_method_id, 
               label: 'Método de Pago',
-              collection: PaymentMethod.all.map { |pm| [pm.description, pm.id] }, 
+              collection: @elligible_payment_methods.map { |pm| [pm.description, pm.id] }, 
               prompt: "Selecciona el tipo de transacción", 
               input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", data: { controller: "tom-select" } }, 
               label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
 
 
   <% if params[:transactable_type] == 'CashInflow' %>
-    <%= simple_fields_for @cashier_transaction.transactable do |inflow_fields| %>
+    <%= simple_fields_for :transactable do |inflow_fields| %>
+      <%= inflow_fields.input :currency, as: :hidden, input_html: { value: 'PEN' } %>
+      <%= inflow_fields.input :processor_transacion_id, label: 'Tx #', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
       <%= inflow_fields.input :received_by_id, collection: @elligible_users, label: 'Recibido por', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
       <%= inflow_fields.input :description, as: :text, label: 'Descripción', input_html: { class: "mt-1 block w-full sm:text-sm border-gray-300 rounded-md", rows: 3 }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
     <% end %>
   <% elsif params[:transactable_type] == 'CashOutflow' %>
-    <%= simple_fields_for @cashier_transaction.transactable do |outflow_fields| %>
+    <%= simple_fields_for :transactable do |outflow_fields| %>
+      <%= outflow_fields.input :currency, as: :hidden, input_html: { value: 'PEN' } %>
+      <%= outflow_fields.input :processor_transacion_id, label: 'Tx #', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
       <%= outflow_fields.input :paid_to_id, collection: @elligible_users, label: 'Pagado a', input_html: { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
       <%= outflow_fields.input :description, as: :text, label: 'Descripción', input_html: { class: "mt-1 block w-full sm:text-sm border-gray-300 rounded-md", rows: 3 }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
     <% end %>

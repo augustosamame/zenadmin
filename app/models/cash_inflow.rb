@@ -8,4 +8,6 @@ class CashInflow < ApplicationRecord
 
   validates :amount_cents, numericality: { greater_than_or_equal_to: 0 }
   validates :received_by, presence: true
+
+  monetize :amount_cents, with_model_currency: :currency
 end

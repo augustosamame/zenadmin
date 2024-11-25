@@ -1,4 +1,24 @@
 class Admin::DashboardsController < Admin::AdminController
+  def cashiers_dashboard
+    cashier_ids = Cashier.pluck(:id)
+
+    @cashier_shifts = CashierShift
+      .includes([ :cashier, :opened_by, :closed_by ])
+      .joins(:cashier)
+      .where(id: CashierShift
+        .where(cashier_id: cashier_ids)
+        .select("DISTINCT ON (cashier_id) id")
+        .order("cashier_id, created_at DESC")
+      )
+      .order(
+        Arel.sql("CASE cashiers.cashier_type
+                  WHEN 0 THEN 1
+                  WHEN 1 THEN 2
+                  ELSE 3 END"),
+        id: :desc
+      )
+  end
+
   def sales_dashboard
     @selected_location = @current_location
 

@@ -1,0 +1,77 @@
+<%= render "shared/admin/nav", { header_title: "Nuevo Pago" } do %>
+  <%= link_to 'Volver a Pagos', admin_payments_path, class: 'btn btn-secondary' %>
+<% end %>
+
+<div class="px-4 mx-auto mt-8 md:px-10">
+  <%= simple_form_for([:admin, @payment]) do |form| %>
+    <%= render 'shared/form_errors', model: @payment %>
+    
+    <div data-controller="" class="grid grid-cols-3 gap-6">
+      <!-- User Selection -->
+      <div>
+        <%= form.association :user,
+            collection: @customer_users,
+            label: "Cliente",
+            prompt: "Seleccione cliente",
+            input_html: { 
+              class: "form-input",
+              data: {
+                controller: "select",
+                action: "change->payment-form#userChanged",
+                payment_form_target: "userSelect",
+                select_placeholder_value: "Seleccione cliente"
+              }
+            },
+            label_html: { class: "form-label" } %>
+      </div>
+
+      <!-- Payment Method Selection -->
+      <div>
+        <%= form.association :payment_method,
+            collection: PaymentMethod.active.map { |pm| [pm.description, pm.id] },
+            label: "Método de Pago",
+            prompt: "Seleccione método de pago",
+            input_html: { 
+              class: "form-input",
+              data: { 
+                controller: "select",
+                select_placeholder_value: "Seleccione método de pago"
+              }
+            },
+            label_html: { class: "form-label" } %>
+      </div>
+
+      <!-- Amount Field -->
+      <div>
+        <%= form.input :amount,
+            label: "Monto en S/",
+            as: :decimal,
+            input_html: { 
+              step: 0.01,
+              class: "form-input",
+              min: 0
+            },
+            label_html: { class: "form-label" } %>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="mt-6">
+      <%= form.input :comment,
+        label: "Comentarios",
+        as: :text,
+        input_html: { 
+          class: "form-input w-full",
+          rows: 3
+        },
+        label_html: { class: "form-label" } %>
+    </div>
+
+    <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+      <%= form.button :submit, "Crear Pago", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", 
+          admin_payments_path, 
+          class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+    </div>
+  <% end %>
+</div>

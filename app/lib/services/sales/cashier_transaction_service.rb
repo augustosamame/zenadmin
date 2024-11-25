@@ -7,12 +7,40 @@ module Services
 
       # payment does not need a method to add a payment, it is already done in the payment service
 
+      def create_cashier_transaction(payment)
+        CashierTransaction.create!(
+          cashier_shift: @cashier_shift,
+          transactable: payment,
+          amount_cents: payment.amount_cents,
+          payment_method: payment.payment_method,
+          processor_transacion_id: payment.processor_transacion_id
+        )
+        if payment.payment_method.payment_method_type == "bank"
+          # also create a cashier transaction in open cashier_shift for bank
+          bank_cashier = Cashier.find_by(name: payment.payment_method.description)
+          bank_cashier_shift = CashierShift.where(cashier: bank_cashier, status: :open).first
+          opening_super_admin_user = User.with_role(:super_admin).first
+          if bank_cashier_shift.blank?
+            bank_cashier_shift = CashierShift.create!(cashier: bank_cashier, opened_by: opening_super_admin_user, total_sales_cents: 0, date: DateTime.current, opened_at: DateTime.current, status: :open)
+          end
+          CashierTransaction.create!(
+            cashier_shift: bank_cashier_shift,
+            transactable: payment,
+            amount_cents: payment.amount_cents,
+            currency: payment.currency,
+            payment_method: payment.payment_method,
+            processor_transacion_id: payment.processor_transacion_id
+          )
+        end
+      end
+
       def add_cash_inflow(amount_cents, received_by, comment = nil)
         cash_inflow = CashInflow.create!(
           cashier_shift: @cashier_shift,
           amount_cents: amount_cents,
           received_by: received_by,
-          comment: comment
+          comment: comment,
+          processor_transacion_id: processor_transacion_id
         )
       end
 
@@ -21,7 +49,8 @@ module Services
           cashier_shift: @cashier_shift,
           amount_cents: amount_cents,
           paid_to: paid_to,
-          comment: comment
+          comment: comment,
+          processor_transacion_id: processor_transacion_id
         )
       end
 

@@ -13,6 +13,9 @@ application.register("attendance-logs", AttendanceLogsController)
 import BulkTagController from "./bulk_tag_controller"
 application.register("bulk-tag", BulkTagController)
 
+import CalendarController from "./calendar_controller"
+application.register("calendar", CalendarController)
+
 import CloseCashierModalController from "./close_cashier_modal_controller"
 application.register("close-cashier-modal", CloseCashierModalController)
 
@@ -111,6 +114,9 @@ application.register("order-commission-form", OrderCommissionFormController)
 
 import OrderShowController from "./order_show_controller"
 application.register("order-show", OrderShowController)
+
+import PaymentFormController from "./payment_form_controller"
+application.register("payment-form", PaymentFormController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
