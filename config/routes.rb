@@ -166,6 +166,12 @@ Rails.application.routes.draw do
     get "sales_ranking", to: "dashboards#sales_ranking"
     post "dashboards/set_location", to: "dashboards#set_location"
 
+    resources :dashboards, only: [] do
+      collection do
+        get :payments_calendar
+      end
+    end
+
     get "reports/form", to: "reports#reports_form"
     post "reports/generate", to: "reports#generate"
     get "reports/cash_flow", to: "reports#cash_flow"

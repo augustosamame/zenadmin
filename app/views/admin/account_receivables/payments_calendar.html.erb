@@ -1,0 +1,14 @@
+<%= render "shared/admin/nav", { header_title: "Calendario de Pagos" } do %>
+<%= render "shared/admin/location_dropdown" %>
+<% end %>
+
+<div class="p-6">
+  <div class="calendar-container">
+
+    <div 
+      data-controller="calendar" 
+      data-calendar-events-value="<%= @calendar_events.to_json %>"
+      class="min-h-[600px]">
+    </div>
+  </div>
+</div> 

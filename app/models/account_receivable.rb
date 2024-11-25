@@ -10,7 +10,7 @@ class AccountReceivable < ApplicationRecord
 
   monetize :amount_cents, with_model_currency: :currency
 
-  enum :status, { pending: 0, partially_paid: 1, paid: 2, cancelled: 3 }
+  enum :status, { pending: 0, partially_paid: 1, paid: 2, cancelled: 3, overdue: 4 }
   translate_enum :status
 
   validates :amount_cents, :currency, presence: true
