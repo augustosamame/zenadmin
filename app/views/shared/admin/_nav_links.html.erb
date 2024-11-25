@@ -11,12 +11,17 @@
       <%= nav_link_to "Cajas", send("admin_cashiers_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% end %>
-    <% if $global_settings[:feature_flag_commission_ranges] %>
-    <% if current_user.any_admin? || current_user.has_role?("supervisor") || current_user.has_role?("store") %>
+    <% if $global_settings[:pos_can_create_unpaid_orders] %>
     <li>
-      <%= nav_link_to "Rankings", send("admin_sales_ranking_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      <%= nav_link_to "Calendario de Vencimientos", send("payments_calendar_admin_account_receivables_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% end %>
+    <% if $global_settings[:feature_flag_commission_ranges] %>
+      <% if current_user.any_admin? || current_user.has_role?("supervisor") || current_user.has_role?("store") %>
+      <li>
+        <%= nav_link_to "Rankings", send("admin_sales_ranking_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+      <% end %>
     <% end %>
   </ul>
 </li>

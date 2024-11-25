@@ -5,6 +5,7 @@ class AccountReceivable < ApplicationRecord
   belongs_to :user
   belongs_to :order
   belongs_to :payment # Original credit payment
+  has_one :location, through: :order
   has_many :account_receivable_payments, dependent: :destroy
   has_many :payments, through: :account_receivable_payments  # Actual payments made
 

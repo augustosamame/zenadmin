@@ -44,8 +44,17 @@ class Admin::AccountReceivablesController < Admin::AdminController
   end
 
   def payments_calendar
-    @account_receivables = AccountReceivable.includes([ :order ]).where("due_date >= ?", 30.days.ago)
-                      .order(due_date: :asc)
+    if current_user.any_admin? && params[:location_id].present?
+      @location = Location.find(params[:location_id])
+    else
+      @location = @current_location
+    end
+    @account_receivables = AccountReceivable
+        .includes(:order)
+        .joins(order: :location)
+        .where(orders: { location_id: @location&.id })
+        .where("account_receivables.due_date >= ?", 30.days.ago)
+        .order(due_date: :asc)
 
     @calendar_events = @account_receivables.map do |account_receivable|
       {
