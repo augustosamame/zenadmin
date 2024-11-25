@@ -10,6 +10,9 @@
         <tr>
           <th class="px-4 py-2 text-left">Nombre</th>
           <th class="px-4 py-2 text-left">Descripción</th>
+          <% if $global_settings[:feature_flag_bank_cashiers_active] %>
+            <th class="px-4 py-2 text-left">Tipo</th>
+          <% end %>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
@@ -19,6 +22,9 @@
           <tr>
             <td class="px-4 py-2"><%= payment_method.name %></td>
             <td class="px-4 py-2"><%= payment_method.description %></td>
+            <% if $global_settings[:feature_flag_bank_cashiers_active] %>
+              <td class="px-4 py-2"><%= payment_method.translated_payment_method_type %></td>
+            <% end %>
             <td class="px-4 py-2"><%= payment_method.translated_status %></td>
             <td class="px-4 py-2">
               <%= render partial: "admin/payment_methods/actions", locals: { payment_method: payment_method, default_object_options_array: @default_object_options_array } %>

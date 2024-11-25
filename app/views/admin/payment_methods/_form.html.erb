@@ -12,9 +12,14 @@
       <%= f.input :description, label: "Descripción", input_html: { class: "form-input" } %>
     </div>
 
+    <!-- Payment Method Type Field -->
+    <div>
+      <%= f.input :payment_method_type, collection: PaymentMethod.translated_payment_method_types.map { |translation, k, _v| [translation.titleize, k] }, label: "Tipo de Método de Pago", prompt: "Seleccione Tipo de Método de Pago", input_html: { data: { controller: "select" }, class: "form-select" } %>
+    </div>
+
     <!-- Status Field -->
     <div>
-      <%= f.input :status, collection: PaymentMethod.statuses.keys.map { |s| [s.capitalize, s] }, label: "Estado", prompt: "Seleccione Estado", input_html: { data: { controller: "select" }, class: "form-select" } %>
+      <%= f.input :status, collection: PaymentMethod.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, label: "Estado", prompt: "Seleccione Estado", input_html: { data: { controller: "select" }, class: "form-select" } %>
     </div>
   </div>
 

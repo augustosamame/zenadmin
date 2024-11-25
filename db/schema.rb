@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_24_172913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -123,9 +123,11 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cash_inflow_type"], name: "index_cash_inflows_on_cash_inflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_inflows_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_cash_inflows_on_custom_id", unique: true
+    t.index ["processor_transacion_id"], name: "index_cash_inflows_on_processor_transacion_id"
     t.index ["received_by_id"], name: "index_cash_inflows_on_received_by_id"
   end
 
@@ -140,10 +142,12 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cash_outflow_type"], name: "index_cash_outflows_on_cash_outflow_type"
     t.index ["cashier_shift_id"], name: "index_cash_outflows_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_cash_outflows_on_custom_id", unique: true
     t.index ["paid_to_id"], name: "index_cash_outflows_on_paid_to_id"
+    t.index ["processor_transacion_id"], name: "index_cash_outflows_on_processor_transacion_id"
   end
 
   create_table "cashier_shifts", force: :cascade do |t|
@@ -171,8 +175,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
     t.string "currency", default: "PEN", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "processor_transacion_id"
     t.index ["cashier_shift_id"], name: "index_cashier_transactions_on_cashier_shift_id"
     t.index ["payment_method_id"], name: "index_cashier_transactions_on_payment_method_id"
+    t.index ["processor_transacion_id"], name: "index_cashier_transactions_on_processor_transacion_id"
     t.index ["transactable_type", "transactable_id"], name: "index_cashier_transactions_on_transactable"
   end
 
@@ -182,6 +188,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "cashier_type", default: 0
+    t.index ["cashier_type"], name: "index_cashiers_on_cashier_type"
     t.index ["location_id"], name: "index_cashiers_on_location_id"
   end
 
@@ -538,6 +546,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_23_171453) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "payment_method_type", default: 0
+    t.string "cashier_name"
+    t.index ["payment_method_type"], name: "index_payment_methods_on_payment_method_type"
   end
 
   create_table "payments", force: :cascade do |t|

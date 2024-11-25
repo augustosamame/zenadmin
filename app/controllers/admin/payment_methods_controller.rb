@@ -3,13 +3,26 @@ class Admin::PaymentMethodsController < Admin::AdminController
   def index
     authorize! :read, PaymentMethod
     @datatable_options = "resource_name:'PaymentMethod';create_button:true;"
+    if $global_settings[:feature_flag_bank_cashiers_active]
+      if $global_settings[:pos_can_create_unpaid_orders]
+        @filtered_payment_methods = PaymentMethod.active.order(:payment_method_type, :id)
+      else
+        @filtered_payment_methods = PaymentMethod.active.where.not(payment_method_type: "credit").order(:payment_method_type, :id)
+      end
+    else
+      if $global_settings[:pos_can_create_unpaid_orders]
+        @filtered_payment_methods = PaymentMethod.active.where.not(payment_method_type: "bank").order(:payment_method_type, :id)
+      else
+        @filtered_payment_methods = PaymentMethod.active.where.not(payment_method_type: [ "bank", "credit" ]).order(:payment_method_type, :id)
+      end
+    end
     respond_to do |format|
       format.html do
-        @payment_methods = PaymentMethod.all.active.order(:id)
+        @payment_methods = @filtered_payment_methods
       end
 
       format.json do
-        render json: PaymentMethod.all.active.order(:id)
+        render json: @filtered_payment_methods
       end
     end
   end
@@ -57,6 +70,6 @@ class Admin::PaymentMethodsController < Admin::AdminController
   end
 
   def payment_method_params
-    params.require(:payment_method).permit(:name, :description, :status)
+    params.require(:payment_method).permit(:name, :description, :status, :payment_method_type)
   end
 end

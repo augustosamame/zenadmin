@@ -6,6 +6,11 @@
     <li>
       <%= nav_link_to "Ventas", send("admin_sales_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if current_user.any_admin? %>
+    <li>
+      <%= nav_link_to "Cajas", send("admin_cashiers_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
     <% if $global_settings[:feature_flag_commission_ranges] %>
     <% if current_user.any_admin? || current_user.has_role?("supervisor") || current_user.has_role?("store") %>
     <li>

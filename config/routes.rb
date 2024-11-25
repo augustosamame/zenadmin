@@ -162,6 +162,7 @@ Rails.application.routes.draw do
     end
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
+    get "cashiers_dashboard", to: "dashboards#cashiers_dashboard"
     get "sales_ranking", to: "dashboards#sales_ranking"
     post "dashboards/set_location", to: "dashboards#set_location"
 

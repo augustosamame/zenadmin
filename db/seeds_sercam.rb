@@ -27,7 +27,8 @@ settings = [
   { name: 'feature_flag_product_packs', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de paquetes de productos activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'feature_flag_birthday_discount', data_type: 'type_boolean', internal: false, localized_name: 'Descuento cumpleañero Activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active' },
   { name: 'birthday_discount_percentage', data_type: 'type_integer', internal: false, localized_name: '% de descuento cumpleañero', string_value: nil, integer_value: 0, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
-  { name: 'default_credit_receivable_due_date', data_type: 'type_integer', internal: false, localized_name: 'Días por defecto para vencimiento de pagos al crédito', string_value: nil, integer_value: 30, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
+  { name: 'default_credit_receivable_due_date', data_type: 'type_integer', internal: false, localized_name: 'Días por defecto para vencimiento de pagos al crédito', string_value: nil, integer_value: 30, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_bank_cashiers_active', data_type: 'type_boolean', internal: false, localized_name: 'Cajas tipo banco activos', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
 ]
 
 begin
@@ -93,12 +94,12 @@ supervisor_1.add_role('supervisor')
 
 PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarj Crédito / Débito')
 PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')
-PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin')
-PaymentMethod.find_or_create_by!(name: 'banco_bcp', description: 'Banco BCP')
-PaymentMethod.find_or_create_by!(name: 'banco_interbank', description: 'Banco Interbank')
-PaymentMethod.find_or_create_by!(name: 'banco_de_la_nacion', description: 'Banco de la Nación')
-PaymentMethod.find_or_create_by!(name: 'banco_bbva', description: 'Banco BBVA')
-PaymentMethod.find_or_create_by!(name: 'credit', description: 'Crédito')
+PaymentMethod.find_or_create_by!(name: 'wallet', description: 'Yape / Plin', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'banco_bcp', description: 'Banco BCP', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'banco_interbank', description: 'Banco Interbank', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'banco_de_la_nacion', description: 'Banco de la Nación', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'banco_bbva', description: 'Banco BBVA', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'credit', description: 'Crédito', payment_method_type: "credit")
 
 setting_ecommerce_active = Setting.find_by(name: 'ecommerce_active')
 if setting_ecommerce_active&.boolean_value == true
@@ -106,14 +107,14 @@ if setting_ecommerce_active&.boolean_value == true
   User.create!(email: 'ecommerce@sercamsrl.com', phone: "900000000", login: "ecommerce@sercamsrl.com", require_password_change: false, password: SecureRandom.alphanumeric(8), first_name: "Ecommerce", last_name: "Module", internal: true) unless ecommerce_module_user_already_exists
 end
 
-user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
-user1.add_role('super_admin')
-
 useradmin1 = User.create!(email: 'grivera@sercamsrl.com', phone: "986976366", login: "grivera@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Gerardo", last_name: "Rivera")
 useradmin1.add_role('super_admin')
 
 useradmin2 = User.create!(email: 'fserna@sercamsrl.com', phone: "986976367", login: "fserna@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Fidel", last_name: "Serna")
 useradmin2.add_role('super_admin')
+
+user1 = User.create!(email: 'augusto@devtechperu.com', phone: "986976377", login: "augusto@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Augusto", last_name: "Admin")
+user1.add_role('super_admin')
 
 generic_customer = User.create!(email: 'generic_customer@devtechperu.com', phone: "986970001", login: "generic_customer@devtechperu.com", require_password_change: false, password: "12345678", first_name: "Cliente", last_name: "Genérico", internal: false)
 

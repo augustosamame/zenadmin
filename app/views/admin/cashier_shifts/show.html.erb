@@ -1,5 +1,5 @@
 
-<%= render "shared/admin/nav", { header_title: "Detalles de Caja", back_icon: true } do %>
+<%= render "shared/admin/nav", { header_title: "Detalles de #{@cashier_shift.cashier.name}", back_icon: true } do %>
   <% if current_user.any_admin? %>
     <%= link_to 'Editar', edit_admin_cashier_shift_path(@cashier_shift), class: 'btn btn-secondary mr-2' %>
   <% end %>
@@ -106,7 +106,7 @@
 
   </div>
 
-  <h2 class="mb-4 text-xl font-semibold">Movimientos de Caja</h2>
+  <h2 class="mb-4 text-xl font-semibold">Movimientos</h2>
   <div class="overflow-x-auto">
     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
       <thead class="bg-gray-50 dark:bg-gray-700">
@@ -116,11 +116,12 @@
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Descripción</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Medio de Pago</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tx #</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-        <% @cashier_shift.cashier_transactions.includes([:transactable, :payment_method]).order(created_at: :asc).each do |transaction| %>
+        <% @cashier_shift.cashier_transactions.includes([:transactable, :payment_method]).order(created_at: :desc).each do |transaction| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= transaction.id %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= friendly_date(current_user, transaction.created_at) %></td>
@@ -131,8 +132,8 @@
             </td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.payment_method&.description %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= transaction.processor_transacion_id %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= format_currency(transaction.amount) %></td>
-
           </tr>
         <% end %>
       </tbody>

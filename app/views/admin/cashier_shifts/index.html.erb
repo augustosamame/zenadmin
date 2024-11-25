@@ -11,6 +11,7 @@
           <% if current_user.any_admin_or_supervisor? %>
             <th class="px-4 py-2 text-left">Tienda</th>
           <% end %>
+          <th class="px-4 py-2 text-left">Nombre</th>
           <th class="px-4 py-2 text-left">Fecha</th>
           <th class="px-4 py-2 text-left">Hora de Inicio</th>
           <th class="px-4 py-2 text-left">Abierto Por</th>
@@ -28,6 +29,7 @@
             <% if current_user.any_admin_or_supervisor? %>
               <td class="px-4 py-2"><%= cashier_shift&.location&.name %></td>
             <% end %>
+            <td class="px-4 py-2"><%= cashier_shift.cashier.name %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.date, false) %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.opened_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.opened_by&.name %></td>

@@ -81,11 +81,6 @@ class Payment < ApplicationRecord
   private
 
     def create_cashier_transaction
-      CashierTransaction.create!(
-        cashier_shift: cashier_shift,
-        transactable: self,
-        amount_cents: amount_cents,
-        payment_method: payment_method
-      )
+      Services::Sales::CashierTransactionService.new(self.cashier_shift).create_cashier_transaction(self)
     end
 end
