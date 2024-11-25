@@ -60,7 +60,7 @@ class Admin::OrdersController < Admin::AdminController
               payment.merge(
                 payable: @order,
                 cashier_shift: @current_cashier_shift,
-                status: @order.origin == "pos" && payment[:payment_method_id]&.to_i != credit_payment_method.id ? "paid" : "pending"
+                status: @order.origin == "pos" && (payment[:payment_method_id]&.to_i != credit_payment_method&.id) ? "paid" : "pending"
               )
             )
           end
