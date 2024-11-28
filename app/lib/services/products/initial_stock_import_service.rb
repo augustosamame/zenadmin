@@ -52,7 +52,11 @@ module Services
         warehouse_location = location.warehouses.first
         brand = Brand.find_by!(name: "Jardín del Zen")
 
-        stock_transfer = StockTransfer.where(destination_warehouse: warehouse_location, origin_warehouse: warehouse_main).first
+        if location.name == "Jockey"
+          stock_transfer = StockTransfer.where(destination_warehouse: warehouse_location, origin_warehouse: warehouse_main).last
+        else
+          stock_transfer = StockTransfer.where(destination_warehouse: warehouse_location, origin_warehouse: warehouse_main).first
+        end
         raise "First Stock transfer not found" if stock_transfer.blank?
 
         ActiveRecord::Base.transaction do
