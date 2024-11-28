@@ -73,6 +73,15 @@ module AdminHelper
     end
   end
 
+  def friendly_transactable_object_custom_id(transaction)
+    case transaction&.transactable&.class&.name
+    when "Payment"
+      transaction&.transactable&.order&.custom_id
+    else
+      transaction&.transactable&.custom_id
+    end
+  end
+
   def translated_payable_type(payable_type)
     case payable_type
     when "Order"

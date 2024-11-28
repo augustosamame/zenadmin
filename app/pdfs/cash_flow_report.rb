@@ -37,6 +37,7 @@ class CashFlowReport < Prawn::Document
       current_cashier = @current_cashier
       current_user = @current_user
       friendly_type_method = method(:friendly_transactable_type)
+      friendly_transactable_object_custom_id_method = method(:friendly_transactable_object_custom_id)
 
       global_totals = Hash.new(0)
 
@@ -70,7 +71,7 @@ class CashFlowReport < Prawn::Document
             cashier_transaction_lines_data << [
               cashier_transaction.id,
               cashier_transaction.created_at.strftime("%H:%M"),
-              friendly_type_method.call(cashier_transaction),
+              "#{friendly_type_method.call(cashier_transaction)} - #{friendly_transactable_object_custom_id_method.call(cashier_transaction)}",
               cashier_transaction.payment_method.description,
               sprintf("S/ %.2f", cashier_transaction.amount)
             ]
