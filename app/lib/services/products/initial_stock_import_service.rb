@@ -49,6 +49,12 @@ module Services
             end
 
             # Find the first stock transfer for this product
+            # check that warehouse_inventory exists for this product
+            warehouse_inventory = WarehouseInventory.find_by(warehouse: warehouse_location, product: found_product)
+            if warehouse_inventory.blank?
+              Rails.logger.info("Warehouse inventory not found for product #{product_name}. Creating it")
+              warehouse_inventory = WarehouseInventory.create(warehouse: warehouse_location, product: found_product, stock: 0)
+            end
             
             stock_transfer_line = stock_transfer.stock_transfer_lines
                                                 .where(product: found_product)
