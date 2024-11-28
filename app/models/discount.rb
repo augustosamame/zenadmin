@@ -40,6 +40,17 @@ class Discount < ApplicationRecord
     start_datetime <= Time.current && end_datetime >= Time.current
   end
 
+  def self.toggle_status_based_on_datetime
+    sleep 5 # to prevent race condition with discount start / end datetime
+    Discount.all.each do |discount|
+      if discount.start_datetime <= Time.current && discount.end_datetime >= Time.current
+        discount.update(status: :active)
+      else
+        discount.update(status: :inactive)
+      end
+    end
+  end
+
   def update_matching_product_ids
     matching_products = Product.all
 

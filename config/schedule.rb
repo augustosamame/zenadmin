@@ -25,4 +25,12 @@ every :day, at: "8am" do
   runner "Services::Sales::LoyaltyTierService.update_all_users_loyalty_tiers"
 end
 
+every :hour do
+  runner "ProductPack.toggle_status_based_on_datetime"
+end
+
+every :hour do
+  runner "Discount.toggle_status_based_on_datetime"
+end
+
 # Learn more: http://github.com/javan/whenever
