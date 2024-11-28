@@ -53,9 +53,16 @@ class Product < ApplicationRecord
   scope :without_tests, -> { where(is_test_product: false) }
 
   before_validation :set_permalink
+  after_commit :create_warehouse_inventory_for_all_warehouses, on: :create
 
   def set_permalink
     self.permalink = name.parameterize if permalink.blank?
+  end
+
+  def create_warehouse_inventory_for_all_warehouses
+    Warehouse.all.each do |warehouse|
+      WarehouseInventory.create(warehouse: warehouse, product: self, stock: 0)
+    end
   end
 
   def add_tag(tag_name_or_object)
