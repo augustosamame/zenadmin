@@ -1,14 +1,36 @@
 <div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
-  <%= simple_form_for([:admin, @cashier_shift], html: { class: "space-y-4" }) do |f| %>
+  <%= simple_form_for([:admin, @cashier_shift], html: { class: "space-y-4", data: { controller: "datetime-picker" } }) do |f| %>
     <%= render 'shared/form_errors', model: @cashier_shift %>
 
     <div>
-      <%= f.input :opened_at, as: :string, label: "Hora de Inicio", input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+      <%= f.input :opened_at,
+          as: :datetime,
+          label: "Hora de Inicio",
+          input_html: { 
+            class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
+            data: { datetime_picker_target: "input" },
+            value: @cashier_shift.opened_at || Time.current
+          },
+          label_html: { 
+            class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+          },
+          html5: true %>
     </div>
 
     <% if @cashier_shift.persisted? %>
       <div>
-        <%= f.input :closed_at, as: :string, label: "Hora de Cierre", input_html: { class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md" }, label_html: { class: "block text-sm font-medium text-gray-700 dark:text-gray-300" } %>
+        <%= f.input :closed_at,
+            as: :datetime,
+            label: "Hora de Cierre",
+            input_html: { 
+              class: "mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md",
+              data: { datetime_picker_target: "input" },
+              value: @cashier_shift.closed_at || Time.current
+            },
+            label_html: { 
+              class: "block text-sm font-medium text-gray-700 dark:text-gray-300" 
+            },
+            html5: true %>
       </div>
     <% end %>
 

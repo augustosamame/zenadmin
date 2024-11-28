@@ -52,6 +52,9 @@ application.register("dashboards--charts", Dashboards__ChartsController)
 import DatatableController from "./datatable_controller"
 application.register("datatable", DatatableController)
 
+import DatetimePickerController from "./datetime_picker_controller"
+application.register("datetime-picker", DatetimePickerController)
+
 import DiscountFormController from "./discount_form_controller"
 application.register("discount-form", DiscountFormController)
 
