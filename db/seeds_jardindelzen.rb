@@ -35,7 +35,7 @@ Role.find_or_create_by!(name: 'store_manager')
 Role.find_or_create_by!(name: 'store')
 Role.find_or_create_by!(name: 'warehouse_manager')
 Role.find_or_create_by!(name: 'customer')
-
+Role.find_or_create_by!(name: 'money_recipient')
 ## custom numbering fields creation now handled by load_global_settings.rb initializer
 
 region_default = Region.find_or_create_by!(name: 'default')
@@ -93,12 +93,14 @@ storeuser6.add_role('store')
 storeuser7 = User.create!(email: 'ica@aromaterapia.com.pe', phone: "928855858", location_id: location_7.id, login: "ica@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Ica", internal: true)
 storeuser7.add_role('store')
 
+bank_deposit_user = User.create!(email: 'bank_deposit@aromaterapia.com.pe', phone: "986976314", login: "bank_deposit@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Depósito", last_name: "Bancario", internal: true)
+bank_deposit_user.add_role('money_recipient')
+
 supervisor_1 = User.create!(email: 'supervisor@aromaterapia.com.pe', phone: "986976314", login: "supervisor@aromaterapia.com.pe", require_password_change: false, password: "12345678", first_name: "Carmen", last_name: "Supervisor")
 supervisor_1.add_role('supervisor')
 
 warehouse_2 = Warehouse.find_or_create_by!(name: "Rappi", region: region_default)
 warehouse_3 = Warehouse.find_or_create_by!(name: "PedidosYa", region: region_default)
-
 
 PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarj Crédito / Débito')
 PaymentMethod.find_or_create_by!(name: 'cash', description: 'Efectivo')

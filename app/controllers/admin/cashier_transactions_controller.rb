@@ -3,13 +3,7 @@ class Admin::CashierTransactionsController < Admin::AdminController
   before_action :build_transactable, only: [ :new, :create ]
 
   def new
-    @cashier_shift = CashierShift.find(params[:format])
-    @elligible_users = User.with_any_role(:seller, :admin, :super_admin, :supervisor)
-    if @cashier_shift.cashier.cashier_type == "bank"
-      @elligible_payment_methods = PaymentMethod.where(description: @cashier_shift.cashier.name)
-    else
-      @elligible_payment_methods = PaymentMethod.all
-    end
+    load_form_dependencies
   end
 
   def create
@@ -20,7 +14,17 @@ class Admin::CashierTransactionsController < Admin::AdminController
     end
     @cashier_transaction.cashier_shift = @cashier_shift
     @cashier_transaction.currency = "PEN"
-    @cashier_transaction.transactable.currency = "PEN" if @cashier_transaction.transactable.present?
+
+    if @cashier_transaction.transactable.present?
+      @cashier_transaction.transactable.currency = "PEN"
+      
+      # Set description based on transactable type
+      case @cashier_transaction.transactable_type
+      when "CashOutflow"
+        paid_to_name = @cashier_transaction.transactable.paid_to&.name
+        @cashier_transaction.transactable.description += " - Pagado a #{paid_to_name}" if paid_to_name.present?
+      end
+    end
 
     if @cashier_transaction.save
       redirect_to admin_cashier_shift_path(@cashier_transaction.cashier_shift), notice: "Transacción registrada exitosamente."
@@ -45,7 +49,7 @@ class Admin::CashierTransactionsController < Admin::AdminController
     else
       PaymentMethod.all
     end
-    @elligible_users = User.with_any_role(:seller, :admin, :super_admin, :supervisor)
+    @elligible_users = User.with_any_role(:admin, :super_admin, :supervisor, :money_recipient)
   end
 
   def initialize_cashier_transaction
