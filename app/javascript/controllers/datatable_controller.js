@@ -60,7 +60,7 @@ export default class extends Controller {
       },
       order: [],
       scrollX: true,  // Add this option
-      scrollCollapse: true  // Add this option
+      scrollCollapse: true
     };
   }
 
@@ -219,6 +219,8 @@ export default class extends Controller {
 
   applyTailwindClasses() {
     this.applyPaginationStyles();
+
+    $('.dt-scroll-body').css('overflow', 'visible');
 
     $('.dt-button').addClass('rounded-md px-4 py-2 bg-primary-500 text-white border-primary-500 hover:text-primary-300 transition duration-200');
     $('.dt-layout-row').addClass('flex flex-col mt-2 pt-2 sm:flex-row justify-between');
