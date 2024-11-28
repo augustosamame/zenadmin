@@ -51,7 +51,7 @@ class Admin::ProductPacksController < Admin::AdminController
 
   def product_pack_params
     params.require(:product_pack).permit(
-      :name, :description, :price, :status,
+      :name, :description, :price, :status, :start_datetime, :end_datetime,
       product_pack_items_attributes: [ :id, :quantity, :_destroy, tag_ids: [] ]
     )
   end

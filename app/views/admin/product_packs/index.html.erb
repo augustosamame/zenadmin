@@ -10,7 +10,10 @@
           <th class="px-4 py-2 text-left">Nombre</th>
           <th class="px-4 py-2 text-left">Etiquetas de Productos</th>
           <th class="px-4 py-2 text-left">Precio Pack</th>
+          <th class="px-4 py-2 text-left">Fecha de Inicio</th>
+          <th class="px-4 py-2 text-left">Fecha de Fin</th>
           <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Vigente</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
       </thead>
@@ -33,7 +36,10 @@
             <% end %>
           </td>
           <td class="px-4 py-2"><%= format_currency(product_pack.price) %></td>
+          <td class="px-4 py-2"><%= product_pack.start_datetime.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="px-4 py-2"><%= product_pack.end_datetime.strftime("%Y-%m-%d %H:%M") %></td>
           <td class="px-4 py-2"><%= product_pack.translated_status %></td>
+          <td class="px-4 py-2"><%= product_pack.is_current? ? "Vigente" : "No Vigente" %></td>
           <td class="px-4 py-2">
             <% if current_user.store_or_store_manager? %>
               <%= link_to 'Ver', admin_product_pack_path(product_pack), class: "btn btn-sm btn-primary" %>

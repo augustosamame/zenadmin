@@ -34,7 +34,15 @@
     </div>
 
     <div class="mb-5">
-      <%= form.input :status, label: "Estado", collection: ProductPack.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: 'form-select' } %>
+      <%= form.input :start_datetime, label: "Fecha de Inicio", as: :datetime, html5: true, input_html: { class: "form-input" }, label_html: { class: "form-label mb-2" } %>
+    </div>
+
+    <div class="mb-5">
+      <%= form.input :end_datetime, label: "Fecha de Fin", as: :datetime, html5: true, input_html: { class: "form-input" }, label_html: { class: "form-label mb-2" } %>
+    </div>
+
+    <div class="mt-5 mb-5">
+      <%= form.input :status, label: "Estado", collection: ProductPack.statuses.keys.map { |status| [status.titleize, status] }, input_html: { class: 'form-select mt-2' } %>
     </div>
 
     <!-- Form Actions -->

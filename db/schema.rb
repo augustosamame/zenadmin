@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_24_172913) do
+ActiveRecord::Schema[7.2].define(version: 2024_11_28_023834) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -689,6 +689,10 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_24_172913) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.datetime "start_datetime"
+    t.datetime "end_datetime"
+    t.index ["end_datetime"], name: "index_product_packs_on_end_datetime"
+    t.index ["start_datetime"], name: "index_product_packs_on_start_datetime"
   end
 
   create_table "products", force: :cascade do |t|
