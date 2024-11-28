@@ -318,3 +318,4 @@ Services::Products::ProductImportService.new("productos_y_etiquetas_jardin_del_z
 Services::Products::InitialStockImportService.new("jardin_del_zen_stock_and_price_report.csv").stock_and_prices
 
 Services::Products::InitialStockImportService.new("plaza_norte.csv", 1, "Plaza Norte").stocks_only
+Services::Products::InitialStockImportService.new("plaza_norte.csv", 1, "Plaza Norte").fix_stocks_due_to_wrong_column
