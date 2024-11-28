@@ -93,7 +93,7 @@ group :development do
   gem "web-console"
   gem "awesome_print"
   gem "byebug"
-  gem "bullet", "~> 7.2.0"
+  gem "bullet", "~> 8.0.0"
   gem "bootstrap-generators", github: "WorkBravely/bootstrap-generators", branch: "master"
   gem "rails-admin-scaffold", github: "augustosamame/rails-admin-scaffold", branch: "master"
 
