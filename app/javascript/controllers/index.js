@@ -148,6 +148,9 @@ application.register("pos--product-grid", Pos__ProductGridController)
 import Pos__SellersModalController from "./pos/sellers_modal_controller"
 application.register("pos--sellers-modal", Pos__SellersModalController)
 
+import Pos__BirthdayDiscountModalController from "./pos/birthday_discount_modal_controller"
+application.register("pos--birthday-discount-modal", Pos__BirthdayDiscountModalController)
+
 import ProductCategoryFormController from "./product_category_form_controller"
 application.register("product-category-form", ProductCategoryFormController)
 

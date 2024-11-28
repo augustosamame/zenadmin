@@ -1,0 +1,39 @@
+<div id="birthday-discount-percentage" data-value="<%= $global_settings[:birthday_discount_percentage] %>" class="hidden"></div>
+
+<div data-pos--birthday-discount-modal-target="container" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog" data-action="click->pos--birthday-discount-modal#handleBackgroundClick">
+  <div class="relative w-full h-screen">
+    <div data-pos--birthday-discount-modal-target="content" class="hidden h-auto max-w-2xl p-8 m-4 mx-auto bg-white rounded-lg shadow-xl dark:bg-slate-700" data-action="click->pos--birthday-discount-modal#handleContentClick">
+      <h2 class="text-lg font-semibold text-center dark:text-slate-100">Descuento por Cumpleaños</h2>
+      
+      <div class="mt-6 space-y-4">
+        <div class="text-center text-gray-700 dark:text-gray-300">
+          <p>Descuento a aplicar: <%= $global_settings[:birthday_discount_percentage] %>%</p>
+          <p class="text-sm">Seleccione un producto y tome una foto del DNI</p>
+        </div>
+
+        <div class="flex justify-center">
+          <video data-pos--birthday-discount-modal-target="video" class="hidden w-full max-w-md border rounded-lg dark:border-slate-600"></video>
+          <canvas data-pos--birthday-discount-modal-target="canvas" class="hidden w-full max-w-md border rounded-lg dark:border-slate-600"></canvas>
+        </div>
+
+        <div class="flex justify-center space-x-4">
+          <button type="button" class="btn btn-secondary" data-action="click->pos--birthday-discount-modal#startCamera">
+            <%= icon "camera", classes: "w-5 h-5 mr-2" %>
+            Iniciar Cámara
+          </button>
+          <button type="button" class="btn btn-primary" data-action="click->pos--birthday-discount-modal#takePhoto">
+            <%= icon "camera", classes: "w-5 h-5 mr-2" %>
+            Tomar Foto
+          </button>
+        </div>
+
+        <div class="flex justify-center mt-4 space-x-4">
+          <button type="button" class="btn btn-secondary" data-action="click->pos--birthday-discount-modal#close">Cancelar</button>
+          <button type="button" class="btn btn-primary" data-action="click->pos--birthday-discount-modal#applyDiscount" data-pos--birthday-discount-modal-target="applyButton" disabled>
+            Aplicar Descuento
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -43,14 +43,28 @@
        <% end %>
      </div>
 
-     <% if $global_settings[:feature_flag_commission_ranges] %>
+     <% if $global_settings[:feature_flag_birthday_discount] %>
 
-      <div class="flex items-center justify-center h-16">
-        <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
-        <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
-        Comisiones
-        <% end %>
-      </div>
+        <div data-controller="pos--birthday-discount-modal">
+          <button type="button" class="w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" data-action="click->pos--birthday-discount-modal#open">
+            <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+            Descuento Cumpleañero
+          </button>
+          <%= render 'shared/admin/pos/birthday_discount_modal' %>
+        </div>
+
+     <% else %>
+
+      <% if $global_settings[:feature_flag_commission_ranges] %>
+
+        <div class="flex items-center justify-center h-16">
+          <%= link_to admin_commissions_path, class: "w-full h-full text-black bg-white border border-gray-300 rounded btn dark:bg-slate-600 dark:text-white dark:border-slate-400" do %>
+          <%= icon "face-smile", classes: "stroke-current w-6 h-6 text-slate-600 dark:text-slate-300 mr-2" %>
+          Comisiones
+          <% end %>
+        </div>
+
+      <% end %>
 
      <% end %>
 
@@ -62,7 +76,5 @@
       </a>
     </div>
     -->
-
-   </div>
 
  </div>

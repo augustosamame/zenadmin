@@ -87,6 +87,10 @@ export default class extends Controller {
     let invalidProducts = [];
     const items = this.itemsTarget.querySelectorAll('div.flex');
     items.forEach(item => {
+
+      if (item.getAttribute('data-birthday-discount') === 'true') {
+        return;
+      }
       const validationResult = this.validatePrice(item);
       if (!validationResult.isValid) {
         invalidProducts.push(validationResult);
@@ -147,40 +151,99 @@ export default class extends Controller {
   }
 
   addItem(product) {
-    const existingItem = this.itemsTarget.querySelector(`[data-item-sku="${product.custom_id}"]`);
+    console.log('Adding item:', product);
 
-    if (existingItem) {
+    // Check for existing item
+    const existingItem = Array.from(this.itemsTarget.children).find(item => {
+      return item.getAttribute('data-item-sku') === product.custom_id &&
+        !item.hasAttribute('data-combo-id') &&
+        !item.hasAttribute('data-pack-id');
+    });
+
+    if (existingItem && !product.isComboItem && !product.isPackItem) {
       this.updateExistingItem(existingItem, product);
+      this.selectItem(existingItem); // Select the updated item
     } else {
       this.addNewItem(product);
-      this.selectItem({ currentTarget: this.itemsTarget.lastElementChild });
-      this.currentMode = 'quantity'; // Default to quantity mode
-    }
-
-    const buttonsElement = document.querySelector('[data-controller="pos--buttons"]');
-    const buttonsController = this.application.getControllerForElementAndIdentifier(buttonsElement, 'pos--buttons');
-    if (buttonsController) {
-      // buttonsController.hideDraftButton();
-    }
-
-    if (product.isLoyaltyFree) {
-      const itemElement = existingItem || this.itemsTarget.lastElementChild;
-      itemElement.setAttribute('data-item-loyalty-free', 'true');
     }
 
     this.calculateTotal();
-    this.evaluateGroupDiscount();
-    this.saveDraft();
   }
 
-  selectItem(event) {
-    // Clear any previously selected items
-    this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
-      item.classList.remove('bg-blue-100');
-    });
+  addNewItem(product) {
+    console.log('Adding new item:', product);
+    const itemElement = document.createElement('div');
+    itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
+    itemElement.setAttribute('data-item-name', product.name);
+    itemElement.setAttribute('data-item-sku', product.custom_id);
+    itemElement.setAttribute('data-item-original-price', product.price);
+    itemElement.setAttribute('data-product-id', product.id);
+    itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
+    itemElement.setAttribute('data-item-already-discounted', product.already_discounted);
+    itemElement.setAttribute('data-item-id', Date.now().toString());
 
-    this.selectedItem = event.currentTarget;
-    this.selectedItem.classList.add('bg-blue-100');
+    itemElement.innerHTML = `
+      <div class="flex-grow" style="flex-basis: 55%;">
+        <span class="block font-medium">${product.name}</span>
+        <span class="block text-sm text-gray-500">${product.custom_id}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span data-item-quantity="${product.quantity}">${product.quantity}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span class="editable-price">S/ ${product.price.toFixed(2)}</span>
+      </div>
+      <div class="flex-grow" style="flex-basis: 15%;">
+        <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
+      </div>
+    `;
+
+    if (product.isComboItem) {
+      itemElement.setAttribute('data-combo-id', product.comboId);
+      itemElement.setAttribute('data-original-quantity', product.quantity);
+    }
+
+    this.itemsTarget.appendChild(itemElement);
+    this.selectItem(itemElement);
+  }
+
+  updateExistingItem(existingItem, product) {
+    const quantityElement = existingItem.querySelector('[data-item-quantity]');
+    const subtotalElement = existingItem.querySelector('[data-item-subtotal]');
+    const newQuantity = parseInt(quantityElement.textContent) + product.quantity;
+    quantityElement.textContent = newQuantity;
+    const price = parseFloat(existingItem.querySelector('.editable-price').textContent.replace('S/ ', ''));
+    const newSubtotal = (newQuantity * price).toFixed(2);
+    subtotalElement.textContent = `S/ ${newSubtotal}`;
+
+    if (product.isComboItem) {
+      const currentQuantity = parseInt(existingItem.querySelector('[data-item-quantity]').textContent);
+      const newQuantity = currentQuantity + product.quantity;
+      existingItem.setAttribute('data-original-quantity', newQuantity);
+    }
+  }
+
+  selectItem(eventOrElement) {
+    // Remove previous selection
+    if (this.selectedItem) {
+      this.selectedItem.classList.remove('bg-blue-100', 'dark:bg-blue-900');
+      this.selectedItem.classList.add('bg-white', 'dark:bg-gray-700');
+    }
+
+    // Handle both event objects and direct element references
+    const element = eventOrElement.target ? eventOrElement.target.closest('div.flex') : eventOrElement;
+
+    // Set new selection
+    this.selectedItem = element;
+    if (this.selectedItem) {
+      this.selectedItem.classList.remove('bg-white', 'dark:bg-gray-700');
+      this.selectedItem.classList.add('bg-blue-100', 'dark:bg-blue-900');
+
+      // Add a unique identifier if it doesn't exist
+      if (!this.selectedItem.dataset.itemId) {
+        this.selectedItem.dataset.itemId = Date.now().toString();
+      }
+    }
 
     // Mark the first keypress
     this.isFirstKeyPress = true;
@@ -709,59 +772,9 @@ export default class extends Controller {
     };
   }
 
-  updateExistingItem(existingItem, product) {
-    const quantityElement = existingItem.querySelector('[data-item-quantity]');
-    const subtotalElement = existingItem.querySelector('[data-item-subtotal]');
-    const newQuantity = parseInt(quantityElement.textContent) + product.quantity;
-    quantityElement.textContent = newQuantity;
-    const newSubtotal = (newQuantity * product.price).toFixed(2);
-    subtotalElement.textContent = `S/ ${newSubtotal}`;
-
-    if (product.isComboItem) {
-      const currentQuantity = parseInt(existingItem.querySelector('[data-item-quantity]').textContent);
-      const newQuantity = currentQuantity + product.quantity;
-      existingItem.setAttribute('data-original-quantity', newQuantity);
-    }
-    existingItem.setAttribute('data-item-already-discounted', product.already_discounted);
-  }
-
   addComboDiscount(comboId, discountAmount) {
     this.comboDiscounts.set(comboId, discountAmount);
     this.calculateTotal();
-  }
-
-  addNewItem(product) {
-    console.log('Adding new item:', product);
-    const itemElement = document.createElement('div');
-    itemElement.classList.add('flex', 'gap-2', 'mb-2', 'items-start', 'cursor-pointer');
-    itemElement.setAttribute('data-item-name', product.name);
-    itemElement.setAttribute('data-item-sku', product.custom_id);
-    itemElement.setAttribute('data-item-original-price', product.price);
-    itemElement.setAttribute('data-product-id', product.id);
-    itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
-    itemElement.setAttribute('data-item-already-discounted', product.already_discounted);
-    itemElement.innerHTML = `
-      <div class="flex-grow" style="flex-basis: 55%;">
-        <span class="block font-medium">${product.name}</span>
-        <span class="block text-sm text-gray-500">${product.custom_id}</span>
-      </div>
-      <div class="flex-grow" style="flex-basis: 15%;">
-        <span data-item-quantity="${product.quantity}">${product.quantity}</span>
-      </div>
-      <div class="flex-grow" style="flex-basis: 15%;">
-        <span class="editable-price">S/ ${product.price.toFixed(2)}</span>
-      </div>
-      <div class="flex-grow" style="flex-basis: 15%;">
-        <span data-item-subtotal>S/ ${(product.quantity * product.price).toFixed(2)}</span>
-      </div>
-    `;
-
-    if (product.isComboItem) {
-      itemElement.setAttribute('data-combo-id', product.comboId);
-      itemElement.setAttribute('data-original-quantity', product.quantity);
-    }
-
-    this.itemsTarget.appendChild(itemElement);
   }
 
   clearOrder() {
@@ -777,4 +790,26 @@ export default class extends Controller {
       item.removeAttribute('data-group-discount');
     });
   }
+
+  applyBirthdayDiscount() {
+    if (!this.selectedItem) {
+      alert('Por favor seleccione un producto para aplicar el descuento');
+      return;
+    }
+
+    // Get discount percentage from data attribute
+    const discountPercentage = parseInt(document.getElementById('birthday-discount-percentage').dataset.value);
+    const priceElement = this.selectedItem.querySelector('.editable-price');
+    const originalPrice = parseFloat(this.selectedItem.dataset.itemOriginalPrice);
+    const discountedPrice = originalPrice * (1 - discountPercentage / 100);
+
+    priceElement.textContent = `S/ ${discountedPrice.toFixed(2)}`;
+    this.selectedItem.setAttribute('data-birthday-discount', 'true');
+    this.selectedItem.setAttribute('data-item-already-discounted', 'true');
+
+    this.updateSubtotal(this.selectedItem);
+    this.calculateTotal();
+  }
+
+
 }
