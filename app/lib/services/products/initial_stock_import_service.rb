@@ -9,6 +9,33 @@ module Services
         @location_name = location_name
       end
 
+      def import_individual_stock_transfer
+        datetime_string = @file_path.split("st_").last
+        datetime = datetime_string.to_datetime + 9.hours
+        warehouse_main = Warehouse.find_by!(name: "Almacén Oficina Principal")
+        user = User.find_by!(email: "almacen_principal@jardindelzen.com")
+
+        location = Location.find_by!(name: @location_name)
+        warehouse_location = location.warehouses.first
+        brand = Brand.find_by!(name: "Jardín del Zen")
+        ActiveRecord::Base.transaction do
+          stock_transfer = StockTransfer.create!(user: user, origin_warehouse: warehouse_main, destination_warehouse: warehouse_location, transfer_date: datetime, status: :active, stage: :pending)
+          CSV.foreach(@file_path, headers: true, liberal_parsing: true, encoding: 'bom|utf-8', row_sep: :auto).with_index(1) do |row, index|
+            product_name = row[2]
+            quantity = row[3]&.to_i || 0
+
+            found_product = Product.find_by(name: product_name.downcase.capitalize)
+            if found_product.blank?
+              Rails.logger.info("Product #{product_name} not found. Creating it")
+              found_product = Product.create!(name: product_name.downcase.capitalize, price_cents: 0, discounted_price_cents: 0, brand: brand, description: product_name.downcase.capitalize)
+            end
+            
+            StockTransferLine.create!(stock_transfer: stock_transfer, product: found_product, quantity: quantity)
+          end
+          stock_transfer.finish_transfer!
+        end
+      end
+
       def fix_stocks_due_to_wrong_column
         # 11 is the wrong column for stock
         # 15 is the correct column for stock

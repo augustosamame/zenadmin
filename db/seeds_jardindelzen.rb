@@ -319,3 +319,4 @@ Services::Products::InitialStockImportService.new("jardin_del_zen_stock_and_pric
 
 Services::Products::InitialStockImportService.new("plaza_norte.csv", 1, "Plaza Norte").stocks_only
 Services::Products::InitialStockImportService.new("plaza_norte.csv", 1, "Plaza Norte").fix_stocks_due_to_wrong_column
+Services::Products::InitialStockImportService.new("plaza_norte_stock_transfer_1.csv", 1, "Plaza Norte").import_individual_stock_transfer("2024-11-25")
