@@ -7,6 +7,13 @@ class WarehouseInventory < ApplicationRecord
   validate :stock_numericality_based_on_settings
   validates :warehouse_id, uniqueness: { scope: :product_id, message: "should have a unique product stock record" }
 
+  def self.reconstruct_stock_from_movements_all_warehouses(dry_run = false)
+    Warehouse.all.each do |warehouse|
+      WarehouseInventory.reconstruct_stock_from_movements(warehouse.id, dry_run)
+    end
+  end
+
+  # TODO: add a method to reconstruct the stock from the stock transfers
   def self.reconstruct_stock_from_movements(warehouse_id, dry_run = false)
     warehouse = Warehouse.find(warehouse_id)
     warehouse_inventory_records = WarehouseInventory.where(warehouse: warehouse)
