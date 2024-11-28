@@ -134,7 +134,7 @@
     <div class="mt-8">
       <div class="flex items-center justify-between mb-4">
         <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
-        <% if current_user.any_admin_or_supervisor? %>
+        <% if current_user.any_admin? %>
           <%= link_to "Modificar Comisiones", 
                       edit_admin_order_path(@order), 
                       class: "btn btn-primary" %>

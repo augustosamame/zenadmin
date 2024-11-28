@@ -106,7 +106,7 @@ export default class extends Controller {
     const minAllowedPrice = originalPrice * (1 - this.maxDiscountPercentage / 100);
     const productName = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
 
-    if (currentPrice < minAllowedPrice) {
+    if (currentPrice < (minAllowedPrice - 0.001)) {
       return {
         isValid: false,
         productName: productName,
