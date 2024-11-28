@@ -2,10 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ['container', 'content', 'video', 'canvas', 'applyButton']
+  static values = {
+    selectedItemId: String
+  }
 
   connect() {
     this.stream = null;
     this.photoTaken = false;
+    this.imageData = null;
   }
 
   disconnect() {
@@ -87,6 +91,8 @@ export default class extends Controller {
     this.canvasTarget.height = this.videoTarget.videoHeight;
     context.drawImage(this.videoTarget, 0, 0);
 
+    this.imageData = this.canvasTarget.toDataURL('image/jpeg');
+
     this.videoTarget.classList.add('hidden');
     this.canvasTarget.classList.remove('hidden');
     this.stopCamera();
@@ -106,7 +112,7 @@ export default class extends Controller {
     const orderItemsController = this.getOrderItemsController();
     if (orderItemsController) {
       this.restoreSelectedItem();
-      orderItemsController.applyBirthdayDiscount();
+      orderItemsController.applyBirthdayDiscount(this.imageData);
       this.close(event);
     }
   }

@@ -442,4 +442,40 @@ export default class extends Controller {
     this.paymentContainerTarget.classList.add('hidden');
     this.productGridTarget.classList.remove('hidden');
   }
+
+  createOrderData(payments, selectedSellers, comment) {
+    const orderItemsElement = document.querySelector('[data-controller="pos--order-items"]');
+    const orderItemsController = this.application.getControllerForElementAndIdentifier(
+      orderItemsElement,
+      'pos--order-items'
+    );
+
+    const orderItemsAttributes = [];
+    orderItemsElement.querySelectorAll('div.flex').forEach(item => {
+      const itemData = {
+        product_id: item.getAttribute('data-product-id'),
+        quantity: parseInt(item.querySelector('[data-item-quantity]').textContent),
+        price: parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', '')),
+        already_discounted: item.getAttribute('data-item-already-discounted') === 'true'
+      };
+
+      // Add birthday discount data if present
+      if (item.hasAttribute('data-birthday-discount')) {
+        itemData.birthday_discount = true;
+        itemData.birthday_image = item.getAttribute('data-birthday-image');
+      }
+
+      orderItemsAttributes.push(itemData);
+    });
+
+    // ... rest of your existing createOrderData code ...
+
+    return {
+      order: {
+        // ... existing order data ...
+        order_items_attributes: orderItemsAttributes,
+        // ... rest of your existing order data ...
+      }
+    };
+  }
 }

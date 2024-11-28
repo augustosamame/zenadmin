@@ -742,27 +742,25 @@ export default class extends Controller {
   collectOrderData() {
     const orderItems = [];
     this.itemsTarget.querySelectorAll('div.flex').forEach(item => {
-      const id = item.dataset.productId;
-      const name = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
-      const custom_id = item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim();
-      const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent.trim());
-      const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
-      const subtotal = parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', ''));
-      const isLoyaltyFree = item.hasAttribute('data-loyalty-free-product');
-      const isDiscounted = item.getAttribute('data-item-already-discounted') === 'true';
-      const packId = item.getAttribute('data-pack-id');
+      const itemData = {
+        id: item.dataset.productId,
+        name: item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim(),
+        custom_id: item.querySelector('div[style*="flex-basis: 55%"] span.text-sm').textContent.trim(),
+        quantity: parseInt(item.querySelector('[data-item-quantity]').textContent.trim()),
+        price: parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', '')),
+        subtotal: parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', '')),
+        is_loyalty_free: item.hasAttribute('data-loyalty-free-product'),
+        is_discounted: item.getAttribute('data-item-already-discounted') === 'true',
+        pack_id: item.getAttribute('data-pack-id')
+      };
 
-      orderItems.push({
-        id,
-        name,
-        custom_id,
-        quantity,
-        price,
-        subtotal,
-        isLoyaltyFree,
-        isDiscounted,
-        packId // Include pack ID if present
-      });
+      // Add birthday discount data if present
+      if (item.hasAttribute('data-birthday-discount')) {
+        itemData.birthday_discount = true;
+        itemData.birthday_image = item.getAttribute('data-birthday-image');
+      }
+
+      orderItems.push(itemData);
     });
 
     return {
@@ -791,13 +789,12 @@ export default class extends Controller {
     });
   }
 
-  applyBirthdayDiscount() {
+  applyBirthdayDiscount(imageData) {
     if (!this.selectedItem) {
       alert('Por favor seleccione un producto para aplicar el descuento');
       return;
     }
 
-    // Get discount percentage from data attribute
     const discountPercentage = parseInt(document.getElementById('birthday-discount-percentage').dataset.value);
     const priceElement = this.selectedItem.querySelector('.editable-price');
     const originalPrice = parseFloat(this.selectedItem.dataset.itemOriginalPrice);
@@ -806,6 +803,11 @@ export default class extends Controller {
     priceElement.textContent = `S/ ${discountedPrice.toFixed(2)}`;
     this.selectedItem.setAttribute('data-birthday-discount', 'true');
     this.selectedItem.setAttribute('data-item-already-discounted', 'true');
+
+    // Store the image data with the item
+    if (imageData) {
+      this.selectedItem.setAttribute('data-birthday-image', imageData);
+    }
 
     this.updateSubtotal(this.selectedItem);
     this.calculateTotal();
