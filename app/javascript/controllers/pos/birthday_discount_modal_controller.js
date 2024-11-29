@@ -86,12 +86,14 @@ export default class extends Controller {
   takePhoto() {
     if (!this.stream) return;
 
+    console.log('Taking photo...');
     const context = this.canvasTarget.getContext('2d');
     this.canvasTarget.width = this.videoTarget.videoWidth;
     this.canvasTarget.height = this.videoTarget.videoHeight;
     context.drawImage(this.videoTarget, 0, 0);
 
     this.imageData = this.canvasTarget.toDataURL('image/jpeg');
+    console.log('Image data length:', this.imageData.length);
 
     this.videoTarget.classList.add('hidden');
     this.canvasTarget.classList.remove('hidden');
@@ -104,10 +106,12 @@ export default class extends Controller {
   applyDiscount(event) {
     event.preventDefault();
 
-    if (!this.photoTaken) {
+    if (!this.photoTaken || !this.imageData) {
       alert('Por favor tome una foto del DNI primero');
       return;
     }
+
+    console.log('Applying discount with image data length:', this.imageData.length);
 
     const orderItemsController = this.getOrderItemsController();
     if (orderItemsController) {

@@ -756,8 +756,13 @@ export default class extends Controller {
 
       // Add birthday discount data if present
       if (item.hasAttribute('data-birthday-discount')) {
+        console.log('Found birthday discount item');
         itemData.birthday_discount = true;
-        itemData.birthday_image = item.getAttribute('data-birthday-image');
+        const imageData = item.getAttribute('data-birthday-image');
+        if (imageData) {
+          console.log('Found birthday image data, length:', imageData.length);
+          itemData.birthday_image = imageData;
+        }
       }
 
       orderItems.push(itemData);

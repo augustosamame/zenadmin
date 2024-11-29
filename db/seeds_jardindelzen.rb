@@ -111,6 +111,7 @@ PaymentMethod.find_or_create_by!(name: 'points', description: 'Puntos')
 PaymentMethod.find_or_create_by!(name: 'miles', description: 'Millas')
 PaymentMethod.find_or_create_by!(name: 'rappi', description: 'Rappi')
 PaymentMethod.find_or_create_by!(name: 'pedidosya', description: 'PedidosYa')
+PaymentMethod.find_or_create_by!(name: 'niubiz_diners', description: 'Niubiz Diners', payment_method_type: 'standard')
 
 if setting_6.boolean_value == true
   ecommerce_module_user_already_exists = User.find_by(email: 'ecommerce@devtechperu.com')

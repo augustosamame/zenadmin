@@ -83,6 +83,9 @@
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
+          <% if @order.order_items.any? { |item| item.birthday_discount? } %>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Descuento Cumpleañero</th>
+          <% end %>
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
@@ -92,11 +95,27 @@
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= item.quantity %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(item.price) %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(item.price * item.quantity) %></td>
+            <% if item.birthday_discount? %>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">Si</td>
+            <% else %>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"></td>
+            <% end %>
           </tr>
         <% end %>
       </tbody>
     </table>
   </div>
+
+  <% if @order.order_items.any? { |item| item.birthday_discount? } %>
+    <% image = @order.order_items.where(birthday_discount: true).first.birthday_image %>
+    <div class="mt-8">
+      <h4 class="mb-4 text-lg font-medium text-gray-900">Sustento de Descuento Cumpleañero</h4>
+      <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+        <dt class="text-sm font-medium text-gray-500">Imagen</dt>
+        <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= image_tag image, class: "h-60" %></dd>
+      </div>
+    </div>
+  <% end %>
 
   <!-- Payments -->
   <div class="mt-8">
