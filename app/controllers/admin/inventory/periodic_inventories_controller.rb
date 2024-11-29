@@ -36,8 +36,8 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     # main_warehouse_id = Warehouse.find_by!(is_main: true).id
 
     differences.each do |difference|
-      stock_adjustment = difference[:stock_qty] - difference[:actual_qty]
-      if stock_adjustment > 0 # missing stock
+      stock_adjustment = difference[:actual_qty] - difference[:stock_qty]
+      if stock_adjustment < 0 # missing stock
         stock_transfer = StockTransfer.create!(
           user_id: responsible_user.id,
           comments: "Ajuste de inventario",
@@ -51,7 +51,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           stock_transfer_lines_attributes: [
             {
               product_id: difference[:product_id],
-              quantity: stock_adjustment.abs
+              quantity: -(stock_adjustment.abs)
             }
           ]
         )
@@ -75,7 +75,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           stock_transfer_lines_attributes: [
             {
               product_id: difference[:product_id],
-              quantity: -(stock_adjustment.abs)
+              quantity: stock_adjustment.abs
             }
           ]
         )
