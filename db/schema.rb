@@ -14,6 +14,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_28_215508) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
+  enable_extension "unaccent"
 
   create_table "account_receivable_payments", force: :cascade do |t|
     t.bigint "account_receivable_id", null: false

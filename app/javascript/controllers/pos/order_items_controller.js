@@ -153,7 +153,7 @@ export default class extends Controller {
   addItem(product) {
     console.log('Adding item:', product);
 
-    // Check for existing item
+    // Check for existing item with combo/pack consideration
     const existingItem = Array.from(this.itemsTarget.children).find(item => {
       return item.getAttribute('data-item-sku') === product.custom_id &&
         !item.hasAttribute('data-combo-id') &&
@@ -162,12 +162,27 @@ export default class extends Controller {
 
     if (existingItem && !product.isComboItem && !product.isPackItem) {
       this.updateExistingItem(existingItem, product);
-      this.selectItem(existingItem); // Select the updated item
+      this.selectItem(existingItem);
     } else {
       this.addNewItem(product);
+      this.selectItem({ currentTarget: this.itemsTarget.lastElementChild });
+      this.currentMode = 'quantity'; // Default to quantity mode
+    }
+
+    const buttonsElement = document.querySelector('[data-controller="pos--buttons"]');
+    const buttonsController = this.application.getControllerForElementAndIdentifier(buttonsElement, 'pos--buttons');
+    if (buttonsController) {
+      // buttonsController.hideDraftButton();
+    }
+
+    if (product.isLoyaltyFree) {
+      const itemElement = existingItem || this.itemsTarget.lastElementChild;
+      itemElement.setAttribute('data-item-loyalty-free', 'true');
     }
 
     this.calculateTotal();
+    this.evaluateGroupDiscount();
+    this.saveDraft();
   }
 
   addNewItem(product) {
@@ -231,7 +246,8 @@ export default class extends Controller {
     }
 
     // Handle both event objects and direct element references
-    const element = eventOrElement.target ? eventOrElement.target.closest('div.flex') : eventOrElement;
+    const element = eventOrElement.currentTarget || eventOrElement;
+    if (!element) return;
 
     // Set new selection
     this.selectedItem = element;
