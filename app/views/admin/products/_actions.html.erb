@@ -1,43 +1,41 @@
-<% cache "product_actions_#{product.id}" do %>
-  <div data-controller="object-actions-dropdown" class="relative">
-    <button data-action="click->object-actions-dropdown#toggle click@window->object-actions-dropdown#hide"
-      class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
-      <!-- Inline SVG for the cog icon -->
-      <svg class="w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 2.75L9 4a7.05 7.05 0 00-2.5 1.5L5.5 4.5A9 9 0 002 6.5l1.5 1a7.05 7.05 0 00-1.5 2.5L2.75 9.75 2 12l.75 2.25L4 13.5a7.05 7.05 0 001.5 2.5l-1 1.5a9 9 0 002.25 1.25l1-1.5a7.05 7.05 0 002.5 1.5l.75 1.75L12 22l2.25-.75L13.5 20a7.05 7.05 0 002.5-1.5l1.5 1a9 9 0 002.25-1.25l-1-1.5a7.05 7.05 0 001.5-2.5l1.75-.75L22 12l-.75-2.25L20 10.5a7.05 7.05 0 00-1.5-2.5l1-1.5A9 9 0 0017.5 4.5l-1 1.5A7.05 7.05 0 0014 4l-.75-1.25L12 2l-2.25.75zM12 15a3 3 0 110-6 3 3 0 010 6z" />
-      </svg>
-    </button>
-    <ul data-object-actions-dropdown-target="menu"
-      class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
+<div data-controller="object-actions-dropdown" class="relative">
+  <button data-action="click->object-actions-dropdown#toggle click@window->object-actions-dropdown#hide"
+    class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
+    <!-- Inline SVG for the cog icon -->
+    <svg class="w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 2.75L9 4a7.05 7.05 0 00-2.5 1.5L5.5 4.5A9 9 0 002 6.5l1.5 1a7.05 7.05 0 00-1.5 2.5L2.75 9.75 2 12l.75 2.25L4 13.5a7.05 7.05 0 001.5 2.5l-1 1.5a9 9 0 002.25 1.25l1-1.5a7.05 7.05 0 002.5 1.5l.75 1.75L12 22l2.25-.75L13.5 20a7.05 7.05 0 002.5-1.5l1.5 1a9 9 0 002.25-1.25l-1-1.5a7.05 7.05 0 001.5-2.5l1.75-.75L22 12l-.75-2.25L20 10.5a7.05 7.05 0 00-1.5-2.5l1-1.5A9 9 0 0017.5 4.5l-1 1.5A7.05 7.05 0 0014 4l-.75-1.25L12 2l-2.25.75zM12 15a3 3 0 110-6 3 3 0 010 6z" />
+    </svg>
+  </button>
+  <ul data-object-actions-dropdown-target="menu"
+    class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
+    <li>
+      <%= link_to admin_inventory_kardex_path(product_id: product.id, warehouse_id: warehouse.id), class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
+        <!-- Inline SVG for the pencil icon -->
+        <svg class="w-5 h-5 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3zm2 2v14h14V5H5zm7 2h2v8h-2V7zm-4 4h2v4H8v-4zm8 0h2v4h-2v-4z" />
+        </svg>
+        <span>Ver Kardex</span>
+      <% end %>
+    </li>
+    <% if show_admin_actions %>
       <li>
-        <%= link_to admin_inventory_kardex_path(product_id: product.id, warehouse_id: warehouse.id), class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
+        <%= link_to edit_admin_product_path(product), class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
           <!-- Inline SVG for the pencil icon -->
           <svg class="w-5 h-5 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h18v18H3V3zm2 2v14h14V5H5zm7 2h2v8h-2V7zm-4 4h2v4H8v-4zm8 0h2v4h-2v-4z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17L4 20l3-7 7-7 4 4-7 7z" />
           </svg>
-          <span>Ver Kardex</span>
+          <span>Editar Producto</span>
         <% end %>
       </li>
-      <% if show_admin_actions %>
-        <li>
-          <%= link_to edit_admin_product_path(product), class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
-            <!-- Inline SVG for the pencil icon -->
-            <svg class="w-5 h-5 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 17L4 20l3-7 7-7 4 4-7 7z" />
-            </svg>
-            <span>Editar Producto</span>
-          <% end %>
-        </li>
-        <li>
-          <%= link_to admin_product_path(product), data: { turbo_method: :delete, turbo_confirm: 'Está seguro?' }, class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
-            <!-- Inline SVG for the trash icon -->
-            <svg class="w-5 h-5 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 3h22l-1 1h-20l-1-1z" />
-            </svg>
-            <span>Eliminar Producto</span>
-          <% end %>
-        </li>
-      <% end %>
-    </ul>
-  </div>
-<% end %>
+      <li>
+        <%= link_to admin_product_path(product), data: { turbo_method: :delete, turbo_confirm: 'Está seguro?' }, class: "px-4 py-[.4rem] flex items-center space-x-3" do %>
+          <!-- Inline SVG for the trash icon -->
+          <svg class="w-5 h-5 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6M1 3h22l-1 1h-20l-1-1z" />
+          </svg>
+          <span>Eliminar Producto</span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>
