@@ -11,7 +11,7 @@ class ConsolidatedReport < Prawn::Document
     @current_user = current_user
 
     # Initialize with a very long page to accommodate all content
-    super(page_size: [ 222, 50000 ], margin: [ 5, 5, 5, 5 ])
+    super(page_size: [ 222, 50000 ], margin: [ 5, 15, 5, 15 ])
     generate_content
   end
 

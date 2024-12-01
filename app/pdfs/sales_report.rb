@@ -11,7 +11,7 @@ class SalesReport < Prawn::Document
     @total_items = total_items
     @current_user = current_user
     @content_height = measure_content
-    super(page_size: [ 222, @content_height + 10 ], margin: [ 5, 5, 5, 5 ]) # Add a small buffer
+    super(page_size: [ 222, @content_height + 10 ], margin: [ 5, 15, 5, 15 ]) # Add a small buffer
     generate_content
   end
 
@@ -20,7 +20,7 @@ class SalesReport < Prawn::Document
   end
 
   def measure_content
-    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 5, 5, 5 ])
+    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 15, 5, 15 ])
     content_generator(dummy_document)
     50000 - dummy_document.cursor # This gives us the height of the content
   end

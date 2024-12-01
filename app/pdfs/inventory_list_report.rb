@@ -7,7 +7,7 @@ class InventoryListReport < Prawn::Document
     @warehouse = warehouse
     @products = products
     @content_height = measure_content
-    super(page_size: [ 222, @content_height + 10 ], margin: [ 5, 5, 5, 5 ])
+    super(page_size: [ 222, @content_height + 10 ], margin: [ 5, 15, 5, 15 ])
     generate_content
   end
 
@@ -16,7 +16,7 @@ class InventoryListReport < Prawn::Document
   end
 
   def measure_content
-    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 5, 5, 5 ])
+    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 15, 5, 15 ])
     content_generator(dummy_document)
     50000 - dummy_document.cursor
   end
