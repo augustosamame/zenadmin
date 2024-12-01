@@ -35,13 +35,14 @@ module Services
       def self.automatic_weekly_requisition_quantity(product, location)
         # TODO: Implement the logic to calculate the automatic weekly requisition quantity
         # This is a placeholder method
-        rand(1..10)
+        # rand(1..10)
+        0
       end
 
       def self.unrequisitioned_presold_quantity(product, location)
         # TODO: Implement the logic to calculate the unrequisitioned presold quantity
         # This is a placeholder method
-        rand(1..10)
+        0
       end
     end
   end

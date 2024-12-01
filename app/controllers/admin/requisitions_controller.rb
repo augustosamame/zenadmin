@@ -104,6 +104,9 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def edit
+    @requisition.requisition_lines.includes(:product).each do |line|
+      line.current_stock = line.product&.stock(@current_warehouse)
+    end
   end
 
   def update

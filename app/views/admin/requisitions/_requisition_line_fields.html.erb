@@ -28,9 +28,9 @@
                         class: "form-input w-16 text-sm no-spinner #{'text-red-600 font-semibold' if f.object.current_stock.to_i < 0}", 
                         step: 1, 
                         readonly: true,
-                        disabled: true,
+                        
                         tabindex: -1,
-                        value: f.object.current_stock %>
+                        value: f.object.product&.stock(@current_warehouse) %>
     </div>
 
     <!-- Automatic Quantity Field -->
