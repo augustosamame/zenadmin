@@ -33,10 +33,45 @@ module Services
       end
 
       def self.automatic_weekly_requisition_quantity(product, location)
-        # TODO: Implement the logic to calculate the automatic weekly requisition quantity
-        # This is a placeholder method
-        # rand(1..10)
-        0
+        # Look back 4 weeks (28 days) to calculate average weekly sales
+        start_date = 4.weeks.ago.beginning_of_week
+        end_date = Time.current.end_of_week
+
+        # Get all order items for this product at this location within the date range
+        total_quantity_sold = OrderItem
+          .joins(:order)
+          .where(
+            product_id: product.id,
+            orders: {
+              location_id: location.id,
+              created_at: start_date..end_date,
+              status: :active # Only count completed orders
+            }
+          )
+          .sum(:quantity)
+
+        # Calculate weekly average (total sales divided by 4 weeks)
+        weekly_average = (total_quantity_sold / 4.0).ceil
+
+        # Get current stock
+        warehouse = location.warehouses.first
+        current_stock = product.stock(warehouse)
+
+        # Get min/max stock settings for the product at the warehouse
+        min_max_stock = ProductMinMaxStock.find_by(
+          product_id: product.id,
+          warehouse_id: warehouse.id
+        )
+
+        suggested_quantity = if min_max_stock && current_stock < min_max_stock.min_stock
+          # If below minimum, suggest enough to reach max stock
+          min_max_stock.max_stock - current_stock
+        else
+          # Otherwise suggest the weekly average
+          weekly_average
+        end
+
+        [suggested_quantity, 0].max
       end
 
       def self.unrequisitioned_presold_quantity(product, location)
