@@ -48,7 +48,7 @@ export default class extends Controller {
   fetchRucData(event) {
     const rucId = event.target.value.trim();
 
-    if (rucId !== '') {
+    if (rucId !== '' && rucId.length === 11) {
       axios.get(`/admin/search_ruc?numero=${rucId}`, { headers: { 'Accept': 'application/json' } })
         .then(response => {
           if (response.data.error) {

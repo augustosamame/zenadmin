@@ -51,7 +51,13 @@ class User < ApplicationRecord
 
   def set_user_email
     if self.customer.present? && login_type == "email"
-      generated_email = "#{self.customer.doc_id || rand(10000000)}@sincorreo.com"
+      if self.customer.doc_id.present?
+        generated_email = "#{self.customer.doc_id}@sincorreo.com"
+      elsif self.customer.factura_ruc.present?
+        generated_email = "#{self.customer.factura_ruc}@sincorreo.com"
+      else
+        generated_email = "#{rand(10000000)}@sincorreo.com"
+      end
       self.email = generated_email
       self.login = generated_email
     end
