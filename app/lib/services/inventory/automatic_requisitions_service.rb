@@ -34,8 +34,10 @@ module Services
 
       def self.automatic_weekly_requisition_quantity(product, location)
         # Look back 4 weeks (28 days) to calculate average weekly sales
-        start_date = 4.weeks.ago.beginning_of_week
+        start_date = [4.weeks.ago.beginning_of_week, Date.new(2024, 11, 20)].max
         end_date = Time.current.end_of_week
+
+        weeks_count = ((end_date.to_date - start_date.to_date) / 7.0).ceil
 
         # Get all order items for this product at this location within the date range
         total_quantity_sold = OrderItem
@@ -51,7 +53,7 @@ module Services
           .sum(:quantity)
 
         # Calculate weekly average (total sales divided by 4 weeks)
-        weekly_average = (total_quantity_sold / 4.0).ceil
+        weekly_average = (total_quantity_sold / weeks_count.to_f).ceil
 
         # Get current stock
         warehouse = location.warehouses.first
