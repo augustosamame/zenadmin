@@ -21,7 +21,7 @@ class CashFlowReport < Prawn::Document
   end
 
   def measure_content
-    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 15, 5, 15 ])
+    dummy_document = Prawn::Document.new(page_size: [ 222, 50000 ], margin: [ 5, 5, 5, 5 ])
     content_generator(dummy_document)
     50000 - dummy_document.cursor # This gives us the height of the content
   end
