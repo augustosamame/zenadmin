@@ -104,8 +104,21 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def edit
-    @requisition.requisition_lines.includes([:product, product: :warehouse_inventories]).each do |line|
-      line.current_stock = line.product.stock(@current_warehouse)
+    # Optimize edit action with proper eager loading
+    @requisition = Requisition.includes(
+      requisition_lines: { 
+        product: { warehouse_inventories: :warehouse } 
+      }
+    ).find(params[:id])
+
+    # Pre-calculate stocks in a single query
+    product_stocks = WarehouseInventory
+      .where(warehouse: @current_warehouse, product_id: @requisition.requisition_lines.map(&:product_id))
+      .pluck(:product_id, :stock)
+      .to_h
+
+    @requisition.requisition_lines.each do |line|
+      line.current_stock = product_stocks[line.product_id] || 0
     end
   end
 
@@ -208,7 +221,11 @@ class Admin::RequisitionsController < Admin::AdminController
   private
 
   def set_requisition
-    @requisition = Requisition.find(params[:id])
+    @requisition = Requisition.includes(
+      requisition_lines: { 
+        product: { warehouse_inventories: :warehouse } 
+      }
+    ).find(params[:id])
   end
 
   def set_locations_and_warehouses
@@ -218,7 +235,12 @@ class Admin::RequisitionsController < Admin::AdminController
       @origin_locations = Location.where(id: @current_location.id)
     end
     @requisition_warehouses = Warehouse.where(is_main: true)
-    @all_products = Product.includes(:warehouse_inventories).order(:name)
+    @all_products = Product
+      .includes(:warehouse_inventories)
+      .left_joins(:warehouse_inventories)
+      .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
+      .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
+      .order(:name)
   end
 
   def requisition_params
