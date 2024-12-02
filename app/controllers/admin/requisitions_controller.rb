@@ -239,6 +239,7 @@ class Admin::RequisitionsController < Admin::AdminController
       .includes(:warehouse_inventories)
       .left_joins(:warehouse_inventories)
       .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
+      .where.not(id: nil)
       .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
       .order(:name)
   end
