@@ -1,4 +1,8 @@
 <%= simple_form_for([:admin, @requisition], html: { data: { controller: "requisition-form", action: "submit->requisition-form#submitForm", requisition_form_target: "form" } }) do |form| %>
+  <div class="relative z-50 mb-4">
+    <%= form.error_notification %>
+    <%= render 'shared/error_messages', resource: @requisition if @requisition.errors.any? %>
+  </div>
 
   <%= hidden_field_tag :debug_commit_value, '', data: { requisition_form_target: "debugCommit" } %>
   

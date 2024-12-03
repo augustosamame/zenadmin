@@ -1,5 +1,5 @@
 class Admin::RequisitionsController < Admin::AdminController
-  before_action :set_requisition, only: [ :show, :edit, :update, :destroy, :approve, :reject, :fulfill ]
+  before_action :set_requisition, only: [ :show, :update, :destroy, :approve, :reject, :fulfill ]
   before_action :set_locations_and_warehouses, only: [ :new, :create, :edit, :update ]
 
   def index
@@ -105,19 +105,17 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def edit
     # Optimize edit action with proper eager loading
-    @requisition = Requisition.includes(
-      requisition_lines: { 
-        product: { warehouse_inventories: :warehouse } 
-      }
-    ).find(params[:id])
+    @requisition = Requisition.find(params[:id])
+
+    @requisition_lines = RequisitionLine.includes(:product).where(requisition_id: @requisition.id).where.not(product_id: nil)
 
     # Pre-calculate stocks in a single query
     product_stocks = WarehouseInventory
-      .where(warehouse: @current_warehouse, product_id: @requisition.requisition_lines.map(&:product_id))
+      .where(warehouse: @current_warehouse, product_id: @requisition_lines.map(&:product_id))
       .pluck(:product_id, :stock)
       .to_h
 
-    @requisition.requisition_lines.each do |line|
+    @requisition_lines.each do |line|
       line.current_stock = product_stocks[line.product_id] || 0
     end
   end
