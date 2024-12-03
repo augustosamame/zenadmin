@@ -41,7 +41,7 @@
               <% if requisition.req_submitted? && current_user.any_admin_or_warehouse_manager? %>
                 <%= link_to 'Planificar', edit_admin_requisition_path(requisition), class: 'text-indigo-600 hover:text-indigo-900 ml-2' %>
               <% end %>
-              <% if requisition.req_planned? && current_user.any_admin_or_warehouse_manager? %>
+              <% if (requisition.req_submitted? || requisition.req_planned?) && current_user.any_admin_or_warehouse_manager? %>
                 <%= link_to 'Imprimir PDF', admin_requisition_path(requisition, format: :pdf), class: 'text-indigo-600 hover:text-indigo-900 ml-2', target: "_blank" %>
               <% end %>
             </td>
