@@ -47,7 +47,7 @@
   <div class="p-2 mt-8 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
     <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
     <div id="requisition-form-lines" data-requisition-form-target="lines">
-      <%= form.simple_fields_for :requisition_lines do |line_form| %>
+      <%= form.simple_fields_for :requisition_lines, @requisition_lines do |line_form| %>
         <%= render 'requisition_line_fields', f: line_form, all_products: @all_products %>
       <% end %>
     </div>

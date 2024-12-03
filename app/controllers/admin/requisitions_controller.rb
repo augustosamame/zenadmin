@@ -107,7 +107,11 @@ class Admin::RequisitionsController < Admin::AdminController
     # Optimize edit action with proper eager loading
     @requisition = Requisition.find(params[:id])
 
-    @requisition_lines = RequisitionLine.includes(:product).where(requisition_id: @requisition.id)
+    @requisition_lines = RequisitionLine
+      .joins(:product)
+      .where(requisition_id: @requisition.id, products: { status: :active })
+      .order('products.name ASC')
+      .includes(product: [:warehouse_inventories])  
 
     # Pre-calculate stocks in a single query
     product_stocks = WarehouseInventory
