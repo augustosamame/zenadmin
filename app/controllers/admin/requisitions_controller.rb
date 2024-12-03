@@ -107,7 +107,7 @@ class Admin::RequisitionsController < Admin::AdminController
     # Optimize edit action with proper eager loading
     @requisition = Requisition.find(params[:id])
 
-    @requisition_lines = RequisitionLine.includes(:product).where(requisition_id: @requisition.id).where.not(product_id: nil)
+    @requisition_lines = RequisitionLine.includes(:product).where(requisition_id: @requisition.id)
 
     # Pre-calculate stocks in a single query
     product_stocks = WarehouseInventory
@@ -233,13 +233,7 @@ class Admin::RequisitionsController < Admin::AdminController
       @origin_locations = Location.where(id: @current_location.id)
     end
     @requisition_warehouses = Warehouse.where(is_main: true)
-    @all_products = Product
-      .includes(:warehouse_inventories)
-      .left_joins(:warehouse_inventories)
-      .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
-      .where.not(id: nil)
-      .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
-      .order(:name)
+    @all_products = Product.active.order(:name)
   end
 
   def requisition_params
