@@ -8,7 +8,11 @@ class Admin::CommissionsController < Admin::AdminController
 
     Services::Sales::OrderCommissionService.recalculate_commissions
 
-    @commissions = Commission.includes([ :user, :order ]).all
+    if current_user.any_admin_or_supervisor?
+      @commissions = Commission.all.includes([ :user, :order ]).order(id: :desc)
+    else
+      @commissions = Commission.joins(:order).where(orders: { location: @current_location }).includes([ :user, :order ]).order(id: :desc)
+    end
 
     @datatable_options = "resource_name:'Commission';create_button:false;sort_2_desc;"
 
