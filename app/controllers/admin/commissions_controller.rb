@@ -14,7 +14,7 @@ class Admin::CommissionsController < Admin::AdminController
       @commissions = Commission.joins(:order).where(orders: { location: @current_location }).includes([ :user, :order ]).order(id: :desc)
     end
 
-    @datatable_options = "resource_name:'Commission';create_button:false;sort_2_desc;"
+    @datatable_options = "resource_name:'Commission';create_button:false;sort_0_desc;hide_0;"
 
     respond_to do |format|
       format.html
