@@ -45,6 +45,16 @@ class WarehouseInventory < ApplicationRecord
     end
   end
 
+  def self.create_records_for_all_products_in_main_warehouse
+    main_warehouse = Warehouse.where(is_main: true).first
+    Product.all.each do |product|
+      warehouse_inventory_exists = WarehouseInventory.where(warehouse: main_warehouse, product: product).exists?
+      unless warehouse_inventory_exists
+        WarehouseInventory.create!(warehouse: main_warehouse, product: product, stock: 0)
+      end
+    end
+  end
+
   private
 
     def stock_numericality_based_on_settings
