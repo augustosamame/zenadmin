@@ -14,6 +14,11 @@ module Services
       def create_invoices
         invoice_data = determine_order_invoices_matrix
 
+        if [ "B002", "B003" ].include?(invoice_data&.invoice_series&.prefix)
+          # ignore RUS boletas for now
+          return nil
+        end
+
         invoice_line_ids = []
         @order.order_items.each do |order_line|
           invoice_line_ids << {
