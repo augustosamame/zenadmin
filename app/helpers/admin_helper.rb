@@ -167,7 +167,7 @@ module AdminHelper
     end
 
     # Add the "+ comprobante" link if conditions are met (only in PDF column)
-    if format == "pdf" && (current_user.has_role?(:admin) || order.invoices.empty?)
+    if format == "pdf" && (current_user.any_admin? || order.invoices.empty?)
       content << link_to("Agr Comprob",
         "#",
         class: "text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300",
