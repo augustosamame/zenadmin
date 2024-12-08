@@ -34,7 +34,7 @@ class Order < ApplicationRecord
   has_many :sellers, through: :commissions, source: :user
 
   has_many :invoices, dependent: :destroy
-
+  has_many :external_invoices, dependent: :destroy
   has_many :preorders, dependent: :destroy
 
   has_many :notifications, as: :notifiable, dependent: :destroy

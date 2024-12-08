@@ -26,11 +26,11 @@
         <% @users.each do |user| %>
           <tr>
             <td class="px-4 py-2"><%= user.id %></td>
-            <td class="px-4 py-2"><%= user.name %></td>
+            <td class="px-4 py-2"><%= user.name.blank? ? user&.customer&.customer_name : user.name %></td>
             <td class="px-4 py-2"><%= user.email %></td>
             <td class="px-4 py-2"><%= user.phone %></td>
-            <td class="px-4 py-2"><%= user&.customer&.doc_type %></td>
-            <td class="px-4 py-2"><%= user&.customer&.doc_id %></td>
+            <td class="px-4 py-2"><%= user&.customer&.doc_id.blank? ? ((user&.customer&.factura_ruc.present? ? "ruc" : "dni")) : user&.customer&.doc_type %></td>
+            <td class="px-4 py-2"><%= user&.customer&.doc_id.blank? ? user&.customer&.factura_ruc : user&.customer&.doc_id %></td>
             <td class="px-4 py-2"><%= user&.loyalty_tier&.name %></td>
             <td class="px-4 py-2"><%= user.orders_count %></td>
             <td class="px-4 py-2"><%= format_currency(user.total_order_amount) %></td>

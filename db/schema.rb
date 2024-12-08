@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_11_28_215508) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_08_041044) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -311,6 +311,21 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_28_215508) do
     t.index ["matching_product_ids"], name: "index_discounts_on_matching_product_ids", using: :gin
     t.index ["start_datetime"], name: "index_discounts_on_start_datetime"
     t.index ["status"], name: "index_discounts_on_status"
+  end
+
+  create_table "external_invoices", force: :cascade do |t|
+    t.bigint "order_id", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", null: false
+    t.string "custom_id", null: false
+    t.integer "invoice_type", default: 0, null: false
+    t.integer "sunat_status", default: 1, null: false
+    t.string "invoice_url"
+    t.integer "status", default: 1, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_id", "invoice_type"], name: "index_external_invoices_on_custom_id_and_invoice_type", unique: true
+    t.index ["order_id"], name: "index_external_invoices_on_order_id"
   end
 
   create_table "factory_factories", force: :cascade do |t|
@@ -1034,6 +1049,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_11_28_215508) do
   add_foreign_key "customers", "users"
   add_foreign_key "customers", "users", column: "referrer_id"
   add_foreign_key "discount_filters", "discounts"
+  add_foreign_key "external_invoices", "orders"
   add_foreign_key "factory_factories", "regions"
   add_foreign_key "in_transit_stocks", "products"
   add_foreign_key "in_transit_stocks", "stock_transfers"

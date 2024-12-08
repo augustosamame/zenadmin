@@ -7,9 +7,9 @@ class Admin::OrdersController < Admin::AdminController
     respond_to do |format|
       format.html do
           @orders = if @current_location
-            Order.includes([ :invoices ]).where(location_id: @current_location.id).order(id: :desc)
+            Order.includes([ :invoices, :location, :external_invoices ]).where(location_id: @current_location.id).order(id: :desc)
           else
-            Order.includes([ :invoices ]).all.order(id: :desc)
+            Order.includes([ :invoices, :location, :external_invoices ]).all.order(id: :desc)
           end
 
         if @orders.size > 3000

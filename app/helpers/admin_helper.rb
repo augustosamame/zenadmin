@@ -98,38 +98,97 @@ module AdminHelper
   end
 
   def show_invoice_actions(order, format = "pdf")
+    content = []
+
+    # Show existing system invoices with URLs
     if order.last_issued_ok_invoice_urls.present?
-      order.last_issued_ok_invoice_urls.map do |label, url|
+      content << order.last_issued_ok_invoice_urls.map do |label, url|
         if format == "xml"
           url = url.gsub(".pdf", ".xml")
           label = "XML"
         end
-        link_to label, url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline"
+        link_to(label, url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline mr-2")
       end.join(", ").html_safe
-    else
-      if order.invoices.present? && format == "pdf"
-        content_tag(:div, class: "flex items-center space-x-2", data: { controller: "invoice-error-modal", invoice_error_modal_order_id_value: order.id }) do
-          concat(button_tag "Error", type: "button", class: "text-red-600 underline cursor-pointer", data: { action: "click->invoice-error-modal#open" })
-          concat(button_tag "Reenviar", type: "button", class: "btn btn-sm btn-primary", data: {
-            action: "click->invoice-error-modal#resendInvoice",
-            invoice_error_modal_order_id_param: order.id
-          })
-          concat(content_tag(:div, class: "hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full", data: { invoice_error_modal_target: "modal" }) do
-            content_tag(:div, class: "relative top-1/4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white") do
-              concat(content_tag(:h3, "Error al emitir el Comprobante", class: "text-lg font-bold mb-4"))
-              concat(content_tag(:p, order.invoices.last.invoice_sunat_response, class: "mb-4 overflow-auto max-h-96"))
-              concat(button_tag "Cerrar", type: "button", class: "btn btn-sm btn-secondary", data: { action: "click->invoice-error-modal#close" })
+    end
+
+    # Show external invoices (only in PDF column)
+    if format == "pdf" && order.external_invoices.any?
+      content << order.external_invoices.map do |external_invoice|
+        content_tag(:span, class: "inline-flex items-center") do
+          if external_invoice.invoice_url.present?
+            concat(link_to(external_invoice.custom_id, external_invoice.invoice_url,
+              target: "_blank",
+              class: "text-blue-600 hover:text-blue-800 underline mr-2"
+            ))
+          else
+            concat(content_tag(:span, external_invoice.custom_id, class: "text-gray-600 mr-2"))
+          end
+
+          concat(
+            button_to(admin_order_external_invoice_path(order, external_invoice),
+              method: :delete,
+              class: "text-red-500 hover:text-red-700",
+              form: {
+                data: {
+                  turbo_confirm: "¿Está seguro?",
+                  turbo: false
+                }
+              }
+            ) do
+              content_tag(:svg,
+                content_tag(:path, "", d: "M6 18L18 6M6 6l12 12", stroke: "currentColor", stroke_width: "2", stroke_linecap: "round", stroke_linejoin: "round"),
+                class: "w-4 h-4",
+                fill: "none",
+                viewBox: "0 0 24 24",
+                stroke: "currentColor"
+              )
             end
-          end)
+          )
         end
-      else
-        if format == "pdf"
-          "Aún no emitida"
-        else
-          ""
-        end
+      end.join(", ").html_safe
+    end
+
+    # Show error modal for failed invoices
+    if order.invoices.present? && format == "pdf" && !order.last_issued_ok_invoice_urls.present?
+      content << content_tag(:div, class: "flex items-center space-x-2", data: { controller: "invoice-error-modal", invoice_error_modal_order_id_value: order.id }) do
+        concat(button_tag "Error", type: "button", class: "text-red-600 underline cursor-pointer", data: { action: "click->invoice-error-modal#open" })
+        concat(button_tag "Reenviar", type: "button", class: "btn btn-sm btn-primary", data: {
+          action: "click->invoice-error-modal#resendInvoice",
+          invoice_error_modal_order_id_param: order.id
+        })
+        concat(content_tag(:div, class: "hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full", data: { invoice_error_modal_target: "modal" }) do
+          content_tag(:div, class: "relative top-1/4 mx-auto p-5 border w-full max-w-4xl shadow-lg rounded-md bg-white") do
+            concat(content_tag(:h3, "Error al emitir el Comprobante", class: "text-lg font-bold mb-4"))
+            concat(content_tag(:p, order.invoices.last.invoice_sunat_response, class: "mb-4 overflow-auto max-h-96"))
+            concat(button_tag "Cerrar", type: "button", class: "btn btn-sm btn-secondary", data: { action: "click->invoice-error-modal#close" })
+          end
+        end)
       end
     end
+
+    # Add the "+ comprobante" link if conditions are met (only in PDF column)
+    if format == "pdf" && (current_user.has_role?(:admin) || order.invoices.empty?)
+      content << link_to("Agr Comprob",
+        "#",
+        class: "text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300",
+        data: {
+          controller: "external-invoice",
+          external_invoice_order_id_value: order.id,
+          action: "click->external-invoice#openModal",
+          turbo: false
+        }
+      )
+    end
+
+    # Show "Aún no emitida" message if no invoices and PDF column
+    if content.empty? && format == "pdf"
+      content << "Aún no emitida"
+    end
+
+    # Return empty string for XML column if no content
+    return "" if content.empty? && format == "xml"
+
+    safe_join(content, " ")
   end
 
   def report_button_class(report_type)

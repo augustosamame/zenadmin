@@ -67,6 +67,9 @@ application.register("dynamic-form", DynamicFormController)
 import DynamicProductFilterController from "./dynamic_product_filter_controller"
 application.register("dynamic-product-filter", DynamicProductFilterController)
 
+import ExternalInvoiceController from "./external_invoice_controller"
+application.register("external-invoice", ExternalInvoiceController)
+
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 

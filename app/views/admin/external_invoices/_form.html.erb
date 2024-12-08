@@ -1,0 +1,48 @@
+<%= simple_form_for [:admin, order, external_invoice], 
+      html: { 
+        class: "space-y-6",
+        data: { 
+          controller: "external-invoice",
+          turbo: false,
+          action: "submit->external-invoice#handleSubmit"
+        }
+      } do |f| %>
+  <% if external_invoice.errors.any? %>
+    <div class="p-4 mb-4 text-sm text-red-700 bg-red-100 rounded-lg dark:bg-red-200 dark:text-red-800" role="alert">
+      <h2 class="font-medium"><%= pluralize(external_invoice.errors.count, "error") %> no permitió guardar el comprobante externo:</h2>
+      <ul class="mt-1.5 ml-2 list-disc list-inside">
+        <% external_invoice.errors.full_messages.each do |message| %>
+          <li class="ml-2 mr-2 text-red-700 dark:text-red-800"><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="space-y-4">
+    <%= f.input :custom_id,
+        label: "Número de Comprobante",
+        input_html: { 
+          class: "input-field ml-2 mr-2",
+          autofocus: true
+        },
+        error_html: { class: "mt-1 text-sm text-red-600 dark:text-red-500" } %>
+
+    <%= f.input :invoice_type,
+        label: "Tipo de Comprobante",
+        collection: ExternalInvoice.invoice_types.keys.map { |type| [t("invoice_types.#{type}"), type] },
+        input_html: { 
+          class: "select-input ml-2",
+          data: { controller: "tom-select" }
+        },
+        error_html: { class: "mt-1 ml-2 text-sm text-red-600 dark:text-red-500" } %>
+
+    <%= f.input :invoice_url,
+        label: "URL del Comprobante",
+        input_html: { 
+          class: "input-field ml-2"
+        },
+        error_html: { class: "mt-1 text-sm text-red-600 dark:text-red-500" } %>
+  </div>
+
+  <%= f.submit "Guardar", class: "btn btn-primary w-full mt-6" %>
+<% end %>
