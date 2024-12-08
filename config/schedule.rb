@@ -17,7 +17,7 @@
 #   runner "AnotherModel.prune_old_records"
 # end
 #
-every :monday, at: "9am" do # Use any day of the week or :weekend, :weekday
+every :sunday, at: "9am" do # Use any day of the week or :weekend, :weekday
   runner "Services::Inventory::AutomaticRequisitionsService.create_weekly_requisitions"
 end
 
