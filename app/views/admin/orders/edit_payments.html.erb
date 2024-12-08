@@ -1,0 +1,79 @@
+<%= render "shared/admin/nav", { header_title: "Editar Pagos - Venta ##{@order.custom_id}" } do %>
+  <%= link_to "Volver a Venta", admin_order_path(@order), class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <%= simple_form_for [:admin, @order], url: update_payments_admin_order_path(@order) do |f| %>
+    <%= render "shared/error_messages", resource: @order %>
+    
+    <!-- Order Total (Read-only) -->
+    <div class="mb-8 overflow-hidden bg-white shadow sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Total de Venta: <%= format_currency(@order.total_price) %></h3>
+      </div>
+    </div>
+
+    <!-- Payments (Editable) -->
+    <div class="mt-8" data-controller="payment-editor">
+      <h4 class="mb-4 text-lg font-medium text-gray-900">Pagos</h4>
+      <div data-payment-editor-target="totalError" class="hidden p-4 mb-4 text-red-700 bg-red-100 rounded-lg"></div>
+      
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método de Pago</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <%= f.simple_fields_for :payments do |payment_form| %>
+            <tr>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <%= payment_form.association :payment_method,
+                    collection: PaymentMethod.active.order(:name),
+                    label_method: :description,
+                    input_html: { 
+                      class: "select-input",
+                      data: { 
+                        controller: "tom-select",
+                        "payment-editor-target": "paymentMethod"
+                      }
+                    },
+                    label: false %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <%= payment_form.input :amount,
+                    label: false,
+                    input_html: { 
+                      value: number_with_precision(payment_form.object.amount.to_f, precision: 2),
+                      class: "w-32 px-2 py-1 text-sm border rounded",
+                      data: { 
+                        "payment-editor-target": "amount",
+                        action: "change->payment-editor#validateTotal"
+                      }
+                    } %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot>
+          <tr>
+            <td class="px-6 py-4 text-sm font-medium text-right text-gray-900">Total Pagos:</td>
+            <td class="px-6 py-4 text-sm text-gray-900" data-payment-editor-target="paymentsTotal">
+              <%= format_currency(@order.payments.sum(&:amount)) %>
+            </td>
+          </tr>
+        </tfoot>
+      </table>
+    </div>
+
+    <div class="mt-8">
+      <%= f.submit "Actualizar Pagos", 
+          class: "btn btn-primary",
+          data: { 
+            "payment-editor-target": "submitButton",
+            action: "click->payment-editor#validateBeforeSubmit" 
+          } %>
+    </div>
+  <% end %>
+</div>

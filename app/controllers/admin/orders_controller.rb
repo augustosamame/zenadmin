@@ -12,7 +12,7 @@ class Admin::OrdersController < Admin::AdminController
             Order.includes([ :invoices ]).all.order(id: :desc)
           end
 
-        if @orders.size > 2000
+        if @orders.size > 3000
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
         else
           @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
@@ -117,10 +117,65 @@ class Admin::OrdersController < Admin::AdminController
 
   def edit
     @order = Order.includes(:commissions).find(params[:id])
-    render :edit_commissions
+    render :edit
   end
 
   def update
+    @order = Order.find(params[:id])
+    service = Services::Sales::OrderItemEditService.new(@order)
+
+    # Transform the nested attributes to use order_item IDs as keys
+    # and convert prices to cents
+    transformed_params = {}
+    order_params[:order_items_attributes].each do |_, item_attrs|
+      transformed_params[item_attrs[:id]] = {
+        id: item_attrs[:id],
+        product_id: item_attrs[:product_id],
+        quantity: item_attrs[:quantity],
+        price_cents: (item_attrs[:price].to_f * 100).to_i
+      }
+    end
+
+    if service.update_order_items(transformed_params)
+      redirect_to admin_order_path(@order), notice: "Venta actualizada exitosamente."
+    else
+      render :edit, status: :unprocessable_entity
+    end
+  end
+
+  def edit_payments
+    authorize! :manage, Payment
+    @order = Order.includes(payments: :payment_method).find(params[:id])
+  end
+
+  def update_payments
+    authorize! :manage, Payment
+    @order = Order.find(params[:id])
+
+    service = Services::Sales::OrderPaymentEditService.new(@order)
+
+    transformed_params = {}
+    order_params[:payments_attributes].each do |_, payment_attrs|
+      transformed_params[payment_attrs[:id]] = {
+        id: payment_attrs[:id],
+        payment_method_id: payment_attrs[:payment_method_id],
+        amount_cents: (payment_attrs[:amount].to_f * 100).to_i
+      }
+    end
+
+    if service.update_payments(transformed_params)
+      redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente."
+    else
+      render :edit_payments, status: :unprocessable_entity
+    end
+  end
+
+  def edit_commissions
+    @order = Order.includes(:commissions).find(params[:id])
+    render :edit_commissions
+  end
+
+  def update_commissions
     @order = Order.includes(commissions: :user).find(params[:id])
 
     # Filter out any empty or zero percentage commissions
@@ -144,7 +199,7 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, order_items_attributes: [ :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image ], payments_attributes: [ :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
+      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, order_items_attributes: [ :id, :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image ], payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date ], sellers_attributes: [ :id, :user_id, :percentage, :amount ], commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
     end
 
     def get_generic_customer_id

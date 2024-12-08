@@ -115,11 +115,20 @@ application.register("object-actions-dropdown", ObjectActionsDropdownController)
 import OrderCommissionFormController from "./order_commission_form_controller"
 application.register("order-commission-form", OrderCommissionFormController)
 
+import OrderItemsController from "./order_items_controller"
+application.register("order-items", OrderItemsController)
+
 import OrderShowController from "./order_show_controller"
 application.register("order-show", OrderShowController)
 
+import PaymentEditorController from "./payment_editor_controller"
+application.register("payment-editor", PaymentEditorController)
+
 import PaymentFormController from "./payment_form_controller"
 application.register("payment-form", PaymentFormController)
+
+import Pos__BirthdayDiscountModalController from "./pos/birthday_discount_modal_controller"
+application.register("pos--birthday-discount-modal", Pos__BirthdayDiscountModalController)
 
 import Pos__ButtonsController from "./pos/buttons_controller"
 application.register("pos--buttons", Pos__ButtonsController)
@@ -147,9 +156,6 @@ application.register("pos--product-grid", Pos__ProductGridController)
 
 import Pos__SellersModalController from "./pos/sellers_modal_controller"
 application.register("pos--sellers-modal", Pos__SellersModalController)
-
-import Pos__BirthdayDiscountModalController from "./pos/birthday_discount_modal_controller"
-application.register("pos--birthday-discount-modal", Pos__BirthdayDiscountModalController)
 
 import ProductCategoryFormController from "./product_category_form_controller"
 application.register("product-category-form", ProductCategoryFormController)

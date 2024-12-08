@@ -10,8 +10,14 @@
   data-order-show-customer-phone-value="<%= @order.customer&.phone %>">
   <div class="overflow-hidden bg-white shadow sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
-      <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
-    </div>
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
+        <% if current_user.any_admin? %>
+            <%= link_to "Modificar Venta", 
+                        edit_admin_order_path(@order), 
+                        class: "btn btn-primary" %>
+        <% end %>
+      </div>
     <div class="border-t border-gray-200">
       <dl>
         <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
@@ -123,7 +129,14 @@
 
   <!-- Payments -->
   <div class="mt-8">
-    <h4 class="mb-4 text-lg font-medium text-gray-900">Pagos</h4>
+    <div class="flex items-center justify-between mb-4">
+      <h4 class="text-lg font-medium text-gray-900">Pagos</h4>
+      <% if current_user.any_admin? %>
+        <%= link_to "Modificar Pagos", 
+                    edit_payments_admin_order_path(@order), 
+                    class: "btn btn-primary" %>
+      <% end %>
+    </div>
     <table class="min-w-full divide-y divide-gray-200">
       <thead class="bg-gray-50">
         <tr>
@@ -159,7 +172,7 @@
         <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
         <% if current_user.any_admin? %>
           <%= link_to "Modificar Comisiones", 
-                      edit_admin_order_path(@order), 
+                      edit_commissions_admin_order_path(@order), 
                       class: "btn btn-primary" %>
         <% end %>
       </div>

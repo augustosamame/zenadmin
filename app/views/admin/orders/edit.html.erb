@@ -1,11 +1,12 @@
-<!-- app/views/admin/orders/edit.html.erb -->
-
 <%= render "shared/admin/nav", { header_title: "Editar Venta ##{@order.custom_id}" } do %>
   <%= link_to "Volver a Detalles", admin_order_path(@order), class: "btn btn-secondary" %>
 <% end %>
 
 <div class="container px-4 py-8 mx-auto">
   <%= simple_form_for [:admin, @order] do |f| %>
+    <%= render "shared/error_messages", resource: @order %>
+    
+    <!-- Order Details (Read-only) -->
     <div class="overflow-hidden bg-white shadow sm:rounded-lg">
       <div class="px-4 py-5 sm:px-6">
         <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
@@ -14,52 +15,92 @@
         <dl>
           <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Número de Venta</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.id %></dd>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.custom_id %></dd>
           </div>
           <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500">Fecha</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= friendly_date(current_user, @order.order_date) %></dd>
-          </div>
-          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
             <dt class="text-sm font-medium text-gray-500">Cliente</dt>
             <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.customer.name %></dd>
           </div>
-          <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
-            <dt class="text-sm font-medium text-gray-500">Total</dt>
-            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= format_currency(@order.total_price) %></dd>
+          <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Fecha</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= friendly_date(current_user, @order.order_date) %></dd>
           </div>
         </dl>
       </div>
     </div>
 
+    <!-- Order Items (Editable) -->
     <div class="mt-8">
-      <h4 class="mb-4 text-lg font-medium text-gray-900">Comisiones de Vendedores</h4>
-      <table class="min-w-full divide-y divide-gray-200">
+      <h4 class="mb-4 text-lg font-medium text-gray-900">Artículos de la Venta</h4>
+      <table class="min-w-full divide-y divide-gray-200" data-controller="order-items">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Nombre</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Email</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Porcentaje</th>
-            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Venta</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <%= f.simple_fields_for :commissions do |commission_form| %>
+          <%= f.simple_fields_for :order_items do |item_form| %>
             <tr>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.name %></td>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= commission_form.object.user.email %></td>
               <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                <%= commission_form.input :percentage, label: false, input_html: { step: 0.01, class: "w-24 px-2 py-1 text-sm border rounded" } %>
+                <%= item_form.association :product, 
+                    collection: Product.active.order(:name),
+                    input_html: { 
+                      class: "select-input",
+                      data: { 
+                        controller: "tom-select",
+                        "order-items-target": "product",
+                        "order-item-id": item_form.object.id
+                      }
+                    },
+                    label: false %>
               </td>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= format_currency(commission_form.object.sale_amount) %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <%= item_form.input :quantity, 
+                    label: false,
+                    input_html: { 
+                      min: 1,
+                      class: "w-24 px-2 py-1 text-sm border rounded",
+                      data: { 
+                        "order-items-target": "quantity",
+                        action: "change->order-items#calculateTotal"
+                      }
+                    } %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                <%= item_form.input :price, 
+                    label: false,
+                    input_html: {
+                      value: number_with_precision(item_form.object.price.to_f, precision: 2), 
+                      class: "w-24 px-2 py-1 text-sm border rounded",
+                      data: { 
+                        "order-items-target": "price",
+                        action: "change->order-items#calculateTotal"
+                      }
+                    } %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap" 
+                  data-order-items-target="lineTotal">
+                <%= format_currency(item_form.object.price * item_form.object.quantity) %>
+              </td>
             </tr>
           <% end %>
         </tbody>
+        <tfoot>
+          <tr>
+            <td colspan="3" class="px-6 py-4 text-sm font-medium text-right text-gray-900">Total:</td>
+            <td class="px-6 py-4 text-sm text-gray-900" data-order-items-target="orderTotal">
+              <%= format_currency(@order.total_price) %>
+            </td>
+          </tr>
+        </tfoot>
       </table>
     </div>
 
     <div class="mt-8">
-      <%= f.submit "Actualizar Comisiones", class: "btn btn-primary" %>
+      <%= f.submit "Actualizar Venta", class: "btn btn-primary" %>
     </div>
   <% end %>
 </div>

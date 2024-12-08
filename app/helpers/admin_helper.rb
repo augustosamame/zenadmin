@@ -102,7 +102,7 @@ module AdminHelper
       order.last_issued_ok_invoice_urls.map do |label, url|
         if format == "xml"
           url = url.gsub(".pdf", ".xml")
-          label = "Descargar XML"
+          label = "XML"
         end
         link_to label, url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline"
       end.join(", ").html_safe

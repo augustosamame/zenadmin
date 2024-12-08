@@ -48,6 +48,9 @@ Rails.application.routes.draw do
       member do
         post :retry_invoice
         get :universal_invoice_show
+        get :edit_commissions
+        get :edit_payments
+        patch :update_payments
       end
       collection do
         get "pos"
