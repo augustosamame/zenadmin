@@ -59,7 +59,8 @@ module Services
           "invoice_line_ids": invoice_line_ids,
           "email": @order.customer.email,
           "invoice_type": invoice_data.invoice_type,
-          "efact_client_token": invoice_data.invoicer.einvoice_api_key
+          "efact_client_token": invoice_data.invoicer.einvoice_api_key,
+          "comments": @order.einvoice_comments
         }
 
         response = Integrations::Nubefact.new.emitir_comprobante(invoice_data_hash.to_json)

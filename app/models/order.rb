@@ -153,9 +153,25 @@ class Order < ApplicationRecord
     commissions.status_order_unpaid.update_all(status: :status_order_paid)
   end
 
+  def einvoice_comments
+    text = ""
+    begin
+      text += "Vendedor: #{self.sellers&.first&.name} - " if self.sellers&.first&.present?
+      text += "Medio de Pago: #{self.main_payment_method}" if self.main_payment_method.present?
+      text
+    rescue StandardError => e
+      Rails.logger.error "Error generating einvoice_comments for order #{id}: #{e.message}"
+      ""
+    end
+  end
+
   private
 
     def create_notification
       Services::Notifications::CreateNotificationService.new(self).create
+    end
+
+    def main_payment_method
+      self.payments.where(status: :paid).order(amount_cents: :desc).first&.payment_method&.description
     end
 end
