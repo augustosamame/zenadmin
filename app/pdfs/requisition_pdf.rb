@@ -71,7 +71,7 @@ class RequisitionPdf < Prawn::Document
         ]
       ]
 
-      requisition.requisition_lines.includes(:product).each do |line|
+      requisition.requisition_lines.includes(:product).where("manual_quantity > 0 OR planned_quantity > 0").each do |line|
         products_data << [
           line.product.name,
           line.automatic_quantity.to_s,
