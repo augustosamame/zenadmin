@@ -110,8 +110,8 @@ class Admin::RequisitionsController < Admin::AdminController
     @requisition_lines = RequisitionLine
       .joins(:product)
       .where(requisition_id: @requisition.id, products: { status: :active })
-      .order('products.name ASC')
-      .includes(product: [:warehouse_inventories])  
+      .order("products.name ASC")
+      .includes(product: [ :warehouse_inventories ])
 
     # Pre-calculate stocks in a single query
     product_stocks = WarehouseInventory
@@ -224,8 +224,8 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def set_requisition
     @requisition = Requisition.includes(
-      requisition_lines: { 
-        product: { warehouse_inventories: :warehouse } 
+      requisition_lines: {
+        product: { warehouse_inventories: :warehouse }
       }
     ).find(params[:id])
   end
@@ -241,7 +241,7 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def requisition_params
-    params.require(:requisition).permit(
+    filtered_params = params.require(:requisition).permit(
       :location_id,
       :warehouse_id,
       :requisition_date,
@@ -260,5 +260,16 @@ class Admin::RequisitionsController < Admin::AdminController
         :_destroy
       ]
     )
+
+    # Filter out invalid requisition lines
+    if filtered_params[:requisition_lines_attributes].present?
+      filtered_params[:requisition_lines_attributes].reject! do |_, line_params|
+        line_params[:product_id].blank? ||
+        line_params[:manual_quantity].blank? ||
+        line_params[:manual_quantity].to_i <= 0
+      end
+    end
+
+    filtered_params
   end
 end
