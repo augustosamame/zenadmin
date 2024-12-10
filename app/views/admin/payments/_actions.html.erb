@@ -1,0 +1,17 @@
+<div class="flex items-center space-x-2">
+  <%= link_to admin_payment_path(payment), 
+    class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+    <%= icon "eye", 
+      classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" 
+    %>
+  <% end %>
+
+  <% if current_user.any_admin_or_supervisor? %>
+    <%= link_to edit_admin_payment_path(payment), 
+      class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+      <%= icon "pencil", 
+        classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" 
+      %>
+    <% end %>
+  <% end %>
+</div>

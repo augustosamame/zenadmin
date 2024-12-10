@@ -1,5 +1,10 @@
 class Admin::OrdersController < Admin::AdminController
   include MoneyRails::ActionViewExtension
+  include CurrencyFormattable
+  include AdminHelper
+  include ActionView::Helpers::TagHelper
+  include ActionView::Helpers::UrlHelper  # For link_to
+  include ActionView::Context
 
   before_action :check_duplicate_order, only: [ :create ]
 
@@ -7,12 +12,12 @@ class Admin::OrdersController < Admin::AdminController
     respond_to do |format|
       format.html do
           @orders = if @current_location
-            Order.includes([ :invoices, :location, :external_invoices ]).where(location_id: @current_location.id).order(id: :desc)
+            Order.includes([ :invoices, :external_invoices ]).where(location_id: @current_location.id).order(id: :desc)
           else
             Order.includes([ :invoices, :location, :external_invoices ]).all.order(id: :desc)
           end
 
-        if @orders.size > 3000
+        if @orders.size > 3
           @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
         else
           @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
@@ -213,7 +218,11 @@ class Admin::OrdersController < Admin::AdminController
     end
 
     def datatable_json
-      orders = Order.all
+      orders = if @current_location
+        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id).order(id: :desc)
+      else
+        Order.includes(:user, :invoices, :location, :external_invoices).order(id: :desc)
+      end
 
       # Apply search filter
       if params[:search][:value].present?
@@ -224,40 +233,67 @@ class Admin::OrdersController < Admin::AdminController
       if params[:order].present?
         order_by = case params[:order]["0"][:column].to_i
         when 0 then "id"
-        when 1 then "order_date"
-        when 2
-          # For the customer column, join the users table and order by first_name
-          orders = orders.joins(:user)
-          "users.first_name, users.last_name"
-        when 3 then "total_price_cents"
-        when 4 then "total_discount_cents"
-        when 6 then "payment_status"
-        when 7 then "status"
+        when 1 then "locations.name" if current_user.any_admin_or_supervisor?
+        when 2 then "custom_id"
+        when 3 then "order_date"
+        when 4 then "users.name"
+        when 5 then "total_price_cents"
+        when 6 then "total_original_price_cents"
+        when 7 then "total_discount_cents"
+        when 8 then "payment_status"
+        when 9 then "status"
         else "id"
         end
-        direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
-        orders = orders.reorder("#{order_by} #{direction}")
+
+        if order_by
+          direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
+          orders = orders.reorder("#{order_by} #{direction}")
+        end
       end
 
       # Pagination
       orders = orders.page(params[:start].to_i / params[:length].to_i + 1).per(params[:length].to_i)
-      # Return the data in the format expected by DataTables
+
       {
         draw: params[:draw].to_i,
         recordsTotal: Order.count,
         recordsFiltered: orders.total_count,
         data: orders.map do |order|
-          [
-            order.id,
-            order.order_date&.strftime("%Y-%m-%d %H:%M:%S"),
-            order.customer.name,
-            format_currency(order.total_price),
-            format_currency(order.total_discount),
-            order.active_invoice_id,
-            order.payment_status,
-            order.status,
-            render_to_string(partial: "admin/orders/actions", formats: [ :html ], locals: { order: order, default_object_options_array: @default_object_options_array })
+          row = [
+            order.id
           ]
+
+          if current_user.any_admin_or_supervisor?
+            row << order.location&.name
+          end
+
+          row.concat([
+            order.custom_id,
+            friendly_date(current_user, order.order_date),
+            order&.user&.name,
+            format_currency(order.total_price),
+            format_currency(order.total_original_price),
+            format_currency(order.total_discount),
+            show_invoice_actions(order, "pdf"),
+            show_invoice_actions(order, "xml"),
+            order.translated_payment_status,
+            order.translated_status,
+            render_to_string(
+              partial: "admin/orders/view_action",
+              formats: [ :html ],
+              locals: { order: order }
+            )
+          ])
+
+          if current_user.any_admin_or_supervisor?
+            row << render_to_string(
+              partial: "admin/orders/edit_action",
+              formats: [ :html ],
+              locals: { order: order }
+            )
+          end
+
+          row
         end
       }
     end
