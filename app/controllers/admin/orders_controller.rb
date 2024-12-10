@@ -219,9 +219,9 @@ class Admin::OrdersController < Admin::AdminController
 
     def datatable_json
       orders = if @current_location
-        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id).order(id: :desc)
+        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id)
       else
-        Order.includes(:user, :invoices, :location, :external_invoices).order(id: :desc)
+        Order.includes(:user, :invoices, :location, :external_invoices)
       end
 
       # Apply search filter
@@ -231,24 +231,38 @@ class Admin::OrdersController < Admin::AdminController
 
       # Apply sorting
       if params[:order].present?
-        order_by = case params[:order]["0"][:column].to_i
-        when 0 then "id"
-        when 1 then "locations.name" if current_user.any_admin_or_supervisor?
-        when 2 then "custom_id"
-        when 3 then "order_date"
-        when 4 then "users.name"
-        when 5 then "total_price_cents"
-        when 6 then "total_original_price_cents"
-        when 7 then "total_discount_cents"
-        when 8 then "payment_status"
-        when 9 then "status"
-        else "id"
-        end
+        column_index = params[:order]["0"][:column].to_i
+        direction = params[:order]["0"][:dir]
 
-        if order_by
-          direction = params[:order]["0"][:dir] == "desc" ? "desc" : "asc"
-          orders = orders.reorder("#{order_by} #{direction}")
+        case column_index
+        when 0
+          orders = orders.reorder(Arel.sql("orders.id #{direction}"))
+        when 1
+          if current_user.any_admin_or_supervisor?
+            orders = orders.joins(:location).reorder(Arel.sql("locations.name #{direction}"))
+          end
+        when 2
+          orders = orders.reorder(Arel.sql("orders.custom_id #{direction}"))
+        when 3
+          orders = orders.reorder(Arel.sql("orders.order_date #{direction}"))
+        when 4
+          orders = orders.joins(:user)
+                        .reorder(Arel.sql("users.first_name #{direction}, users.last_name #{direction}"))
+        when 5
+          orders = orders.reorder(Arel.sql("orders.total_price_cents #{direction}"))
+        when 6
+          orders = orders.reorder(Arel.sql("orders.total_original_price_cents #{direction}"))
+        when 7
+          orders = orders.reorder(Arel.sql("orders.total_discount_cents #{direction}"))
+        when 10
+          orders = orders.reorder(Arel.sql("orders.payment_status #{direction}"))
+        when 11
+          orders = orders.reorder(Arel.sql("orders.stage #{direction}"))
+        else
+          orders = orders.reorder(id: :desc)
         end
+      else
+        orders = orders.order(id: :desc) # Default sorting
       end
 
       # Pagination
