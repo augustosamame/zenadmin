@@ -103,6 +103,31 @@ export default class extends Controller {
     return true;
   }
 
+  validateNoItemsWithZeroPriceOrZeroQuantity() {
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+    let invalidItems = [];
+
+    for (const item of items) {
+      const price = parseFloat(item.querySelector('.editable-price').textContent.replace('S/ ', ''));
+      const quantity = parseInt(item.querySelector('[data-item-quantity]').textContent);
+      const productName = item.querySelector('div[style*="flex-basis: 55%"] span.font-medium').textContent.trim();
+
+      if (price === 0 || quantity === 0) {
+        invalidItems.push({
+          productName,
+          price,
+          quantity
+        });
+      }
+    }
+
+    if (invalidItems.length > 0) {
+      this.showZeroPriceQuantityError(invalidItems);
+      return false;
+    }
+    return true;
+  }
+
   validatePrice(item) {
     const priceElement = item.querySelector('.editable-price');
     const currentPrice = parseFloat(priceElement.textContent.replace('S/ ', ''));
@@ -834,5 +859,28 @@ export default class extends Controller {
     this.calculateTotal();
   }
 
+  showZeroPriceQuantityError(invalidItems) {
+    const productList = invalidItems.map(item =>
+      `- ${item.productName}: ${item.price === 0 ? 'Precio S/ 0.00' : ''} ${item.quantity === 0 ? 'Cantidad 0' : ''}`
+    ).join('\n');
+
+    const errorMessage = `Los siguientes productos tienen precio o cantidad igual a 0:\n\n${productList}\n\nPor favor, corrija los valores antes de continuar.`;
+
+    const customModal = document.querySelector('[data-controller="custom-modal"]');
+    if (customModal) {
+      const customModalController = this.application.getControllerForElementAndIdentifier(customModal, 'custom-modal');
+      if (customModalController) {
+        customModalController.openWithContent('Error de Validación', errorMessage, [
+          { label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }
+        ]);
+      } else {
+        console.error('CustomModalController not found!');
+        alert(errorMessage);
+      }
+    } else {
+      console.error('Custom modal element not found!');
+      alert(errorMessage);
+    }
+  }
 
 }

@@ -52,7 +52,10 @@ export default class extends Controller {
   payOrder() {
     console.log('Pay button clicked');
 
-    if (!this.validatePrices()) return;
+    if (!this.validatePrices()) {
+      console.log('Validation failed, stopping payment process');
+      return;
+    }
     if (!this.validateCustomerForLargeOrder()) return;
 
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
@@ -94,10 +97,17 @@ export default class extends Controller {
       'pos--order-items'
     );
 
-    if (orderItemsController && !orderItemsController.validateAllPrices()) {
+    if (!orderItemsController.validateAllPrices()) {
       console.log('Price validation failed');
       return false;
     }
+
+    // Add zero price/quantity validation here
+    if (!orderItemsController.validateNoItemsWithZeroPriceOrZeroQuantity()) {
+      console.log('Zero price/quantity validation failed');
+      return false;
+    }
+
     return true;
   }
 
