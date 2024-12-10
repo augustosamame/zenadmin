@@ -2,8 +2,6 @@
 
 <p>Se ha realizado un pedido de productos de la tienda <strong><%= @requisition.location.name %></strong>.</p>
 
-<%= spacer(16) %>
-
 <p>Los productos pedidos son:</p>
 
 <table class="mb-0" style="width: 100%; border-collapse: collapse;">
@@ -26,8 +24,6 @@
     <% end %>
   </tbody>
 </table>
-
-<%= spacer(16) %>
 
 <p>Puede revisar el pedido en el siguiente enlace para procesarlo: <%= link_to "Pedido ##{@requisition.custom_id}", admin_requisition_url(@requisition), target: "_blank" %></p>
 
