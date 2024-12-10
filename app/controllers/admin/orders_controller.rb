@@ -18,7 +18,7 @@ class Admin::OrdersController < Admin::AdminController
               .limit(10)
         else
           Order.includes([ :invoices, :location, :external_invoices ])
-              .order(id: :desc)
+              .order(id: :desc).limit(10)
         end
         @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
       end
