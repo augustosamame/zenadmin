@@ -1,34 +1,40 @@
-<%= render "shared/admin/nav", { header_title: "Nueva Venta - #{@current_location.name}" } do %>
-  <%= render "shared/admin/create_dropdown" %>
+<% if @current_location.present? %>
+<%= render "shared/admin/nav", { header_title: "Nueva Venta - #{@current_location&.name}" } do %>
+  <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
-<div id="max-price-discount-percentage" data-value="<%= $global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
+  <div id="max-price-discount-percentage" data-value="<%= $global_settings[:max_price_discount_percentage] %>" style="display: none;"></div>
 
-<div id="max-total-sale-without-customer" data-value="<%= $global_settings[:max_total_sale_without_customer] %>" style="display: none;"></div>
+  <div id="max-total-sale-without-customer" data-value="<%= $global_settings[:max_total_sale_without_customer] %>" style="display: none;"></div>
 
-<!-- Container to adjust layout for mobile and desktop -->
-<div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>" data-credit-payment-method-id="<%= PaymentMethod.find_by(name: 'credit')&.id %>">
+  <!-- Container to adjust layout for mobile and desktop -->
+  <div class="flex flex-col lg:flex-row h-[calc(100vh-180px)] text-black bg-white dark:bg-black dark:text-white" data-controller="pos--payment" data-pos--payment-can-create-unpaid-orders="<%= @can_create_unpaid_orders %>" data-credit-payment-method-id="<%= PaymentMethod.find_by(name: 'credit')&.id %>">
 
-  <!-- Product Grid and Payment Container Section (on top for mobile, on right for desktop) -->
-  <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto">
+    <!-- Product Grid and Payment Container Section (on top for mobile, on right for desktop) -->
+    <div class="order-first w-full p-4 bg-gray-200 dark:bg-gray-900 lg:w-1/2 lg:order-last lg:h-full lg:overflow-y-auto">
 
-    <%= render "admin/orders/pos/product_grid" %>
-    <%= render "admin/orders/pos/payment_container" %>
+      <%= render "admin/orders/pos/product_grid" %>
+      <%= render "admin/orders/pos/payment_container" %>
+
+    </div>
+
+    <!-- Order and Keypad Section (full width on mobile, left half on desktop) -->
+    <div class="flex flex-col w-full h-full p-3 bg-gray-100 lg:w-1/2 dark:bg-gray-800">
+      
+      <%= render "admin/orders/pos/order_item_list" %>
+      <%= render "admin/orders/pos/pos_buttons_container" %>
+      <%= render "admin/orders/pos/loyalty_info_container" %>
+      <%= render "admin/orders/pos/keypad_container" %>
+
+    </div>
 
   </div>
 
-  <!-- Order and Keypad Section (full width on mobile, left half on desktop) -->
-  <div class="flex flex-col w-full h-full p-3 bg-gray-100 lg:w-1/2 dark:bg-gray-800">
-    
-    <%= render "admin/orders/pos/order_item_list" %>
-    <%= render "admin/orders/pos/pos_buttons_container" %>
-    <%= render "admin/orders/pos/loyalty_info_container" %>
-    <%= render "admin/orders/pos/keypad_container" %>
+  <%= render 'admin/orders/pos/post_sale_modal' %>
 
-  </div>
-
-</div>
-
-<%= render 'admin/orders/pos/post_sale_modal' %>
-
-<%= audio_tag "barcode-add-sound.mp3", id: "barcode-add-sound", preload: 'auto' %>
+  <%= audio_tag "barcode-add-sound.mp3", id: "barcode-add-sound", preload: 'auto' %>
+<% else %>
+  <%= render "shared/admin/nav", { header_title: "Debe seleccionar una ubicación" } do %>
+    <%= render "shared/admin/location_dropdown" %>
+  <% end %>
+<% end %>
