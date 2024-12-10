@@ -11,17 +11,16 @@ class Admin::OrdersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-          @orders = if @current_location
-            Order.includes([ :invoices, :external_invoices ]).where(location_id: @current_location.id).order(id: :desc)
-          else
-            Order.includes([ :invoices, :location, :external_invoices ]).all.order(id: :desc)
-          end
-
-        if @orders.size > 3
-          @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
+        @orders = if @current_location
+          Order.includes([ :invoices, :external_invoices ])
+              .where(location_id: @current_location.id)
+              .order(id: :desc)
+              .limit(10)
         else
-          @datatable_options = "server_side:false;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
+          Order.includes([ :invoices, :location, :external_invoices ])
+              .order(id: :desc)
         end
+        @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
       end
 
       format.json do
