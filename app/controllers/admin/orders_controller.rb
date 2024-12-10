@@ -5,6 +5,8 @@ class Admin::OrdersController < Admin::AdminController
   include ActionView::Helpers::TagHelper
   include ActionView::Helpers::UrlHelper  # For link_to
   include ActionView::Context
+  include ActionView::Helpers::FormTagHelper  # For button_tag
+  include ActionView::Helpers::FormOptionsHelper
 
   before_action :check_duplicate_order, only: [ :create ]
 
