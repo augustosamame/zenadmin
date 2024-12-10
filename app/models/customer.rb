@@ -14,6 +14,25 @@ class Customer < ApplicationRecord
 
   # validates :doc_id, presence: true, uniqueness: true
 
+  # RUC validations
+  validates :factura_ruc, format: {
+    with: /\A\d{11}\z/,
+    message: "debe tener exactamente 11 dígitos"
+  }, if: -> { factura_ruc.present? }
+
+  validates :factura_razon_social, presence: {
+    message: "no puede estar en blanco si RUC está presente"
+  }, if: -> { factura_ruc.present? }
+
+  # DNI validation - must be either blank or exactly 8 digits for DNI type
+  validates :doc_id, format: {
+    with: /\A\d{8}\z/,
+    message: "debe tener exactamente 8 dígitos"
+  }, if: -> { doc_type == "dni" && doc_id.present? && doc_id.strip != "" }
+
+  # At least one identifier must be present
+  validate :must_have_one_identifier
+
   def set_consumer_role_to_user
     user.add_role("customer")
   end
@@ -23,6 +42,12 @@ class Customer < ApplicationRecord
   end
 
   private
+
+  def must_have_one_identifier
+    if doc_id.blank? && factura_ruc.blank?
+      errors.add(:base, "Debe proporcionar al menos un documento de identidad (DNI/CE/Pasaporte) o RUC")
+    end
+  end
 
   def set_consumer_email
     if self.doc_id.present?
