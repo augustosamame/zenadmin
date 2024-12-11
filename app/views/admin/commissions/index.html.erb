@@ -55,7 +55,7 @@
             <td class="px-4 py-2"><%= commission.order.custom_id %></td>
             <td class="px-4 py-2"><%= format_currency(commission.order.total_price - commission.order.total_discount) %></td>
             <td class="px-4 py-2"><%= commission.percentage %>%</td>
-            <td class="px-4 py-2"><%= (commission.order.total_price - commission.order.total_discount) * commission.percentage / 100 %></td>
+            <td class="px-4 py-2"><%= format_currency((commission.order.total_price - commission.order.total_discount) * commission.percentage / 100) %></td>
             <td class="px-4 py-2"><%= format_currency(commission.amount) %></td>
             <td class="px-4 py-2"><%= commission.translated_status %></td>
           </tr>
