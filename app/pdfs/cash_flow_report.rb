@@ -40,6 +40,7 @@ class CashFlowReport < Prawn::Document
       friendly_transactable_object_custom_id_method = method(:friendly_transactable_object_custom_id)
 
       global_totals = Hash.new(0)
+      previous_shift_balance = 0
 
       pdf.instance_eval do
         text "Reporte Diario de Caja", size: 12, align: :center, style: :bold
@@ -60,9 +61,16 @@ class CashFlowReport < Prawn::Document
         move_down 10
 
         cashier_shifts.each do |cashier_shift|
+          previous_shift_balance = Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
+
           text_box "Turno de Caja ##{cashier_shift.id}", size: 10, style: :bold, at: [ 0, cursor ], width: 130
           text_box "Hora: #{cashier_shift.created_at.strftime("%H:%M")}", size: 10, at: [ 130, cursor ], width: 80, align: :right
           move_down 15
+
+          if previous_shift_balance > 0
+            text "Saldo en efectivo de caja anterior: S/ #{sprintf("%.2f", previous_shift_balance)}", size: 8, style: :italic
+            move_down 5
+          end
 
           cashier_transaction_lines_data = [ [ "Tx", "Hora", "Tipo", "Medio", "Monto" ] ]
           shift_totals = Hash.new(0)
@@ -94,7 +102,12 @@ class CashFlowReport < Prawn::Document
             move_down 10
             text "Totales por medio de pago para este turno:", size: 9, style: :bold
             shift_totals.each do |payment_method, total|
-              text "#{payment_method}: S/ #{sprintf("%.2f", total)}", size: 8
+              display_total = if payment_method == "Efectivo"
+                total - previous_shift_balance
+              else
+                total
+              end
+              text "#{payment_method}: S/ #{sprintf("%.2f", display_total)}", size: 8
             end
           end
           move_down 10
@@ -102,12 +115,19 @@ class CashFlowReport < Prawn::Document
           move_down 10
         end
         move_down 10
-        text "Total: S/ #{sprintf("%.2f", global_totals.values.sum)}", size: 10, style: :bold
+        adjusted_total = global_totals.values.sum - previous_shift_balance
+        text "Total: S/ #{sprintf("%.2f", adjusted_total)}", size: 10, style: :bold
         move_down 10
         text "Totales por medio de pago:", size: 10, style: :bold
         move_down 5
         global_totals.each do |payment_method, total|
-          text "#{payment_method}: S/ #{sprintf("%.2f", total)}", size: 9
+          # Subtract previous balance from cash total in global totals
+          display_total = if payment_method == "Efectivo"
+            total - previous_shift_balance
+          else
+            total
+          end
+          text "#{payment_method}: S/ #{sprintf("%.2f", display_total)}", size: 9
           move_down 5
         end
         # Add seller totals section
