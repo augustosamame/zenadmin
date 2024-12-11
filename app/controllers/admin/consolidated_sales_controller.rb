@@ -17,7 +17,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
 
     respond_to do |format|
       format.html do
-        @datatable_options = "server_side:true;resource_name:'ConsolidatedSales';create_button:false;sort_1_desc:true;order_1_1:true;date_filter:true"
+        @datatable_options = "server_side:true;resource_name:'ConsolidatedSales';create_button:false;sort_1_desc:true;order_1_1:true;date_filter:true;row_group:'custom_id'"
       end
       format.json do
         render json: format_for_datatable(@orders)
