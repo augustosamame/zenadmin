@@ -19,6 +19,11 @@ module Services
           return nil
         end
 
+        # dont generate einvoices for pedidosya and rappi orders
+        if [ "pedidosya", "rappi" ].include?(@order&.payments&.first&.payment_method&.name)
+          return nil
+        end
+
         invoice_line_ids = []
         @order.order_items.each do |order_line|
           invoice_line_ids << {
