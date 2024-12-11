@@ -70,6 +70,7 @@ class Admin::OrdersController < Admin::AdminController
               )
             )
           end
+          Services::Sales::PaymentAdjustmentService.new(@order).adjust_payments
         end
         if order_params[:sellers_attributes].present?
           Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
