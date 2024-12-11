@@ -110,7 +110,10 @@ class Admin::RequisitionsController < Admin::AdminController
     @requisition_lines = RequisitionLine
       .joins(:product)
       .where(requisition_id: @requisition.id, products: { status: :active })
-      .order("products.name ASC")
+      .order(
+        Arel.sql("CASE WHEN requisition_lines.manual_quantity > 0 THEN 0 ELSE 1 END"),
+        Arel.sql("products.name ASC")
+      )
       .includes(product: [ :warehouse_inventories ])
 
     # Pre-calculate stocks in a single query

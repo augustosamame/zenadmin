@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form", "template", "debugCommit"]
+  static targets = ["line", "lines", "form", "template", "debugCommit", "plannedQuantity"]
 
   connect() {
     console.log("Requisition form controller connected")
@@ -53,7 +53,7 @@ export default class extends Controller {
     })
 
     this.linesTarget.appendChild(newLine)
-    
+
     // Initialize event listeners for the new line
     const newSelect = newLine.querySelector('select[data-controller="select"]')
     if (newSelect) {
@@ -119,5 +119,20 @@ export default class extends Controller {
         }
       })
     })
+  }
+
+  copyManualQuantity(event) {
+    event.preventDefault()
+    const line = event.target.closest('.nested-fields')
+    const manualQuantityInput = line.querySelector('input[name*="[manual_quantity]"]')
+    const plannedQuantityInput = line.querySelector('input[name*="[planned_quantity]"]')
+
+    if (manualQuantityInput && plannedQuantityInput) {
+      plannedQuantityInput.value = manualQuantityInput.value
+      plannedQuantityInput.classList.add('bg-green-50')
+      setTimeout(() => {
+        plannedQuantityInput.classList.remove('bg-green-50')
+      }, 500)
+    }
   }
 }
