@@ -22,7 +22,6 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
       format.json do
         render json: format_for_datatable(@orders)
       end
-      format.csv { send_data to_csv(@orders), filename: "ventas_consolidadas_#{Date.current}.csv" }
     end
   end
 
@@ -65,27 +64,5 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
         ]
       end
     }
-  end
-
-  def to_csv(orders)
-    headers = %w[Tienda Orden Fecha Cliente Total Método\ Pago Total\ Pago Tx\ # Comprobante]
-
-    CSV.generate(headers: true) do |csv|
-      csv << headers
-
-      orders.each do |order|
-        csv << [
-          order.location_name,
-          order.order_custom_id,
-          order.order_datetime&.strftime("%d/%m/%Y %H:%M"),
-          order.customer_name,
-          order.order_total&.to_f&./(100),
-          order.payment_method,
-          order.payment_total&.to_f&.fdiv(100),
-          order.payment_tx,
-          order.invoice_custom_id
-        ]
-      end
-    end
   end
 end
