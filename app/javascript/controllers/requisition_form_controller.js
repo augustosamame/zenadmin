@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form", "template", "debugCommit", "plannedQuantity"]
+  static targets = ["line", "lines", "form", "template", "debugCommit", "plannedQuantity?", "manualQuantity?"]
 
   connect() {
     console.log("Requisition form controller connected")
@@ -124,6 +124,8 @@ export default class extends Controller {
   copyManualQuantity(event) {
     event.preventDefault()
     const line = event.target.closest('.nested-fields')
+    if (!line) return
+
     const manualQuantityInput = line.querySelector('input[name*="[manual_quantity]"]')
     const plannedQuantityInput = line.querySelector('input[name*="[planned_quantity]"]')
 
@@ -132,6 +134,23 @@ export default class extends Controller {
       plannedQuantityInput.classList.add('bg-green-50')
       setTimeout(() => {
         plannedQuantityInput.classList.remove('bg-green-50')
+      }, 500)
+    }
+  }
+
+  copyAutomaticQuantity(event) {
+    event.preventDefault()
+    const line = event.target.closest('.nested-fields')
+    if (!line) return
+
+    const automaticQuantityInput = line.querySelector('input[name*="[automatic_quantity]"]')
+    const manualQuantityInput = line.querySelector('input[name*="[manual_quantity]"]')
+
+    if (automaticQuantityInput && manualQuantityInput) {
+      manualQuantityInput.value = automaticQuantityInput.value
+      manualQuantityInput.classList.add('bg-green-50')
+      setTimeout(() => {
+        manualQuantityInput.classList.remove('bg-green-50')
       }, 500)
     }
   }

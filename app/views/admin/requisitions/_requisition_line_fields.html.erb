@@ -47,11 +47,23 @@
     <!-- Manual Quantity Field -->
     <div class="flex items-center justify-end w-1/4">
       <%= f.label :manual_quantity, "A pedir", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
-      <%= f.number_field :manual_quantity, 
-                        class: "form-input w-16 text-sm no-spinner", 
-                        step: 1,
-                        readonly: (!@requisition.req_draft? && !@requisition.req_submitted?),
-                        value: f.object.manual_quantity %>
+      <div class="flex items-center">
+        <%= f.number_field :manual_quantity, 
+                          class: "form-input w-16 text-sm no-spinner", 
+                          step: 1,
+                          readonly: (!@requisition.req_draft? && !@requisition.req_submitted?),
+                          value: f.object.manual_quantity,
+                          data: { requisition_form_target: "manualQuantity" } %>
+        <% if @requisition.req_draft? %>
+          <button type="button" 
+                  class="p-1 ml-1 text-green-500 hover:text-green-600 focus:outline-none" 
+                  data-action="click->requisition-form#copyAutomaticQuantity">
+            <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="3">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </button>
+        <% end %>
+      </div>
     </div>
 
     <% if current_user.any_admin_or_warehouse_manager? && !@requisition.req_draft? %>
