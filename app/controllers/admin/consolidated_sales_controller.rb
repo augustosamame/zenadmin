@@ -20,7 +20,12 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
         @datatable_options = "server_side:true;resource_name:'ConsolidatedSales';create_button:false;sort_1_desc:true;order_1_1:true;date_filter:true;row_group:'custom_id'"
       end
       format.json do
-        render json: format_for_datatable(@orders)
+        total_records = @orders.except(:select).count
+        start = params[:start].to_i
+        length = params[:length].to_i
+        @orders = @orders.limit(length).offset(start) if length > 0
+
+        render json: format_for_datatable(@orders, total_records)
       end
     end
   end
@@ -44,11 +49,11 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
     cleaned_direction
   end
 
-  def format_for_datatable(records)
+  def format_for_datatable(records, total_records)
     {
       draw: params[:draw].to_i,
-      recordsTotal: records.length,
-      recordsFiltered: records.length,
+      recordsTotal: total_records,
+      recordsFiltered: total_records,
       data: records.map do |record|
         [
           record.location_name,
