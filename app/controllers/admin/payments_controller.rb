@@ -12,21 +12,19 @@ class Admin::PaymentsController < Admin::AdminController
     respond_to do |format|
       format.html do
         @payments = if @current_location
-          Payment.includes([ :user, :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
                 .joins(cashier_shift: { cashier: :location })
                 .where(cashiers: { location_id: @current_location.id })
                 .order(id: :desc)
+                .limit(10)
         else
-          Payment.includes([ :user, :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
+          Payment.includes([ :payment_method, :location, :cashier, :cashier_shift, payable: :user ])
                 .order(id: :desc)
+                .limit(10)
         end
 
         create_button = $global_settings[:pos_can_create_unpaid_orders]
-        if @payments.size > 1
-          @datatable_options = "server_side:true;resource_name:'Payment';create_button:#{create_button};sort_1_desc;"
-        else
-          @datatable_options = "server_side:false;resource_name:'Payment';create_button:#{create_button};sort_1_desc;"
-        end
+        @datatable_options = "server_side:true;resource_name:'Payment';create_button:#{create_button};sort_1_desc;"
       end
 
       format.json do
