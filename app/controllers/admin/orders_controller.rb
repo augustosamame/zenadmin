@@ -129,24 +129,38 @@ class Admin::OrdersController < Admin::AdminController
 
   def update
     @order = Order.find(params[:id])
-    service = Services::Sales::OrderItemEditService.new(@order)
 
-    # Transform the nested attributes to use order_item IDs as keys
-    # and convert prices to cents
-    transformed_params = {}
-    order_params[:order_items_attributes].each do |_, item_attrs|
-      transformed_params[item_attrs[:id]] = {
-        id: item_attrs[:id],
-        product_id: item_attrs[:product_id],
-        quantity: item_attrs[:quantity],
-        price_cents: (item_attrs[:price].to_f * 100).to_i
-      }
-    end
-
-    if service.update_order_items(transformed_params)
-      redirect_to admin_order_path(@order), notice: "Venta actualizada exitosamente."
+    if params[:order][:commissions_attributes].present?
+      # Handle commission updates
+      if Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(
+        params[:order][:commissions_attributes]&.values || []
+      )
+        redirect_to admin_order_path(@order), notice: "Comisiones actualizadas exitosamente."
+      else
+        flash.now[:error] = "Error al actualizar las comisiones."
+        render :edit_commissions, status: :unprocessable_entity
+      end
     else
-      render :edit, status: :unprocessable_entity
+      # Handle regular order updates
+      service = Services::Sales::OrderItemEditService.new(@order)
+
+      # Transform the nested attributes to use order_item IDs as keys
+      # and convert prices to cents
+      transformed_params = {}
+      order_params[:order_items_attributes].each do |_, item_attrs|
+        transformed_params[item_attrs[:id]] = {
+          id: item_attrs[:id],
+          product_id: item_attrs[:product_id],
+          quantity: item_attrs[:quantity],
+          price_cents: (item_attrs[:price].to_f * 100).to_i
+        }
+      end
+
+      if service.update_order_items(transformed_params)
+        redirect_to admin_order_path(@order), notice: "Venta actualizada exitosamente."
+      else
+        render :edit, status: :unprocessable_entity
+      end
     end
   end
 
