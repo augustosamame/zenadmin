@@ -11,14 +11,17 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
       location: @current_location,
       date_range: @date_range,
       order_column: order_column,
-      order_direction: order_direction
+      order_direction: order_direction,
+      search_term: params.dig("search", "value") || nil
     )
 
     respond_to do |format|
       format.html do
-        @datatable_options = "server_side:true;resource_name:'ConsolidatedSales';create_button:false;sort_1_desc:true;order_1_1:true"
+        @datatable_options = "server_side:true;resource_name:'ConsolidatedSales';create_button:false;sort_1_desc:true;order_1_1:true;date_filter:true"
       end
-      format.json { render json: format_for_datatable(@orders) }
+      format.json do
+        render json: format_for_datatable(@orders)
+      end
       format.csv { send_data to_csv(@orders), filename: "ventas_consolidadas_#{Date.current}.csv" }
     end
   end
@@ -26,53 +29,42 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
   private
 
   def order_column
-    columns = %w[location_name order_custom_id order_datetime customer_name order_total payment_method payment_total payment_tx invoice_custom_id actions]
-    columns[params.dig(:order, "0", :column).to_i] || "order_custom_id"
+    if request.format.json?
+      Rails.logger.debug "JSON request - column index: #{params.dig(:order, '0', :column)}"
+      params.dig(:order, "0", :column)
+    else
+      Rails.logger.debug "HTML request - column index: #{params.dig(:order, '0', :column)}"
+      params.dig(:order, "0", :column)
+    end
   end
 
   def order_direction
-    params.dig(:order, "0", :dir) == "desc" ? "desc" : "asc"
+    direction = params.dig(:order, "0", :dir)
+    # Clean up direction regardless of request format
+    cleaned_direction = direction.to_s.split(":").first if direction
+    cleaned_direction
   end
 
-  def format_for_datatable(orders)
+  def format_for_datatable(records)
     {
       draw: params[:draw].to_i,
-      recordsTotal: orders.length,
-      recordsFiltered: orders.length,
-      data: orders.map { |order| format_order(order) }
+      recordsTotal: records.length,
+      recordsFiltered: records.length,
+      data: records.map do |record|
+        [
+          record.location_name,
+          record.custom_id,
+          I18n.l(record.order_datetime.to_datetime, format: :short),
+          record.customer_name,
+          helpers.number_to_currency(record.order_total.to_f / 100, unit: "S/", format: "%u %n"),
+          record.payment_method,
+          helpers.number_to_currency(record.payment_total.to_f / 100, unit: "S/", format: "%u %n"),
+          record.payment_tx,
+          record.invoice_custom_id,
+          helpers.link_to("Ver Detalles", admin_order_path(record.id), class: "btn btn-link")
+        ]
+      end
     }
-  end
-
-  def format_order(order)
-    if order.is_a?(OpenStruct) && order.invoice_custom_id&.start_with?("⚠️")
-      # This is an error record for a missing invoice
-      [
-        nil,  # location_name
-        nil,  # order_custom_id
-        nil,  # order_datetime
-        nil,  # customer_name
-        nil,  # order_total
-        nil,  # payment_method
-        nil,  # payment_total
-        nil,  # payment_tx
-        order.invoice_custom_id,  # Show the error message
-        nil   # No actions for error records
-      ]
-    else
-      # Normal record formatting
-      [
-        order.location_name,
-        order.order_custom_id,
-        order.order_datetime&.strftime("%d/%m/%Y %H:%M"),
-        order.customer_name,
-        helpers.format_currency(Money.new(order.order_total || 0, "PEN")),
-        order.payment_method,
-        order.payment_total ? helpers.format_currency(Money.new(order.payment_total, "PEN")) : "",
-        order.payment_tx,
-        order.invoice_custom_id,
-        helpers.link_to("Ver Detalles", admin_order_path(order.id), class: "btn btn-link")
-      ]
-    end
   end
 
   def to_csv(orders)

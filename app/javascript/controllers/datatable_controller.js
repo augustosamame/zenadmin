@@ -111,6 +111,24 @@ export default class extends Controller {
       options.ajax = {
         url: resourceMapping.ajaxUrl,
         type: "GET",
+        data: (d) => {
+          // If date_filter is enabled, add the filter parameters
+          if (allAdditionalOptions.includes("date_filter:true")) {
+            const fromDate = document.querySelector('[name="filter[from_date]"]')?.value;
+            const toDate = document.querySelector('[name="filter[to_date]"]')?.value;
+
+            if (fromDate && toDate) {
+              return {
+                ...d,
+                filter: {
+                  from_date: fromDate,
+                  to_date: toDate
+                }
+              };
+            }
+          }
+          return d;
+        }
       };
     }
 

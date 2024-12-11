@@ -72,6 +72,21 @@ class Order < ApplicationRecord
       }
     }
 
+  pg_search_scope :search_consolidated_sales,
+    against: [ :custom_id ],
+    associated_against: {
+      user: [ :first_name, :last_name ],
+      invoices: [ :custom_id ],
+      external_invoices: [ :custom_id ]
+    },
+    using: {
+      tsearch: {
+        prefix: true,
+        any_word: true,
+        dictionary: "spanish"
+      }
+    }
+
   attr_accessor :sellers_attributes, :invoice_series_comprobante_type
 
   def refresh_dashboard_metrics
@@ -172,7 +187,7 @@ class Order < ApplicationRecord
     end
   end
 
-  def self.consolidated_sales(location: nil, date_range: nil, order_column: nil, order_direction: nil)
+  def self.consolidated_sales(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
     # First get the regular sales data
     base_query = Order.select("orders.*")
                    .joins(:location, :user)
@@ -182,14 +197,15 @@ class Order < ApplicationRecord
                    .joins("LEFT JOIN external_invoices ON external_invoices.order_id = orders.id")
 
     base_query = base_query.where(location: location) if location
-    base_query = base_query.where(created_at: date_range) if date_range
+    base_query = base_query.where(order_date: date_range) if date_range
+    base_query = base_query.search_consolidated_sales(search_term) if search_term.present?
 
     # Execute the query with all columns we need
     sales_data = base_query.select([
       "orders.id",
       "locations.name as location_name",
       "orders.custom_id as order_custom_id",
-      "orders.created_at as order_datetime",
+      "orders.order_date as order_datetime",
       "CONCAT(users.first_name, ' ', users.last_name) as customer_name",
       "orders.total_price_cents as order_total",
       "payment_methods.description as payment_method",
@@ -198,33 +214,29 @@ class Order < ApplicationRecord
       "COALESCE(invoices.custom_id, external_invoices.custom_id) as invoice_custom_id"
     ].join(", "))
 
+    # byebug
     # Add ordering if specified
-    if order_column && order_direction
-      order_sql = case order_column.to_i
-      when 0  # location
-                    "locations.name"
-      when 1  # order_custom_id
+    if order_column.present? && order_direction.present?
+      order_sql = case order_column
+      when "1" # order_custom_id
+                    Rails.logger.debug "Attempting to sort by custom_id"
                     "orders.custom_id"
-      when 2  # order_datetime
+      when "2"
                     "orders.created_at"
-      when 3  # customer_name
-                    "CONCAT(users.first_name, ' ', users.last_name)"
-      when 4  # order_total
+      when "4"
                     "orders.total_price_cents"
-      when 5  # payment_method
-                    "payment_methods.description"
-      when 6  # payment_total
-                    "payments.amount_cents"
-      when 7  # payment_tx
-                    "payments.processor_transacion_id"
-      when 8  # invoice_custom_id
-                    "COALESCE(invoices.custom_id, external_invoices.custom_id)"
       else
                     "orders.custom_id"
       end
-      sales_data = sales_data.order("#{order_sql} #{order_direction}")
+
+      direction = order_direction.to_s.upcase
+      direction = "DESC" unless [ "ASC", "DESC" ].include?(direction)
+
+      sales_data = sales_data.order(Arel.sql("#{order_sql} #{direction}"))
+      return sales_data
     else
-      sales_data = sales_data.order("orders.custom_id DESC")
+      sales_data = sales_data.order(Arel.sql("orders.custom_id DESC"))
+      return sales_data
     end
 
     # Execute the query to get the results
