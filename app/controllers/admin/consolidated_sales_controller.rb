@@ -65,6 +65,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
           helpers.number_to_currency(record.payment_total.to_f / 100, unit: "S/", format: "%u %n"),
           record.payment_tx,
           record.invoice_custom_id,
+          record.invoice&.sunat_status,
           helpers.link_to("Ver Detalles", admin_order_path(record.id), class: "btn btn-link")
         ]
       end
