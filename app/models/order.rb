@@ -198,7 +198,11 @@ class Order < ApplicationRecord
                    .joins("LEFT JOIN external_invoices ON external_invoices.order_id = orders.id")
 
     base_query = base_query.where(location: location) if location
-    base_query = base_query.where(order_date: date_range) if date_range
+    if date_range
+      start_date = date_range.begin.in_time_zone("America/Lima").beginning_of_day.utc
+      end_date = date_range.end.in_time_zone("America/Lima").end_of_day.utc
+      base_query = base_query.where("orders.order_date BETWEEN ? AND ?", start_date, end_date)
+    end
     base_query = base_query.search_consolidated_sales(search_term) if search_term.present?
 
     # Execute the query with all columns we need

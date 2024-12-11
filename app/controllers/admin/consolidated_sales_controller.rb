@@ -53,7 +53,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
         [
           record.location_name,
           record.custom_id,
-          I18n.l(record.order_datetime.to_datetime, format: :short),
+          I18n.l(record.order_datetime.in_time_zone("America/Lima"), format: :short),
           record.customer_name,
           helpers.number_to_currency(record.order_total.to_f / 100, unit: "S/", format: "%u %n"),
           record.payment_method,
