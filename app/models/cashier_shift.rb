@@ -43,4 +43,12 @@ class CashierShift < ApplicationRecord
 
     total_payments + total_inflows - total_outflows
   end
+
+  def daily_balance
+    total_balance - Money.new(cash_from_previous_shift_cents, "PEN")
+  end
+
+  def cash_from_previous_shift_cents
+    self.cash_inflows.where(description: "Saldo de caja anterior - Efectivo").sum(:amount_cents)
+  end
 end

@@ -74,17 +74,17 @@
       <p class="mt-1 text-lg font-semibold"><%= @cashier_shift.closed_at ? friendly_date(current_user, @cashier_shift.closed_at) : 'En curso' %></p>
     </div>
     <div>
-      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Balance Total</p>
-      <p class="mt-1 text-lg font-semibold"><%= format_currency(@cashier_shift.total_balance) %></p>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Balance del Día</p>
+      <p class="mt-1 text-lg font-semibold"><%= format_currency(@cashier_shift.daily_balance) %></p>
     </div>
 
     <div class="col-span-3">
       <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Balance por Método de Pago</p>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        <% @cashier_shift.cashier_transactions.includes([:payment_method]).group_by(&:payment_method).each do |payment_method, transactions| %>
+        <% payment_method_balances(@cashier_shift).each do |balance| %>
           <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= payment_method&.description || 'Sin método' %></p>
-            <p class="text-lg font-semibold"><%= format_currency(transactions.sum(&:amount)) %></p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= balance[:description] %></p>
+            <p class="text-lg font-semibold"><%= format_currency(balance[:amount]) %></p>
           </div>
         <% end %>
       </div>
