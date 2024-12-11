@@ -228,7 +228,7 @@ class Admin::OrdersController < Admin::AdminController
 
       # Apply search filter
       if params[:search][:value].present?
-        orders = orders.search_by_customer_name(params[:search][:value])
+        orders = orders.search_by_customer_name_or_total_or_invoice_number(params[:search][:value])
       end
 
       # Apply sorting

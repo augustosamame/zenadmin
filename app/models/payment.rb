@@ -1,5 +1,6 @@
 class Payment < ApplicationRecord
   audited_if_enabled
+  include PgSearch::Model
   include TranslateEnum
 
   include DefaultRegionable
@@ -34,6 +35,19 @@ class Payment < ApplicationRecord
   after_create :create_cashier_transaction
 
   scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
+
+  pg_search_scope :search_by_all_fields,
+    against: [ :custom_id, :amount_cents, :processor_transacion_id ],
+    associated_against: {
+      user: [ :first_name, :last_name ]
+    },
+    using: {
+      tsearch: {
+        prefix: true,
+        any_word: true,
+        dictionary: "spanish"
+      }
+    }
 
   def order
     payable if payable_type == "Order"

@@ -56,7 +56,22 @@ export default class extends Controller {
       lengthMenu: [10, 25, 100],
       layout: {
         top2Start: { buttons: [] },
-        top2End: { buttons: ['csv', 'print'] }
+        top2End: {
+          buttons: [
+            {
+              extend: 'csv',
+              charset: 'UTF-8',
+              bom: true,
+              fieldSeparator: ',',
+              fieldBoundary: '"',
+              filename: 'export',
+              exportOptions: {
+                columns: ':visible'
+              }
+            },
+            'print'
+          ]
+        }
       },
       order: [],
       scrollX: true,  // Add this option

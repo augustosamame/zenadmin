@@ -72,9 +72,8 @@ class Admin::PaymentsController < Admin::AdminController
   end
 
   def datatable_json
-    # Start with base query without eager loading payable
     payments = Payment.includes(:user, :payment_method, :location, :cashier, :cashier_shift)
-                     .joins(:payment_method) # Add explicit join for sorting
+                     .joins(:payment_method)
 
     # Location filter
     if @current_location && !current_user.any_admin_or_supervisor?
@@ -84,17 +83,13 @@ class Admin::PaymentsController < Admin::AdminController
 
     # Apply search filter
     if params[:search][:value].present?
-      payments = payments.joins(:user)
-                        .where("users.first_name ILIKE :search OR users.last_name ILIKE :search OR payments.custom_id ILIKE :search",
-                              search: "%#{params[:search][:value]}%")
+      payments = payments.search_by_all_fields(params[:search][:value])
     end
 
     # Apply sorting
     if params[:order].present?
-      Rails.logger.debug "Sorting params: #{params[:order].inspect}"
       column_index = params[:order]["0"][:column].to_i
       direction = params[:order]["0"][:dir]
-      Rails.logger.debug "Column: #{column_index}, Direction: #{direction}"
 
       order_clause = case column_index
       when 0
@@ -126,33 +121,24 @@ class Admin::PaymentsController < Admin::AdminController
         if order_clause[0].is_a?(Array)
           # Handle multiple columns
           order_sql = order_clause[0].map { |col| "#{col} #{order_clause[1]}" }.join(", ")
+          payments = payments.reorder(Arel.sql(order_sql))
         else
-          order_sql = "#{order_clause[0]} #{order_clause[1]}"
+          payments = payments.reorder(Arel.sql("#{order_clause[0]} #{order_clause[1]}"))
         end
-        Rails.logger.debug "Order SQL: #{order_sql}"
-        payments = payments.reorder(Arel.sql(order_sql))
       end
+    else
+      payments = payments.order(id: :desc) # Default sorting
     end
-
-    # Get total counts before pagination
-    total_count = Payment.count
-    filtered_count = payments.count
 
     # Pagination
     paginated_payments = payments.page(params[:start].to_i / params[:length].to_i + 1)
                                 .per(params[:length].to_i)
 
-    # Load payable associations after pagination
-    loaded_payments = paginated_payments.map do |payment|
-      payment.payable.try(:user) if payment.payable.present?
-      payment
-    end
-
     {
       draw: params[:draw].to_i,
-      recordsTotal: total_count,
-      recordsFiltered: filtered_count,
-      data: loaded_payments.map do |payment|
+      recordsTotal: Payment.count,
+      recordsFiltered: payments.count,
+      data: paginated_payments.map do |payment|
         row = []
 
         if current_user.any_admin_or_supervisor?

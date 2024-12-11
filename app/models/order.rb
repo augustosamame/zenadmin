@@ -57,13 +57,20 @@ class Order < ApplicationRecord
 
   scope :unpaid_or_partially_paid, -> { where(payment_status: [ :unpaid, :partially_paid ]) }
 
-  pg_search_scope :search_by_customer_name,
-                  associated_against: {
-                    user: [ :first_name, :last_name ] # Assuming the customer user has first_name and last_name fields
-                  },
-                  using: {
-                    tsearch: { prefix: true }
-                  }
+  pg_search_scope :search_by_customer_name_or_total_or_invoice_number,
+    against: [ :custom_id, :total_price_cents ],
+    associated_against: {
+      user: [ :first_name, :last_name ],
+      invoices: [ :custom_id ],
+      external_invoices: [ :custom_id ]
+    },
+    using: {
+      tsearch: {
+        prefix: true,
+        any_word: true,
+        dictionary: "spanish"
+      }
+    }
 
   attr_accessor :sellers_attributes, :invoice_series_comprobante_type
 
