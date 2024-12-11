@@ -172,6 +172,106 @@ class Order < ApplicationRecord
     end
   end
 
+  def self.consolidated_sales(location: nil, date_range: nil, order_column: nil, order_direction: nil)
+    # First get the regular sales data
+    base_query = Order.select("orders.*")
+                   .joins(:location, :user)
+                   .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
+                   .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                   .joins("LEFT JOIN invoices ON invoices.order_id = orders.id")
+                   .joins("LEFT JOIN external_invoices ON external_invoices.order_id = orders.id")
+
+    base_query = base_query.where(location: location) if location
+    base_query = base_query.where(created_at: date_range) if date_range
+
+    # Execute the query with all columns we need
+    sales_data = base_query.select([
+      "orders.id",
+      "locations.name as location_name",
+      "orders.custom_id as order_custom_id",
+      "orders.created_at as order_datetime",
+      "CONCAT(users.first_name, ' ', users.last_name) as customer_name",
+      "orders.total_price_cents as order_total",
+      "payment_methods.description as payment_method",
+      "payments.amount_cents as payment_total",
+      "payments.processor_transacion_id as payment_tx",
+      "COALESCE(invoices.custom_id, external_invoices.custom_id) as invoice_custom_id"
+    ].join(", "))
+
+    # Add ordering if specified
+    if order_column && order_direction
+      order_sql = case order_column.to_i
+      when 0  # location
+                    "locations.name"
+      when 1  # order_custom_id
+                    "orders.custom_id"
+      when 2  # order_datetime
+                    "orders.created_at"
+      when 3  # customer_name
+                    "CONCAT(users.first_name, ' ', users.last_name)"
+      when 4  # order_total
+                    "orders.total_price_cents"
+      when 5  # payment_method
+                    "payment_methods.description"
+      when 6  # payment_total
+                    "payments.amount_cents"
+      when 7  # payment_tx
+                    "payments.processor_transacion_id"
+      when 8  # invoice_custom_id
+                    "COALESCE(invoices.custom_id, external_invoices.custom_id)"
+      else
+                    "orders.custom_id"
+      end
+      sales_data = sales_data.order("#{order_sql} #{order_direction}")
+    else
+      sales_data = sales_data.order("orders.custom_id DESC")
+    end
+
+    # Execute the query to get the results
+    results = sales_data.to_a
+
+    # Get all invoice numbers from the results
+    invoice_numbers = results
+      .map(&:invoice_custom_id)
+      .compact
+      .map { |id| id.split("-").last.to_i }
+      .sort
+
+    return results if invoice_numbers.empty?
+
+    # Find gaps in invoice numbers
+    first_number = invoice_numbers.first
+    last_number = invoice_numbers.last
+    expected_range = (first_number..last_number).to_a
+    missing_numbers = expected_range - invoice_numbers
+
+    # Create error records for missing invoices
+    error_records = missing_numbers.map do |number|
+      OpenStruct.new(
+        id: nil,
+        location_name: nil,
+        order_custom_id: nil,
+        order_datetime: nil,
+        customer_name: nil,
+        order_total: nil,
+        payment_method: nil,
+        payment_total: nil,
+        payment_tx: nil,
+        invoice_custom_id: "⚠️ Comprobante Faltante: F001-#{number.to_s.rjust(8, '0')}"
+      )
+    end
+
+    # Combine real records with error records and sort by invoice number
+    (results + error_records).sort_by do |record|
+      if record.invoice_custom_id
+        number = record.invoice_custom_id.split("-").last.to_i
+        [ number, 0 ]  # Real records come first for same number
+      else
+        [ Float::INFINITY, 1 ]  # Records without invoice numbers come last
+      end
+    end.reverse  # Reverse the final result to maintain DESC order
+  end
+
   private
 
     def create_notification

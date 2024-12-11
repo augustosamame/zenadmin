@@ -121,5 +121,10 @@ export const resourceMappings = {
     buttonText: "Crear Cuenta por Cobrar",
     buttonUrl: "/admin/account_receivables/new",
     ajaxUrl: "/admin/account_receivables.json"
+  },
+  ConsolidatedSales: {
+    buttonText: "Exportar", // or null if you don't want a create button
+    buttonUrl: "/admin/consolidated_sales/new", // or null if you don't want a create button
+    ajaxUrl: "/admin/consolidated_sales.json"
   }
 }

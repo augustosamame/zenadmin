@@ -182,6 +182,8 @@ Rails.application.routes.draw do
     get "reports/inventory_out", to: "reports#inventory_out"
     get "reports/consolidated", to: "reports#consolidated"
 
+    resources :consolidated_sales, only: [ :index ]
+    get "reports/consolidated_sales", to: "consolidated_sales#index"
 
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"
