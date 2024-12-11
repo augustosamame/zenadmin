@@ -16,9 +16,9 @@ class Admin::ProductsController < Admin::AdminController
 
 
         if @products.size > 1000
-          @datatable_options = "server_side:true;resource_name:'Product';sort_0_asc;#{current_user.any_admin? ? '' : 'create_button:false;'}"
+          @datatable_options = "server_side:true;state_save:true;resource_name:'Product';sort_0_asc;#{current_user.any_admin? ? '' : 'create_button:false;'}"
         else
-          @datatable_options = "resource_name:'Product';sort_0_asc;#{current_user.any_admin? ? '' : 'create_button:false;'}"
+          @datatable_options = "resource_name:'Product';sort_0_asc;state_save:true;#{current_user.any_admin? ? '' : 'create_button:false;'}"
         end
       end
 

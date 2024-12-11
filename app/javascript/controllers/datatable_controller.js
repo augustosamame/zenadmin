@@ -45,7 +45,7 @@ export default class extends Controller {
   getInitialOptions() {
     const languageUrl = this.languageCdnValue;
     return {
-      stateSave: true,
+      stateSave: false,
       ordering: true,
       fixedHeader: true,
       responsive: false,
@@ -140,6 +140,8 @@ export default class extends Controller {
       options.select = { style: 'single', info: false };
     } else if (option === "select_multi") {
       options.select = { style: 'multi', info: false };
+    } else if (option === "state_save") {
+      options.stateSave = true;
     } else if (option.startsWith("hide_")) {
       this.parseHideOption(option, options);
     } else if (option.startsWith("sort_")) {
@@ -147,7 +149,11 @@ export default class extends Controller {
     } else {
       let [key, value] = option.split(':');
       if (key && value) {
-        options[key.trim()] = this.parseValue(value.trim());
+        if (key === "state_save") {
+          options.stateSave = this.parseValue(value);
+        } else {
+          options[key.trim()] = this.parseValue(value.trim());
+        }
       }
     }
   }
@@ -156,7 +162,6 @@ export default class extends Controller {
     const [, col, dir] = option.split("_");
     if (!options.order) options.order = [];
     options.order.push([parseInt(col, 10), dir]);
-    options.stateSave = false;
   }
 
   parseHideOption(option, options) {
