@@ -216,7 +216,9 @@ class Order < ApplicationRecord
       "payment_methods.description as payment_method",
       "payments.amount_cents as payment_total",
       "payments.processor_transacion_id as payment_tx",
-      "COALESCE(invoices.custom_id, external_invoices.custom_id) as invoice_custom_id"
+      "COALESCE(invoices.custom_id, external_invoices.custom_id) as invoice_custom_id",
+      "invoices.sunat_status as invoice_status",
+      "COALESCE(invoices.invoice_url, external_invoices.invoice_url) as invoice_url"
     ].join(", "))
 
     # Add ordering if specified
