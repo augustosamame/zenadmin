@@ -189,13 +189,48 @@ class Order < ApplicationRecord
 
   def self.consolidated_sales(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
     # First get the regular sales data
-    base_query = Order.select("orders.*")
-                   .joins("INNER JOIN locations ON locations.id = orders.location_id")
-                   .joins("INNER JOIN users ON users.id = orders.user_id")
-                   .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
-                   .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
-                   .joins("LEFT JOIN invoices ON invoices.order_id = orders.id")
-                   .joins("LEFT JOIN external_invoices ON external_invoices.order_id = orders.id")
+    base_query = Order.select([
+      "orders.id",
+      "orders.custom_id",
+      "orders.order_date",
+      "orders.total_price_cents",
+      "orders.location_id",
+      "orders.user_id",
+      "locations.name as location_name",
+      "orders.order_date as order_datetime",
+      "orders.total_price_cents as order_total",
+      "CONCAT(users.first_name, ' ', users.last_name) as customer_name",
+      "payment_methods.description as payment_method",
+      "payments.amount_cents as payment_total",
+      "payments.processor_transacion_id as payment_tx",
+      "invoice_data.custom_id as invoice_custom_id",
+      "invoice_data.sunat_status as invoice_status",
+      "invoice_data.invoice_url as invoice_url"
+    ].join(", "))
+                 .joins("INNER JOIN locations ON locations.id = orders.location_id")
+                 .joins("INNER JOIN users ON users.id = orders.user_id")
+                 .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
+                 .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                 .joins(<<-SQL
+                   LEFT JOIN LATERAL (
+                     SELECT#{' '}
+                       custom_id,
+                       sunat_status,
+                       invoice_url,
+                       'invoice' as source
+                     FROM invoices#{' '}
+                     WHERE invoices.order_id = orders.id
+                     UNION ALL
+                     SELECT#{' '}
+                       custom_id,
+                       NULL as sunat_status,
+                       invoice_url,
+                       'external_invoice' as source
+                     FROM external_invoices#{' '}
+                     WHERE external_invoices.order_id = orders.id
+                   ) invoice_data ON true
+                 SQL
+                 )
 
     base_query = base_query.where(location: location) if location
     if date_range
@@ -204,22 +239,6 @@ class Order < ApplicationRecord
       base_query = base_query.where("orders.order_date BETWEEN ? AND ?", start_date, end_date)
     end
     base_query = base_query.search_consolidated_sales(search_term) if search_term.present?
-
-    # Execute the query with all columns we need
-    sales_data = base_query.select([
-      "orders.id",
-      "locations.name as location_name",
-      "orders.custom_id as order_custom_id",
-      "orders.order_date as order_datetime",
-      "CONCAT(users.first_name, ' ', users.last_name) as customer_name",
-      "orders.total_price_cents as order_total",
-      "payment_methods.description as payment_method",
-      "payments.amount_cents as payment_total",
-      "payments.processor_transacion_id as payment_tx",
-      "COALESCE(invoices.custom_id, external_invoices.custom_id) as invoice_custom_id",
-      "invoices.sunat_status as invoice_status",
-      "COALESCE(invoices.invoice_url, external_invoices.invoice_url) as invoice_url"
-    ].join(", "))
 
     # Add ordering if specified
     if order_column.present? && order_direction.present?
@@ -235,10 +254,23 @@ class Order < ApplicationRecord
       end
 
       direction = order_direction.upcase
-      return sales_data.order(Arel.sql("#{order_sql} #{direction}"))
+      return base_query.order(Arel.sql("#{order_sql} #{direction}"))
     end
 
-    sales_data.order(Arel.sql("orders.custom_id DESC"))
+    base_query.order(Arel.sql("orders.custom_id DESC"))
+  end
+
+  def self.search_consolidated_sales_sql(search_term)
+    search_condition = "%#{search_term}%"
+    [
+      "orders.custom_id ILIKE :search",
+      "CONCAT(users.first_name, ' ', users.last_name) ILIKE :search",
+      "invoice_data.custom_id ILIKE :search"
+    ].join(" OR ")
+  end
+
+  def self.search_consolidated_sales(search_term)
+    where(search_consolidated_sales_sql(search_term), search: "%#{search_term}%")
   end
 
   private

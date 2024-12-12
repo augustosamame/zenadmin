@@ -436,6 +436,18 @@ ENV LD_PRELOAD="libjemalloc.so.2" \
 bundle / bundler should be installed systemwide
 run bundle
 
+## Comments on the consoliated_sales query in Order model:
+
+This query is used to consolidate sales data, returning one line per order when there are invoices and external invoices, and also when there are multiple payment methods.
+The LATERAL join was the right solution here because:
+It maintains the ActiveRecord::Relation, which keeps the controller happy
+It allows us to UNION the two invoice types without breaking the query structure
+It properly handles cases where:
+Both invoice types exist
+Only one invoice type exists
+No invoices exist
+It keeps the original ordering capabilities
+It maintains compatibility with search and filtering
 
 
 
