@@ -17,15 +17,9 @@ class Services::Sales::OrderVoidService
         order_data = serialize_order_data
         invoice_list = @order.invoices.where(sunat_status: "sunat_success").map { |invoice| invoice.custom_id }.join(", ")
 
-        Rails.logger.debug "=== Debug VoidedOrder Creation ==="
-        Rails.logger.debug "Location exists?: #{Location.exists?(@order.location_id)}"
-        Rails.logger.debug "User exists?: #{User.exists?(@current_user.id)}"
-        Rails.logger.debug "Order ID: #{@order.id}"
-        Rails.logger.debug "Location ID: #{@order.location_id}"
-        Rails.logger.debug "User ID: #{@current_user.id}"
-
-        voided_order = VoidedOrder.new(
+        voided_order = VoidedOrder.create!(
           original_order_id: @order.id.to_s,
+          original_order_order_date: @order.order_date,
           original_order_custom_id: @order.custom_id,
           location_id: @order.location_id,
           user_id: @current_user.id,
@@ -34,13 +28,6 @@ class Services::Sales::OrderVoidService
           void_reason: @reason,
           invoice_list: invoice_list
         )
-
-        unless voided_order.valid?
-          Rails.logger.debug "Validation errors: #{voided_order.errors.full_messages}"
-          raise ActiveRecord::RecordInvalid.new(voided_order)
-        end
-
-        voided_order.save!
 
         unless Location.exists?(@order.location_id) && User.exists?(@current_user.id)
           raise ActiveRecord::RecordNotFound, "Location or User not found"

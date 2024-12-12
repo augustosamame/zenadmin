@@ -1005,6 +1005,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_12_023121) do
   create_table "voided_orders", force: :cascade do |t|
     t.string "original_order_id", null: false
     t.string "original_order_custom_id", null: false
+    t.datetime "original_order_order_date", null: false
     t.bigint "location_id", null: false
     t.bigint "user_id", null: false
     t.jsonb "original_order_data", default: {}, null: false
@@ -1016,7 +1017,9 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_12_023121) do
     t.index ["location_id"], name: "index_voided_orders_on_location_id"
     t.index ["original_order_custom_id"], name: "index_voided_orders_on_original_order_custom_id"
     t.index ["original_order_id"], name: "index_voided_orders_on_original_order_id"
+    t.index ["original_order_order_date"], name: "index_voided_orders_on_original_order_order_date"
     t.index ["user_id"], name: "index_voided_orders_on_user_id"
+    t.index ["voided_at"], name: "index_voided_orders_on_voided_at"
   end
 
   create_table "warehouse_inventories", force: :cascade do |t|

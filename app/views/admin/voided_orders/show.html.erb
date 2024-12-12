@@ -1,4 +1,4 @@
-<%= render "shared/admin/nav", { header_title: "Órden Anulada" } do %>
+<%= render "shared/admin/nav", { header_title: "Venta Anulada" } do %>
   <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
@@ -13,7 +13,7 @@
   <div class="overflow-hidden bg-white shadow sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
       <h3 class="text-lg font-medium leading-6 text-gray-900">
-        Orden Anulada: <%= @voided_order.original_order_custom_id %>
+        Venta Anulada: <%= @voided_order.original_order_custom_id %>
       </h3>
     </div>
 
@@ -27,6 +27,11 @@
         <div class="sm:col-span-1">
           <dt class="text-sm font-medium text-gray-500">Usuario que anuló</dt>
           <dd class="mt-1 text-sm text-gray-900"><%= @voided_order.user.name %></dd>
+        </div>
+
+        <div class="sm:col-span-1">
+          <dt class="text-sm font-medium text-gray-500">Fecha de Venta Original</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= l @voided_order.original_order_order_date, format: :long %></dd>
         </div>
 
         <div class="sm:col-span-1">
@@ -50,7 +55,7 @@
 
     <div class="border-t border-gray-200">
       <div class="px-4 py-5 sm:px-6">
-        <h4 class="text-lg font-medium text-gray-900">Detalles de la Orden Original</h4>
+        <h4 class="text-lg font-medium text-gray-900">Detalles de la Venta Original</h4>
       </div>
 
       <div class="px-4 py-5 sm:px-6">
@@ -59,7 +64,7 @@
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">ID Producto</th>
+                <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Producto</th>
                 <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Cantidad</th>
                 <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Precio</th>
               </tr>
@@ -67,7 +72,7 @@
             <tbody class="bg-white divide-y divide-gray-200">
               <% @order_data["order_items"].each do |item| %>
                 <tr>
-                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= item["product_id"] %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= Product.find(item["product_id"])&.name %></td>
                   <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= item["quantity"] %></td>
                   <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
                     <%= number_to_currency(item["price_cents"].to_f / 100, unit: "S/") %>
@@ -159,6 +164,54 @@
           </div>
         </div>
       <% end %>
+
+      <% if @order_data["commissions"].present? %>
+        <div class="border-t border-gray-200">
+          <div class="px-4 py-5 sm:px-6">
+            <h4 class="text-lg font-medium text-gray-900">Comisiones</h4>
+            <div class="mt-4 overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-gray-50">
+                  <tr>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Vendedor</th>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Estado</th>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Porcentaje</th>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Monto de Venta</th>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Monto Comisión</th>
+                    <th class="px-6 py-3 text-xs font-medium text-left text-gray-500 uppercase">Fecha</th>
+                  </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                  <% @order_data["commissions"].each do |commission| %>
+                    <tr>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= User.find(commission["user_id"])&.name %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= commission["status"].humanize %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= number_to_percentage(commission["percentage"], precision: 0) %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= number_to_currency(commission["sale_amount_cents"].to_f / 100, unit: "S/") %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= number_to_currency(commission["amount_cents"].to_f / 100, unit: "S/") %>
+                      </td>
+                      <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                        <%= l Time.zone.parse(commission["created_at"]), format: :short %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+
     </div>
   </div>
 </div>

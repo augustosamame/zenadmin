@@ -3,6 +3,7 @@ class CreateVoidedOrders < ActiveRecord::Migration[7.2]
     create_table :voided_orders do |t|
       t.string :original_order_id, null: false
       t.string :original_order_custom_id, null: false
+      t.datetime :original_order_order_date, null: false
       t.bigint :location_id, null: false
       t.bigint :user_id, null: false
       t.jsonb :original_order_data, null: false, default: {}
@@ -13,8 +14,10 @@ class CreateVoidedOrders < ActiveRecord::Migration[7.2]
 
       t.index :original_order_id
       t.index :original_order_custom_id
+      t.index :original_order_order_date
       t.index :location_id
       t.index :user_id
+      t.index :voided_at
     end
 
     add_foreign_key :voided_orders, :locations
