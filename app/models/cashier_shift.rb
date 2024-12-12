@@ -21,8 +21,10 @@ class CashierShift < ApplicationRecord
 
   before_create :check_if_shift_is_open
 
+  attr_accessor :retroactive_order_override
+
   def check_if_shift_is_open
-    if cashier.cashier_shifts.open.exists?
+    if cashier.cashier_shifts.open.exists? && !retroactive_order_override
       errors.add(:base, "Ya hay un turno de caja abierto para este cajero: #{cashier.name}.")
       throw(:abort)
     end

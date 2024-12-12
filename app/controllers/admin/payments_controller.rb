@@ -76,7 +76,7 @@ class Admin::PaymentsController < Admin::AdminController
                      .joins(:payment_method)
 
     # Location filter
-    if @current_location && !current_user.any_admin_or_supervisor?
+    if @current_location && current_user.any_admin_or_supervisor?
       payments = payments.joins(cashier_shift: { cashier: :location })
                         .where(cashiers: { location_id: @current_location.id })
     end

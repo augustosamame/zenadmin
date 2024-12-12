@@ -33,7 +33,9 @@ module Services
               sale_amount_cents: sale_amount_cents,
               amount_cents: amount_cents,
               percentage: percentage,
-              status: @order.paid? ? :status_order_paid : :status_order_unpaid
+              status: @order.paid? ? :status_order_paid : :status_order_unpaid,
+              created_at: @order.order_date,
+              updated_at: @order.order_date
             )
           end
         end

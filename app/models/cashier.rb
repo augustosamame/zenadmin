@@ -25,6 +25,6 @@ class Cashier < ApplicationRecord
   end
 
   def current_shift(current_user)
-    cashier_shifts.last
+    cashier_shifts.order(opened_at: :desc).first
   end
 end

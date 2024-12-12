@@ -371,6 +371,8 @@ export default class extends Controller {
     // Generate a unique request ID
     this.requestId = Date.now().toString();
 
+    const orderDateInput = document.getElementById('pos-order-date');
+
     const orderData = {
       order: {
         stage: 'confirmed',
@@ -387,7 +389,8 @@ export default class extends Controller {
         payments_attributes: payments,
         sellers_attributes: selectedSellers,
         request_id: this.requestId,
-        fast_stock_transfer_flag: this.hasAutomaticDeliveryTarget ? this.automaticDeliveryTarget.checked : true
+        fast_stock_transfer_flag: this.hasAutomaticDeliveryTarget ? this.automaticDeliveryTarget.checked : true,
+        order_date: orderDateInput?.value || null
       }
     };
 
