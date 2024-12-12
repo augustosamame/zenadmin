@@ -1,0 +1,55 @@
+<%= render "shared/admin/nav", { header_title: "Órdenes Anuladas" } do %>
+  <%= render "shared/admin/location_dropdown" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Órdenes Anuladas</h1>
+  </div>
+
+  <div class="overflow-hidden bg-white shadow sm:rounded-lg">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">ID Original</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Ubicación</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Usuario</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha Anulación</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Razón</th>
+            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @voided_orders.each do |voided_order| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= voided_order.original_order_custom_id %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= voided_order.location.name %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= voided_order.user.name %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= l voided_order.voided_at, format: :short %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= voided_order.void_reason.presence || "-" %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                <%= link_to "Ver Detalles", admin_voided_order_path(voided_order), 
+                    class: "text-primary-600 hover:text-primary-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="mt-4">
+    <%= paginate @voided_orders %>
+  </div>
+</div>

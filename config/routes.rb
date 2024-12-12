@@ -51,12 +51,17 @@ Rails.application.routes.draw do
         get :edit_commissions
         get :edit_payments
         patch :update_payments
+        post :void
       end
       collection do
         get "pos"
       end
+
       resources :external_invoices, only: [ :new, :create, :destroy ]
     end
+
+    resources :voided_orders, only: [ :index, :show ]
+
     resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
     resources :users do

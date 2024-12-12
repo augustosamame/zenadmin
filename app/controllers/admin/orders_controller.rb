@@ -164,6 +164,16 @@ class Admin::OrdersController < Admin::AdminController
     end
   end
 
+  def void
+    @order = Order.find(params[:id])
+    result = Services::Sales::OrderVoidService.new(@order, current_user).void
+    if result[0] == true
+      redirect_to admin_orders_path, notice: "Venta anulada exitosamente."
+    else
+      redirect_to admin_orders_path, alert: "Error al anular la venta: #{result[1]}"
+    end
+  end
+
   def edit_payments
     authorize! :manage, Payment
     @order = Order.includes(payments: :payment_method).find(params[:id])
@@ -320,6 +330,14 @@ class Admin::OrdersController < Admin::AdminController
               partial: "admin/orders/edit_action",
               formats: [ :html ],
               locals: { order: order }
+            )
+          end
+
+          if current_user.any_admin_or_supervisor?
+            row << render_to_string(
+              partial: "admin/orders/void_action",
+              formats: [ :html ],
+              locals: { order: order, current_user: current_user }
             )
           end
 

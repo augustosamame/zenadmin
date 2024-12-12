@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_08_041044) do
+ActiveRecord::Schema[7.2].define(version: 2024_12_12_023121) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -1002,6 +1002,23 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_08_041044) do
     t.index ["warehouse_id"], name: "index_users_on_warehouse_id"
   end
 
+  create_table "voided_orders", force: :cascade do |t|
+    t.string "original_order_id", null: false
+    t.string "original_order_custom_id", null: false
+    t.bigint "location_id", null: false
+    t.bigint "user_id", null: false
+    t.jsonb "original_order_data", default: {}, null: false
+    t.datetime "voided_at", null: false
+    t.string "void_reason"
+    t.text "invoice_list"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["location_id"], name: "index_voided_orders_on_location_id"
+    t.index ["original_order_custom_id"], name: "index_voided_orders_on_original_order_custom_id"
+    t.index ["original_order_id"], name: "index_voided_orders_on_original_order_id"
+    t.index ["user_id"], name: "index_voided_orders_on_user_id"
+  end
+
   create_table "warehouse_inventories", force: :cascade do |t|
     t.bigint "warehouse_id", null: false
     t.bigint "product_id", null: false
@@ -1123,6 +1140,8 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_08_041044) do
   add_foreign_key "user_roles", "users"
   add_foreign_key "user_seller_photos", "users"
   add_foreign_key "users", "loyalty_tiers"
+  add_foreign_key "voided_orders", "locations"
+  add_foreign_key "voided_orders", "users"
   add_foreign_key "warehouse_inventories", "products"
   add_foreign_key "warehouse_inventories", "warehouses"
   add_foreign_key "warehouses", "regions"
