@@ -53,7 +53,10 @@ export default class extends Controller {
       language: { url: languageUrl },
       pagingType: 'simple_numbers',
       pageLength: 10,
-      lengthMenu: [10, 25, 100],
+      lengthMenu: [
+        [10, 25, 100, -1],
+        [10, 25, 100, 'Todas']
+      ],
       layout: {
         top2Start: { buttons: [] },
         top2End: {
