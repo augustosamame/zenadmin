@@ -8,7 +8,7 @@ module Services
 
       def send_invoice_email
         invoice_link = @order.universal_invoice_link
-        ErpMailer.send_user_invoice(@order.user, invoice_link).deliver_later
+        ErpMailer.send_user_invoice(@order, @order.user, invoice_link).deliver_later
       end
 
       def create_invoices
