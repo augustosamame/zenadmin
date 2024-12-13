@@ -16,11 +16,14 @@ class Admin::OrdersController < Admin::AdminController
         @orders = if @current_location
           Order.includes([ :invoices, :external_invoices ])
               .where(location_id: @current_location.id)
+              .with_commission_status
               .order(id: :desc)
               .limit(10)
         else
           Order.includes([ :invoices, :location, :external_invoices ])
-              .order(id: :desc).limit(10)
+              .with_commission_status
+              .order(id: :desc)
+              .limit(10)
         end
         @datatable_options = "server_side:true;resource_name:'Order';create_button:false;sort_0_desc;hide_0;"
       end
@@ -267,9 +270,9 @@ class Admin::OrdersController < Admin::AdminController
 
     def datatable_json
       orders = if @current_location
-        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id)
+        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id).with_commission_status
       else
-        Order.includes(:user, :invoices, :location, :external_invoices)
+        Order.includes(:user, :invoices, :location, :external_invoices).with_commission_status
       end
 
       # Apply search filter
@@ -340,6 +343,7 @@ class Admin::OrdersController < Admin::AdminController
             show_invoice_actions(order, "xml"),
             order.translated_payment_status,
             order.translated_status,
+            order.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20") : "",
             render_to_string(
               partial: "admin/orders/view_action",
               formats: [ :html ],

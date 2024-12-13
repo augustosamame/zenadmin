@@ -57,6 +57,17 @@ class Order < ApplicationRecord
 
   scope :unpaid_or_partially_paid, -> { where(payment_status: [ :unpaid, :partially_paid ]) }
 
+  scope :with_commission_status, -> {
+    select([
+      "orders.*",
+      'CASE
+        WHEN (SELECT COUNT(*) FROM commissions WHERE commissions.order_id = orders.id) = 0
+        THEN true
+        ELSE false
+      END as missing_commission'
+    ].join(", "))
+  }
+
   pg_search_scope :search_by_customer_name_or_total_or_invoice_number,
     against: [ :custom_id, :total_price_cents ],
     associated_against: {
@@ -205,12 +216,17 @@ class Order < ApplicationRecord
       "payments.processor_transacion_id as payment_tx",
       "invoice_data.custom_id as invoice_custom_id",
       "invoice_data.sunat_status as invoice_status",
-      "invoice_data.invoice_url as invoice_url"
+      "invoice_data.invoice_url as invoice_url",
+      "CASE
+        WHEN commissions.id IS NULL THEN true
+        ELSE false
+      END as missing_commission"
     ].join(", "))
                  .joins("INNER JOIN locations ON locations.id = orders.location_id")
                  .joins("INNER JOIN users ON users.id = orders.user_id")
                  .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
                  .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                 .joins("LEFT JOIN commissions ON commissions.order_id = orders.id")
                  .joins(<<-SQL
                    LEFT JOIN LATERAL (
                      SELECT#{' '}

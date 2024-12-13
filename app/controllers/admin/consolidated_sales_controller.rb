@@ -66,6 +66,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
           record.payment_tx,
           record.invoice_custom_id.present? ? helpers.link_to(record.invoice_custom_id, record.invoice_url, target: "_blank") : "",
           record.invoice_status.present? ? Invoice.sunat_statuses.key(record.invoice_status.to_i)&.humanize : "",
+          record.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10") : "",
           helpers.link_to("Ver Detalles", admin_order_path(record.id), class: "text-blue-600 hover:text-blue-800 underline")
         ]
       end
