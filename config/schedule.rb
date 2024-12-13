@@ -1,5 +1,3 @@
-set :chronic_options, hours24: true
-set :timezone, "America/Lima"
 # Use this file to easily define all of your cron jobs.
 #
 # It's helpful, but not entirely necessary to understand cron before proceeding.
@@ -35,7 +33,7 @@ every :hour do
   runner "Discount.toggle_status_based_on_datetime"
 end
 
-every :day, at: "2am" do
+every :day, at: "7am" do
   runner "CashierShift.automatic_close_all_shifts"
 end
 
