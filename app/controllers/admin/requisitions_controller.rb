@@ -154,7 +154,9 @@ class Admin::RequisitionsController < Admin::AdminController
           when "plan"
             Rails.logger.info "Attempting to plan requisition"
             if @requisition.req_submitted? && @requisition.may_plan?
+              Rails.logger.info "About to plan! requisition ##{@requisition.id}"
               @requisition.plan!
+              Rails.logger.info "Planned requisition ##{@requisition.id}"
               flash[:notice] = "Pedido planificado correctamente."
             else
               raise AASM::InvalidTransition.new("No se puede planificar el pedido en su estado actual")

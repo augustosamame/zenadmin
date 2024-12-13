@@ -73,7 +73,10 @@ class Requisition < ApplicationRecord
   end
 
   def has_planned_quantities?
-    requisition_lines.any? { |line| line.planned_quantity.to_i > 0 }
+    Rails.logger.info "Checking if requisition ##{id} has planned quantities"
+    result = requisition_lines.any? { |line| line.planned_quantity.to_i > 0 }
+    Rails.logger.info "checked planned quantities: #{result}"
+    result
   end
 
   def req_draft?
@@ -103,6 +106,7 @@ class Requisition < ApplicationRecord
   private
 
   def create_associated_stock_transfer
+    Rails.logger.info "Creating stock transfer for requisition ##{id}"
     origin_warehouse = self.warehouse
     destination_warehouse = self&.location&.warehouses&.first
 

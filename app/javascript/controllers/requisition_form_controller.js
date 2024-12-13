@@ -46,7 +46,11 @@ export default class extends Controller {
 
     newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove())
     newLine.querySelectorAll("input, select").forEach(input => {
-      input.value = ""
+      if (input.name.includes("quantity")) {
+        input.value = "0"
+      } else {
+        input.value = ""
+      }
       input.classList.remove("tomselected", "ts-hidden-accessible")
       input.removeAttribute("id")
       input.style.display = ''
