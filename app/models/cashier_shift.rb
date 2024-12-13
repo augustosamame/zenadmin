@@ -53,4 +53,15 @@ class CashierShift < ApplicationRecord
   def cash_from_previous_shift_cents
     self.cash_inflows.where(description: "Saldo de caja anterior - Efectivo").sum(:amount_cents)
   end
+
+  def self.automatic_close_all_shifts
+    closed_by_user = User.find_by!(email: "almacen_principal@jardindelzen.com")
+    Location.all.each do |location|
+      location.cashiers.each do |cashier|
+        cashier.cashier_shifts.open.each do |open_shift|
+          Services::Sales::CashierTransactionService.new(open_shift).close_shift(closed_by_user)
+        end
+      end
+    end
+  end
 end
