@@ -32,6 +32,13 @@ class Customer < ApplicationRecord
 
   # At least one identifier must be present
   validate :must_have_one_identifier
+  validate :first_name_or_last_name_present_if_dni
+
+  def first_name_or_last_name_present_if_dni
+    if doc_type == "dni" && doc_id.present? && (self.user.first_name.blank? || self.user.last_name.blank?)
+      errors.add(:base, "El nombre y apellido son obligatorios si se proporciona un DNI. NO PRESIONAR ENTER luego de ingresar el DNI, esperar a que se complete el formulario con los datos desde RENIEC")
+    end
+  end
 
   def set_consumer_role_to_user
     user.add_role("customer")
