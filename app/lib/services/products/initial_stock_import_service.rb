@@ -20,16 +20,16 @@ module Services
         brand = Brand.find_by!(name: "Jardín del Zen")
         ActiveRecord::Base.transaction do
           stock_transfer = StockTransfer.create!(user: user, origin_warehouse: warehouse_main, destination_warehouse: warehouse_location, transfer_date: datetime, status: :active, stage: :pending)
-          CSV.foreach(@file_path, headers: true, liberal_parsing: true, encoding: 'bom|utf-8', row_sep: :auto).with_index(1) do |row, index|
+          CSV.foreach(@file_path, headers: true, liberal_parsing: true, encoding: "bom|utf-8", row_sep: :auto).with_index(1) do |row, index|
             product_name = row[2]
             quantity = row[3]&.to_i || 0
 
-            found_product = Product.find_by(name: product_name.downcase.capitalize)
+            found_product = Product.where("LOWER(name) = ?", product_name.downcase).first
             if found_product.blank?
               Rails.logger.info("Product #{product_name} not found. Creating it")
               found_product = Product.create!(name: product_name.downcase.capitalize, price_cents: 0, discounted_price_cents: 0, brand: brand, description: product_name.downcase.capitalize)
             end
-            
+
             StockTransferLine.create!(stock_transfer: stock_transfer, product: found_product, quantity: quantity)
           end
           stock_transfer.finish_transfer!
@@ -44,7 +44,7 @@ module Services
         # we need to get the stock from column 15
         # we need to update the product with the new stock
         # we need to update the first stock transfer line with the new stock
-      
+
         warehouse_main = Warehouse.find_by!(name: "Almacén Oficina Principal")
         user = User.find_by!(email: "almacen_principal@jardindelzen.com")
 
@@ -65,7 +65,7 @@ module Services
             correct_stock = row[16]&.to_i || 0
             incorrect_stock = row[11]&.to_i || 0
             delta = correct_stock - incorrect_stock
-            
+
             # Find the product
             found_product = Product.find_by("UPPER(name) = ?", product_name.upcase)
             if found_product.blank?
@@ -86,7 +86,7 @@ module Services
               Rails.logger.info("Warehouse inventory not found for product #{product_name}. Creating it")
               warehouse_inventory = WarehouseInventory.create(warehouse: warehouse_location, product: found_product, stock: 0)
             end
-            
+
             stock_transfer_line = stock_transfer.stock_transfer_lines
                                                 .where(product: found_product)
                                                 .order(created_at: :asc)
@@ -99,10 +99,10 @@ module Services
                 product: found_product,
                 quantity: correct_stock,
               ) unless correct_stock <= 0
-            else 
+            else
 
               Rails.logger.info("Updating stock for product #{product_name} from #{stock_transfer_line.quantity} to #{correct_stock}")
-              
+
               # Update the stock transfer line
               stock_transfer_quantity = stock_transfer_line.quantity
               Rails.logger.info("New quantity in stock transfer line for product #{product_name}: #{stock_transfer_quantity + delta}")
@@ -119,7 +119,6 @@ module Services
         end
 
         puts "Stock correction completed"
-
       end
 
       def stocks_only
