@@ -27,6 +27,13 @@
               <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
               <span><%= option[:label] %></span>
             <% end %>
+          <% elsif option[:event_name] == 'print' %>
+            <%= link_to admin_stock_transfer_path(stock_transfer, format: :pdf), 
+                        target: "_blank",
+                        class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+              <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+              <span><%= option[:label] %></span>
+            <% end %>
           <% else %>
             <%= link_to '#', data: { action: "click->object-actions-dropdown#handleAction", object_id: stock_transfer.id, event_name: option[:event_name], object_model: "StockTransfer" }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
               <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>

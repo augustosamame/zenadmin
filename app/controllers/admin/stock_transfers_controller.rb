@@ -9,7 +9,8 @@ class Admin::StockTransfersController < Admin::AdminController
           @default_object_options_array = [
             { event_name: "show", label: "Ver", icon: "eye" },
             { event_name: "edit", label: "Editar", icon: "pencil" },
-            { event_name: "delete", label: "Eliminar", icon: "trash" }
+            { event_name: "delete", label: "Eliminar", icon: "trash" },
+            { event_name: "print", label: "Imprimir PDF", icon: "printer" }
           ]
         else
           @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user)
@@ -61,6 +62,15 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def show
+    respond_to do |format|
+      format.html
+      format.pdf do
+        pdf = StockTransferPdf.new(@stock_transfer, view_context)
+        send_data pdf.render, filename: "stock_transfer_#{@stock_transfer.custom_id}.pdf",
+                            type: "application/pdf",
+                            disposition: "inline"
+      end
+    end
   end
 
   def new
