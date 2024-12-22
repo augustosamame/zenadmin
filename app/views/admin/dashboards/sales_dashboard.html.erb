@@ -3,7 +3,7 @@
 <% end %>
 
 <%= turbo_frame_tag "sales_dashboard" do %>
-<!-- <div data-controller="dashboards--auto-refresh" data-dashboards--auto-refresh-interval-value="100000"> -->
+<div>
 
   <%= turbo_stream_from "sales_dashboard" %>
 
