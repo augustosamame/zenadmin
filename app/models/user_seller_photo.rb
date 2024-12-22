@@ -1,5 +1,5 @@
 class UserSellerPhoto < ApplicationRecord
   belongs_to :user
 
-  validates :seller_photo, presence: true
+  # validates :seller_photo, presence: true
 end
