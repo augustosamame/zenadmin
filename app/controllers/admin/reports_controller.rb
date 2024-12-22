@@ -1,13 +1,16 @@
 # app/controllers/admin/reports_controller.rb
 class Admin::ReportsController < Admin::AdminController
   def reports_form
-    # Use session date if available, otherwise use params or current date
     @selected_date = session[:selected_report_date] || params[:date] || Date.current
-    Rails.logger.debug "Reports form loaded with date: #{@selected_date}"
+    @selected_location = if current_user.any_admin_or_supervisor?
+      Location.find_by(id: session[:location_id]) || @current_location
+    else
+      @current_location
+    end
+    Rails.logger.debug "Reports form loaded with date: #{@selected_date}, location: #{@selected_location&.name}"
   end
 
   def generate
-    # Save the date to session when generating report
     @date = if params[:date].present?
       parsed_date = Date.parse(params[:date])
       session[:selected_report_date] = parsed_date
@@ -17,10 +20,14 @@ class Admin::ReportsController < Admin::AdminController
       Date.current
     end
 
-    @location = params[:location].present? ? params[:location] : @current_location
-    report_type = params[:report_type]
+    @location = if current_user.any_admin_or_supervisor?
+      Location.find_by(id: session[:location_id]) || @current_location
+    else
+      @current_location
+    end
 
-    Rails.logger.debug "Generating report for date: #{@date}, type: #{report_type}"
+    report_type = params[:report_type]
+    Rails.logger.debug "Generating report for date: #{@date}, type: #{report_type}, location: #{@location.name}"
 
     respond_to do |format|
       format.html do

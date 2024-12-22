@@ -1,5 +1,5 @@
 <%= render "shared/admin/nav", { header_title: "Reporte Diario de Ventas" } do %>
-  <!-- Add any additional header content here -->
+   <%= render "shared/admin/location_dropdown" if current_user.any_admin_or_supervisor? %>
 <% end %>
 
 <div class="container p-4 mx-auto mt-8" data-controller="report-date">
