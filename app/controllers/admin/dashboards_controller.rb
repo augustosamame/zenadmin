@@ -38,7 +38,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     @ranking = User.includes(:user_seller_photo)
       .with_any_role("seller", "supervisor", "store_manager")
-      .where(active: true)
+      .where(status: "active")
       .joins(sanitize_sql_array([ <<-SQL, start_date, end_date, @current_period ]))
         LEFT JOIN (
           SELECT#{' '}
