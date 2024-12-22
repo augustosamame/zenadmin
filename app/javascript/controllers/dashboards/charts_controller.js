@@ -76,7 +76,7 @@ export default class extends Controller {
         parentHeightOffset: 0,
         toolbar: {
           show: false
-        }
+        },
       },
       stroke: {
         curve: 'stepline',

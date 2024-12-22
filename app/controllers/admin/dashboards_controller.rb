@@ -24,7 +24,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     set_sales_variables
     set_chart_data
-    set_seller_commissions_list
+    set_seller_commissions_monthly_list
   end
 
   def sales_ranking
@@ -105,7 +105,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     set_sales_variables
     set_chart_data
-    set_seller_commissions_list
+    set_seller_commissions_monthly_list
 
     respond_to do |format|
       format.turbo_stream do
@@ -133,9 +133,26 @@ class Admin::DashboardsController < Admin::AdminController
 
     def set_seller_commissions_list
       if @selected_location.present?
-        @seller_commissions_list = Commission.joins(:order).includes(user: :avatar_attachment, order: {}).where(orders: { location_id: @selected_location&.id }).order(created_at: :desc).limit(5)
+        @seller_commissions_list = Commission.joins(:order).includes(order: {}).where(orders: { location_id: @selected_location&.id }).order(created_at: :desc).limit(5)
       else
-        @seller_commissions_list = Commission.all.includes(user: :avatar_attachment, order: {}).order(created_at: :desc).limit(5)
+        @seller_commissions_list = Commission.all.includes(order: {}).order(created_at: :desc).limit(5)
+      end
+    end
+
+    def set_seller_commissions_monthly_list
+      current_month_range = Time.zone.now.beginning_of_month..Time.zone.now.end_of_month
+
+      base_query = User.joins(:commissions)
+                      .joins("INNER JOIN orders ON orders.id = commissions.order_id")
+                      .where(orders: { order_date: current_month_range })
+                      .group("users.id")
+                      .select("users.*, SUM(commissions.sale_amount_cents) as total_commission_cents")
+                      .order("total_commission_cents DESC")
+
+      @seller_commissions_list = if @selected_location.present?
+        base_query.where(orders: { location_id: @selected_location.id })
+      else
+        base_query
       end
     end
 
