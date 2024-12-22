@@ -9,7 +9,7 @@
             name="<%= f.object_name %>[user_id]" 
             class="w-72 form-input">
       <option value="">Selecciona un vendedor</option>
-      <% User.with_role(:seller).each do |user| %>
+      <% User.with_any_role(:seller, :supervisor).each do |user| %>
         <option value="<%= user.id %>" <%= 'selected' if f.object.user_id == user.id %>><%= user.name %></option>
       <% end %>
     </select>
