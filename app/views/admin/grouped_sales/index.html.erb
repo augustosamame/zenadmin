@@ -1,0 +1,52 @@
+<%= render "shared/admin/nav", { header_title: "Ventas Totales por Tienda" } do %>
+  <%= render "shared/admin/location_dropdown" if current_user.any_admin_or_supervisor? %>
+<% end %>
+
+<div class="container p-4 mx-auto mt-8">
+  <%= form_tag admin_grouped_sales_path, method: :get, class: "mb-6 space-y-4 sm:space-y-0 sm:flex sm:items-center sm:space-x-4" do %>
+    <%= hidden_field_tag :location_id, params[:location_id] if params[:location_id].present? %>
+    
+    <div>
+      <%= label_tag :start_date, "Fecha Inicio:", class: "block text-sm font-medium text-gray-700" %>
+      <%= date_field_tag :start_date, @start_date, 
+          class: "mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" %>
+    </div>
+
+    <div>
+      <%= label_tag :end_date, "Fecha Fin:", class: "block text-sm font-medium text-gray-700" %>
+      <%= date_field_tag :end_date, @end_date, 
+          class: "mt-1 block rounded-md border-gray-300 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50" %>
+    </div>
+
+    <%= submit_tag "Filtrar", class: "mt-6 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  <% end %>
+
+  <div class="overflow-x-auto">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tienda</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Ventas</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total Ventas</th>
+          <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Ticket Promedio</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        <% @sales_data.each do |sale| %>
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap"><%= friendly_date(current_user, sale.sale_date) %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= sale.location_name %></td>
+            <td class="px-6 py-4 whitespace-nowrap"><%= sale.orders_count %></td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= format_currency(Money.new(sale.total_sales_cents, "PEN")) %>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <%= format_currency(Money.new(sale.total_sales_cents / sale.orders_count, "PEN")) %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
