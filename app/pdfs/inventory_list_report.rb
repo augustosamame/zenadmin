@@ -44,10 +44,10 @@ class InventoryListReport < Prawn::Document
       move_down 10
 
       # Products table with additional column
-      products_data = [ [ "Producto", "Sistema", "Físico" ] ] +
+      products_data = [ [ "Producto", "Stock", "Físico" ] ] +
         products.map do |product|
           [
-            product.name.truncate(32),  # Shortened to accommodate new column
+            product.name, # .truncate(32),  # Shortened to accommodate new column
             product.stock(warehouse).to_s,
             "____"  # Empty column for manual counting
           ]
@@ -59,7 +59,7 @@ class InventoryListReport < Prawn::Document
         cells.size = 7
         columns(1..2).align = :right
         self.header = true
-        self.column_widths = [ 130, 40, 40 ]  # Adjusted widths for three columns
+        self.column_widths = [ 150, 30, 30 ]  # Adjusted widths for three columns
       end
 
       move_down 10
