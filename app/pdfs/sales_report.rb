@@ -64,7 +64,7 @@ class SalesReport < Prawn::Document
 
         order_items_data = [ [ "Producto", "Cant", "Precio", "Total" ] ] +
           order.order_items.map do |item|
-            [ item.product.name.truncate(20),
+            [ item.product.name,
              item.quantity,
              "S/ #{sprintf("%.2f", item.price)}",
              "S/ #{sprintf("%.2f", item.quantity * item.price)}" ]
@@ -76,7 +76,7 @@ class SalesReport < Prawn::Document
           cells.size = 7
           columns(1..3).align = :right
           self.header = true
-          self.column_widths = [ 90, 30, 45, 45 ]
+          self.column_widths = [ 100, 20, 45, 45 ]
         end
 
         move_down 10
