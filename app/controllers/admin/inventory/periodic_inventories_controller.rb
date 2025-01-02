@@ -1,7 +1,15 @@
 class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
   def index
     @warehouse = @current_warehouse
-    @periodic_inventories = PeriodicInventory.all.includes(:warehouse, :user).order(id: :desc)
+    @periodic_inventories = if current_user.any_admin_or_supervisor?
+      PeriodicInventory.all
+        .includes(:warehouse, :user)
+        .order(id: :desc)
+    else
+      PeriodicInventory.where(warehouse: @current_warehouse)
+        .includes(:warehouse, :user)
+        .order(id: :desc)
+    end
     @datatable_options = "server_side:false;resource_name:'PeriodicInventory';sort_0_desc;"
   end
 
@@ -56,8 +64,9 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           ]
         )
 
-        stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
-        stock_to_adjust.update(stock: stock_to_adjust.stock - stock_adjustment)
+        # stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
+        # stock_to_adjust.update(stock: stock_to_adjust.stock - stock_adjustment)
+        # dont adjust stock, just create the stock transfer in pending state
 
         stock_transfers << stock_transfer
       else
@@ -80,9 +89,9 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
           ]
         )
 
-        stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
-        stock_to_adjust.update(stock: stock_to_adjust.stock + stock_adjustment)
-
+        # stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
+        # stock_to_adjust.update(stock: stock_to_adjust.stock + stock_adjustment)
+        # dont adjust stock, just create the stock transfer in pending state
         stock_transfers << stock_transfer
       end
     end
