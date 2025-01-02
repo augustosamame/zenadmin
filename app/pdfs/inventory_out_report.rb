@@ -66,7 +66,7 @@ class InventoryOutReport < Prawn::Document
 
         stock_transfer_lines_data = [ [ "Producto", "Cant" ] ] +
           stock_transfer.stock_transfer_lines.map do |line|
-            [ line.product.name.truncate(40),
+            [ line.product.name,
              line.quantity ]
           end
 
