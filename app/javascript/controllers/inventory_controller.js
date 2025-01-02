@@ -57,9 +57,9 @@ export default class extends Controller {
         const actualStockInput = row.querySelector("[data-inventory-target='actualStock']")
         const adjustmentTypeSelect = row.querySelector("[data-inventory-target='adjustmentType']")
 
+        // If no value entered, assume it matches current stock
         if (!actualStockInput.value) {
-          alert("Debe llenar todos los campos de stock físico")
-          return false
+          actualStockInput.value = stock
         }
 
         const actualStock = parseInt(actualStockInput.value, 10)
@@ -83,11 +83,6 @@ export default class extends Controller {
         const stock = parseInt(row.querySelector("[data-inventory-target='stock']").textContent.trim(), 10)
         const actualStockInput = row.querySelector("[data-inventory-target='actualStock']")
         const adjustmentTypeSelect = row.querySelector("[data-inventory-target='adjustmentType']")
-
-        if (!actualStockInput.value) {
-          alert("Debe llenar todos los campos de stock físico")
-          return false
-        }
 
         const actualStock = parseInt(actualStockInput.value, 10)
         if (stock !== actualStock) {
