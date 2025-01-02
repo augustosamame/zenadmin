@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2024_12_12_023121) do
+ActiveRecord::Schema[7.2].define(version: 2025_01_02_214430) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -620,6 +620,7 @@ ActiveRecord::Schema[7.2].define(version: 2024_12_12_023121) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "real_stock", default: 0
     t.index ["periodic_inventory_id"], name: "index_periodic_inventory_lines_on_periodic_inventory_id"
     t.index ["product_id"], name: "index_periodic_inventory_lines_on_product_id"
     t.index ["status"], name: "index_periodic_inventory_lines_on_status"

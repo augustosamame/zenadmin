@@ -40,6 +40,11 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     results = params[:results]
     responsible_user = User.find(params[:responsible_user_id])
 
+    # Create a hash of product_id => real_stock from differences
+    real_stocks = differences.each_with_object({}) do |difference, hash|
+      hash[difference[:product_id].to_s] = difference[:actual_qty]
+    end
+
     stock_transfers = []
     # main_warehouse_id = Warehouse.find_by!(is_main: true).id
 
@@ -99,7 +104,8 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     periodic_inventory = Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
       warehouse: @current_warehouse,
       user: responsible_user,
-      stock_transfer_ids: stock_transfers.pluck(:id)
+      stock_transfer_ids: stock_transfers.pluck(:id),
+      real_stocks: real_stocks
     )
 
     if results[:differences_count] == 0
