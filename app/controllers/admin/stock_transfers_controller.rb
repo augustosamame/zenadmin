@@ -23,7 +23,7 @@ class Admin::StockTransfersController < Admin::AdminController
           ]
         end
 
-        if @stock_transfers.size > 200
+        if @stock_transfers.size > 2000
           @datatable_options = "server_side:true;resource_name:'StockTransfer'; sort_0_desc;"
         else
           @datatable_options = "resource_name:'StockTransfer'; sort_0_desc;"
