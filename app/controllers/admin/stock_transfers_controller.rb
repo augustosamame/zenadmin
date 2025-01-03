@@ -48,6 +48,7 @@ class Admin::StockTransfersController < Admin::AdminController
         end
         if current_user.any_admin_or_supervisor?
           @default_object_options_array = [
+            { event_name: "show", label: "Ver", icon: "eye" },
             { event_name: "confirm", label: "Confirmar", icon: "check" }
           ]
         else

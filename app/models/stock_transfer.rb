@@ -71,7 +71,11 @@ class StockTransfer < ApplicationRecord
   end
 
   def process_complete
-    Services::Inventory::StockTransferService.new(self).update_destination_warehouse_inventory
+    if is_adjustment?
+      Services::Inventory::StockTransferService.new(self).update_adjustment_inventory
+    else
+      Services::Inventory::StockTransferService.new(self).update_destination_warehouse_inventory
+    end
   end
 
   def in_transit_step_enabled?

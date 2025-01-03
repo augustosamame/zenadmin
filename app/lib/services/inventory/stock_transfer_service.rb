@@ -29,17 +29,33 @@ module Services
         end
       end
 
+      def update_adjustment_inventory
+          if stock_transfer.adjustment_type != "devolucion"
+            # do nothing to destination warehouse stock if its an adjustment and adjustment type is not 'devolucion'
+            return
+          else
+            stock_transfer.destination_warehouse_id = Warehouse.find_by(is_main: true).id
+          end
+        stock_transfer.stock_transfer_lines.each do |line|
+          if stock_transfer.destination_warehouse_id == stock_transfer.origin_warehouse_id && stock_transfer.destination_warehouse_id == Warehouse.find_by(is_main: true).id
+            stock_transfer.update_column(:destination_warehouse_id, nil)
+          end
+          if stock_transfer.adjustment_type == "devolucion" && stock_transfer.destination_warehouse_id.present?
+            destination_warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
+            destination_warehouse_inventory.stock ||= 0
+            destination_warehouse_inventory.stock -= line.quantity
+            destination_warehouse_inventory.save!
+          end
+          warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.origin_warehouse_id, product_id: line.product_id)
+          warehouse_inventory.stock ||= 0
+          warehouse_inventory.stock += line.quantity
+          saved = warehouse_inventory.save!
+        end
+      end
+
       # Handles updating inventory when moving to 'complete'
       def update_destination_warehouse_inventory
         stock_transfer.stock_transfer_lines.each do |line|
-          if stock_transfer.is_adjustment?
-            if stock_transfer.adjustment_type != "devolucion"
-              # do nothing to destination warehouse stock if its an adjustment and adjustment type is not 'devolucion'
-              return
-            else
-              stock_transfer.destination_warehouse_id = Warehouse.find_by(is_main: true).id
-            end
-          end
           warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
           warehouse_inventory.stock ||= 0
           quantity_to_add = line.received_quantity || line.quantity

@@ -45,78 +45,56 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
       hash[difference[:product_id].to_s] = difference[:actual_qty]
     end
 
-    stock_transfers = []
-    # main_warehouse_id = Warehouse.find_by!(is_main: true).id
+    stock_transfer = nil
 
-    differences.each do |difference|
-      stock_adjustment = difference[:actual_qty] - difference[:stock_qty]
-      if stock_adjustment < 0 # missing stock
+    # Only create stock transfer if there are differences
+    if differences.present?
+      ActiveRecord::Base.transaction do
+        # Create a single stock transfer for all adjustments
         stock_transfer = StockTransfer.create!(
           user_id: responsible_user.id,
           comments: "Ajuste de inventario",
           is_adjustment: true,
-          adjustment_type: difference[:adjustment_type],
+          adjustment_type: differences.first[:adjustment_type],
           stage: :pending,
           status: :active,
           transfer_date: Time.current,
-          origin_warehouse_id: difference[:warehouse_id],
-          # destination_warehouse_id: main_warehouse_id,
-          stock_transfer_lines_attributes: [
-            {
-              product_id: difference[:product_id],
-              quantity: -(stock_adjustment.abs)
-            }
-          ]
+          origin_warehouse_id: @current_warehouse.id
         )
 
-        # stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
-        # stock_to_adjust.update(stock: stock_to_adjust.stock - stock_adjustment)
-        # dont adjust stock, just create the stock transfer in pending state
+        # Add all stock transfer lines
+        differences.each do |difference|
+          stock_adjustment = difference[:actual_qty] - difference[:stock_qty]
+          next if stock_adjustment.zero?
 
-        stock_transfers << stock_transfer
-      else
-        # extra stock
-        stock_transfer = StockTransfer.create!(
-          user_id: responsible_user.id,
-          comments: "Ajuste de inventario",
-          is_adjustment: true,
-          adjustment_type: difference[:adjustment_type],
-          stage: :pending,
-          status: :active,
-          transfer_date: Time.current,
-          origin_warehouse_id: difference[:warehouse_id],
-          # destination_warehouse_id: difference[:warehouse_id],
-          stock_transfer_lines_attributes: [
-            {
-              product_id: difference[:product_id],
-              quantity: stock_adjustment.abs
-            }
-          ]
+          StockTransferLine.create!(
+            stock_transfer: stock_transfer,
+            product_id: difference[:product_id],
+            quantity: stock_adjustment
+          )
+        end
+
+        periodic_inventory = Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
+          warehouse: @current_warehouse,
+          user: responsible_user,
+          stock_transfer_ids: stock_transfer ? [ stock_transfer.id ] : [],
+          real_stocks: real_stocks
         )
 
-        # stock_to_adjust = @current_warehouse.warehouse_inventories.find_by(product_id: difference[:product_id])
-        # stock_to_adjust.update(stock: stock_to_adjust.stock + stock_adjustment)
-        # dont adjust stock, just create the stock transfer in pending state
-        stock_transfers << stock_transfer
+        if results[:differences_count] == 0
+          message = "No se encontraron diferencias en el inventario"
+        else
+          message = "Se han creado #{results[:differences_count]} ajustes de inventario por las diferencias encontradas"
+          Services::Notifications::CreateNotificationService.new(periodic_inventory, custom_strategy: "MissingStockPeriodicInventory").create
+        end
+
+        render partial: "admin/inventory/periodic_inventories/stock_adjustments",
+               locals: { stock_transfers: stock_transfer ? [ stock_transfer ] : [], message: message }
       end
     end
-
-    periodic_inventory = Services::Inventory::PeriodicInventoryService.create_manual_snapshot(
-      warehouse: @current_warehouse,
-      user: responsible_user,
-      stock_transfer_ids: stock_transfers.pluck(:id),
-      real_stocks: real_stocks
-    )
-
-    if results[:differences_count] == 0
-      message = "No se encontraron diferencias en el inventario"
-    else
-      message = "Se han creado #{results[:differences_count]} ajustes de inventario por las diferencias encontradas"
-      Services::Notifications::CreateNotificationService.new(periodic_inventory, custom_strategy: "MissingStockPeriodicInventory").create
-    end
-
-    render partial: "admin/inventory/periodic_inventories/stock_adjustments",
-           locals: { stock_transfers: stock_transfers, message: message }
+  rescue StandardError => e
+    Rails.logger.error "Error creating periodic inventory: #{e.message}"
+    render json: { error: "Error al crear el inventario periódico: #{e.message}" }, status: :unprocessable_entity
   end
 
   def print_inventory_list

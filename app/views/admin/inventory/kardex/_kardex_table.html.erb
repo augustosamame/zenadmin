@@ -18,7 +18,16 @@
         <tr>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].to_date %></td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].strftime("%H:%M") %></td>
-          <td class="px-6 py-4 whitespace-nowrap"><%= movement[:type] == "OrderItem" ? 'Order' : 'Stock Transfer' %></td>
+          <td class="px-6 py-4 whitespace-nowrap">
+            <%= case movement[:type]
+                when "OrderItem"
+                  'Venta'
+                when "Adjustment"
+                  'Ajuste de Inventario'
+                else
+                  'Transferencia de Stock'
+                end %>
+          </td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:custom_id] %></td>
           <td class="px-6 py-4 whitespace-nowrap">
             <%= movement[:type] == "OrderItem" ? movement[:origin_warehouse_name] : (movement[:qty_out] > 0 ? movement[:destination_warehouse_name] : movement[:origin_warehouse_name]) %>

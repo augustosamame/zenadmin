@@ -44,14 +44,20 @@ class Admin::Inventory::KardexController < Admin::AdminController
         qty_in = 0
         current_stock -= qty_out
       else
-        if movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
+        if movement.stock_transfer.is_adjustment?
           qty_in = movement.received_quantity || movement.quantity
           qty_out = 0
           current_stock += qty_in
         else
-          qty_in = 0
-          qty_out = movement.quantity
-          current_stock -= qty_out
+          if movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
+            qty_in = movement.received_quantity || movement.quantity
+            qty_out = 0
+            current_stock += qty_in
+          else
+            qty_in = 0
+            qty_out = movement.quantity
+            current_stock -= qty_out
+          end
         end
       end
 
@@ -60,7 +66,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
         final_stock: current_stock,
         qty_in: qty_in,
         qty_out: qty_out,
-        type: movement.class.name
+        type: (movement.class.name == "StockTransferLine" && movement.stock_transfer.is_adjustment?) ? "Adjustment" : movement.class.name
       )
 
       # Add custom attributes for display
