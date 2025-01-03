@@ -41,7 +41,7 @@ class Admin::StockTransfersController < Admin::AdminController
       format.html do
         @stock_transfers = StockTransfer.where(is_adjustment: true).includes(:origin_warehouse, :user).order(id: :desc)
 
-        if @stock_transfers.size > 50
+        if @stock_transfers.size > 500
           @datatable_options = "server_side:true;resource_name:'StockAdjustment'; sort_0_desc;"
         else
           @datatable_options = "resource_name:'StockAdjustment'; sort_0_desc;"
