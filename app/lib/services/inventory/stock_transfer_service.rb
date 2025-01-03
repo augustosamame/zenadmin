@@ -30,12 +30,7 @@ module Services
       end
 
       def update_adjustment_inventory
-          if stock_transfer.adjustment_type != "devolucion"
-            # do nothing to destination warehouse stock if its an adjustment and adjustment type is not 'devolucion'
-            return
-          else
-            stock_transfer.destination_warehouse_id = Warehouse.find_by(is_main: true).id
-          end
+        stock_transfer.destination_warehouse_id = Warehouse.find_by(is_main: true).id
         stock_transfer.stock_transfer_lines.each do |line|
           if stock_transfer.destination_warehouse_id == stock_transfer.origin_warehouse_id && stock_transfer.destination_warehouse_id == Warehouse.find_by(is_main: true).id
             stock_transfer.update_column(:destination_warehouse_id, nil)
