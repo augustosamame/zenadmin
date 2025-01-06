@@ -4,7 +4,11 @@ class Admin::InTransitStocksController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @in_transit_stocks = InTransitStock.all.includes(:product,  :user).order(id: :desc)
+        @in_transit_stocks = InTransitStock.all
+          .includes(:product, :user)
+          .where(origin_warehouse: @current_warehouse)
+          .or(InTransitStock.where(destination_warehouse: @current_warehouse))
+          .order(id: :desc)
 
         if @in_transit_stocks.size > 2000
           @datatable_options = "server_side:true;resource_name:'InTransitStock'; sort_0_desc;create_button:false;"
