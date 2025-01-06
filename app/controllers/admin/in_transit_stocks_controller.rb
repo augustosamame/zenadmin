@@ -6,7 +6,7 @@ class Admin::InTransitStocksController < Admin::AdminController
       format.html do
         @in_transit_stocks = InTransitStock.all.includes(:product,  :user).order(id: :desc)
 
-        if @in_transit_stocks.size > 50
+        if @in_transit_stocks.size > 2000
           @datatable_options = "server_side:true;resource_name:'InTransitStock'; sort_0_desc;create_button:false;"
         else
           @datatable_options = "resource_name:'InTransitStock'; sort_0_desc;create_button:false;"

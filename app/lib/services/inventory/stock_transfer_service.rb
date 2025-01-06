@@ -44,7 +44,7 @@ module Services
           warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.origin_warehouse_id, product_id: line.product_id)
           warehouse_inventory.stock ||= 0
           warehouse_inventory.stock += line.quantity
-          saved = warehouse_inventory.save!
+          warehouse_inventory.save!
         end
       end
 
