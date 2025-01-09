@@ -153,7 +153,7 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def initiate_receive
-    @stock_transfer_lines = @stock_transfer.stock_transfer_lines.includes(:product)
+    @stock_transfer_lines = @stock_transfer.stock_transfer_lines.joins(:product).includes(:product).order("products.name ASC")
   end
 
   def execute_receive
