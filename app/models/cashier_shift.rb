@@ -34,7 +34,7 @@ class CashierShift < ApplicationRecord
     Order.joins(:payments, :commissions)
          .where(payments: { cashier_shift_id: self.id })
          .group("commissions.user_id")
-         .sum("(commissions.amount_cents / 100.0)")
+         .sum("(commissions.sale_amount_cents / 100.0)")
          .transform_values { |cents| cents.to_f }
   end
 
