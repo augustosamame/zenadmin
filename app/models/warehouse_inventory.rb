@@ -19,14 +19,18 @@ class WarehouseInventory < ApplicationRecord
     warehouse_inventory_records = WarehouseInventory.where(warehouse: warehouse)
     warehouse_inventory_records.each do |warehouse_inventory|
       initial_stock = 0
-      incoming_stock_transfer_lines = StockTransferLine.joins(:stock_transfer).where(product: warehouse_inventory.product, stock_transfer: { destination_warehouse: warehouse })
+      incoming_stock_transfer_lines = StockTransferLine.joins(:stock_transfer).where(product: warehouse_inventory.product, stock_transfer: { destination_warehouse: warehouse, is_ajustment: false })
       incoming_stock_transfer_lines.each do |stock_transfer_line|
         initial_stock += stock_transfer_line.quantity
       end
 
       outgoing_stock_transfer_lines = StockTransferLine.joins(:stock_transfer).where(product: warehouse_inventory.product, stock_transfer: { origin_warehouse: warehouse })
       outgoing_stock_transfer_lines.each do |stock_transfer_line|
-        initial_stock -= stock_transfer_line.quantity
+        if stock_transfer_line.stock_transfer.is_ajustment
+          initial_stock += stock_transfer_line.quantity
+        else
+          initial_stock -= stock_transfer_line.quantity
+        end
       end
 
       product_order_items = OrderItem.joins(:order).where(product: warehouse_inventory.product, order: { location_id: warehouse.location_id })
