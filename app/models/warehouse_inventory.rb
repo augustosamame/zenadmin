@@ -26,14 +26,14 @@ class WarehouseInventory < ApplicationRecord
     warehouse = warehouse_inventory.warehouse
 
     incoming_stock_transfer_lines = StockTransferLine.joins(:stock_transfer)
-      .where(product: warehouse_inventory.product, stock_transfer: { destination_warehouse: warehouse, is_adjustment: false })
+      .where(product: warehouse_inventory.product, stock_transfer: { destination_warehouse: warehouse, is_adjustment: false, stage: [ "complete" ] })
     incoming_stock_transfer_lines = incoming_stock_transfer_lines.where("stock_transfer.transfer_date <= ?", max_datetime) if max_datetime
     incoming_stock_transfer_lines.each do |stock_transfer_line|
       initial_stock += stock_transfer_line.quantity
     end
 
     outgoing_stock_transfer_lines = StockTransferLine.joins(:stock_transfer)
-      .where(product: warehouse_inventory.product, stock_transfer: { origin_warehouse: warehouse })
+      .where(product: warehouse_inventory.product, stock_transfer: { origin_warehouse: warehouse, stage: [ "in_transit", "complete" ] })
     outgoing_stock_transfer_lines = outgoing_stock_transfer_lines.where("stock_transfer.transfer_date <= ?", max_datetime) if max_datetime
     outgoing_stock_transfer_lines.each do |stock_transfer_line|
       if stock_transfer_line.stock_transfer.is_adjustment?
