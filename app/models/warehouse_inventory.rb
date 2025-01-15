@@ -71,7 +71,7 @@ class WarehouseInventory < ApplicationRecord
       if last_inventory_line_for_product && last_inventory_adjustment_for_product
         max_datetime_to_calculate_previous_stock = last_inventory_adjustment_for_product&.created_at - 1.second
         previous_stock = WarehouseInventory.reconstruct_single_inventory_stock(warehouse_inventory, max_datetime_to_calculate_previous_stock, true)
-        if pervious_stock
+        if previous_stock
           last_inventory_line_for_product.update!(stock: previous_stock)
         end
         new_adjustment = last_inventory_line_for_product.real_stock - last_inventory_line_for_product.stock
