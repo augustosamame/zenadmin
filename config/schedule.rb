@@ -37,4 +37,8 @@ every :day, at: "7am" do
   runner "CashierShift.automatic_close_all_shifts"
 end
 
+every :hour do
+  runner "WarehouseInventory.reconstruct_stock_from_movements_all_warehouses"
+end
+
 # Learn more: http://github.com/javan/whenever
