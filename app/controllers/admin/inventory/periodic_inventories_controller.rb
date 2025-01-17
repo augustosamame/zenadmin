@@ -29,8 +29,8 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     @products = Product
     .includes(:media, :warehouse_inventories)
     .left_joins(:warehouse_inventories) # Ensures products without inventory are included
-    .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @warehouse.id)
-    .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc) # Use SQL to fetch stock in one go
+    .where("(warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL) AND products.status = ?", @warehouse.id, Product.statuses[:active])
+    .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock").order(id: :desc)
 
     @datatable_options = "server_side:false;resource_name:'StockTransfer';sort_7_asc;no_buttons;create_button:false;"
   end
@@ -101,7 +101,7 @@ class Admin::Inventory::PeriodicInventoriesController < Admin::AdminController
     @products = Product
       .includes(:warehouse_inventories)
       .left_joins(:warehouse_inventories)
-      .where("warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL", @current_warehouse.id)
+      .where("(warehouse_inventories.warehouse_id = ? OR warehouse_inventories.warehouse_id IS NULL) AND products.status = ?", @current_warehouse.id, Product.statuses[:active])
       .select("products.*, COALESCE(warehouse_inventories.stock, 0) AS stock")
       .order(:name)
 
