@@ -19,8 +19,9 @@ class Admin::Inventory::KardexController < Admin::AdminController
     stock_transfers = product.stock_transfer_lines
                             .joins(:stock_transfer)
                             .includes(stock_transfer: [ :origin_warehouse, :destination_warehouse ])
-                            .where(stock_transfers: { stage: "complete" })
-                            .where("stock_transfers.origin_warehouse_id = ? OR stock_transfers.destination_warehouse_id = ?", selected_warehouse.id, selected_warehouse.id)
+                            .where("(stock_transfers.origin_warehouse_id = ? AND stock_transfers.stage IN (?)) OR (stock_transfers.destination_warehouse_id = ? AND stock_transfers.stage = ?)",
+                                  selected_warehouse.id, [ "complete", "in_transit" ],
+                                  selected_warehouse.id, "complete")
                             .order(:created_at)
 
     orders = OrderItem
