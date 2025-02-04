@@ -28,7 +28,7 @@ module Services
         @order.order_items.each do |order_line|
           invoice_line_ids << {
           "name": order_line.product.name,
-          "description": order_line.product.description,
+          "description": ENV["CURRENT_ORGANIZATION"] == "jardindelzen" ? "" : order_line.product.description,
           "product_id": order_line.product.custom_id,
           "quantity": order_line.quantity.round(0),
           "unit_price_no_tax": (order_line.price.to_f / 1.18).round(2),
