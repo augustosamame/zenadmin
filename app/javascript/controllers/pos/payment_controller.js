@@ -307,7 +307,8 @@ export default class extends Controller {
         price_cents: parseInt(price * 100, 10),
         discounted_price_cents: 0,
         currency: 'PEN',
-        is_loyalty_free: item.dataset.itemLoyaltyFree === 'true'
+        is_loyalty_free: item.dataset.itemLoyaltyFree === 'true',
+        product_pack_id: item.dataset.productPackId || null
       };
 
       // Add birthday discount data if present

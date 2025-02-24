@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_01_02_214430) do
+ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -490,8 +490,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_02_214430) do
     t.datetime "updated_at", null: false
     t.boolean "birthday_discount", default: false
     t.text "birthday_image"
+    t.bigint "product_pack_id"
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
+    t.index ["product_pack_id"], name: "index_order_items_on_product_pack_id"
   end
 
   create_table "order_sellers", force: :cascade do |t|
@@ -1087,6 +1089,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_01_02_214430) do
   add_foreign_key "invoices", "payment_methods"
   add_foreign_key "locations", "regions"
   add_foreign_key "order_items", "orders"
+  add_foreign_key "order_items", "product_packs"
   add_foreign_key "order_items", "products"
   add_foreign_key "order_sellers", "orders"
   add_foreign_key "order_sellers", "users"

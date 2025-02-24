@@ -1,22 +1,10 @@
-<%= render "shared/admin/nav", { header_title: "Órdenes por Producto" } do %>
+<%= render "shared/admin/nav", { header_title: "Órdenes por Productos y Packs" } do %>
   <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
 <div class="container p-6 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
   <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
     <%= simple_form_for :filter, url: admin_orders_per_product_index_path, method: :get, html: { class: 'contents' } do |f| %>
-      <% if current_user.any_admin_or_supervisor? %>
-        <div>
-          <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Tienda</p>
-          <%= select_tag :location_id,
-              options_from_collection_for_select(@locations, :id, :name, params[:location_id]),
-              { 
-                prompt: "Todas",
-                class: 'form-select block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600 dark:text-gray-300'
-              } %>
-        </div>
-      <% end %>
-
       <div>
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Desde</p>
         <%= f.input :from_date, 
@@ -63,6 +51,7 @@
         <th>Fecha</th>
         <th>Tienda</th>
         <th>Orden</th>
+        <th>Pack</th>
       </tr>
     </thead>
     <tbody>

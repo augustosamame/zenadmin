@@ -38,12 +38,12 @@ export default class extends Controller {
       // 2. Keypad container
       // 3. Keypad buttons
       // 4. Mode buttons (Precio/Cant)
+      // 5. Product grid
       const isClickInOrderItems = event.target.closest('[data-pos--order-items-target="items"]');
       const isClickInKeypad = event.target.closest('[data-controller="pos--keypad"]');
       const isClickOnKeypadButton = event.target.closest('.keypad-button');
       const isClickOnModeButton = event.target.closest('[data-action*="pos--keypad#select"]');
       const isClickInProductGrid = event.target.closest('[data-controller="pos--product-grid"]');
-
 
       if (!isClickInOrderItems &&
         !isClickInKeypad &&
@@ -221,6 +221,8 @@ export default class extends Controller {
     itemElement.setAttribute('data-action', 'click->pos--order-items#selectItem');
     itemElement.setAttribute('data-item-already-discounted', product.already_discounted);
     itemElement.setAttribute('data-item-id', Date.now().toString());
+    itemElement.setAttribute('data-product-pack-id', product.productPackId || '');  // Add this line
+    itemElement.setAttribute('data-product-pack-name', product.productPackName || '');  // Add this line
 
     itemElement.innerHTML = `
       <div class="flex-grow" style="flex-basis: 55%;">
@@ -507,6 +509,7 @@ export default class extends Controller {
       currentPrice = digit;
       this.startingNewPrice = false;
     } else {
+      // Append the new digit to the current price
       currentPrice += digit;
     }
 
@@ -771,6 +774,7 @@ export default class extends Controller {
         <span data-item-subtotal>S/ ${(item.quantity * item.price).toFixed(2)}</span>
       </div>
     `;
+
     this.itemsTarget.appendChild(itemElement);
     this.calculateTotal();
   }
@@ -792,7 +796,9 @@ export default class extends Controller {
         subtotal: parseFloat(item.querySelector('[data-item-subtotal]').textContent.replace('S/ ', '')),
         is_loyalty_free: item.hasAttribute('data-loyalty-free-product'),
         is_discounted: item.getAttribute('data-item-already-discounted') === 'true',
-        pack_id: item.getAttribute('data-pack-id')
+        pack_id: item.getAttribute('data-pack-id'),
+        productPackId: item.getAttribute('data-product-pack-id'),  // Add this line
+        productPackName: item.getAttribute('data-product-pack-name')  // Add this line
       };
 
       // Add birthday discount data if present

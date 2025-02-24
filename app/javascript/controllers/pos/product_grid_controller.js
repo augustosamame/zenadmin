@@ -91,7 +91,7 @@ export default class extends Controller {
       // Centering the image within the container
       productElement.innerHTML = `
         <div class="flex justify-center">
-          <img src="${product.image || ''}" alt="${product.name || ''}" class="object-cover h-24 w-24 mb-2">
+          <img src="${product.image || ''}" alt="${product.name || ''}" class="object-cover mb-2 w-24 h-24">
         </div>
         <span class="block text-sm">${product.custom_id || ''}</span>
         <span class="block text-sm">${product.name || ''}</span>
@@ -275,7 +275,9 @@ export default class extends Controller {
         already_discounted: true,
         quantity: product.quantity,
         isPackItem: true,
-        packId: pack.id
+        packId: pack.id,
+        productPackId: pack.id,  // Add pack ID for tracking in order_items
+        productPackName: pack.name  // Add pack name for display
       });
     });
 
@@ -311,7 +313,7 @@ export default class extends Controller {
           <label for="pack-item-${index}" class="block text-sm font-medium text-gray-700">
             Seleccionar producto (${item.quantity}x ${item.tags.join(', ')})
           </label>
-          <select id="pack-item-${index}" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+          <select id="pack-item-${index}" class="block py-2 pr-10 pl-3 mt-1 w-full text-base rounded-md border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm">
             <option value="">Seleccionar producto...</option>
             ${productOptions}
           </select>
