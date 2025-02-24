@@ -2,7 +2,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Tableros
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Ventas", send("admin_sales_dashboard_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -33,7 +33,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Admin
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Usuarios", send("admin_users_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -63,7 +63,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Facturación
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Razones Sociales", send("admin_invoicers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -81,7 +81,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Ventas
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Ventas", send("admin_orders_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -118,7 +118,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Compras
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Inventarios", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -130,7 +130,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Inventario
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Inventarios", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -163,7 +163,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Productos
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Productos", send("admin_products_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -189,7 +189,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Asistencia
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Asistencias", send("admin_user_attendance_logs_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
@@ -203,9 +203,12 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Reportes
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <li>
       <%= nav_link_to "Generar Reportes Diarios", send("admin_reports_form_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <li>
+      <%= nav_link_to "Órdenes por Producto y Packs", admin_orders_per_product_index_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% if current_user.any_admin? %>
     <li>
@@ -223,7 +226,7 @@
   <button data-action="click->dropdown#toggle" data-dropdown-target="trigger" class="nav-link">
     Others
   </button>
-  <ul data-dropdown-target="menu" class="absolute z-20 hidden w-48 mt-2 bg-white rounded shadow-md">
+  <ul data-dropdown-target="menu" class="hidden absolute z-20 mt-2 w-48 bg-white rounded shadow-md">
     <% @railsui_demo_links.each do |link| %>
       <li>
         <%= nav_link_to link.to_s, send("admin_#{link.to_s}_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>

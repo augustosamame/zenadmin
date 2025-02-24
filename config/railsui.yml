@@ -1,6 +1,6 @@
 --- !ruby/object:Railsui::Configuration
 application_name: EdukaiErp
-support_email: augusto@devtechperu.com
+support_email: jardindelzen@devtechperu.com
 theme: hound
 pages:
 - about

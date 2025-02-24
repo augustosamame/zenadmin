@@ -170,6 +170,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :orders_per_product, only: [ :index ]
+
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     get "cashiers_dashboard", to: "dashboards#cashiers_dashboard"
     get "sales_ranking", to: "dashboards#sales_ranking"
