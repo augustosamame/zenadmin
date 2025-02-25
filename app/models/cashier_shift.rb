@@ -56,23 +56,27 @@ class CashierShift < ApplicationRecord
   end
 
   def total_ruc_sales
-    Money.new(
-      Order.joins(:payments, invoices: { invoice_series: :invoicer })
-           .where(payments: { cashier_shift_id: self.id })
-           .where(invoicers: { tipo_ruc: :ruc })
-           .sum("payments.amount_cents"),
-      "PEN"
-    )
+    total_cents = payments.includes(payable: []).sum do |payment|
+      order = payment.payable
+      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "ruc"
+        payment.amount_cents
+      else
+        0
+      end
+    end
+    Money.new(total_cents, "PEN")
   end
 
   def total_rus_sales
-    Money.new(
-      Order.joins(:payments, invoices: { invoice_series: :invoicer })
-           .where(payments: { cashier_shift_id: self.id })
-           .where(invoicers: { tipo_ruc: :rus })
-           .sum("payments.amount_cents"),
-      "PEN"
-    )
+    total_cents = payments.includes(payable: []).sum do |payment|
+      order = payment.payable
+      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "rus"
+        payment.amount_cents
+      else
+        0
+      end
+    end
+    Money.new(total_cents, "PEN")
   end
 
   def self.automatic_close_all_shifts
