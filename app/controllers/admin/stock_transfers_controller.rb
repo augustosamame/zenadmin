@@ -127,6 +127,7 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def destroy
+    @stock_transfer.current_user_for_destroy = current_user
     if @stock_transfer.destroy
       flash[:notice] = "La transferencia de Stock se eliminó correctamente."
     else
