@@ -15,6 +15,6 @@ class Invoice < ApplicationRecord
   private
 
     def increment_next_number
-      invoice_series.increment!(:next_number) unless sunat_status == "application_error"
+      invoice_series.increment!(:next_number) unless sunat_status == "application_error" || sunat_status == "sunat_error"
     end
 end
