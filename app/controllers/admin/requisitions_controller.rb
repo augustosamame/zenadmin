@@ -20,6 +20,12 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def show
+    @requisition = Requisition.includes(
+      requisition_lines: [:product],
+      location: {
+        warehouses: :warehouse_inventories
+      }
+    ).find(params[:id])
     respond_to do |format|
       format.html
       format.pdf do
@@ -228,11 +234,7 @@ class Admin::RequisitionsController < Admin::AdminController
   private
 
   def set_requisition
-    @requisition = Requisition.includes(
-      requisition_lines: {
-        product: { warehouse_inventories: :warehouse }
-      }
-    ).find(params[:id])
+    @requisition = Requisition.find(params[:id])
   end
 
   def set_locations_and_warehouses

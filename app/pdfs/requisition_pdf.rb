@@ -63,6 +63,7 @@ class RequisitionPdf < Prawn::Document
       products_data = [
         [
           "Producto",
+          "Stock\nActual",
           "Cantidad\nAutomática",
           "Cantidad\nPrevendida",
           "Cantidad\nPedida",
@@ -71,9 +72,13 @@ class RequisitionPdf < Prawn::Document
         ]
       ]
 
+      warehouse = requisition.location.warehouses.first
+      warehouse_inventories = warehouse.warehouse_inventories.index_by(&:product_id)
+
       requisition.requisition_lines.includes(:product).where("manual_quantity > 0 OR planned_quantity > 0").joins(:product).order("products.name ASC").each do |line|
         products_data << [
           line.product.name,
+          warehouse_inventories[line.product_id]&.stock || 0,
           line.automatic_quantity.to_s,
           line.presold_quantity.to_s,
           line.manual_quantity.to_s,
@@ -89,12 +94,13 @@ class RequisitionPdf < Prawn::Document
         self.header = true
         self.cell_style = { size: 9 }
         self.column_widths = {
-          0 => 200,  # Product name
-          1 => 65,   # Automatic quantity
-          2 => 65,   # Presold quantity
-          3 => 65,   # Manual quantity
-          4 => 65,   # Planned quantity
-          5 => 60    # Status
+          0 => 165,  # Product name
+          1 => 45,   # Stock actual
+          2 => 60,   # Automatic quantity
+          3 => 60,   # Presold quantity
+          4 => 60,   # Manual quantity
+          5 => 60,   # Planned quantity
+          6 => 55    # Status
         }
       end
 

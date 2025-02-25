@@ -52,6 +52,7 @@
       <thead class="bg-gray-50">
         <tr>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+          <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Stock Actual</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Automática</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Prevendida</th>
           <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad Pedida</th>
@@ -60,9 +61,15 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200">
+        <% warehouse = @requisition.location.warehouses.first %>
+        <% warehouse_inventories = warehouse.warehouse_inventories.index_by(&:product_id) %>
+        
         <% @requisition.requisition_lines.includes(:product).each do |line| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.product.name %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+              <%= warehouse_inventories[line.product_id]&.stock || 0 %>
+            </td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.automatic_quantity %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.presold_quantity %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= line.manual_quantity %></td>
@@ -75,7 +82,7 @@
   </div>
 
   <!-- Actions -->
-  <div class="flex items-center justify-end mt-8 space-x-4">
+  <div class="flex justify-end items-center mt-8 space-x-4">
     <% if @requisition.req_planned? %>
       <%= link_to "Imprimir PDF", admin_requisition_path(@requisition, format: :pdf), class: "btn btn-secondary", target: "_blank" %>
     <% else %>
