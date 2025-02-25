@@ -58,7 +58,7 @@ class CashierShift < ApplicationRecord
   def total_ruc_sales
     total_cents = payments.includes(payable: []).sum do |payment|
       order = payment.payable
-      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "ruc"
+      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "RUC"
         payment.amount_cents
       else
         0
@@ -70,7 +70,7 @@ class CashierShift < ApplicationRecord
   def total_rus_sales
     total_cents = payments.includes(payable: []).sum do |payment|
       order = payment.payable
-      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "rus"
+      if order.is_a?(Order) && order.invoice&.invoicer&.tipo_ruc == "RUS"
         payment.amount_cents
       else
         0
