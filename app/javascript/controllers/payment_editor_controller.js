@@ -1,37 +1,73 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["amount", "paymentsTotal", "totalError", "submitButton"]
+  static targets = ["orderTotal", "assignedTotal", "remainingTotal", "amountInput", "lines", "submitButton"]
 
   connect() {
-    this.orderTotal = parseFloat(document.querySelector('[data-order-total]').dataset.orderTotal)
-    this.validateTotal()
+    this.orderTotalCents = parseInt(this.element.dataset.paymentEditorTotalValue) || 0
+    this.orderTotal = this.orderTotalCents / 100
+    this.updateTotals()
   }
 
-  validateTotal() {
-    const total = this.calculateTotal()
-    this.paymentsTotalTarget.textContent = this.formatCurrency(total)
+  addPayment(event) {
+    event.preventDefault()
+    const template = document.getElementById("payment-template")
+    if (!template) return
 
-    const difference = Math.abs(total - this.orderTotal)
-    const isValid = difference < 0.01 // Allow for small rounding differences
+    const clone = template.content.cloneNode(true)
+    const newId = new Date().getTime()
+    
+    // Update all IDs and names in the cloned template
+    clone.querySelectorAll("[id]").forEach(el => {
+      el.id = el.id.replace("NEW_RECORD", newId)
+    })
+    clone.querySelectorAll("[name]").forEach(el => {
+      el.name = el.name.replace("NEW_RECORD", newId)
+    })
+    
+    this.linesTarget.appendChild(clone)
+    
+    // Initialize any Stimulus controllers in the new content
+    this.application.controllers.forEach(controller => {
+      if (controller.context.scope.element.contains(this.linesTarget)) {
+        controller.connect()
+      }
+    })
+  }
 
-    this.totalErrorTarget.classList.toggle('hidden', isValid)
+  removePayment(event) {
+    const line = event.target.closest(".nested-fields")
+    const destroyField = line.querySelector("input[name*='_destroy']")
+    
+    if (destroyField) {
+      destroyField.value = "1"
+      line.style.display = "none"
+    } else {
+      line.remove()
+    }
+    
+    this.updateTotals()
+  }
+
+  updateTotals() {
+    const assignedTotal = this.calculateAssignedTotal()
+    const remainingTotal = this.orderTotal - assignedTotal
+    
+    this.assignedTotalTarget.textContent = this.formatCurrency(assignedTotal)
+    this.remainingTotalTarget.textContent = this.formatCurrency(remainingTotal)
+    
+    // Enable/disable submit button based on total match
+    const isValid = Math.abs(remainingTotal) < 0.01
     this.submitButtonTarget.disabled = !isValid
-
-    if (!isValid) {
-      this.totalErrorTarget.textContent = `El total de los pagos debe ser igual al total de la venta (${this.formatCurrency(this.orderTotal)})`
-    }
   }
 
-  validateBeforeSubmit(event) {
-    if (!this.isValid()) {
-      event.preventDefault()
-    }
-  }
-
-  calculateTotal() {
-    return this.amountTargets.reduce((sum, input) => {
-      return sum + (parseFloat(input.value) || 0)
+  calculateAssignedTotal() {
+    return this.amountInputTargets.reduce((sum, input) => {
+      const line = input.closest(".nested-fields")
+      if (line && line.style.display !== "none") {
+        return sum + (parseFloat(input.value) || 0)
+      }
+      return sum
     }, 0)
   }
 
@@ -42,10 +78,5 @@ export default class extends Controller {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     }).format(amount)
-  }
-
-  isValid() {
-    const total = this.calculateTotal()
-    return Math.abs(total - this.orderTotal) < 0.01
   }
 }

@@ -3,77 +3,72 @@
 <% end %>
 
 <div class="container px-4 py-8 mx-auto">
-  <%= simple_form_for [:admin, @order], url: update_payments_admin_order_path(@order) do |f| %>
+  <%= simple_form_for [:admin, @order], url: update_payments_admin_order_path(@order), html: { data: { controller: "payment-editor", payment_editor_total_value: @order.total_price_cents } } do |f| %>
     <%= render "shared/error_messages", resource: @order %>
     
-    <!-- Order Total (Read-only) -->
-    <div class="mb-8 overflow-hidden bg-white shadow sm:rounded-lg">
-      <div class="px-4 py-5 sm:px-6">
-        <h3 class="text-lg font-medium leading-6 text-gray-900">Total de Venta: <%= format_currency(@order.total_price) %></h3>
+    <!-- Order Total and Summary -->
+    <div class="max-w-5xl p-6 mx-auto mb-8 bg-white border border-gray-200 rounded-lg shadow-md">
+      <div class="p-4 mb-6 rounded-lg bg-gray-50">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium">Editar Pagos</h3>
+          <div class="text-right">
+            <p class="text-sm text-gray-600">Monto Total de Venta</p>
+            <p class="text-xl font-semibold" data-payment-editor-target="orderTotal">
+              <%= format_currency(@order.total_price) %>
+            </p>
+          </div>
+        </div>
+        <div class="mt-2">
+          <div class="flex justify-end space-x-4">
+            <p class="text-sm text-gray-600">
+              Total Asignado: 
+              <span data-payment-editor-target="assignedTotal" class="font-semibold">S/ 0.00</span>
+            </p>
+            <p class="text-sm text-gray-600">
+              Disponible: 
+              <span data-payment-editor-target="remainingTotal" class="font-semibold"><%= format_currency(@order.total_price) %></span>
+            </p>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <!-- Payments (Editable) -->
-    <div class="mt-8" data-controller="payment-editor">
-      <h4 class="mb-4 text-lg font-medium text-gray-900">Pagos</h4>
-      <div data-payment-editor-target="totalError" class="hidden p-4 mb-4 text-red-700 bg-red-100 rounded-lg"></div>
-      
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Método de Pago</th>
-            <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <%= f.simple_fields_for :payments do |payment_form| %>
-            <tr>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                <%= payment_form.association :payment_method,
-                    collection: PaymentMethod.active.order(:name),
-                    label_method: :description,
-                    input_html: { 
-                      class: "select-input",
-                      data: { 
-                        controller: "tom-select",
-                        "payment-editor-target": "paymentMethod"
-                      }
-                    },
-                    label: false %>
-              </td>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
-                <%= payment_form.input :amount,
-                    label: false,
-                    input_html: { 
-                      value: number_with_precision(payment_form.object.amount.to_f, precision: 2),
-                      class: "w-32 px-2 py-1 text-sm border rounded",
-                      data: { 
-                        "payment-editor-target": "amount",
-                        action: "change->payment-editor#validateTotal"
-                      }
-                    } %>
-              </td>
-            </tr>
+      <div class="space-y-4" data-payment-editor-target="lines">
+        <% if @order.payments.empty? %>
+          <%= f.simple_fields_for :payments, Payment.new do |payment_form| %>
+            <%= render 'payment_fields', f: payment_form %>
           <% end %>
-        </tbody>
-        <tfoot>
-          <tr>
-            <td class="px-6 py-4 text-sm font-medium text-right text-gray-900">Total Pagos:</td>
-            <td class="px-6 py-4 text-sm text-gray-900" data-payment-editor-target="paymentsTotal">
-              <%= format_currency(@order.payments.sum(&:amount)) %>
-            </td>
-          </tr>
-        </tfoot>
-      </table>
-    </div>
+        <% else %>
+          <%= f.simple_fields_for :payments do |payment_form| %>
+            <%= render 'payment_fields', f: payment_form %>
+          <% end %>
+        <% end %>
+      </div>
 
-    <div class="mt-8">
-      <%= f.submit "Actualizar Pagos", 
-          class: "btn btn-primary",
-          data: { 
-            "payment-editor-target": "submitButton",
-            action: "click->payment-editor#validateBeforeSubmit" 
-          } %>
+      <div class="flex items-center justify-between py-6 mt-6 border-t">
+        <button type="button" class="btn btn-outline" data-action="click->payment-editor#addPayment">
+          <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+          </svg>
+          Agregar Método de Pago
+        </button>
+
+        <div class="flex items-center space-x-4">
+          <%= f.submit "Guardar Cambios", 
+              class: "btn btn-primary", 
+              data: { 
+                payment_editor_target: "submitButton",
+                disable_with: "Guardando..." 
+              } %>
+          <%= link_to "Cancelar", admin_order_path(@order), class: "btn btn-secondary" %>
+        </div>
+      </div>
+
+      <%# Template for new payments %>
+      <template id="payment-template">
+        <%= f.simple_fields_for :payments, Payment.new, child_index: "NEW_RECORD" do |payment_form| %>
+          <%= render 'payment_fields', f: payment_form %>
+        <% end %>
+      </template>
     </div>
   <% end %>
 </div>

@@ -184,24 +184,29 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def update_payments
-    authorize! :manage, Payment
     @order = Order.find(params[:id])
-
-    service = Services::Sales::OrderPaymentEditService.new(@order)
-
-    transformed_params = {}
-    order_params[:payments_attributes].each do |_, payment_attrs|
-      transformed_params[payment_attrs[:id]] = {
-        id: payment_attrs[:id],
-        payment_method_id: payment_attrs[:payment_method_id],
-        amount_cents: (payment_attrs[:amount].to_f * 100).to_i
-      }
-    end
-
-    if service.update_payments(transformed_params)
-      redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente."
-    else
-      render :edit_payments, status: :unprocessable_entity
+    
+    begin
+      Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes])
+      @order.reevaluate_payment_status
+      
+      respond_to do |format|
+        format.turbo_stream { 
+          redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente"
+        }
+        format.html { redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente" }
+      end
+    rescue => e
+      respond_to do |format|
+        format.turbo_stream {
+          flash[:alert] = "Error al actualizar pagos: #{e.message}"
+          redirect_to edit_payments_admin_order_path(@order)
+        }
+        format.html { 
+          flash[:alert] = "Error al actualizar pagos: #{e.message}"
+          redirect_to edit_payments_admin_order_path(@order)
+        }
+      end
     end
   end
 
@@ -234,9 +239,10 @@ class Admin::OrdersController < Admin::AdminController
   private
 
     def order_params
-      params.require(:order).permit(:region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id,
+      params.require(:order).permit(
+        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id,
         order_items_attributes: [ :id, :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image, :product_pack_id ],
-        payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date ],
+        payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date, :_destroy ],
         sellers_attributes: [ :id, :user_id, :percentage, :amount ],
         commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
     end

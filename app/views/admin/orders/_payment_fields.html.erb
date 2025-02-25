@@ -1,0 +1,45 @@
+<div class="relative flex items-center justify-between mb-4 space-x-6 nested-fields" 
+     data-payment-editor-target="line">
+  <div class="flex items-center flex-shrink-0">
+    <%= f.label :payment_method_id, "Método de Pago", class: "form-label mr-2 w-32 text-right" %>
+    <%= f.association :payment_method,
+        collection: PaymentMethod.active.order(:name),
+        label_method: :description,
+        input_html: { 
+          class: "w-72 form-input",
+          data: { 
+            controller: "tom-select",
+            "payment-editor-target": "paymentMethod"
+          }
+        },
+        label: false %>
+  </div>
+
+  <div class="flex items-center space-x-6">
+    <div class="flex items-center flex-shrink-0">
+      <%= f.label :amount, "Monto", class: "form-label mr-2 w-20 text-right" %>
+      <%= f.input :amount,
+          label: false,
+          input_html: { 
+            value: number_with_precision(f.object.amount.to_f, precision: 2),
+            class: "form-input w-36",
+            step: "0.01",
+            min: "0",
+            data: { 
+              action: "input->payment-editor#updateTotals",
+              payment_editor_target: "amountInput"
+            }
+          } %>
+    </div>
+  </div>
+
+  <%= f.hidden_field :_destroy %>
+
+  <div class="flex items-center flex-shrink-0 space-x-2">
+    <button type="button" class="p-2 text-red-500 hover:text-red-700" data-action="click->payment-editor#removePayment">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+      </svg>
+    </button>
+  </div>
+</div>

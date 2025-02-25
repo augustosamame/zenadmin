@@ -1,56 +1,76 @@
 module Services
   module Sales
     class OrderPaymentEditService
-      def initialize(order)
-        @order = order
-      end
-
-      def update_payments(payments_params)
-        # Validate total matches
-        new_total = payments_params.values.sum { |p| p[:amount_cents] }
-        return false unless new_total == @order.total_price_cents
-
+      def self.update_payments(order, payments_attributes)
         ActiveRecord::Base.transaction do
-          payments_params.each do |id, payment_params|
-            payment = @order.payments.find(id)
+          payments_attributes.each do |_, payment_attrs|
+            if payment_attrs[:id].present?
+              # Update existing payment
+              payment = order.payments.find(payment_attrs[:id])
+              if payment_attrs[:_destroy] == "1"
+                payment.destroy
+              else
+                amount_cents = (payment_attrs[:amount].to_f * 100).to_i
+                payment.update!(
+                  amount_cents: amount_cents,
+                  payment_method_id: payment_attrs[:payment_method_id]
+                )
+                
+                # Update associated cashier transaction if exists
+                if (transaction = payment.cashier_transaction)
+                  transaction.update!(
+                    amount_cents: amount_cents,
+                    payment_method_id: payment_attrs[:payment_method_id]
+                  )
 
-            # Update payment
-            payment.update!(
-              payment_method_id: payment_params[:payment_method_id],
-              amount_cents: payment_params[:amount_cents]
-            )
-
-            # Update associated cashier transaction
-            if (cashier_transaction = payment.cashier_transaction)
-              cashier_transaction.update!(
-                amount_cents: payment_params[:amount_cents],
-                payment_method_id: payment_params[:payment_method_id]
+                  # Update bank cashier transaction if needed
+                  if payment.payment_method.payment_method_type == "bank"
+                    bank_cashier_transaction = CashierTransaction.find_by(
+                      transactable: payment,
+                      cashier_shift: CashierShift.joins(:cashier)
+                        .where(cashiers: { name: payment.payment_method.description })
+                        .where(status: :open)
+                        .first
+                    )
+                    bank_cashier_transaction&.update!(
+                      amount_cents: amount_cents,
+                      payment_method_id: payment_attrs[:payment_method_id]
+                    )
+                  end
+                end
+              end
+            else
+              # Create new payment
+              next if payment_attrs[:_destroy] == "1"
+              
+              amount_cents = (payment_attrs[:amount].to_f * 100).to_i
+              payment = order.payments.create!(
+                payment_method_id: payment_attrs[:payment_method_id],
+                amount_cents: amount_cents,
+                user_id: order.user_id,
+                currency: order.currency || 'PEN'
               )
 
-              # Update bank cashier transaction if needed
+              # Handle bank cashier transaction for new payments
               if payment.payment_method.payment_method_type == "bank"
-                bank_cashier_transaction = CashierTransaction.find_by(
-                  transactable: payment,
-                  cashier_shift: CashierShift.joins(:cashier)
-                    .where(cashiers: { name: payment.payment_method.description })
-                    .where(status: :open)
-                    .first
-                )
-                bank_cashier_transaction&.update!(
-                  amount_cents: payment_params[:amount_cents],
-                  payment_method_id: payment_params[:payment_method_id]
-                )
+                bank_cashier_shift = CashierShift.joins(:cashier)
+                  .where(cashiers: { name: payment.payment_method.description })
+                  .where(status: :open)
+                  .first
+
+                if bank_cashier_shift
+                  CashierTransaction.create!(
+                    transactable: payment,
+                    cashier_shift: bank_cashier_shift,
+                    amount_cents: amount_cents,
+                    payment_method_id: payment_attrs[:payment_method_id],
+                    transaction_type: 'credit'
+                  )
+                end
               end
             end
           end
-
-          # Reevaluate payment status
-          @order.reevaluate_payment_status
         end
-
-        true
-      rescue ActiveRecord::RecordInvalid
-        false
       end
     end
   end
