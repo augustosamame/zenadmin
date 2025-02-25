@@ -181,8 +181,8 @@ export default class extends Controller {
     let gridColumns = 'grid-cols-[2fr_1fr_auto]';
     let innerHtml = `
       <span class="self-center mr-2 w-full">${method}</span>
-      <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-full" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-      <button type="button" class="text-red-500 self-center ml-2" data-action="click->pos--payment#removePayment">✖</button>
+      <input type="number" class="self-center w-full text-right border-none focus:ring-0 payment-amount" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
+      <button type="button" class="self-center ml-2 text-red-500" data-action="click->pos--payment#removePayment">✖</button>
     `;
 
     if (methodName === "card" || methodName === "wallet" || methodType === "bank") {
@@ -191,10 +191,10 @@ export default class extends Controller {
         <span class="self-center mr-2 w-full">${method}</span>
         <div class="flex items-center w-full">
           <label for="tx${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Tx #</label>
-          <input type="text" id="tx${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tx-input" >
+          <input type="text" id="tx${this.getUniqueId()}" class="px-2 py-1 w-full rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 tx-input" >
         </div>
         <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-        <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
+        <button type="button" class="self-center text-red-500" data-action="click->pos--payment#removePayment">✖</button>
       `;
     }
 
@@ -204,10 +204,10 @@ export default class extends Controller {
         <span class="self-center mr-2 w-full">${method}</span>
         <div class="flex items-center w-full">
           <label for="credit-date${this.getUniqueId()}" class="mr-2 whitespace-nowrap">Fecha Cuota</label>
-          <input type="date" id="credit-date${this.getUniqueId()}" class="w-full border border-gray-300 rounded px-2 py-1 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 credit-date-input" >
+          <input type="date" id="credit-date${this.getUniqueId()}" class="px-2 py-1 w-full rounded border border-gray-300 focus:ring-2 focus:ring-blue-500 focus:border-blue-500 credit-date-input" >
         </div>
         <input type="number" class="text-right border-none focus:ring-0 self-center payment-amount w-[104%]" value="${paymentAmount.toFixed(2)}" data-action="input->pos--payment#updateRemaining">
-        <button type="button" class="text-red-500 self-center" data-action="click->pos--payment#removePayment">✖</button>
+        <button type="button" class="self-center text-red-500" data-action="click->pos--payment#removePayment">✖</button>
       `;
     }
 
@@ -304,7 +304,7 @@ export default class extends Controller {
       const itemData = {
         product_id: item.dataset.productId,
         quantity: quantity,
-        price_cents: parseInt(price * 100, 10),
+        price_cents: Math.round(parseFloat(price) * 100),
         discounted_price_cents: 0,
         currency: 'PEN',
         is_loyalty_free: item.dataset.itemLoyaltyFree === 'true',
