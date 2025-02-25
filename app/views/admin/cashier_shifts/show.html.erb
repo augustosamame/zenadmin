@@ -1,4 +1,3 @@
-
 <%= render "shared/admin/nav", { header_title: "Detalles de #{@cashier_shift.cashier.name}", back_icon: true } do %>
   <% if current_user.any_admin? %>
     <%= link_to 'Editar', edit_admin_cashier_shift_path(@cashier_shift), class: 'btn btn-secondary mr-2' %>
@@ -91,6 +90,20 @@
     </div>
 
     <div class="col-span-3">
+      <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Tipo de Documento</p>
+      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+        <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUC</p>
+          <p class="text-lg font-semibold"><%= format_currency(@cashier_shift.total_ruc_sales) %></p>
+        </div>
+        <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUS</p>
+          <p class="text-lg font-semibold"><%= format_currency(@cashier_shift.total_rus_sales) %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-span-3">
       <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Vendedor</p>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
         <% @cashier_shift.sales_by_seller.each do |seller_id, total| %>
@@ -140,4 +153,3 @@
     </table>
   </div>
 </div>
-

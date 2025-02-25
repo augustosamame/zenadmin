@@ -55,6 +55,26 @@ class CashierShift < ApplicationRecord
     self.cash_inflows.where(description: "Saldo de caja anterior - Efectivo").sum(:amount_cents)
   end
 
+  def total_ruc_sales
+    Money.new(
+      Order.joins(:payments, invoices: { invoice_series: :invoicer })
+           .where(payments: { cashier_shift_id: self.id })
+           .where(invoicers: { tipo_ruc: :ruc })
+           .sum("payments.amount_cents"),
+      "PEN"
+    )
+  end
+
+  def total_rus_sales
+    Money.new(
+      Order.joins(:payments, invoices: { invoice_series: :invoicer })
+           .where(payments: { cashier_shift_id: self.id })
+           .where(invoicers: { tipo_ruc: :rus })
+           .sum("payments.amount_cents"),
+      "PEN"
+    )
+  end
+
   def self.automatic_close_all_shifts
     closed_by_user = User.find_by!(email: "almacen_principal@jardindelzen.com")
     Location.all.each do |location|
