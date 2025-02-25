@@ -31,10 +31,11 @@ class CashierShift < ApplicationRecord
   end
 
   def sales_by_seller
-    Order.joins(:payments, :commissions)
+    Order.joins(:payments)
+         .joins("LEFT JOIN commissions ON commissions.order_id = orders.id")
          .where(payments: { cashier_shift_id: self.id })
          .group("commissions.user_id")
-         .sum("(commissions.sale_amount_cents / 100.0)")
+         .sum("(payments.amount_cents / 100.0)")
          .transform_values { |cents| cents.to_f }
   end
 
