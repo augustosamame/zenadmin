@@ -30,8 +30,8 @@ Rails.application.configure do
   config.assets.compile = false
 
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
-  config.asset_host = ->(source, request) do
-    if request && request.host
+  config.asset_host = ->(source, request = nil) do
+    if request&.host
       "https://#{request.host}"
     else
       "https://jardindelzen.devtechperu.com"
