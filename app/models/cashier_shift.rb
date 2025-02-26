@@ -31,17 +31,22 @@ class CashierShift < ApplicationRecord
   end
 
   def sales_by_seller
-    # First, get all distinct payment_id, user_id combinations
+    # First, get all distinct payment_id, user_id combinations with percentage
     payment_seller_pairs = Order.joins(:payments)
                               .joins("LEFT JOIN commissions ON commissions.order_id = orders.id")
                               .where(payments: { cashier_shift_id: self.id })
-                              .select("DISTINCT payments.id, commissions.user_id, payments.amount_cents")
+                              .select("payments.id, commissions.user_id, payments.amount_cents, commissions.percentage")
 
     # Then, group by user_id and sum the amounts
     result = {}
     payment_seller_pairs.each do |pair|
+      next unless pair.user_id # Skip if no user_id (could happen with LEFT JOIN)
+      
       user_id = pair.user_id
-      amount = pair.amount_cents.to_f / 100.0
+      # If percentage is available, use it, otherwise default to 1.0 (100%)
+      percentage = pair.percentage.present? ? (pair.percentage.to_f / 100.0) : 1.0
+      amount = (pair.amount_cents.to_f / 100.0) * percentage
+      
       result[user_id] ||= 0
       result[user_id] += amount
     end
