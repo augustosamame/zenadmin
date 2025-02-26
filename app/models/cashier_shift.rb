@@ -31,12 +31,22 @@ class CashierShift < ApplicationRecord
   end
 
   def sales_by_seller
-    Order.joins(:payments)
-         .joins("LEFT JOIN commissions ON commissions.order_id = orders.id")
-         .where(payments: { cashier_shift_id: self.id })
-         .group("commissions.user_id")
-         .sum("(payments.amount_cents / 100.0)")
-         .transform_values { |cents| cents.to_f }
+    # First, get all distinct payment_id, user_id combinations
+    payment_seller_pairs = Order.joins(:payments)
+                              .joins("LEFT JOIN commissions ON commissions.order_id = orders.id")
+                              .where(payments: { cashier_shift_id: self.id })
+                              .select("DISTINCT payments.id, commissions.user_id, payments.amount_cents")
+
+    # Then, group by user_id and sum the amounts
+    result = {}
+    payment_seller_pairs.each do |pair|
+      user_id = pair.user_id
+      amount = pair.amount_cents.to_f / 100.0
+      result[user_id] ||= 0
+      result[user_id] += amount
+    end
+
+    result
   end
 
   def total_balance
