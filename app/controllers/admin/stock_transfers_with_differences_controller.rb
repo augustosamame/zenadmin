@@ -25,7 +25,7 @@ class Admin::StockTransfersWithDifferencesController < Admin::AdminController
     stock_transfer_line = StockTransferLine.find(params[:id])
     new_received_quantity = stock_transfer_line.quantity
 
-    if stock_transfer_line.update(received_quantity: new_received_quantity)
+    if stock_transfer_line.update_column(:received_quantity, new_received_quantity)
       destination_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.destination_warehouse, product: stock_transfer_line.product)
       WarehouseInventory.reconstruct_single_inventory_stock(destination_warehouse_inventory)
       flash[:notice] = "Cantidad de origen aceptada exitosamente."
@@ -40,7 +40,7 @@ class Admin::StockTransfersWithDifferencesController < Admin::AdminController
     stock_transfer_line = StockTransferLine.find(params[:id])
     new_quantity = stock_transfer_line.received_quantity
 
-    if stock_transfer_line.update(quantity: new_quantity)
+    if stock_transfer_line.update_column(:quantity, new_quantity)
       origin_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.origin_warehouse, product: stock_transfer_line.product)
       WarehouseInventory.reconstruct_single_inventory_stock(origin_warehouse_inventory)
 
