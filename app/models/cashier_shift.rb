@@ -41,12 +41,13 @@ class CashierShift < ApplicationRecord
     result = {}
     payment_seller_pairs.each do |pair|
       next unless pair.user_id # Skip if no user_id (could happen with LEFT JOIN)
-      
+
       user_id = pair.user_id
       # If percentage is available, use it, otherwise default to 1.0 (100%)
       percentage = pair.percentage.present? ? (pair.percentage.to_f / 100.0) : 1.0
+      percentage = 33.3333 if percentage == 33
       amount = (pair.amount_cents.to_f / 100.0) * percentage
-      
+
       result[user_id] ||= 0
       result[user_id] += amount
     end
