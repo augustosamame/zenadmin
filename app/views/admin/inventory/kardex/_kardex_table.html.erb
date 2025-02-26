@@ -11,11 +11,12 @@
         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Ingreso</th>
         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Salida</th>
         <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Stock</th>
+        <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado</th>
       </tr>
     </thead>
     <tbody class="bg-white divide-y divide-gray-200">
       <% movements.each do |movement| %>
-        <tr>
+        <tr class="<%= movement[:difference] ? 'bg-red-50' : '' %>">
           <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].to_date %></td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement["created_at"].strftime("%H:%M") %></td>
           <td class="px-6 py-4 whitespace-nowrap">
@@ -38,6 +39,15 @@
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:qty_in] %></td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:qty_out] %></td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:final_stock] %></td>
+          <% if movement[:difference] %>
+            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                Diferencia
+              </span>
+            </td>
+          <% else %>
+            <td class="px-6 py-4 whitespace-nowrap"></td>
+          <% end %>
         </tr>
       <% end %>
     </tbody>

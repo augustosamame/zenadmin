@@ -195,6 +195,14 @@ Rails.application.routes.draw do
     resources :grouped_sales, only: [ :index ]
     get "reports/grouped_sales", to: "grouped_sales#index"
 
+    resources :stock_transfers_with_differences, only: [ :index ] do
+      member do
+        put :accept_origin_quantity
+        put :accept_destination_quantity
+      end
+    end
+    get "reports/stock_transfers_with_differences", to: "stock_transfers_with_differences#index"
+
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"
     get "billing", to: "page#billing"

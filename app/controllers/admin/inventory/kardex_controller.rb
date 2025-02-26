@@ -45,6 +45,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
         qty_in = 0
         current_stock -= qty_out
       else
+        difference = false
         if movement.stock_transfer.is_adjustment?
           qty_in = movement.received_quantity || movement.quantity
           qty_out = 0
@@ -54,10 +55,12 @@ class Admin::Inventory::KardexController < Admin::AdminController
             qty_in = movement.received_quantity || movement.quantity
             qty_out = 0
             current_stock += qty_in
+            difference = true if movement.received_quantity != movement.quantity
           else
             qty_in = 0
             qty_out = movement.quantity
             current_stock -= qty_out
+            difference = true if movement.received_quantity != movement.quantity
           end
         end
       end
@@ -67,6 +70,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
         final_stock: current_stock,
         qty_in: qty_in,
         qty_out: qty_out,
+        difference: difference,
         type: (movement.class.name == "StockTransferLine" && movement.stock_transfer.is_adjustment?) ? "Adjustment" : movement.class.name
       )
 

@@ -1,0 +1,50 @@
+<%= render "shared/admin/nav", { header_title: "Transferencias de Stock con Diferencias" } do %>
+<% end %>
+
+<div class="container p-6 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <table class="w-full">
+    <thead>
+      <tr class="text-left text-gray-700 dark:text-gray-200">
+        <th class="pr-4 pb-3">Transferencia</th>
+        <th class="pr-4 pb-3">Fecha</th>
+        <th class="pr-4 pb-3">Almacén Origen</th>
+        <th class="pr-4 pb-3">Almacén Destino</th>
+        <th class="pr-4 pb-3">Producto</th>
+        <th class="pr-4 pb-3">Cantidad Enviada</th>
+        <th class="pr-4 pb-3">Cantidad Recibida</th>
+        <th class="pr-4 pb-3">Acción Origen</th>
+        <th class="pr-4 pb-3">Acción Destino</th>
+      </tr>
+    </thead>
+    <tbody>
+      <% @stock_transfer_lines.each do |line| %>
+        <tr class="border-t border-gray-200 dark:border-gray-700">
+          <td class="py-4 pr-4"><%= line.custom_id %></td>
+          <td class="py-4 pr-4"><%= line.created_at.strftime("%Y-%m-%d %H:%M") %></td>
+          <td class="py-4 pr-4"><%= line.origin_warehouse_name %></td>
+          <td class="py-4 pr-4"><%= line.destination_warehouse_name %></td>
+          <td class="py-4 pr-4"><%= line.product_name %></td>
+          <td class="py-4 pr-4"><%= line.quantity %></td>
+          <td class="py-4 pr-4"><%= line.received_quantity || "No establecido" %></td>
+          <td class="py-4 pr-4">
+            <%= button_to "Aceptar Cantidad Enviada", 
+                url_for(controller: 'admin/stock_transfers_with_differences', action: 'accept_origin_quantity', id: line.id), 
+                method: :put, 
+                class: "btn-primary px-3 py-1 text-sm rounded" %>
+          </td>
+          <td class="py-4 pr-4">
+            <%= button_to "Aceptar Cantidad Recibida", 
+                url_for(controller: 'admin/stock_transfers_with_differences', action: 'accept_destination_quantity', id: line.id), 
+                method: :put, 
+                class: "btn-secondary px-3 py-1 text-sm rounded" %>
+          </td>
+        </tr>
+      <% end %>
+    </tbody>
+  </table>
+  <% if @stock_transfer_lines.empty? %>
+    <div class="py-10 text-center text-gray-500 dark:text-gray-400">
+      No hay transferencias de stock con diferencias.
+    </div>
+  <% end %>
+</div>
