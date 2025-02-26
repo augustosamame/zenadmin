@@ -28,6 +28,8 @@ class Admin::StockTransfersWithDifferencesController < Admin::AdminController
     if stock_transfer_line.update_column(:received_quantity, new_received_quantity)
       destination_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.destination_warehouse, product: stock_transfer_line.product)
       WarehouseInventory.reconstruct_single_inventory_stock(destination_warehouse_inventory)
+      origin_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.origin_warehouse, product: stock_transfer_line.product)
+      WarehouseInventory.reconstruct_single_inventory_stock(origin_warehouse_inventory)
       flash[:notice] = "Cantidad de origen aceptada exitosamente."
     else
       flash[:alert] = "Error al actualizar la cantidad: #{stock_transfer_line.errors.full_messages.join(', ')}"
@@ -43,6 +45,8 @@ class Admin::StockTransfersWithDifferencesController < Admin::AdminController
     if stock_transfer_line.update_column(:quantity, new_quantity)
       origin_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.origin_warehouse, product: stock_transfer_line.product)
       WarehouseInventory.reconstruct_single_inventory_stock(origin_warehouse_inventory)
+      destination_warehouse_inventory = WarehouseInventory.find_by(warehouse: stock_transfer_line.stock_transfer.destination_warehouse, product: stock_transfer_line.product)
+      WarehouseInventory.reconstruct_single_inventory_stock(destination_warehouse_inventory)
 
       flash[:notice] = "Cantidad de destino aceptada exitosamente."
     else
