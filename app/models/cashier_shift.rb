@@ -44,8 +44,12 @@ class CashierShift < ApplicationRecord
 
       user_id = pair.user_id
       # If percentage is available, use it, otherwise default to 1.0 (100%)
-      percentage = pair.percentage.present? ? (pair.percentage.to_f / 100.0) : 1.0
-      percentage = 33.3333 if percentage == 33
+      raw_percentage = pair.percentage.present? ? pair.percentage.to_f : 100.0
+      
+      # Special case handling for 33%
+      raw_percentage = 33.3333 if raw_percentage == 33.0
+      
+      percentage = raw_percentage / 100.0
       amount = (pair.amount_cents.to_f / 100.0) * percentage
 
       result[user_id] ||= 0
