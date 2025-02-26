@@ -54,7 +54,6 @@ module Services
           warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
           warehouse_inventory.stock ||= 0
           quantity_to_add = line.received_quantity || line.quantity
-          byebug
           warehouse_inventory.stock += quantity_to_add
           warehouse_inventory.save!
           if line.received_quantity != line.quantity
