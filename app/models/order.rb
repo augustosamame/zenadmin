@@ -40,6 +40,7 @@ class Order < ApplicationRecord
   has_many :notifications, as: :notifiable, dependent: :destroy
 
   before_create :set_defaults
+  before_create :set_wants_factura_to_false_if_customer_has_no_ruc
 
   after_commit :create_notification
   after_create_commit :refresh_dashboard_metrics
@@ -99,6 +100,10 @@ class Order < ApplicationRecord
     }
 
   attr_accessor :sellers_attributes, :invoice_series_comprobante_type
+
+  def set_wants_factura_to_false_if_customer_has_no_ruc
+    self.wants_factura = false if self.user&.customer&.factura_ruc.blank?
+  end
 
   def refresh_dashboard_metrics
     broadcast_refresh_to "sales_dashboard", target: "sales_count"
