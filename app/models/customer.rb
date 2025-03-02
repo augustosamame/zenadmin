@@ -3,6 +3,7 @@ class Customer < ApplicationRecord
   include TranslateEnum
 
   belongs_to :user
+  belongs_to :price_list, optional: true
   include MediaUploader::Attachment(:avatar)
 
   enum :doc_type, { dni: 1, ce: 4, passport: 7 }

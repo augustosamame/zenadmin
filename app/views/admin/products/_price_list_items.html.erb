@@ -1,0 +1,59 @@
+<% if $global_settings[:feature_flag_price_lists] %>
+  <div class="mt-6">
+    <h3 class="mb-4 text-lg font-semibold">Precios por Lista de Precios</h3>
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Lista de Precios</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio</th>
+            <% if @product.persisted? && !defined?(form) %>
+              <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Acciones</th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% if defined?(form) %>
+            <% # This is for the form (edit/new) %>
+            <% PriceList.active_lists.each do |price_list| %>
+              <% price_list_item = @product.price_list_items.find_by(price_list_id: price_list.id) || PriceListItem.new(price_list: price_list, product: @product, price: @product.price) %>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                  <%= price_list.name %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <span class="mr-2">S/</span>
+                    <%= text_field_tag "product[price_list_items_attributes][#{price_list.id}][price]", 
+                                      price_list_item.price.to_f, 
+                                      class: "form-input w-32",
+                                      step: "0.01" %>
+                    <%= hidden_field_tag "product[price_list_items_attributes][#{price_list.id}][price_list_id]", price_list.id %>
+                    <% if price_list_item.persisted? %>
+                      <%= hidden_field_tag "product[price_list_items_attributes][#{price_list.id}][id]", price_list_item.id %>
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          <% else %>
+            <% # This is for the show view %>
+            <% @product.price_list_items.includes(:price_list).each do |item| %>
+              <tr>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                  <%= item.price_list.name %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                  S/ <%= number_with_precision(item.price.to_f, precision: 2) %>
+                </td>
+                <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">
+                  <%= link_to "Editar", edit_admin_product_path(@product, anchor: "price_lists"), class: "text-indigo-600 hover:text-indigo-900" %>
+                </td>
+              </tr>
+            <% end %>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

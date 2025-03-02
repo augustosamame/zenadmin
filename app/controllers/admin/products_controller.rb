@@ -1,7 +1,7 @@
 class Admin::ProductsController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
-  before_action :set_product, only: %i[edit update destroy]
+  before_action :set_product, only: %i[edit update destroy show]
   before_action :set_product_categories, only: %i[new edit create update]
 
   def index
@@ -57,6 +57,10 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def edit
+  end
+
+  def show
+    @price_list_items = @product.price_list_items.includes(:price_list) if $global_settings[:feature_flag_price_lists]
   end
 
   def update
@@ -309,7 +313,8 @@ class Admin::ProductsController < Admin::AdminController
 
     def product_params
       params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, tag_ids: [], product_category_ids: [],
-      media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ])
+      media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
+      price_list_items_attributes: [:id, :price_list_id, :price])
     end
 
     def preprocess_media_attributes(params)

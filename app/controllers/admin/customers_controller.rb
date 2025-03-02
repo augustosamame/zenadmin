@@ -126,6 +126,6 @@ class Admin::CustomersController < Admin::AdminController
   private
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :_destroy ])
+      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :price_list_id, :_destroy ])
     end
 end

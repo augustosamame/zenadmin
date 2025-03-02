@@ -44,6 +44,11 @@
     <li>
       <%= nav_link_to "Tiendas", send("admin_locations_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:feature_flag_price_lists] %>
+    <li>
+      <%= nav_link_to "Listas de Precios", send("admin_price_lists_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
     <% if $global_settings[:feature_flag_commission_ranges] %>
     <li>
       <%= nav_link_to "Rangos de Comisiones", send("admin_commission_ranges_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>

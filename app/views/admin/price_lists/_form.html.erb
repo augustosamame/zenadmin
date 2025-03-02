@@ -1,0 +1,29 @@
+<%= simple_form_for([:admin, @price_list]) do |form| %>
+  <%= render 'shared/form_errors', model: @price_list %>
+  
+  <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+    <div>
+      <%= form.input :name, 
+        label: "Nombre", 
+        input_html: { class: "form-input" }, 
+        label_html: { class: "form-label" } %>
+    </div>
+    
+    <div>
+      <%= form.input :status, 
+        label: "Estado", 
+        collection: PriceList.statuses.keys.map { |status| [status.titleize, status] }, 
+        input_html: { class: "form-input" }, 
+        label_html: { class: "form-label" } %>
+    </div>
+  </div>
+  
+  <% if @price_list.persisted? && @price_list_items.present? %>
+    <%= render 'price_list_items' %>
+  <% end %>
+  
+  <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+    <%= form.submit @price_list.new_record? ? "Crear Lista de Precios" : "Actualizar Lista de Precios", class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_price_lists_path, class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400", data: { action: "click->price-list-form#cancel" } %>
+  </div>
+<% end %>
