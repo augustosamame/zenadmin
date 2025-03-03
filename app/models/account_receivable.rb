@@ -3,8 +3,8 @@ class AccountReceivable < ApplicationRecord
   include TranslateEnum
 
   belongs_to :user
-  belongs_to :order
-  belongs_to :payment # Original credit payment
+  belongs_to :order, optional: true
+  belongs_to :payment, optional: true # Original credit payment
   has_one :location, through: :order
   has_many :account_receivable_payments, dependent: :destroy
   has_many :payments, through: :account_receivable_payments  # Actual payments made
@@ -20,6 +20,10 @@ class AccountReceivable < ApplicationRecord
 
   def remaining_balance
     (amount_cents - payments.sum(:amount_cents)) / 100.0
+  end
+
+  def description
+    self[:description] || "Cuenta por cobrar"
   end
 
   private

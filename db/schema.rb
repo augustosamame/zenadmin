@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_02_231200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -31,8 +31,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
 
   create_table "account_receivables", force: :cascade do |t|
     t.bigint "user_id", null: false
-    t.bigint "order_id", null: false
-    t.bigint "payment_id", null: false
+    t.bigint "order_id"
+    t.bigint "payment_id"
     t.integer "amount_cents", null: false
     t.string "currency", default: "PEN", null: false
     t.datetime "due_date"
@@ -40,6 +40,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "description"
     t.index ["order_id"], name: "index_account_receivables_on_order_id"
     t.index ["payment_id"], name: "index_account_receivables_on_payment_id"
     t.index ["user_id"], name: "index_account_receivables_on_user_id"
@@ -589,6 +590,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
     t.datetime "updated_at", null: false
     t.datetime "due_date"
     t.integer "account_receivable_id"
+    t.string "description"
     t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_payments_on_custom_id", unique: true
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"

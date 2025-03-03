@@ -62,9 +62,13 @@ class Payment < ApplicationRecord
   end
 
   def description
-    payable_name = case payable_type.underscore
+    return self[:description] if self[:description].present?
+    
+    payable_name = case payable_type&.underscore
     when "order"
       "Venta #{payable&.custom_id}"
+    when nil
+      "Saldo inicial a favor"
     else
       "#{payable_type.underscore.humanize} #{payable&.custom_id}"
     end

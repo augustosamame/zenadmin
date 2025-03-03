@@ -73,6 +73,12 @@ application.register("external-invoice", ExternalInvoiceController)
 import HelloController from "./hello_controller"
 application.register("hello", HelloController)
 
+import InitialBalanceFormController from "./initial_balance_form_controller"
+application.register("initial-balance-form", InitialBalanceFormController)
+
+import InitialBalanceModalController from "./initial_balance_modal_controller"
+application.register("initial-balance-modal", InitialBalanceModalController)
+
 import Inventory__KardexController from "./inventory/kardex_controller"
 application.register("inventory--kardex", Inventory__KardexController)
 

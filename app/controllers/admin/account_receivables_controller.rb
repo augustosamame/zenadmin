@@ -32,6 +32,9 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending_previous_period = 0
       @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
+      
+      # Check if customer has any account receivables or payments
+      @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
     else
       raise "User ID is required"
     end
@@ -71,6 +74,59 @@ class Admin::AccountReceivablesController < Admin::AdminController
         }
       }
     end
+  end
+
+  def create_initial_balance
+    @user = User.find(params[:user_id])
+    amount = params[:amount].to_f
+
+    ActiveRecord::Base.transaction do
+      if amount > 0
+        # Create an account receivable for positive balance (customer owes money)
+        account_receivable = AccountReceivable.new(
+          user: @user,
+          amount: amount,
+          currency: "PEN",
+          status: :pending,
+          order_id: nil,
+          payment_id: nil,
+          description: "Saldo inicial",
+          due_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
+        )
+
+        if account_receivable.save
+            flash[:notice] = "Saldo inicial por cobrar creado exitosamente"
+        else
+          flash[:alert] = "Error al crear el saldo inicial: #{account_receivable.errors.full_messages.join(', ')}"
+          raise ActiveRecord::Rollback
+        end
+      elsif amount < 0
+        # Create a payment for negative balance (customer has credit)
+        payment = Payment.new(
+          user: @user,
+          amount: amount.abs,
+          currency: "PEN",
+          status: :paid,
+          payment_method: PaymentMethod.find_by(name: "Efectivo") || PaymentMethod.first,
+          payment_date: Time.current,
+          cashier_shift: CashierShift.open&.last,
+          description: "Saldo inicial a favor",
+          comment: "Saldo inicial a favor del cliente"
+        )
+
+        if payment.save
+            flash[:notice] = "Saldo inicial a favor creado exitosamente"
+        else
+          flash[:alert] = "Error al crear el saldo inicial: #{payment.errors.full_messages.join(', ')}"
+          raise ActiveRecord::Rollback
+        end
+      else
+        flash[:alert] = "El monto debe ser diferente de cero"
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    redirect_to admin_account_receivables_path(user_id: @user.id)
   end
 
   private
