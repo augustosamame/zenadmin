@@ -21,6 +21,7 @@ export default class extends Controller {
     this.selectedCustomerId = null
     this.activePriceListId = null
     this.activePriceListName = null
+    this.previousPriceListId = null
     
     // Hide price list notification initially
     if (this.hasPriceListNotificationTarget) {
@@ -36,6 +37,11 @@ export default class extends Controller {
   
   handleCustomerSelected(event) {
     console.log('Customer selected in product grid:', event.detail)
+    
+    // Store previous price list ID before updating
+    this.previousPriceListId = this.activePriceListId
+    
+    // Update current customer and price list info
     this.selectedCustomerId = event.detail.userId
     this.activePriceListId = event.detail.priceListId
     
@@ -49,15 +55,45 @@ export default class extends Controller {
       }
     }
     
+    // Get order items controller
+    const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+    if (orderItemsContainer) {
+      const orderItemsController = this.application.getControllerForElementAndIdentifier(
+        orderItemsContainer,
+        'pos--order-items'
+      )
+      
+      if (orderItemsController && typeof orderItemsController.updatePricesForCustomer === 'function') {
+        // If we had a price list before but now we don't, reset prices to default
+        if (this.previousPriceListId && !this.activePriceListId) {
+          orderItemsController.resetPricesToDefault()
+        } 
+        // Otherwise update prices based on the current customer
+        else if (this.selectedCustomerId) {
+          orderItemsController.updatePricesForCustomer(this.selectedCustomerId)
+        }
+      }
+    }
+    
     // Reload products with the selected customer to get correct pricing
     this.loadProducts(this.searchTarget.value.trim())
   }
   
   fetchPriceListName(priceListId) {
+    if (!priceListId) return;
+    
     axios.get(`/admin/price_lists/${priceListId}.json`)
       .then(response => {
-        this.activePriceListName = response.data.name
-        this.updatePriceListNotification()
+        if (response.data && response.data.name) {
+          this.activePriceListName = response.data.name
+          this.updatePriceListNotification()
+        } else {
+          console.error('Price list response missing name property')
+          this.activePriceListName = null
+          if (this.hasPriceListNotificationTarget) {
+            this.priceListNotificationTarget.classList.add('hidden')
+          }
+        }
       })
       .catch(error => {
         console.error('Error fetching price list details:', error)
@@ -85,6 +121,11 @@ export default class extends Controller {
   
   handleCustomerCleared() {
     console.log('Customer cleared in product grid')
+    
+    // Store previous price list ID before clearing
+    this.previousPriceListId = this.activePriceListId
+    
+    // Clear customer and price list info
     this.selectedCustomerId = null
     this.activePriceListId = null
     this.activePriceListName = null
@@ -92,6 +133,21 @@ export default class extends Controller {
     // Hide price list notification
     if (this.hasPriceListNotificationTarget) {
       this.priceListNotificationTarget.classList.add('hidden')
+    }
+    
+    // Reset prices to default if we had a price list before
+    if (this.previousPriceListId) {
+      const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+      if (orderItemsContainer) {
+        const orderItemsController = this.application.getControllerForElementAndIdentifier(
+          orderItemsContainer,
+          'pos--order-items'
+        )
+        
+        if (orderItemsController && typeof orderItemsController.resetPricesToDefault === 'function') {
+          orderItemsController.resetPricesToDefault()
+        }
+      }
     }
     
     // Reload products without customer to reset pricing

@@ -307,6 +307,73 @@ class Admin::ProductsController < Admin::AdminController
     }
   end
 
+  def customer_prices
+    if params[:customer_id].blank? || params[:product_ids].blank?
+      render json: [], status: :bad_request
+      return
+    end
+
+    # Check if price lists feature is enabled
+    unless $global_settings[:feature_flag_price_lists]
+      # Return regular prices if price lists are not enabled
+      product_ids = params[:product_ids].split(',').map(&:to_i)
+      products = Product.where(id: product_ids)
+      
+      result = products.map do |product|
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price.to_f,
+          price_list_id: nil
+        }
+      end
+      
+      render json: result
+      return
+    end
+
+    customer = Customer.find_by(user_id: params[:customer_id])
+    if customer.nil?
+      render json: [], status: :not_found
+      return
+    end
+
+    product_ids = params[:product_ids].split(',').map(&:to_i)
+    products = Product.where(id: product_ids)
+
+    result = products.map do |product|
+      price = product.price_for_customer(customer)
+      {
+        id: product.id,
+        name: product.name,
+        price: price.to_f,
+        price_list_id: customer.price_list_id
+      }
+    end
+
+    render json: result
+  end
+
+  def default_prices
+    if params[:product_ids].blank?
+      render json: [], status: :bad_request
+      return
+    end
+
+    product_ids = params[:product_ids].split(',').map(&:to_i)
+    products = Product.where(id: product_ids)
+
+    result = products.map do |product|
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price.to_f
+      }
+    end
+
+    render json: result
+  end
+
   private
 
     def set_product
