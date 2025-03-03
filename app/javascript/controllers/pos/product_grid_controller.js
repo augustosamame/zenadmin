@@ -23,6 +23,9 @@ export default class extends Controller {
     this.activePriceListName = null
     this.previousPriceListId = null
     
+    // Check if price lists feature is enabled
+    this.priceListsEnabled = window.globalSettings && window.globalSettings.feature_flag_price_lists === true
+    
     // Hide price list notification initially
     if (this.hasPriceListNotificationTarget) {
       this.priceListNotificationTarget.classList.add('hidden')
@@ -38,40 +41,55 @@ export default class extends Controller {
   handleCustomerSelected(event) {
     console.log('Customer selected in product grid:', event.detail)
     
-    // Store previous price list ID before updating
-    this.previousPriceListId = this.activePriceListId
-    
-    // Update current customer and price list info
+    // Update current customer ID regardless of price list feature
     this.selectedCustomerId = event.detail.userId
-    this.activePriceListId = event.detail.priceListId
     
-    // If price list ID is present, fetch the price list name
-    if (this.activePriceListId && this.hasPriceListNotificationTarget) {
-      this.fetchPriceListName(this.activePriceListId)
+    // Only handle price list functionality if the feature is enabled
+    if (this.priceListsEnabled) {
+      // Store previous price list ID before updating
+      this.previousPriceListId = this.activePriceListId
+      
+      // Update price list info
+      this.activePriceListId = event.detail.priceListId
+      
+      // If price list ID is present, fetch the price list name
+      if (this.activePriceListId && this.hasPriceListNotificationTarget) {
+        this.fetchPriceListName(this.activePriceListId)
+      } else {
+        // Hide notification if no price list
+        if (this.hasPriceListNotificationTarget) {
+          this.priceListNotificationTarget.classList.add('hidden')
+        }
+      }
+      
+      // Get order items controller
+      const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+      if (orderItemsContainer) {
+        const orderItemsController = this.application.getControllerForElementAndIdentifier(
+          orderItemsContainer,
+          'pos--order-items'
+        )
+        
+        if (orderItemsController && typeof orderItemsController.updatePricesForCustomer === 'function') {
+          // If we had a price list before but now we don't, reset prices to default
+          if (this.previousPriceListId && !this.activePriceListId) {
+            orderItemsController.resetPricesToDefault()
+          } 
+          // Otherwise update prices based on the current customer
+          else if (this.selectedCustomerId) {
+            orderItemsController.updatePricesForCustomer(this.selectedCustomerId)
+          }
+        }
+      }
     } else {
-      // Hide notification if no price list
+      // If price lists are not enabled, ensure price list related properties are null
+      this.activePriceListId = null
+      this.activePriceListName = null
+      this.previousPriceListId = null
+      
+      // Hide price list notification if it exists
       if (this.hasPriceListNotificationTarget) {
         this.priceListNotificationTarget.classList.add('hidden')
-      }
-    }
-    
-    // Get order items controller
-    const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
-    if (orderItemsContainer) {
-      const orderItemsController = this.application.getControllerForElementAndIdentifier(
-        orderItemsContainer,
-        'pos--order-items'
-      )
-      
-      if (orderItemsController && typeof orderItemsController.updatePricesForCustomer === 'function') {
-        // If we had a price list before but now we don't, reset prices to default
-        if (this.previousPriceListId && !this.activePriceListId) {
-          orderItemsController.resetPricesToDefault()
-        } 
-        // Otherwise update prices based on the current customer
-        else if (this.selectedCustomerId) {
-          orderItemsController.updatePricesForCustomer(this.selectedCustomerId)
-        }
       }
     }
     
@@ -122,31 +140,46 @@ export default class extends Controller {
   handleCustomerCleared() {
     console.log('Customer cleared in product grid')
     
-    // Store previous price list ID before clearing
-    this.previousPriceListId = this.activePriceListId
-    
-    // Clear customer and price list info
+    // Clear customer ID regardless of price list feature
     this.selectedCustomerId = null
-    this.activePriceListId = null
-    this.activePriceListName = null
     
-    // Hide price list notification
-    if (this.hasPriceListNotificationTarget) {
-      this.priceListNotificationTarget.classList.add('hidden')
-    }
-    
-    // Reset prices to default if we had a price list before
-    if (this.previousPriceListId) {
-      const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
-      if (orderItemsContainer) {
-        const orderItemsController = this.application.getControllerForElementAndIdentifier(
-          orderItemsContainer,
-          'pos--order-items'
-        )
-        
-        if (orderItemsController && typeof orderItemsController.resetPricesToDefault === 'function') {
-          orderItemsController.resetPricesToDefault()
+    // Only handle price list functionality if the feature is enabled
+    if (this.priceListsEnabled) {
+      // Store previous price list ID before clearing
+      this.previousPriceListId = this.activePriceListId
+      
+      // Clear price list info
+      this.activePriceListId = null
+      this.activePriceListName = null
+      
+      // Hide price list notification
+      if (this.hasPriceListNotificationTarget) {
+        this.priceListNotificationTarget.classList.add('hidden')
+      }
+      
+      // Reset prices to default if we had a price list before
+      if (this.previousPriceListId) {
+        const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+        if (orderItemsContainer) {
+          const orderItemsController = this.application.getControllerForElementAndIdentifier(
+            orderItemsContainer,
+            'pos--order-items'
+          )
+          
+          if (orderItemsController && typeof orderItemsController.resetPricesToDefault === 'function') {
+            orderItemsController.resetPricesToDefault()
+          }
         }
+      }
+    } else {
+      // If price lists are not enabled, ensure price list related properties are null
+      this.activePriceListId = null
+      this.activePriceListName = null
+      this.previousPriceListId = null
+      
+      // Hide price list notification if it exists
+      if (this.hasPriceListNotificationTarget) {
+        this.priceListNotificationTarget.classList.add('hidden')
       }
     }
     

@@ -5,7 +5,11 @@ export default class extends Controller {
   static targets = ['container', 'content', 'modalContainer', 'firstName', 'lastName', 'birthDate'];
 
   connect() {
-    console.log("CustomerTableModalController connected");
+    console.log('Connected to customer_table_modal controller')
+    this.isOpen = false
+    
+    // Check if price lists feature is enabled
+    this.priceListsEnabled = window.globalSettings && window.globalSettings.feature_flag_price_lists === true
     this.csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
   }
 
@@ -123,7 +127,7 @@ export default class extends Controller {
     const userId = selectedRow.dataset.userId;
     const phone = selectedRow.dataset.phone;
     const email = selectedRow.dataset.email;
-    const priceListId = selectedRow.dataset.priceListId;
+    const priceListId = this.priceListsEnabled ? selectedRow.dataset.priceListId : null;
     const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
     const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
     const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
@@ -136,7 +140,14 @@ export default class extends Controller {
     clienteButton.dataset.selectedRuc = ruc;
     clienteButton.dataset.selectedPhone = phone
     clienteButton.dataset.selectedEmail = email
-    clienteButton.dataset.selectedPriceListId = priceListId
+    
+    // Only set price list ID if feature is enabled
+    if (this.priceListsEnabled && priceListId) {
+      clienteButton.dataset.selectedPriceListId = priceListId
+    } else {
+      // Remove the attribute if it exists
+      clienteButton.removeAttribute('data-selected-price-list-id')
+    }
 
     // Keep the existing icon and update the text
     clienteButton.innerHTML = `
@@ -149,12 +160,15 @@ export default class extends Controller {
       bubbles: true,
       detail: { 
         userId: userId,
-        priceListId: priceListId
+        priceListId: this.priceListsEnabled ? priceListId : null
       }
     });
     this.element.dispatchEvent(customerSelectedEvent);
 
-    console.log('Customer selected event dispatched', { userId: userId, priceListId: priceListId });
+    console.log('Customer selected event dispatched', { 
+      userId: userId, 
+      priceListId: this.priceListsEnabled ? priceListId : null 
+    });
 
     // Close the modal
     this.close(event);

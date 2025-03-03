@@ -24,6 +24,8 @@ export default class extends Controller {
     this.orderPaymentStatus = 'unpaid';
     this.creditPaymentMethodId = parseInt(this.element.dataset.creditPaymentMethodId);
     console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
+    this.isProcessing = false;
+    this.priceListsEnabled = window.globalSettings && window.globalSettings.feature_flag_price_lists === true;
   }
 
   togglePaymentSection(event) {
@@ -361,7 +363,8 @@ export default class extends Controller {
     });
 
     const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
-    const selectedPriceListId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedPriceListId;
+    const clienteButton = document.querySelector('[data-action="click->customer-table-modal#open"]');
+    const selectedPriceListId = this.priceListsEnabled ? clienteButton.dataset.selectedPriceListId : null;
     console.log('selectedCustomerId', selectedCustomerId);
     console.log('selectedPriceListId', selectedPriceListId);
     
@@ -381,7 +384,7 @@ export default class extends Controller {
       order: {
         stage: 'confirmed',
         user_id: selectedCustomerId,
-        price_list_id: selectedPriceListId,
+        price_list_id: this.priceListsEnabled ? selectedPriceListId : null,
         total_price: totalOrderAmount,
         total_discount: totalDiscountAmount,
         total_original_price: totalOrderAmount + totalDiscountAmount,
