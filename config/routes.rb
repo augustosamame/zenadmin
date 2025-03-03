@@ -19,11 +19,67 @@ Rails.application.routes.draw do
       collection do
         get :bulk_tag
         post :apply_bulk_tags
+        get :search
+        get :search_by_code
+        get :search_by_name
+        get :search_by_category
+        get :search_by_subcategory
+        get :search_by_brand
+        get :search_by_tag
+        get :search_by_barcode
+        get :search_by_supplier
+        get :search_by_price_range
+        get :search_by_stock_range
+        get :search_by_created_at
+        get :search_by_updated_at
+        get :search_by_status
+        get :search_by_featured
+        get :search_by_discount
+        get :search_by_discount_range
+        get :search_by_discount_start_date
+        get :search_by_discount_end_date
+        get :search_by_discount_status
+        get :search_by_discount_type
+        get :search_by_discount_value
+        get :search_by_discount_value_range
+        get :search_by_discount_percentage
+        get :search_by_discount_percentage_range
+        get :search_by_discount_amount
+        get :search_by_discount_amount_range
+        get :search_by_discount_min_quantity
+        get :search_by_discount_max_quantity
+        get :search_by_discount_min_amount
+        get :search_by_discount_max_amount
+        get :search_by_discount_min_percentage
+        get :search_by_discount_max_percentage
+        get :search_by_discount_min_value
+        get :search_by_discount_max_value
+        get :search_by_discount_min_created_at
+        get :search_by_discount_max_created_at
+        get :search_by_discount_min_updated_at
+        get :search_by_discount_max_updated_at
+        get :search_by_discount_min_start_date
+        get :search_by_discount_max_start_date
+        get :search_by_discount_min_end_date
+        get :search_by_discount_max_end_date
+        get :search_by_discount_min_status
+        get :search_by_discount_max_status
+        get :search_by_discount_min_type
+        get :search_by_discount_max_type
+        get :search_by_discount_min_value_range
+        get :search_by_discount_max_value_range
+        get :search_by_discount_min_percentage_range
+        get :search_by_discount_max_percentage_range
+        get :search_by_discount_min_amount_range
+        get :search_by_discount_max_amount_range
+        get :customer_prices
+        get :default_prices
       end
       resources :media, module: :admin
       post "evaluate_group_discount", on: :collection
       get "search", on: :collection
       get "products_matching_tags", on: :collection
+      get "customer_prices", on: :collection
       get "combo_products_show", on: :member
       member do
         get :stock
@@ -64,6 +120,7 @@ Rails.application.routes.draw do
 
     resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
+    resources :price_lists
     resources :users do
       member do
         get "loyalty_info"

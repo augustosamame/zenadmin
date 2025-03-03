@@ -3,7 +3,7 @@ import axios from 'axios'
 import debounce from 'lodash/debounce'
 
 export default class extends Controller {
-  static targets = ['search', 'product', 'productContainer', 'clearButton']
+  static targets = ['search', 'product', 'productContainer', 'clearButton', 'priceListNotification']
 
   connect() {
     console.log('Connected to the POS product grid controller!')
@@ -12,6 +12,179 @@ export default class extends Controller {
     this.updateClearButtonVisibility()
     this.debouncedSearch = debounce(this.performSearch, 300)
     this.beepSound = document.getElementById('barcode-add-sound')
+    
+    // Listen for customer selection events
+    document.addEventListener('customer-selected', this.handleCustomerSelected.bind(this))
+    document.addEventListener('clear-selected-user', this.handleCustomerCleared.bind(this))
+    
+    // Initialize selected customer ID and price list info
+    this.selectedCustomerId = null
+    this.activePriceListId = null
+    this.activePriceListName = null
+    this.previousPriceListId = null
+    
+    // Check if price lists feature is enabled
+    this.priceListsEnabled = window.globalSettings && window.globalSettings.feature_flag_price_lists === true
+    
+    // Hide price list notification initially
+    if (this.hasPriceListNotificationTarget) {
+      this.priceListNotificationTarget.classList.add('hidden')
+    }
+  }
+  
+  disconnect() {
+    // Clean up event listeners when controller disconnects
+    document.removeEventListener('customer-selected', this.handleCustomerSelected.bind(this))
+    document.removeEventListener('clear-selected-user', this.handleCustomerCleared.bind(this))
+  }
+  
+  handleCustomerSelected(event) {
+    console.log('Customer selected in product grid:', event.detail)
+    
+    // Update current customer ID regardless of price list feature
+    this.selectedCustomerId = event.detail.userId
+    
+    // Only handle price list functionality if the feature is enabled
+    if (this.priceListsEnabled) {
+      // Store previous price list ID before updating
+      this.previousPriceListId = this.activePriceListId
+      
+      // Update price list info
+      this.activePriceListId = event.detail.priceListId
+      
+      // If price list ID is present, fetch the price list name
+      if (this.activePriceListId && this.hasPriceListNotificationTarget) {
+        this.fetchPriceListName(this.activePriceListId)
+      } else {
+        // Hide notification if no price list
+        if (this.hasPriceListNotificationTarget) {
+          this.priceListNotificationTarget.classList.add('hidden')
+        }
+      }
+      
+      // Get order items controller
+      const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+      if (orderItemsContainer) {
+        const orderItemsController = this.application.getControllerForElementAndIdentifier(
+          orderItemsContainer,
+          'pos--order-items'
+        )
+        
+        if (orderItemsController && typeof orderItemsController.updatePricesForCustomer === 'function') {
+          // If we had a price list before but now we don't, reset prices to default
+          if (this.previousPriceListId && !this.activePriceListId) {
+            orderItemsController.resetPricesToDefault()
+          } 
+          // Otherwise update prices based on the current customer
+          else if (this.selectedCustomerId) {
+            orderItemsController.updatePricesForCustomer(this.selectedCustomerId)
+          }
+        }
+      }
+    } else {
+      // If price lists are not enabled, ensure price list related properties are null
+      this.activePriceListId = null
+      this.activePriceListName = null
+      this.previousPriceListId = null
+      
+      // Hide price list notification if it exists
+      if (this.hasPriceListNotificationTarget) {
+        this.priceListNotificationTarget.classList.add('hidden')
+      }
+    }
+    
+    // Reload products with the selected customer to get correct pricing
+    this.loadProducts(this.searchTarget.value.trim())
+  }
+  
+  fetchPriceListName(priceListId) {
+    if (!priceListId) return;
+    
+    axios.get(`/admin/price_lists/${priceListId}.json`)
+      .then(response => {
+        if (response.data && response.data.name) {
+          this.activePriceListName = response.data.name
+          this.updatePriceListNotification()
+        } else {
+          console.error('Price list response missing name property')
+          this.activePriceListName = null
+          if (this.hasPriceListNotificationTarget) {
+            this.priceListNotificationTarget.classList.add('hidden')
+          }
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching price list details:', error)
+        this.activePriceListName = null
+        if (this.hasPriceListNotificationTarget) {
+          this.priceListNotificationTarget.classList.add('hidden')
+        }
+      })
+  }
+  
+  updatePriceListNotification() {
+    if (!this.hasPriceListNotificationTarget || !this.activePriceListName) return
+    
+    this.priceListNotificationTarget.innerHTML = `
+      <div class="flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-5 h-5 mr-2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+        </svg>
+        <span>Lista de Precios Activa: <strong>${this.activePriceListName}</strong></span>
+      </div>
+    `
+    this.priceListNotificationTarget.classList.remove('hidden')
+  }
+  
+  handleCustomerCleared() {
+    console.log('Customer cleared in product grid')
+    
+    // Clear customer ID regardless of price list feature
+    this.selectedCustomerId = null
+    
+    // Only handle price list functionality if the feature is enabled
+    if (this.priceListsEnabled) {
+      // Store previous price list ID before clearing
+      this.previousPriceListId = this.activePriceListId
+      
+      // Clear price list info
+      this.activePriceListId = null
+      this.activePriceListName = null
+      
+      // Hide price list notification
+      if (this.hasPriceListNotificationTarget) {
+        this.priceListNotificationTarget.classList.add('hidden')
+      }
+      
+      // Reset prices to default if we had a price list before
+      if (this.previousPriceListId) {
+        const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]')
+        if (orderItemsContainer) {
+          const orderItemsController = this.application.getControllerForElementAndIdentifier(
+            orderItemsContainer,
+            'pos--order-items'
+          )
+          
+          if (orderItemsController && typeof orderItemsController.resetPricesToDefault === 'function') {
+            orderItemsController.resetPricesToDefault()
+          }
+        }
+      }
+    } else {
+      // If price lists are not enabled, ensure price list related properties are null
+      this.activePriceListId = null
+      this.activePriceListName = null
+      this.previousPriceListId = null
+      
+      // Hide price list notification if it exists
+      if (this.hasPriceListNotificationTarget) {
+        this.priceListNotificationTarget.classList.add('hidden')
+      }
+    }
+    
+    // Reload products without customer to reset pricing
+    this.loadProducts(this.searchTarget.value.trim())
   }
 
   searchProducts() {
@@ -34,7 +207,17 @@ export default class extends Controller {
   }
 
   findExactMatch(query) {
-    axios.get('/admin/products/search', { params: { query: query, exact_match: true } })
+    const params = { 
+      query: query, 
+      exact_match: true
+    }
+    
+    // Add customer_id to params if a customer is selected
+    if (this.selectedCustomerId) {
+      params.customer_id = this.selectedCustomerId
+    }
+    
+    axios.get('/admin/products/search', { params: params })
       .then(response => {
         if (response.data.length === 1) {
           // If exactly one product is found, add it to the order
@@ -52,7 +235,14 @@ export default class extends Controller {
   }
 
   loadProducts(query = '') {
-    axios.get('/admin/products/search', { params: { query: query } })
+    const params = { query: query }
+    
+    // Add customer_id to params if a customer is selected
+    if (this.selectedCustomerId) {
+      params.customer_id = this.selectedCustomerId
+    }
+    
+    axios.get('/admin/products/search', { params: params })
       .then(response => {
         this.renderProducts(response.data)
       })
@@ -353,5 +543,4 @@ export default class extends Controller {
         return '<option value="">Error al cargar productos</option>';
       });
   }
-
 }

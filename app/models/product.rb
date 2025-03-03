@@ -24,7 +24,10 @@ class Product < ApplicationRecord
   has_many :product_min_max_stocks, dependent: :destroy
   has_many :requisition_lines
   has_many :requisitions, through: :requisition_lines
+  has_many :price_list_items, dependent: :destroy
+  has_many :price_lists, through: :price_list_items
 
+  accepts_nested_attributes_for :price_list_items
 
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
@@ -37,6 +40,17 @@ class Product < ApplicationRecord
 
   monetize :price_cents, with_model_currency: :currency
   monetize :discounted_price_cents, with_model_currency: :currency
+
+  before_validation :set_discounted_price
+
+  def set_discounted_price
+    # we do this now as discounts are handled through time sensitive discount objects or price lists
+    self.discounted_price_cents = price_cents
+  end
+
+  def currency
+    "PEN"  # Default currency code for Peruvian Sol
+  end
 
   pg_search_scope :search_by_custom_id_and_name, against: [ :custom_id, :name ], using: {
       tsearch: { prefix: true, any_word: false }
@@ -56,6 +70,7 @@ class Product < ApplicationRecord
 
   before_validation :set_permalink
   after_commit :create_warehouse_inventory_for_all_warehouses, on: :create
+  after_commit :create_price_list_items_for_all_price_lists, on: :create, if: -> { $global_settings[:feature_flag_price_lists] }
 
   def set_permalink
     self.permalink = name.parameterize if permalink.blank?
@@ -64,6 +79,12 @@ class Product < ApplicationRecord
   def create_warehouse_inventory_for_all_warehouses
     Warehouse.all.each do |warehouse|
       WarehouseInventory.create(warehouse: warehouse, product: self, stock: 0)
+    end
+  end
+
+  def create_price_list_items_for_all_price_lists
+    PriceList.active_lists.each do |price_list|
+      PriceListItem.create(price_list: price_list, product: self, price: self.price)
     end
   end
 
@@ -97,6 +118,17 @@ class Product < ApplicationRecord
 
   def smart_image(size)
     self.media&.first&.smart_image(size)
+  end
+
+  def price_for_customer(customer)
+    return self.price unless $global_settings[:feature_flag_price_lists]
+
+    if customer&.price_list
+      price_list_item = price_list_items.find_by(price_list_id: customer.price_list_id)
+      return price_list_item.price if price_list_item
+    end
+
+    self.price
   end
 
   private

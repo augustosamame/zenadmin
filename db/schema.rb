@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_02_193900) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -278,6 +278,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "price_list_id"
+    t.index ["price_list_id"], name: "index_customers_on_price_list_id"
     t.index ["referrer_id"], name: "index_customers_on_referrer_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
@@ -640,6 +642,27 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
     t.index ["order_id"], name: "index_preorders_on_order_id"
     t.index ["product_id"], name: "index_preorders_on_product_id"
     t.index ["warehouse_id"], name: "index_preorders_on_warehouse_id"
+  end
+
+  create_table "price_list_items", force: :cascade do |t|
+    t.bigint "price_list_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "price_cents", default: 0, null: false
+    t.string "price_currency", default: "PEN", null: false
+    t.string "currency"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["price_list_id", "product_id"], name: "index_price_list_items_on_price_list_id_and_product_id", unique: true
+    t.index ["price_list_id"], name: "index_price_list_items_on_price_list_id"
+    t.index ["product_id"], name: "index_price_list_items_on_product_id"
+  end
+
+  create_table "price_lists", force: :cascade do |t|
+    t.string "name", null: false
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_price_lists_on_name", unique: true
   end
 
   create_table "product_categories", force: :cascade do |t|
@@ -1069,6 +1092,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
   add_foreign_key "commission_ranges", "users"
   add_foreign_key "commissions", "orders"
   add_foreign_key "commissions", "users"
+  add_foreign_key "customers", "price_lists"
   add_foreign_key "customers", "users"
   add_foreign_key "customers", "users", column: "referrer_id"
   add_foreign_key "discount_filters", "discounts"
@@ -1108,6 +1132,8 @@ ActiveRecord::Schema[7.2].define(version: 2025_02_24_215148) do
   add_foreign_key "preorders", "orders"
   add_foreign_key "preorders", "products"
   add_foreign_key "preorders", "warehouses"
+  add_foreign_key "price_list_items", "price_lists"
+  add_foreign_key "price_list_items", "products"
   add_foreign_key "product_categories", "product_categories", column: "parent_id"
   add_foreign_key "product_categories_products", "product_categories"
   add_foreign_key "product_categories_products", "products"

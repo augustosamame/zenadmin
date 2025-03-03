@@ -1,7 +1,7 @@
 class Admin::ProductsController < Admin::AdminController
   include ActionView::Helpers::NumberHelper
 
-  before_action :set_product, only: %i[edit update destroy]
+  before_action :set_product, only: %i[edit update destroy show]
   before_action :set_product_categories, only: %i[new edit create update]
 
   def index
@@ -57,6 +57,10 @@ class Admin::ProductsController < Admin::AdminController
   end
 
   def edit
+  end
+
+  def show
+    @price_list_items = @product.price_list_items.includes(:price_list) if $global_settings[:feature_flag_price_lists]
   end
 
   def update
@@ -149,12 +153,18 @@ class Admin::ProductsController < Admin::AdminController
       {}
     end
 
+    # Find customer if customer_id is provided
+    customer = nil
+    if params[:customer_id].present? && $global_settings[:feature_flag_price_lists]
+      customer = Customer.find_by(user_id: params[:customer_id])
+    end
+
     # Build response using bulk operations
     combined_results = []
 
     # Process products
     products.each do |product|
-      combined_results << product_to_json(product, applicable_discounts)
+      combined_results << product_to_json(product, applicable_discounts, customer)
     end
 
     # Process combos
@@ -297,6 +307,73 @@ class Admin::ProductsController < Admin::AdminController
     }
   end
 
+  def customer_prices
+    if params[:customer_id].blank? || params[:product_ids].blank?
+      render json: [], status: :bad_request
+      return
+    end
+
+    # Check if price lists feature is enabled
+    unless $global_settings[:feature_flag_price_lists]
+      # Return regular prices if price lists are not enabled
+      product_ids = params[:product_ids].split(',').map(&:to_i)
+      products = Product.where(id: product_ids)
+      
+      result = products.map do |product|
+        {
+          id: product.id,
+          name: product.name,
+          price: product.price.to_f,
+          price_list_id: nil
+        }
+      end
+      
+      render json: result
+      return
+    end
+
+    customer = Customer.find_by(user_id: params[:customer_id])
+    if customer.nil?
+      render json: [], status: :not_found
+      return
+    end
+
+    product_ids = params[:product_ids].split(',').map(&:to_i)
+    products = Product.where(id: product_ids)
+
+    result = products.map do |product|
+      price = product.price_for_customer(customer)
+      {
+        id: product.id,
+        name: product.name,
+        price: price.to_f,
+        price_list_id: customer.price_list_id
+      }
+    end
+
+    render json: result
+  end
+
+  def default_prices
+    if params[:product_ids].blank?
+      render json: [], status: :bad_request
+      return
+    end
+
+    product_ids = params[:product_ids].split(',').map(&:to_i)
+    products = Product.where(id: product_ids)
+
+    result = products.map do |product|
+      {
+        id: product.id,
+        name: product.name,
+        price: product.price.to_f
+      }
+    end
+
+    render json: result
+  end
+
   private
 
     def set_product
@@ -309,7 +386,8 @@ class Admin::ProductsController < Admin::AdminController
 
     def product_params
       params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, tag_ids: [], product_category_ids: [],
-      media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ])
+      media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
+      price_list_items_attributes: [:id, :price_list_id, :price])
     end
 
     def preprocess_media_attributes(params)
@@ -325,20 +403,27 @@ class Admin::ProductsController < Admin::AdminController
       params
     end
 
-    def product_to_json(product, applicable_discounts)
+    def product_to_json(product, applicable_discounts, customer = nil)
+      # Calculate original price (before any discounts)
       original_price = product.price_cents / 100.0
-      discount = applicable_discounts.values.find { |d| d.matching_product_ids.include?(product.id) }
-
-      discounted_price = if discount
-        if discount.discount_percentage.present?
-          (original_price * (1 - discount.discount_percentage / 100.0)).round(2)
-        elsif discount.discount_fixed_amount.present?
-          [ original_price - discount.discount_fixed_amount, 0 ].max.round(2)
-        else
-          original_price
-        end
-      else
-        original_price
+      
+      # Apply price list pricing if customer is present and has a price list
+      if customer.present? && $global_settings[:feature_flag_price_lists]
+        customer_price = product.price_for_customer(customer)
+        original_price = customer_price.to_f
+      end
+      
+      # Calculate discounted price (after any discounts)
+      discounted_price = original_price
+      
+      # Apply global discounts if any
+      product_discounts = applicable_discounts.values.select do |discount|
+        discount.matching_product_ids.include?(product.id)
+      end
+      
+      if product_discounts.any?
+        max_discount = product_discounts.max_by(&:discount_percentage)
+        discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
       end
 
       {
