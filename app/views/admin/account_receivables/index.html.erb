@@ -1,12 +1,17 @@
 <%= render "shared/admin/nav", { header_title: params[:user_id].present? ? "Estado de Cuenta - #{User.find(params[:user_id]).name}" : "Todas las Cuentas por Cobrar" } do %>
   <%= link_to 'Volver a Clientes', users_index_admin_account_receivables_path, class: 'btn btn-secondary' %>
-  <% if params[:user_id].present? && !@has_transactions %>
-    <div data-controller="initial-balance-modal" class="inline-block">
-      <button type="button" class="btn btn-primary ml-2" data-action="click->initial-balance-modal#open">
-        Crear Saldo Inicial
-      </button>
-      <%= render 'initial_balance_modal', user: @user %>
-    </div>
+  <% if params[:user_id].present? %>
+    <% if !@has_transactions %>
+      <div data-controller="initial-balance-modal" class="inline-block">
+        <button type="button" class="ml-2 btn btn-primary" data-action="click->initial-balance-modal#open">
+          Crear Saldo Inicial
+        </button>
+        <%= render 'initial_balance_modal', user: @user %>
+      </div>
+    <% end %>
+    <%= link_to new_admin_payment_path(user_id: params[:user_id]), class: 'btn btn-primary ml-2' do %>
+      <i class="mr-1 fas fa-plus"></i> Registrar Nuevo Pago
+    <% end %>
   <% end %>
 <% end %>
 
@@ -64,7 +69,7 @@
 </div>
 
 <div class="px-4 mb-16">
-  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table class="min-w-full bg-white dark:bg-slate-800">
       <h3 class="mb-2 text-lg font-bold">Pagos No Aplicados</h3>
       <thead>
@@ -107,7 +112,7 @@
                   <i class="mr-1 fas fa-eye"></i> Ver
                 <% end %>
                 
-                <%= link_to new_admin_account_receivable_payment_path(account_receivable_id: payment.payable_id), 
+                <%= link_to new_admin_account_receivable_payment_path(payment_id: payment.id), 
                     class: "btn btn-secondary" do %>
                   <i class="mr-1 fas fa-dollar-sign"></i> Aplicar
                 <% end %>
@@ -121,7 +126,7 @@
 </div>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
-  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <h3 class="mb-2 text-lg font-bold">Cuentas por Cobrar</h3>
       <thead>

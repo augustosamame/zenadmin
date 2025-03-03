@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_02_231200) do
+ActiveRecord::Schema[7.2].define(version: 2025_03_03_045623) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_trgm"
   enable_extension "plpgsql"
@@ -591,8 +591,10 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_02_231200) do
     t.datetime "due_date"
     t.integer "account_receivable_id"
     t.string "description"
+    t.bigint "original_payment_id"
     t.index ["cashier_shift_id"], name: "index_payments_on_cashier_shift_id"
     t.index ["custom_id"], name: "index_payments_on_custom_id", unique: true
+    t.index ["original_payment_id"], name: "index_payments_on_original_payment_id"
     t.index ["payable_type", "payable_id"], name: "index_payments_on_payable"
     t.index ["payment_date"], name: "index_payments_on_payment_date"
     t.index ["payment_method_id"], name: "index_payments_on_payment_method_id"
@@ -1101,6 +1103,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_02_231200) do
   add_foreign_key "orders", "users", column: "seller_id"
   add_foreign_key "payments", "cashier_shifts"
   add_foreign_key "payments", "payment_methods"
+  add_foreign_key "payments", "payments", column: "original_payment_id"
   add_foreign_key "payments", "regions"
   add_foreign_key "payments", "users"
   add_foreign_key "periodic_inventories", "users"

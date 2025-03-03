@@ -29,6 +29,15 @@
           </li>
         <% end %>
       <% end %>
+      
+      <% if $global_settings[:pos_can_create_unpaid_orders] && user&.email != "generic_customer@devtechperu.com" %>
+        <li>
+          <%= link_to admin_account_receivables_path(user_id: user.id), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+            <%= icon "credit-card", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+            <span>Estado de Cuenta</span>
+          <% end %>
+        </li>
+      <% end %>
     </ul>
   </ul>
 </div>

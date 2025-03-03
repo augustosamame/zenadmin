@@ -1,0 +1,91 @@
+<%= render "shared/admin/nav", { header_title: "Aplicar Pagos" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="container px-4 py-6 mx-auto">
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Aplicar Pago a Cuenta por Cobrar</h1>
+    <p class="text-gray-600">Cliente: <%= @payment.user.name %></p>
+  </div>
+
+  <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
+    <h2 class="mb-4 text-xl font-semibold">Detalles del Pago</h2>
+    <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+      <div>
+        <p><strong>ID:</strong> <%= @payment.custom_id %></p>
+        <p><strong>Fecha:</strong> <%= l(@payment.payment_date, format: :long) %></p>
+        <p><strong>Método de Pago:</strong> <%= @payment.payment_method.name %></p>
+      </div>
+      <div>
+        <p><strong>Monto:</strong> <%= number_to_currency(@payment.amount, unit: "S/ ") %></p>
+        <p><strong>Estado:</strong> <%= @payment.translated_status %></p>
+        <p><strong>Descripción:</strong> <%= @payment.description %></p>
+      </div>
+    </div>
+  </div>
+
+  <% if @account_receivables.empty? %>
+    <div class="p-4 mb-6 text-yellow-700 bg-yellow-100 border-l-4 border-yellow-500">
+      <p>No hay cuentas por cobrar pendientes para este cliente.</p>
+    </div>
+    <div class="flex justify-end">
+      <%= link_to "Volver", admin_account_receivables_path(user_id: @payment.user_id), class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  <% else %>
+    <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
+      <h2 class="mb-4 text-xl font-semibold">Cuentas por Cobrar Pendientes</h2>
+      <div class="overflow-x-auto">
+        <table class="min-w-full bg-white">
+          <thead>
+            <tr class="bg-gray-100">
+              <th class="px-4 py-2 text-left border-b">ID</th>
+              <th class="px-4 py-2 text-left border-b">Fecha</th>
+              <th class="px-4 py-2 text-left border-b">Vencimiento</th>
+              <th class="px-4 py-2 text-left border-b">Monto</th>
+              <th class="px-4 py-2 text-left border-b">Saldo Pendiente</th>
+              <th class="px-4 py-2 text-left border-b">Estado</th>
+              <th class="px-4 py-2 text-left border-b">Descripción</th>
+              <th class="px-4 py-2 text-left border-b">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% @account_receivables.each do |account_receivable| %>
+              <tr class="hover:bg-gray-50">
+                <td class="px-4 py-2 border-b"><%= account_receivable.id %></td>
+                <td class="px-4 py-2 border-b"><%= l(account_receivable.created_at, format: :short) %></td>
+                <td class="px-4 py-2 border-b"><%= account_receivable.due_date ? l(account_receivable.due_date, format: :short) : "N/A" %></td>
+                <td class="px-4 py-2 border-b"><%= number_to_currency(account_receivable.amount, unit: "S/ ") %></td>
+                <td class="px-4 py-2 border-b"><%= number_to_currency(account_receivable.remaining_balance, unit: "S/ ") %></td>
+                <td class="px-4 py-2 border-b">
+                  <span class="px-2 py-1 rounded text-xs font-semibold
+                    <%= case account_receivable.status
+                        when 'pending' then 'bg-yellow-100 text-yellow-800'
+                        when 'partially_paid' then 'bg-blue-100 text-blue-800'
+                        when 'paid' then 'bg-green-100 text-green-800'
+                        when 'overdue' then 'bg-red-100 text-red-800'
+                        else 'bg-gray-100 text-gray-800'
+                        end %>">
+                    <%= account_receivable.translated_status %>
+                  </span>
+                </td>
+                <td class="px-4 py-2 border-b"><%= account_receivable.description %></td>
+                <td class="px-4 py-2 border-b">
+                  <%= form_with url: admin_account_receivable_payments_path, method: :post, data: { turbo: false } do |f| %>
+                    <%= f.hidden_field :payment_id, value: @payment.id %>
+                    <%= f.hidden_field :account_receivable_id, value: account_receivable.id %>
+                    <%= f.text_field :notes, placeholder: "Notas (opcional)", class: "border rounded px-2 py-1 text-sm mb-2 w-full" %>
+                    <%= f.submit "Aplicar", class: "bg-blue-500 hover:bg-blue-600 text-white text-sm font-bold py-1 px-3 rounded" %>
+                  <% end %>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="flex justify-between">
+      <%= link_to "Volver", admin_account_receivables_path(user_id: @payment.user_id), class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" %>
+    </div>
+  <% end %>
+</div>

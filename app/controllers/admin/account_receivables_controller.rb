@@ -21,7 +21,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
     if params[:user_id].present?
       @user = User.find(params[:user_id])
       @account_receivables = AccountReceivable.where(user_id: params[:user_id])
-      @unapplied_payments = Payment.includes([ :cashier_shift ]).where(user_id: params[:user_id], account_receivable_id: nil, status: "paid").order(id: :desc)
+      @unapplied_payments = Payment.unapplied.includes([ :cashier_shift ]).where(user_id: params[:user_id]).order(id: :desc)
       @applied_payments = Payment.where(payable_type: "Order")
                                 .joins("INNER JOIN orders ON orders.id = payments.payable_id")
                                 .where(orders: { user_id: params[:user_id], is_credit_sale: true })

@@ -13,6 +13,9 @@ class Payment < ApplicationRecord
   # belongs_to :payable, polymorphic: true, autosave: true, required: true
   belongs_to :payable, polymorphic: true, autosave: true, optional: true
   belongs_to :cashier_shift
+  belongs_to :original_payment, class_name: "Payment", optional: true
+  belongs_to :account_receivable, optional: true
+  has_many :derived_payments, class_name: "Payment", foreign_key: "original_payment_id", dependent: :nullify
   has_one :cashier, through: :cashier_shift
   has_one :location, through: :cashier
   belongs_to :order, optional: true
@@ -30,11 +33,11 @@ class Payment < ApplicationRecord
   # validates :payable, presence: true
 
   before_validation :set_payment_date
-  before_validation :set_cashier_shift
 
   after_create :create_cashier_transaction
 
   scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
+  scope :unapplied, -> { where(account_receivable_id: nil, status: :paid) }
 
   pg_search_scope :search_by_all_fields,
     against: [ :custom_id, :amount_cents, :processor_transacion_id ],
@@ -57,13 +60,9 @@ class Payment < ApplicationRecord
     self.payment_date = Time.zone.now if self.payment_date.nil?
   end
 
-  def set_cashier_shift
-    self.cashier_shift = cashier_shift_id.present? ? cashier_shift : CashierShift.open&.last
-  end
-
   def description
     return self[:description] if self[:description].present?
-    
+
     payable_name = case payable_type&.underscore
     when "order"
       "Venta #{payable&.custom_id}"
