@@ -2,7 +2,7 @@ class Admin::CustomersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @users = User.includes([ :customer, :loyalty_tier ])
+        @users = User.includes(:loyalty_tier, customer: :price_list)
                      .where(internal: false)
                      .with_role("customer")
                      .select("users.*,
@@ -18,7 +18,9 @@ class Admin::CustomersController < Admin::AdminController
         render json: @customers.select(:id, :first_name, :last_name, :email, :phone, :user_id)
       end
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes([ :user ]).all })
+        # Check if the request is coming from the POS modal
+        in_modal = request.referer&.include?('/admin/orders/pos') || params[:in_modal].present?
+        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes(:user, :price_list).all, in_modal: in_modal })
       end
     end
   end

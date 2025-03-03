@@ -10,6 +10,7 @@ class Order < ApplicationRecord
   belongs_to :user
   belongs_to :seller, class_name: "User"
   belongs_to :location
+  belongs_to :price_list, optional: true
 
   enum :stage, { draft: 0, confirmed: 1, shipped: 2, delivered: 3, cancelled: 4 }
   translate_enum :stage

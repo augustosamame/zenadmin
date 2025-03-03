@@ -25,7 +25,7 @@ export default class extends Controller {
 
   loadTableData() {
     console.log("Loading table data");
-    fetch('/admin/customers', {
+    fetch('/admin/customers?in_modal=true', {
       headers: {
         'Accept': 'text/vnd.turbo-stream.html',
         'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]').content
@@ -123,6 +123,7 @@ export default class extends Controller {
     const userId = selectedRow.dataset.userId;
     const phone = selectedRow.dataset.phone;
     const email = selectedRow.dataset.email;
+    const priceListId = selectedRow.dataset.priceListId;
     const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
     const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
     const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
@@ -135,6 +136,7 @@ export default class extends Controller {
     clienteButton.dataset.selectedRuc = ruc;
     clienteButton.dataset.selectedPhone = phone
     clienteButton.dataset.selectedEmail = email
+    clienteButton.dataset.selectedPriceListId = priceListId
 
     // Keep the existing icon and update the text
     clienteButton.innerHTML = `
@@ -145,11 +147,14 @@ export default class extends Controller {
 
     const customerSelectedEvent = new CustomEvent('customer-selected', {
       bubbles: true,
-      detail: { userId: userId }
+      detail: { 
+        userId: userId,
+        priceListId: priceListId
+      }
     });
     this.element.dispatchEvent(customerSelectedEvent);
 
-    console.log('Customer selected event dispatched', { userId: userId });
+    console.log('Customer selected event dispatched', { userId: userId, priceListId: priceListId });
 
     // Close the modal
     this.close(event);

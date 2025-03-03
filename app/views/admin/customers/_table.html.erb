@@ -11,12 +11,20 @@
             <!-- <th class="px-4 py-2 text-left">Correo</th> -->
             <th class="px-4 py-2 text-left">Teléfono</th>
             <th class="px-4 py-2 text-left">RUC</th>
+            <% if $global_settings[:feature_flag_price_lists] && !local_assigns[:in_modal] %>
+              <th class="px-4 py-2 text-left">Lista de Precios</th>
+            <% end %>
             <th class="px-4 py-2 text-left">Acciones</th>
           </tr>
         </thead>
         <tbody>
           <% customers.each do |customer| %>
-            <tr data-object-id="<%= customer.id %>" data-user-id="<%= customer.user_id %>" data-phone="<%= customer.user.phone %>" data-email="<%= customer.user.email %>" data-action="click->customer-table-modal#selectObject">
+            <tr data-object-id="<%= customer.id %>" 
+                data-user-id="<%= customer.user_id %>" 
+                data-phone="<%= customer.user.phone %>" 
+                data-email="<%= customer.user.email %>"
+                data-price-list-id="<%= customer.price_list_id %>"
+                data-action="click->customer-table-modal#selectObject">
               <td class="px-4 py-2"><%= customer.user.id %></td>
               <td class="px-4 py-2"><%= customer.doc_id %></td>
               <td class="px-4 py-2"><%= customer.user.first_name %></td>
@@ -24,6 +32,17 @@
               <!-- <td class="px-4 py-2"><%= customer.user.email %></td> -->
               <td class="px-4 py-2"><%= customer.user.phone %></td>
               <td class="px-4 py-2"><%= customer.factura_ruc %></td>
+              <% if $global_settings[:feature_flag_price_lists] && !local_assigns[:in_modal] %>
+                <td class="px-4 py-2">
+                  <% if customer.price_list %>
+                    <span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-500/20">
+                      <%= customer.price_list.name %>
+                    </span>
+                  <% else %>
+                    <span class="text-gray-400 dark:text-gray-500">Predeterminada</span>
+                  <% end %>
+                </td>
+              <% end %>
               <td class="px-4 py-2">
                 <button class="btn btn-primary">Seleccionar</button>
               </td>

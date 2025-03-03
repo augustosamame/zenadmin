@@ -153,12 +153,18 @@ class Admin::ProductsController < Admin::AdminController
       {}
     end
 
+    # Find customer if customer_id is provided
+    customer = nil
+    if params[:customer_id].present? && $global_settings[:feature_flag_price_lists]
+      customer = Customer.find_by(user_id: params[:customer_id])
+    end
+
     # Build response using bulk operations
     combined_results = []
 
     # Process products
     products.each do |product|
-      combined_results << product_to_json(product, applicable_discounts)
+      combined_results << product_to_json(product, applicable_discounts, customer)
     end
 
     # Process combos
@@ -330,20 +336,27 @@ class Admin::ProductsController < Admin::AdminController
       params
     end
 
-    def product_to_json(product, applicable_discounts)
+    def product_to_json(product, applicable_discounts, customer = nil)
+      # Calculate original price (before any discounts)
       original_price = product.price_cents / 100.0
-      discount = applicable_discounts.values.find { |d| d.matching_product_ids.include?(product.id) }
-
-      discounted_price = if discount
-        if discount.discount_percentage.present?
-          (original_price * (1 - discount.discount_percentage / 100.0)).round(2)
-        elsif discount.discount_fixed_amount.present?
-          [ original_price - discount.discount_fixed_amount, 0 ].max.round(2)
-        else
-          original_price
-        end
-      else
-        original_price
+      
+      # Apply price list pricing if customer is present and has a price list
+      if customer.present? && $global_settings[:feature_flag_price_lists]
+        customer_price = product.price_for_customer(customer)
+        original_price = customer_price.to_f
+      end
+      
+      # Calculate discounted price (after any discounts)
+      discounted_price = original_price
+      
+      # Apply global discounts if any
+      product_discounts = applicable_discounts.values.select do |discount|
+        discount.matching_product_ids.include?(product.id)
+      end
+      
+      if product_discounts.any?
+        max_discount = product_discounts.max_by(&:discount_percentage)
+        discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
       end
 
       {

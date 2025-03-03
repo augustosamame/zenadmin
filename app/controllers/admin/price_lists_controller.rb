@@ -1,5 +1,5 @@
 class Admin::PriceListsController < Admin::AdminController
-  before_action :set_price_list, only: [ :edit, :update, :destroy ]
+  before_action :set_price_list, only: [ :show, :edit, :update, :destroy ]
 
   def index
     authorize! :read, PriceList
@@ -11,6 +11,15 @@ class Admin::PriceListsController < Admin::AdminController
       format.json do
         render json: @price_lists
       end
+    end
+  end
+
+  def show
+    authorize! :read, @price_list
+    
+    respond_to do |format|
+      format.html { redirect_to edit_admin_price_list_path(@price_list) }
+      format.json { render json: @price_list }
     end
   end
 
