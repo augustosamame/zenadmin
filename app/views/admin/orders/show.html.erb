@@ -10,7 +10,7 @@
   data-order-show-customer-phone-value="<%= @order.customer&.phone %>">
   <div class="overflow-hidden bg-white shadow sm:rounded-lg">
     <div class="px-4 py-5 sm:px-6">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex justify-between items-center mb-4">
         <h3 class="text-lg font-medium leading-6 text-gray-900">Detalles de la Venta</h3>
         <% if current_user.any_admin? %>
             <%= link_to "Modificar Venta", 
@@ -52,6 +52,12 @@
           <dt class="text-sm font-medium text-gray-500">Estado</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.translated_status %></dd>
         </div>
+        <% if $global_settings[:feature_flag_price_lists] %>
+          <div class="px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Lista de Precios</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order&.price_list&.name || "Predeterminada" %></dd>
+          </div>
+        <% end %>
         <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Notas del Vendedor</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.seller_note %></dd>
@@ -129,7 +135,7 @@
 
   <!-- Payments -->
   <div class="mt-8">
-    <div class="flex items-center justify-between mb-4">
+    <div class="flex justify-between items-center mb-4">
       <h4 class="text-lg font-medium text-gray-900">Pagos</h4>
       <% if current_user.any_admin? %>
         <%= link_to "Modificar Pagos", 
@@ -168,7 +174,7 @@
   <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
     <!-- Sellers -->
     <div class="mt-8">
-      <div class="flex items-center justify-between mb-4">
+      <div class="flex justify-between items-center mb-4">
         <h4 class="text-lg font-medium text-gray-900">Vendedores</h4>
         <% if current_user.any_admin? %>
           <%= link_to "Modificar Comisiones", 

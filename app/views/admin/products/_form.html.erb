@@ -1,6 +1,6 @@
 <%= simple_form_for([:admin, @product]) do |form| %>
   <%= render 'shared/form_errors', model: @product %>
-  <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+  <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
 
     <div>
       <%= form.input :name, label: "Nombre", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
@@ -23,9 +23,12 @@
       <%= form.input :price, label: "Precio", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
     </div>
 
-    <div>
-      <%= form.input :discounted_price, label: "Precio Descontado", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
-    </div>
+    <% if $global_settings[:feature_flag_price_lists] %>
+      <!-- Price Lists Section -->
+      <div class="col-span-2" id="price_lists">
+        <%= render 'price_list_items', form: true %>
+      </div>
+    <% end %>
 
     <div>
       <%= form.association :brand, label: "Marca", prompt: "Selecciona la marca", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>

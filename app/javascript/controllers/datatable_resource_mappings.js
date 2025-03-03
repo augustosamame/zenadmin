@@ -129,5 +129,16 @@ export const resourceMappings = {
   },
   OrdersPerProduct: {
     ajaxUrl: "/admin/orders_per_product.json"
+  },
+  PriceList: {
+    buttonText: "Crear Lista de Precios",
+    buttonUrl: "/admin/price_lists/new",
+    ajaxUrl: "/admin/price_lists.json"
+  },
+  PriceListItem: {
+    search_input: true,
+    paging: true,
+    info: true,
+    page_length: 10
   }
 }

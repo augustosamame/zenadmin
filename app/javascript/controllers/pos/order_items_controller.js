@@ -889,4 +889,195 @@ export default class extends Controller {
     }
   }
 
+  updatePricesForCustomer(customerId) {
+    if (!customerId) return;
+    
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+    if (items.length === 0) return;
+    
+    const productIds = Array.from(items).map(item => item.getAttribute('data-product-id')).filter(id => id);
+    if (productIds.length === 0) return;
+    
+    // Show loading indicator
+    const loadingToast = this.showToast('Actualizando precios...', 'info');
+    
+    // Fetch updated prices for all products in the cart
+    fetch(`/admin/products/customer_prices?customer_id=${customerId}&product_ids=${productIds.join(',')}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching customer prices');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // If no data or empty array, don't proceed with updates
+        if (!data || data.length === 0) {
+          this.hideToast(loadingToast);
+          return;
+        }
+        
+        // Update each item with the new price
+        items.forEach(item => {
+          const productId = item.getAttribute('data-product-id');
+          if (!productId) return;
+          
+          const productData = data.find(p => p.id.toString() === productId);
+          if (!productData) return;
+          
+          // Skip combo items and already discounted items
+          if (item.hasAttribute('data-combo-id') || 
+              item.getAttribute('data-item-already-discounted') === 'true' ||
+              item.hasAttribute('data-item-loyalty-free')) {
+            return;
+          }
+          
+          // Update price and original price
+          const priceElement = item.querySelector('.editable-price');
+          const quantityElement = item.querySelector('[data-item-quantity]');
+          const subtotalElement = item.querySelector('[data-item-subtotal]');
+          const quantity = parseInt(quantityElement.textContent);
+          
+          // Update price display
+          priceElement.textContent = `S/ ${productData.price.toFixed(2)}`;
+          
+          // Update original price attribute for validation
+          item.setAttribute('data-item-original-price', productData.price);
+          
+          // Update subtotal
+          subtotalElement.textContent = `S/ ${(quantity * productData.price).toFixed(2)}`;
+          
+          // Mark as price list item if applicable
+          if (productData.price_list_id) {
+            item.setAttribute('data-price-list-id', productData.price_list_id);
+          } else {
+            item.removeAttribute('data-price-list-id');
+          }
+        });
+        
+        // Recalculate total
+        this.calculateTotal();
+        
+        // Show success toast
+        this.hideToast(loadingToast);
+        this.showToast('Precios actualizados según lista de precios del cliente', 'success');
+      })
+      .catch(error => {
+        console.error('Error updating prices:', error);
+        this.hideToast(loadingToast);
+        this.showToast('Error al actualizar precios', 'error');
+      });
+  }
+  
+  resetPricesToDefault() {
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+    if (items.length === 0) return;
+    
+    const productIds = Array.from(items)
+      .filter(item => item.hasAttribute('data-price-list-id'))
+      .map(item => item.getAttribute('data-product-id'))
+      .filter(id => id);
+    
+    if (productIds.length === 0) return;
+    
+    // Show loading indicator
+    const loadingToast = this.showToast('Restaurando precios por defecto...', 'info');
+    
+    // Fetch default prices for products
+    fetch(`/admin/products/default_prices?product_ids=${productIds.join(',')}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error fetching default prices');
+        }
+        return response.json();
+      })
+      .then(data => {
+        // If no data or empty array, don't proceed with updates
+        if (!data || data.length === 0) {
+          this.hideToast(loadingToast);
+          return;
+        }
+        
+        // Update each item with the default price
+        items.forEach(item => {
+          // Skip items that don't have a price list ID attribute
+          if (!item.hasAttribute('data-price-list-id')) return;
+          
+          const productId = item.getAttribute('data-product-id');
+          if (!productId) return;
+          
+          const productData = data.find(p => p.id.toString() === productId);
+          if (!productData) return;
+          
+          // Skip combo items and already discounted items
+          if (item.hasAttribute('data-combo-id') || 
+              item.getAttribute('data-item-already-discounted') === 'true' ||
+              item.hasAttribute('data-item-loyalty-free')) {
+            return;
+          }
+          
+          // Update price and original price
+          const priceElement = item.querySelector('.editable-price');
+          const quantityElement = item.querySelector('[data-item-quantity]');
+          const subtotalElement = item.querySelector('[data-item-subtotal]');
+          const quantity = parseInt(quantityElement.textContent);
+          
+          // Update price display
+          priceElement.textContent = `S/ ${productData.price.toFixed(2)}`;
+          
+          // Update original price attribute for validation
+          item.setAttribute('data-item-original-price', productData.price);
+          
+          // Update subtotal
+          subtotalElement.textContent = `S/ ${(quantity * productData.price).toFixed(2)}`;
+          
+          // Remove price list ID attribute
+          item.removeAttribute('data-price-list-id');
+        });
+        
+        // Recalculate total
+        this.calculateTotal();
+        
+        // Show success toast
+        this.hideToast(loadingToast);
+        this.showToast('Precios restaurados a valores por defecto', 'success');
+      })
+      .catch(error => {
+        console.error('Error resetting prices:', error);
+        this.hideToast(loadingToast);
+        this.showToast('Error al restaurar precios', 'error');
+      });
+  }
+  
+  showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.classList.add('fixed', 'bottom-4', 'right-4', 'p-4', 'rounded', 'shadow-lg', 'z-50');
+    
+    // Set background color based on type
+    if (type === 'success') {
+      toast.classList.add('bg-green-500', 'text-white');
+    } else if (type === 'error') {
+      toast.classList.add('bg-red-500', 'text-white');
+    } else {
+      toast.classList.add('bg-blue-500', 'text-white');
+    }
+    
+    toast.textContent = message;
+    document.body.appendChild(toast);
+    
+    // Auto-hide after 3 seconds unless it's a loading toast
+    if (type !== 'info') {
+      setTimeout(() => {
+        this.hideToast(toast);
+      }, 3000);
+    }
+    
+    return toast;
+  }
+  
+  hideToast(toast) {
+    if (toast && toast.parentNode) {
+      toast.parentNode.removeChild(toast);
+    }
+  }
+  
 }

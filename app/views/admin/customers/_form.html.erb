@@ -1,7 +1,7 @@
 <div id="switchable-container" class="my-6">
   <%= simple_form_for([:admin, @user], url: @user.persisted? ? admin_customer_path(@user) : admin_customers_path, html: { data: { controller: "customer-form", customer_form_target: "form", customer_form_in_modal_value: local_assigns[:in_modal] || false, turbo_frame: "switchable-container" } }) do |form| %>
     <%= render 'shared/form_errors', model: @user %>
-    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+    <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
 
       <%# Fields for associated Customer record %>
       <%= form.simple_fields_for :customer do |customer_form| %>
@@ -92,6 +92,17 @@
           <%= form.input :status, 
             label: "Estado", 
             collection: User.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, 
+            input_html: { class: "form-input" }, 
+            label_html: { class: "form-label" } %>
+        </div>
+      <% end %>
+
+      <% if $global_settings[:feature_flag_price_lists] %>
+        <div>
+          <%= customer_form.association :price_list, 
+            label: "Lista de Precios", 
+            collection: PriceList.active_lists,
+            include_blank: "Precio por defecto",
             input_html: { class: "form-input" }, 
             label_html: { class: "form-label" } %>
         </div>

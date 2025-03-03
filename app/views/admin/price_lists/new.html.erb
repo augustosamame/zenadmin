@@ -1,0 +1,13 @@
+<%= render "shared/admin/nav", { header_title: "Métodos de Pago" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Nueva Lista de Precios</h1>
+  </div>
+
+  <div class="p-6 bg-white rounded-lg shadow-md">
+    <%= render 'form' %>
+  </div>
+</div>
