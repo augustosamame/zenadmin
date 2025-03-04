@@ -41,11 +41,17 @@ class Admin::PaymentsController < Admin::AdminController
     @payment = Payment.new
     generic_customer = User.find_by(email: "generic_customer@devtechperu.com")
     @customer_users = User.with_role("customer") - [ generic_customer ]
+
+    # Pre-select user if user_id is provided
+    if params[:user_id].present?
+      @payment.user_id = params[:user_id]
+    end
   end
 
   def create
     @payment = Payment.new(payment_params)
     @payment.status = "paid"
+    @payment.cashier_shift = @current_cashier_shift
     if @payment.save!
       redirect_to admin_payments_path
     else

@@ -218,11 +218,12 @@ Rails.application.routes.draw do
     resources :account_receivables, only: [ :index, :show ] do
       get "users_index", on: :collection
       get "payments_calendar", on: :collection
+      post "create_initial_balance", on: :collection
     end
 
-    resources :account_receivable_payments, only: [ :new, :create ] do
-    collection do
-      get :success
+    resources :account_receivable_payments do
+      collection do
+        get :success
         get :error
       end
     end

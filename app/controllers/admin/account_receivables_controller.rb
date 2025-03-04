@@ -21,7 +21,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
     if params[:user_id].present?
       @user = User.find(params[:user_id])
       @account_receivables = AccountReceivable.where(user_id: params[:user_id])
-      @unapplied_payments = Payment.includes([ :cashier_shift ]).where(user_id: params[:user_id], account_receivable_id: nil, status: "paid").order(id: :desc)
+      @unapplied_payments = Payment.unapplied.includes([ :cashier_shift ]).where(user_id: params[:user_id]).order(id: :desc)
       @applied_payments = Payment.where(payable_type: "Order")
                                 .joins("INNER JOIN orders ON orders.id = payments.payable_id")
                                 .where(orders: { user_id: params[:user_id], is_credit_sale: true })
@@ -32,6 +32,9 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending_previous_period = 0
       @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
+
+      # Check if customer has any account receivables or payments
+      @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
     else
       raise "User ID is required"
     end
@@ -71,6 +74,85 @@ class Admin::AccountReceivablesController < Admin::AdminController
         }
       }
     end
+  end
+
+  def create_initial_balance
+    @user = User.find(params[:user_id])
+    amount = params[:amount].to_f
+
+    # Find or create a special cashier and cashier shift for initial balances
+    initial_balance_cashier = Cashier.find_by(name: "Caja Balance Inicial")
+    
+    if initial_balance_cashier.nil?
+      # Create a special cashier for initial balances
+      initial_balance_cashier = Cashier.create!(
+        name: "Caja Balance Inicial", 
+        location: Location.first
+      )
+    end
+    
+    # Find or create an open cashier shift for the initial balance cashier
+    initial_balance_shift = CashierShift.where(cashier_id: initial_balance_cashier.id, status: :open).first
+    
+    if initial_balance_shift.nil?
+      # Create a new open cashier shift
+      initial_balance_shift = CashierShift.create!(
+        cashier_id: initial_balance_cashier.id,
+        date: Date.current,
+        total_sales_cents: 0,
+        status: :open,
+        opened_by_id: current_user.id,
+        opened_at: Time.current
+      )
+    end
+
+    ActiveRecord::Base.transaction do
+      if amount > 0
+        # Create an account receivable for positive balance (customer owes money)
+        account_receivable = AccountReceivable.new(
+          user: @user,
+          amount: amount,
+          currency: "PEN",
+          status: :pending,
+          order_id: nil,
+          payment_id: nil,
+          description: "Saldo inicial",
+          due_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
+        )
+
+        if account_receivable.save
+            flash[:notice] = "Saldo inicial por cobrar creado exitosamente"
+        else
+          flash[:alert] = "Error al crear el saldo inicial: #{account_receivable.errors.full_messages.join(', ')}"
+          raise ActiveRecord::Rollback
+        end
+      elsif amount < 0
+        # Create a payment for negative balance (customer has credit)
+        payment = Payment.new(
+          user: @user,
+          amount: amount.abs,
+          currency: "PEN",
+          status: :paid,
+          payment_method: PaymentMethod.find_by(name: "cash") || PaymentMethod.first,
+          payment_date: Time.current,
+          cashier_shift: initial_balance_shift,
+          description: "Saldo inicial a favor",
+          comment: "Saldo inicial a favor del cliente"
+        )
+
+        if payment.save
+            flash[:notice] = "Saldo inicial a favor creado exitosamente"
+        else
+          flash[:alert] = "Error al crear el saldo inicial: #{payment.errors.full_messages.join(', ')}"
+          raise ActiveRecord::Rollback
+        end
+      else
+        flash[:alert] = "El monto debe ser diferente de cero"
+        raise ActiveRecord::Rollback
+      end
+    end
+
+    redirect_to admin_account_receivables_path(user_id: @user.id)
   end
 
   private
