@@ -9,7 +9,7 @@
 
 server "52.1.115.249", user: "deploy", roles: %w[app db web], ssh_options: { keys: [ "/Users/augusto/Documents/Credentials/AWS/jardindelzen.pem" ], user: "deploy", port: 1222, keepalive: true }
 
-server "54.158.52.48", user: "deploy", roles: %w[app db web], ssh_options: { keys: [ "/Users/augusto/Documents/Credentials/AWS/jardindelzen.pem" ], user: "deploy", port: 1222, keepalive: true }
+# server "54.158.52.48", user: "deploy", roles: %w[app db web], ssh_options: { keys: [ "/Users/augusto/Documents/Credentials/AWS/jardindelzen.pem" ], user: "deploy", port: 1222, keepalive: true }
 
 
 # role-based syntax
