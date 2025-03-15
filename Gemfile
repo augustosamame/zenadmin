@@ -37,7 +37,7 @@ gem "railsui", github: "augustosamame/railsui", branch: "main"
 
 gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"
-gem "audited", "~> 5.7.0"
+gem "audited", "~> 5.8.0"
 gem "sidekiq", "~> 7.3.4"
 gem "dotenv-rails", "~> 3.1.4", require: "dotenv/load"
 gem "cssbundling-rails", "~> 1.4.1"
