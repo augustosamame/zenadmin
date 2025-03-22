@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 7.2.1.2"
+gem "rails", "~> 8.0.1"
 # The original asset pipeline for Rails [https://github.com/rails/sprockets-rails]
 gem "sprockets-rails"
 # Use postgresql as the database for Active Record
@@ -37,7 +37,7 @@ gem "railsui", github: "augustosamame/railsui", branch: "main"
 
 gem "interactor", "~> 3.0"
 gem "cancancan", "~> 3.6.1"
-gem "audited", "~> 5.7.0"
+gem "audited", github: "collectiveidea/audited"
 gem "sidekiq", "~> 7.3.4"
 gem "dotenv-rails", "~> 3.1.4", require: "dotenv/load"
 gem "cssbundling-rails", "~> 1.4.1"
@@ -70,7 +70,7 @@ gem "geocoder", "~> 1.8.3"
 gem "kaminari", "~> 1.2.2"
 gem "web-push", "~> 3.0.1"
 gem "aasm", "~> 5.5.0"
-gem "rails-i18n", "~> 7.0.10"
+gem "rails-i18n", github: "svenfuchs/rails-i18n"
 gem "prawn", "~> 2.5.0"
 gem "prawn-table", "~> 0.2.2"
 gem "combine_pdf", "~> 1.0.26"
@@ -93,7 +93,7 @@ group :development do
   gem "web-console"
   gem "awesome_print"
   gem "byebug"
-  gem "bullet", "~> 7.2.0"
+  gem "bullet", "~> 8.0.1"
   gem "bootstrap-generators", github: "WorkBravely/bootstrap-generators", branch: "master"
   gem "rails-admin-scaffold", github: "augustosamame/rails-admin-scaffold", branch: "master"
 
