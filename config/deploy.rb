@@ -5,7 +5,8 @@ set :application, "rails_app"
 set :repo_url, "git@github.com:augustosamame/zenadmin.git"
 
 # Default branch is :master
-set :branch, "main"
+# Allow branch to be specified during deployment
+set :branch, ENV["BRANCH"] || "main"
 
 set :user, "deploy"
 set :deploy_to, "/home/deploy/rails_app"
