@@ -107,4 +107,7 @@ group :development do
   gem "capistrano-sidekiq"
   gem "capistrano-dotenv", require: false
   gem "capistrano-faster-assets", "~> 1.0"
+  gem 'capistrano-bundler', '~> 2.0'
+  gem 'ed25519', '~> 1.2'
+  gem 'bcrypt_pbkdf', '~> 1.0'
 end
