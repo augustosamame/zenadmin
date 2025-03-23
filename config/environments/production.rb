@@ -1,4 +1,25 @@
 require "active_support/core_ext/integer/time"
+require 'ipaddr'
+
+CLOUDFLARE_IPS = %w[
+  173.245.48.0/20
+  103.21.244.0/22
+  103.22.200.0/22
+  103.31.4.0/22
+  141.101.64.0/18
+  108.162.192.0/18
+  190.93.240.0/20
+  188.114.96.0/20
+  197.234.240.0/22
+  198.41.128.0/17
+  162.158.0.0/15
+  104.16.0.0/13
+  104.24.0.0/14
+  172.64.0.0/13
+  131.0.72.0/22
+  127.0.0.1
+  ::1
+].map { |ip| IPAddr.new(ip) }
 
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
@@ -57,8 +78,11 @@ Rails.application.configure do
   config.action_controller.default_url_options = { protocol: 'https' }
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
-  config.action_dispatch.trusted_proxies = ['127.0.0.1', '::1']
+  config.action_dispatch.trusted_proxies = CLOUDFLARE_IPS
   config.force_ssl = false
+  config.assume_ssl = true
+
+  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
