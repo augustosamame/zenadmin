@@ -10,10 +10,10 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.2].define(version: 2025_03_03_045623) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
   # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
-  enable_extension "plpgsql"
   enable_extension "unaccent"
 
   create_table "account_receivable_payments", force: :cascade do |t|
@@ -431,6 +431,7 @@ ActiveRecord::Schema[7.2].define(version: 2025_03_03_045623) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "is_main", default: false
     t.index ["region_id"], name: "index_locations_on_region_id"
   end
 

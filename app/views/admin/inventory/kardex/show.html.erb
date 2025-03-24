@@ -44,11 +44,15 @@
   <% end %>
 
   <div class="container p-6 mx-6 mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
-    <div id="kardex-table" 
-         data-controller="datatable" 
-         data-datatable-options-value="server_side:false;resource_name:'Product';create_button:false;"
-         data-url="<%= admin_inventory_fetch_kardex_movements_path %>">
-      <!-- Table will be dynamically updated here -->
-    </div>
+    <% if @movements.present? %>
+      <%= render partial: 'admin/inventory/kardex/kardex_table', locals: { movements: @movements } %>
+    <% else %>
+      <div id="kardex-table" 
+           data-controller="datatable" 
+           data-datatable-options-value="server_side:false;resource_name:'Product';create_button:false;"
+           data-url="<%= admin_inventory_fetch_kardex_movements_path %>">
+        <!-- Table will be dynamically updated here -->
+      </div>
+    <% end %>
   </div>
 </div>

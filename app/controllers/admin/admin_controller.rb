@@ -17,7 +17,7 @@ class Admin::AdminController < ApplicationController
   end
 
   def set_current_objects
-    @current_warehouse = Warehouse.find_by(id: session[:current_warehouse_id] || current_user&.warehouse_id || @current_location&.warehouses&.first&.id || Warehouse.find_by(name: "Almacén Oficina Principal"))
+    @current_warehouse = Warehouse.find_by(id: session[:current_warehouse_id] || current_user&.warehouse_id || @current_location&.warehouses&.first&.id || Warehouse.find_by(is_main: true) || Warehouse.find_by(name: "Almacén Oficina Principal"))
     session[:current_warehouse_id] = @current_warehouse&.id
     current_cashier = Cashier.find_by(id: session[:current_cashier_id])
     @current_cashier = current_cashier || @current_location&.cashiers&.first

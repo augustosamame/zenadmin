@@ -5,9 +5,20 @@ export default class extends Controller {
   static values = { url: String }
 
   connect() {
+    console.log("Kardex controller connected!")
     this.initializeSelects()
-    if (this.hasWarehouseSelectTarget) {
-      this.fetchMovements()
+    
+    // Get product_id and warehouse_id from URL parameters
+    const urlParams = new URLSearchParams(window.location.search)
+    const productIdParam = urlParams.get('product_id')
+    const warehouseIdParam = urlParams.get('warehouse_id')
+    
+    console.log("URL params:", { productIdParam, warehouseIdParam })
+    
+    // If both parameters exist in the URL, fetch movements directly
+    if (productIdParam && warehouseIdParam) {
+      console.log("Both parameters exist, fetching movements directly")
+      this.fetchMovementsWithParams(productIdParam, warehouseIdParam)
     }
   }
 
@@ -29,12 +40,18 @@ export default class extends Controller {
 
     if (!productId) return
 
+    this.fetchMovementsWithParams(productId, warehouseId)
+  }
+
+  fetchMovementsWithParams(productId, warehouseId) {
     const url = new URL(this.urlValue, window.location.origin)
 
     url.searchParams.set("product_id", productId)
     if (warehouseId) {
       url.searchParams.set("warehouse_id", warehouseId)
     }
+
+    console.log("Fetching movements with URL:", url.toString())
 
     fetch(url, {
       headers: {
@@ -46,6 +63,9 @@ export default class extends Controller {
         Turbo.renderStreamMessage(html)
         this.initializeSelects()
         this.reinitializeDatatable()
+      })
+      .catch(error => {
+        console.error("Error fetching kardex movements:", error)
       })
   }
 

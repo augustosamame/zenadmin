@@ -10,11 +10,36 @@ class Admin::Inventory::KardexController < Admin::AdminController
     else
       @warehouse = @current_warehouse
     end
+
+    # Automatically fetch kardex movements if both product_id and warehouse_id are present
+    if params[:product_id].present? && (params[:warehouse_id].present? || @current_warehouse.present?)
+      fetch_kardex_movements_for_show
+    end
   end
 
   def fetch_kardex_movements
     product = Product.find(params[:product_id])
     selected_warehouse = params[:warehouse_id].present? ? Warehouse.find(params[:warehouse_id]) : @current_warehouse
+    
+    @movements = get_kardex_movements(product, selected_warehouse)
+
+    # Respond with Turbo Stream or HTML
+    respond_to do |format|
+      format.turbo_stream
+      # format.html { render partial: 'admin/inventorykardex/kardex_table', locals: { movements: @movements } }
+    end
+  end
+
+  private
+
+  def fetch_kardex_movements_for_show
+    product = Product.find(params[:product_id])
+    selected_warehouse = params[:warehouse_id].present? ? Warehouse.find(params[:warehouse_id]) : @current_warehouse
+    
+    @movements = get_kardex_movements(product, selected_warehouse)
+  end
+
+  def get_kardex_movements(product, selected_warehouse)
     # Fetch stock transfers and orders related to the product
     stock_transfers = product.stock_transfer_lines
                             .joins(:stock_transfer)
@@ -39,7 +64,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
     current_stock = 0
 
     # Calculate final stock for each movement
-    @movements = movements.map do |movement|
+    movements.map do |movement|
       if movement.is_a?(OrderItem)
         qty_out = movement.quantity
         qty_in = 0
@@ -91,12 +116,6 @@ class Admin::Inventory::KardexController < Admin::AdminController
       end
 
       movement_hash
-    end
-
-    # Respond with Turbo Stream or HTML
-    respond_to do |format|
-      format.turbo_stream
-      # format.html { render partial: 'admin/inventorykardex/kardex_table', locals: { movements: @movements } }
     end
   end
 end

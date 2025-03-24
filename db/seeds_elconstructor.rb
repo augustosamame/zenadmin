@@ -68,14 +68,14 @@ factory_1 = Factory::Factory.find_or_create_by!(name: 'Main Factory', region: re
 supplier_1 = Supplier.create!(name: "Cementos Sol Vendor", sourceable: vendor_1, region: region_default)
 supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, region: region_default)
 
-# warehouse_user_1 = User.create!(email: 'almacen_principal@sercamsrl.com', phone: "986976311", login: "almacen_principal@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
-# warehouse_user_1.add_role('warehouse_manager')
+warehouse_user_1 = User.create!(email: 'almacen_principal@sercamsrl.com', phone: "986976311", login: "almacen_principal@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
+warehouse_user_1.add_role('warehouse_manager')
 
-# location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000')
+location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000')
 
-# warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
+warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
 
-location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', is_main: true)
+location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 location_2 = Location.find_or_create_by!(name: 'Eternit', region: region_default, email: "eternit@sercamsrl.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
 
@@ -164,9 +164,7 @@ Tag.find_or_create_by!(name: 'Materiales Eléctricos', tag_type: 'category')
 
 Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
 
-# product_1 = Product.find_or_create_by!(name: 'Cemento APU', description: "Cemento APU", price_cents: 2200, discounted_price_cents: 2200, brand: Brand.first)
-# product_1.add_tag(Tag.find_by(name: 'Cementos'))
-# product_2 = Product.find_or_create_by!(name: 'Cemento Sol', description: "Cemento Sol", price_cents: 2400, discounted_price_cents: 2400, brand: Brand.first)
-# product_2.add_tag(Tag.find_by(name: 'Cementos'))
-
-Services::Products::SercamProductImportService.new("sercam_product_inventory.csv").import_products_and_stocks
+product_1 = Product.find_or_create_by!(name: 'Cemento APU', description: "Cemento APU", price_cents: 2200, discounted_price_cents: 2200, brand: Brand.first)
+product_1.add_tag(Tag.find_by(name: 'Cementos'))
+product_2 = Product.find_or_create_by!(name: 'Cemento Sol', description: "Cemento Sol", price_cents: 2400, discounted_price_cents: 2400, brand: Brand.first)
+product_2.add_tag(Tag.find_by(name: 'Cementos'))
