@@ -90,6 +90,14 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer.user_id = current_user.id
     if @stock_transfer.save
       @stock_transfer.finish_transfer! if @stock_transfer.origin_warehouse_id.nil? # inventario inicial
+      
+      # Create guia if requested and allowed by settings
+      if !@stock_transfer.is_adjustment && 
+         params[:stock_transfer][:create_guia] == "1" && 
+         $global_settings[:show_sunat_guia_for_stock_transfers]
+        Services::Inventory::StockTransferGuiaService.new(@stock_transfer).create_guias
+      end
+      
       if @stock_transfer.is_adjustment
         @stock_transfer.finish_transfer!
         redirect_to index_stock_adjustments_admin_stock_transfers_path, notice: "El ajuste de Stock se creó correctamente."
@@ -211,6 +219,6 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def stock_transfer_params
-    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
+    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, :create_guia, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
   end
 end

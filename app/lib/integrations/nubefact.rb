@@ -16,5 +16,13 @@ module Integrations
       }
       self.class.post("/invoice", body: invoice_data, headers: headers)
     end
+
+    def emitir_guia(guia_data)
+      headers = {
+        "Content-Type" => "application/json",
+        "authorization" => "#{JSON.parse(guia_data)['efact_client_token']}"
+      }
+      self.class.post("/invoice", body: guia_data, headers: headers)
+    end
   end
 end
