@@ -75,11 +75,13 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 
 # warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
 
-location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000', is_main: true)
+location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000000', is_main: true)
 
-location_2 = Location.find_or_create_by!(name: 'Eternit', region: region_default, email: "eternit@sercamsrl.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
+location_2 = Location.find_or_create_by!(name: 'Eternit', region: region_default, email: "eternit@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000009')
 
-location_3 = Location.find_or_create_by!(name: 'Agricultor', region: region_default, email: "agricultor@sercamsrl.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
+location_3 = Location.find_or_create_by!(name: 'Agricultor', region: region_default, email: "agricultor@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000008')
+
+location_4 = Location.find_or_create_by!(name: 'Transporte', region: region_default, email: "transporte@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000007')
 
 storeuser1 = User.create!(email: 'talavera@sercamsrl.com', phone: "986976311", location_id: location_1.id, login: "talavera@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Talavera", internal: true)
 storeuser1.add_role('store')
@@ -89,6 +91,9 @@ storeuser2.add_role('store')
 
 storeuser3 = User.create!(email: 'agricultor@sercamsrl.com', phone: "928855854", location_id: location_3.id, login: "agricultor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Agricultor", internal: true)
 storeuser3.add_role('store')
+
+storeuser4 = User.create!(email: 'transporte@sercamsrl.com', phone: "900000007", location_id: location_4.id, login: "transporte@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Transporte", internal: true)
+storeuser4.add_role('store')
 
 supervisor_1 = User.create!(email: 'supervisor@sercamsrl.com', phone: "986976314", login: "supervisor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Sercam")
 supervisor_1.add_role('supervisor')
@@ -136,18 +141,28 @@ Customer.create!(
 
 invoicer1 = Invoicer.find_or_create_by!(name: 'Sercam', razon_social: 'Sercam SRL', ruc: '20527409242', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561331", region: region_default)
 
-invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F001', next_number: 1)
-invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B001', next_number: 1)
+invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F002', next_number: 15975)
+invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B002', next_number: 9368)
 
-invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F002', next_number: 1)
-invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B002', next_number: 1)
+invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F010', next_number: 1)
+invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B010', next_number: 1)
 
 invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F003', next_number: 1)
 invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B003', next_number: 1)
 
+invseries7 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F007', next_number: 1)
+invseries8 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'F008', next_number: 1)
+
+
 InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries2, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries6, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_4, invoice_series: invseries7, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_4, invoice_series: invseries8, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+
 
 NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
