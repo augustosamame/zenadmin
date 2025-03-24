@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -635,6 +635,39 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
     t.index ["status"], name: "index_periodic_inventory_lines_on_status"
   end
 
+  create_table "planned_stock_transfer_lines", force: :cascade do |t|
+    t.bigint "planned_stock_transfer_id", null: false
+    t.bigint "product_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "fulfilled_quantity", precision: 10, scale: 2, default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["planned_stock_transfer_id"], name: "idx_on_planned_stock_transfer_id_2638df56a8"
+    t.index ["product_id"], name: "index_planned_stock_transfer_lines_on_product_id"
+  end
+
+  create_table "planned_stock_transfers", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "origin_warehouse_id", null: false
+    t.bigint "destination_warehouse_id"
+    t.bigint "order_id"
+    t.string "custom_id", null: false
+    t.datetime "planned_date"
+    t.text "comments"
+    t.integer "status", default: 0, null: false
+    t.string "fulfillment_status", default: "pending"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["custom_id"], name: "index_planned_stock_transfers_on_custom_id", unique: true
+    t.index ["destination_warehouse_id"], name: "index_planned_stock_transfers_on_destination_warehouse_id"
+    t.index ["fulfillment_status"], name: "index_planned_stock_transfers_on_fulfillment_status"
+    t.index ["order_id"], name: "index_planned_stock_transfers_on_order_id"
+    t.index ["origin_warehouse_id"], name: "index_planned_stock_transfers_on_origin_warehouse_id"
+    t.index ["planned_date"], name: "index_planned_stock_transfers_on_planned_date"
+    t.index ["status"], name: "index_planned_stock_transfers_on_status"
+    t.index ["user_id"], name: "index_planned_stock_transfers_on_user_id"
+  end
+
   create_table "preorders", force: :cascade do |t|
     t.bigint "product_id", null: false
     t.bigint "order_id", null: false
@@ -911,10 +944,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "planned_stock_transfer_id"
     t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
     t.index ["periodic_inventory_id"], name: "index_stock_transfers_on_periodic_inventory_id"
+    t.index ["planned_stock_transfer_id"], name: "index_stock_transfers_on_planned_stock_transfer_id"
     t.index ["stage"], name: "index_stock_transfers_on_stage"
     t.index ["status"], name: "index_stock_transfers_on_status"
     t.index ["transfer_date"], name: "index_stock_transfers_on_transfer_date"
@@ -1135,6 +1170,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
   add_foreign_key "periodic_inventories", "warehouses"
   add_foreign_key "periodic_inventory_lines", "periodic_inventories"
   add_foreign_key "periodic_inventory_lines", "products"
+  add_foreign_key "planned_stock_transfer_lines", "planned_stock_transfers"
+  add_foreign_key "planned_stock_transfer_lines", "products"
+  add_foreign_key "planned_stock_transfers", "orders"
+  add_foreign_key "planned_stock_transfers", "users"
+  add_foreign_key "planned_stock_transfers", "warehouses", column: "destination_warehouse_id"
+  add_foreign_key "planned_stock_transfers", "warehouses", column: "origin_warehouse_id"
   add_foreign_key "preorders", "orders"
   add_foreign_key "preorders", "products"
   add_foreign_key "preorders", "warehouses"
@@ -1163,6 +1204,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_23_231814) do
   add_foreign_key "stock_transfer_lines", "products"
   add_foreign_key "stock_transfer_lines", "stock_transfers"
   add_foreign_key "stock_transfers", "periodic_inventories"
+  add_foreign_key "stock_transfers", "planned_stock_transfers"
   add_foreign_key "stock_transfers", "users"
   add_foreign_key "stock_transfers", "warehouses", column: "destination_warehouse_id"
   add_foreign_key "stock_transfers", "warehouses", column: "origin_warehouse_id"

@@ -8,6 +8,7 @@ class StockTransfer < ApplicationRecord
   belongs_to :origin_warehouse, class_name: "Warehouse", optional: true
   belongs_to :destination_warehouse, class_name: "Warehouse", optional: true
   belongs_to :periodic_inventory, class_name: "PeriodicInventory", optional: true
+  belongs_to :planned_stock_transfer, optional: true
 
   attr_accessor :current_user_for_destroy, :cached_lines
 

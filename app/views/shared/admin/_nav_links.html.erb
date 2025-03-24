@@ -145,6 +145,11 @@
     <li>
       <%= nav_link_to "Transferencias de Stocks", send("admin_stock_transfers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:pos_can_create_orders_without_stock_transfers] %>
+    <li>
+      <%= nav_link_to "Transferencias de Stocks Planificadas", send("admin_planned_stock_transfers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
     <li>
       <%= nav_link_to "Ajustes de Inventario", send("index_stock_adjustments_admin_stock_transfers_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>

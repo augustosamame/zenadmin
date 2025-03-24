@@ -1,0 +1,143 @@
+<%= form_with(model: [:admin, planned_stock_transfer], class: "space-y-8", data: { controller: "planned-stock-transfer-form" }) do |form| %>
+  <% if planned_stock_transfer.errors.any? %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            Se encontraron <%= pluralize(planned_stock_transfer.errors.count, "error") %>:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% planned_stock_transfer.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white dark:bg-slate-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Información General</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Información básica de la transferencia de stock planificada.
+        </p>
+      </div>
+      <div class="mt-5 md:mt-0 md:col-span-2">
+        <div class="grid grid-cols-6 gap-6">
+          <div class="col-span-6 sm:col-span-3">
+            <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: "Seleccionar Almacén de Origen" }, { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" } %>
+          </div>
+
+          <div class="col-span-6 sm:col-span-3">
+            <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, { include_blank: "Seleccionar Almacén de Destino" }, { class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" } %>
+          </div>
+
+          <div class="col-span-6 sm:col-span-3">
+            <%= form.label :planned_date, "Fecha Planificada", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.date_field :planned_date, class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+          </div>
+
+          <div class="col-span-6">
+            <%= form.label :comments, "Comentarios", class: "block text-sm font-medium text-gray-700 dark:text-gray-300" %>
+            <%= form.text_area :comments, rows: 3, class: "mt-1 block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white dark:bg-slate-800 shadow px-4 py-5 sm:rounded-lg sm:p-6">
+    <div class="md:grid md:grid-cols-3 md:gap-6">
+      <div class="md:col-span-1">
+        <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-white">Productos</h3>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+          Agregue los productos que desea transferir.
+        </p>
+      </div>
+      <div class="mt-5 md:mt-0 md:col-span-2">
+        <div class="space-y-4" data-planned-stock-transfer-form-target="linesContainer">
+          <template data-planned-stock-transfer-form-target="lineTemplate">
+            <div class="grid grid-cols-12 gap-4 items-center line-item">
+              <div class="col-span-6">
+                <%= form.fields_for :planned_stock_transfer_lines, PlannedStockTransferLine.new, child_index: 'NEW_RECORD' do |line_form| %>
+                  <%= line_form.collection_select :product_id, Product.active.order(:name), :id, :name, { include_blank: "Seleccionar Producto" }, { class: "block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" } %>
+                <% end %>
+              </div>
+              <div class="col-span-4">
+                <%= form.fields_for :planned_stock_transfer_lines, PlannedStockTransferLine.new, child_index: 'NEW_RECORD' do |line_form| %>
+                  <%= line_form.number_field :quantity, min: 1, step: 1, placeholder: "Cantidad", class: "block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+                <% end %>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <button type="button" data-action="click->planned-stock-transfer-form#removeLine" class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <%= form.fields_for :planned_stock_transfer_lines, PlannedStockTransferLine.new, child_index: 'NEW_RECORD' do |line_form| %>
+                <%= line_form.hidden_field :_destroy, class: "destroy-field" %>
+              <% end %>
+            </div>
+          </template>
+
+          <div class="grid grid-cols-12 gap-4 items-center font-medium text-gray-700 dark:text-gray-300">
+            <div class="col-span-6">Producto</div>
+            <div class="col-span-4">Cantidad</div>
+            <div class="col-span-2"></div>
+          </div>
+
+          <% planned_stock_transfer.planned_stock_transfer_lines.each_with_index do |line, index| %>
+            <div class="grid grid-cols-12 gap-4 items-center line-item">
+              <div class="col-span-6">
+                <%= form.fields_for :planned_stock_transfer_lines, line do |line_form| %>
+                  <%= line_form.collection_select :product_id, Product.active.order(:name), :id, :name, { include_blank: "Seleccionar Producto" }, { class: "block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" } %>
+                <% end %>
+              </div>
+              <div class="col-span-4">
+                <%= form.fields_for :planned_stock_transfer_lines, line do |line_form| %>
+                  <%= line_form.number_field :quantity, min: 1, step: 1, placeholder: "Cantidad", class: "block w-full py-2 px-3 border border-gray-300 bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" %>
+                <% end %>
+              </div>
+              <div class="col-span-2 flex justify-end">
+                <button type="button" data-action="click->planned-stock-transfer-form#removeLine" class="inline-flex items-center p-1 border border-transparent rounded-full shadow-sm text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
+                  <svg class="h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+              </div>
+              <%= form.fields_for :planned_stock_transfer_lines, line do |line_form| %>
+                <%= line_form.hidden_field :_destroy, class: "destroy-field" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+
+        <div class="mt-4">
+          <button type="button" data-action="click->planned-stock-transfer-form#addLine" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+              <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Agregar Producto
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end">
+    <%= link_to "Cancelar", admin_planned_stock_transfers_path, class: "inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 mr-3" %>
+    <%= form.submit @button_label, class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  </div>
+<% end %>

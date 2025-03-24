@@ -64,6 +64,11 @@ export const resourceMappings = {
     buttonUrl: "/admin/stock_transfers/new",
     ajaxUrl: "/admin/stock_transfers.json"
   },
+  PlannedStockTransfer: {
+    buttonText: "Crear Transferencia de Stock Planificada",
+    buttonUrl: "/admin/planned_stock_transfers/new",
+    ajaxUrl: "/admin/planned_stock_transfers.json"
+  },
   StockAdjustment: {
     buttonText: "Crear Ajuste de Inventario",
     buttonUrl: "/admin/stock_transfers/new",

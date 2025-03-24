@@ -1,0 +1,44 @@
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Código</th>
+          <th class="px-4 py-2 text-left">Usuario</th>
+          <th class="px-4 py-2 text-left">Origen</th>
+          <th class="px-4 py-2 text-left">Destino</th>
+          <th class="px-4 py-2 text-left">Total Productos</th>
+          <th class="px-4 py-2 text-left">Productos Cumplidos</th>
+          <th class="px-4 py-2 text-left">Fecha Planificada</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Estado de Cumplimiento</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @planned_stock_transfers.each do |planned_stock_transfer| %>
+          <tr>
+            <td class="px-4 py-2"><%= planned_stock_transfer.custom_id %></td>
+            <td class="px-4 py-2"><%= planned_stock_transfer.user&.name %></td>
+            <td class="px-4 py-2"><%= planned_stock_transfer.origin_warehouse&.name %></td>
+            <td class="px-4 py-2">
+              <% if planned_stock_transfer.order.present? %>
+                Venta <%= planned_stock_transfer.order.custom_id %>
+              <% else %>
+                <%= planned_stock_transfer.destination_warehouse&.name %>
+              <% end %>
+            </td>
+            <td class="px-4 py-2"><%= planned_stock_transfer.total_products %></td>
+            <td class="px-4 py-2"><%= planned_stock_transfer.total_fulfilled_products %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, planned_stock_transfer.planned_date) %></td>
+            <td class="px-4 py-2"><%= planned_stock_transfer.translated_status %></td>
+            <td class="px-4 py-2"><%= translated_stage(planned_stock_transfer.fulfillment_status) %></td>
+            <td class="px-4 py-2">
+              <%= render partial: "admin/planned_stock_transfers/actions", locals: { planned_stock_transfer: planned_stock_transfer, default_object_options_array: @default_object_options_array } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

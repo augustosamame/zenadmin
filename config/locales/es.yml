@@ -195,6 +195,14 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
+      planned_stock_transfer:
+        status_list:
+          active: Activo
+          inactive: Inactivo
+        fulfillment_status_list:
+          pending: Pendiente
+          partially_fulfilled: Parcialmente Completado
+          fulfilled: Completado
       account_receivable:
         status_list:
           pending: Pendiente

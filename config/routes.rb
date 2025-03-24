@@ -190,6 +190,11 @@ Rails.application.routes.draw do
         patch :adjustment_stock_transfer_admin_confirm
       end
     end
+    resources :planned_stock_transfers do
+      member do
+        post :create_stock_transfer
+      end
+    end
     resources :in_transit_stocks
 
     resources :combo_products
