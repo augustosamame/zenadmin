@@ -139,19 +139,19 @@ Customer.create!(
   user: user2,
 )
 
-invoicer1 = Invoicer.find_or_create_by!(name: 'Sercam', razon_social: 'Sercam SRL', ruc: '20527409242', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561331", region: region_default)
+invoicer1 = Invoicer.find_or_create_by!(name: 'Sercam', razon_social: 'Sercam SRL', ruc: '20527409242', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234567501", region: region_default)
 
 invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F002', next_number: 15975)
 invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B002', next_number: 9368)
 
-invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F010', next_number: 1)
-invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B010', next_number: 1)
+invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F010', next_number: 2391)
+invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B010', next_number: 2760)
 
-invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F003', next_number: 1)
-invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B003', next_number: 1)
+invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F003', next_number: 1141)
+invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B003', next_number: 32207)
 
-invseries7 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F007', next_number: 1)
-invseries8 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'F008', next_number: 1)
+invseries7 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F007', next_number: 769)
+invseries8 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'F008', next_number: 748)
 
 
 InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
