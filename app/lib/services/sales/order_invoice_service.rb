@@ -25,21 +25,40 @@ module Services
         end
 
         invoice_line_ids = []
+        total_tax_amount = 0
+
         @order.order_items.each do |order_line|
+          # Calculate unit prices without early rounding
+          unit_price_with_tax = order_line.price.to_f
+          unit_price_no_tax = (unit_price_with_tax / 1.18)
+
+          # Calculate line totals
+          quantity = order_line.quantity.to_f
+          line_price_total_with_tax = unit_price_with_tax * quantity
+          line_price_total_no_tax = unit_price_no_tax * quantity
+
+          # Calculate tax amount precisely
+          line_tax_amount = (line_price_total_with_tax - line_price_total_no_tax).round(2)
+          total_tax_amount += line_tax_amount
+
+          # Calculate discount
+          line_discount = order_line.discounted_price.to_f == 0 ? 0 :
+                         (unit_price_with_tax - order_line.discounted_price.to_f) * quantity
+
           invoice_line_ids << {
-          "name": order_line.product.name,
-          "description": order_line.product.description,
-          "product_id": order_line.product.custom_id,
-          "quantity": order_line.quantity.round(0),
-          "unit_price_no_tax": (order_line.price.to_f / 1.18).round(2),
-          "unit_price_with_tax": order_line.price.to_f,
-          "price_subtotal": ((order_line.price.to_f - (order_line.price.to_f / 1.18)) * order_line.quantity).round(2),
-          "line_price_total_no_tax": ((order_line.price.to_f - (order_line.price.to_f / 1.18)) * order_line.quantity).round(2),
-          "line_price_total_with_tax": (order_line.price.to_f * order_line.quantity).round(2),
-          "line_tax_amount": ((order_line.price.to_f - (order_line.price.to_f / 1.18)) * order_line.quantity).round(2),
-          "line_discount": order_line.discounted_price.to_f == 0 ? 0 : (order_line.price.to_f - order_line.discounted_price.to_f) * order_line.quantity,
-          "tax_id": "IGV"
-        }
+            "name": order_line.product.name,
+            "description": order_line.product.description,
+            "product_id": order_line.product.custom_id,
+            "quantity": quantity.round(0),
+            "unit_price_no_tax": unit_price_no_tax.round(2),
+            "unit_price_with_tax": unit_price_with_tax,
+            "price_subtotal": line_price_total_no_tax.round(2),
+            "line_price_total_no_tax": line_price_total_no_tax.round(2),
+            "line_price_total_with_tax": line_price_total_with_tax.round(2),
+            "line_tax_amount": line_tax_amount,
+            "line_discount": line_discount,
+            "tax_id": "IGV"
+          }
         end
 
         invoice_data_hash = {
@@ -59,7 +78,7 @@ module Services
           "order_discount": (@order.total_discount.to_f / 1.18).round(2),
           "tax_line_ids": [ {
             "tax_id": "IGV",
-            "amount": (@order.total_price.to_f - (@order.total_price.to_f / 1.18)).round(2)
+            "amount": total_tax_amount
           } ],
           "invoice_line_ids": invoice_line_ids,
           "email": @order.customer.email,
