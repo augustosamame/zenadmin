@@ -110,7 +110,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: [
+        streams = [
           turbo_stream.replace("sales_count", partial: "sales_count"),
           turbo_stream.replace("sales_amount", partial: "sales_amount"),
           turbo_stream.replace("sales_count_this_month", partial: "sales_count_this_month"),
@@ -118,8 +118,17 @@ class Admin::DashboardsController < Admin::AdminController
           turbo_stream.replace("sales_average_per_day_this_month", partial: "sales_average_per_day_this_month"),
           turbo_stream.replace("sales_dashboard_notification_feed", partial: "sales_dashboard_notification_feed"),
           turbo_stream.replace("commission_targets_graph", partial: "commission_targets_graph"),
-          turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_list")
+          turbo_stream.replace("seller_commissions_daily_list", partial: "seller_commissions_daily_list")
         ]
+        
+        # Add the appropriate commission list based on organization
+        if ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
+          streams << turbo_stream.replace("seller_commissions_15day_list", partial: "seller_commissions_15day_list")
+        else
+          streams << turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_monthly_list")
+        end
+        
+        render turbo_stream: streams
       end
     end
   end
@@ -132,6 +141,8 @@ class Admin::DashboardsController < Admin::AdminController
       set_sales_amount_this_month_variables
       set_sales_count_this_month_variables
       set_sales_daily_average_this_month_variables
+      set_seller_commissions_daily_list
+      set_seller_commissions_15day_list
     end
 
     def set_seller_commissions_list
@@ -153,6 +164,62 @@ class Admin::DashboardsController < Admin::AdminController
                       .order("total_commission_cents DESC")
 
       @seller_commissions_list = if @selected_location.present?
+        base_query.where(orders: { location_id: @selected_location.id })
+      else
+        base_query
+      end
+    end
+
+    def set_seller_commissions_daily_list
+      # Set the date range for today
+      today_range = Time.zone.now.beginning_of_day..Time.zone.now.end_of_day
+
+      # Create the base query to get sellers with their commission totals for today
+      base_query = User.joins(:commissions)
+                      .joins("INNER JOIN orders ON orders.id = commissions.order_id")
+                      .where(orders: { order_date: today_range })
+                      .group("users.id")
+                      .select("users.*, SUM(commissions.sale_amount_cents) as total_commission_cents")
+                      .order("total_commission_cents DESC")
+
+      # Apply location filter if a location is selected
+      @seller_commissions_daily_list = if @selected_location.present?
+        base_query.where(orders: { location_id: @selected_location.id })
+      else
+        base_query
+      end
+    end
+
+    def set_seller_commissions_15day_list
+      # Get current date
+      current_date = Time.zone.now
+      
+      # Determine which half of the month we're in
+      if current_date.day <= 15
+        # First half of the month (1st to 15th)
+        start_date = current_date.beginning_of_month
+        end_date = current_date.beginning_of_month + 14.days
+        @current_15day_period_text = "1-15 #{current_date.strftime('%B %Y')}"
+      else
+        # Second half of the month (16th to end)
+        start_date = current_date.beginning_of_month + 15.days
+        end_date = current_date.end_of_month
+        @current_15day_period_text = "16-#{current_date.end_of_month.day} #{current_date.strftime('%B %Y')}"
+      end
+      
+      # Set the date range for the current 15-day period
+      current_15day_range = start_date.beginning_of_day..end_date.end_of_day
+
+      # Create the base query to get sellers with their commission totals for the 15-day period
+      base_query = User.joins(:commissions)
+                      .joins("INNER JOIN orders ON orders.id = commissions.order_id")
+                      .where(orders: { order_date: current_15day_range })
+                      .group("users.id")
+                      .select("users.*, SUM(commissions.sale_amount_cents) as total_commission_cents")
+                      .order("total_commission_cents DESC")
+
+      # Apply location filter if a location is selected
+      @seller_commissions_15day_list = if @selected_location.present?
         base_query.where(orders: { location_id: @selected_location.id })
       else
         base_query

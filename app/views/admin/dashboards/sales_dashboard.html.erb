@@ -33,7 +33,12 @@
       <%= render "separator" %>
 
       <% if $global_settings[:feature_flag_commission_ranges] %>
-        <%= render "seller_commissions_monthly_list" %>
+        <%= render "seller_commissions_daily_list" %>
+        <% if ENV["CURRENT_ORGANIZATION"] == "jardindelzen" %>
+          <%= render "seller_commissions_15day_list" %>
+        <% else %>
+          <%= render "seller_commissions_monthly_list" %>
+        <% end %>
       <% end %>
 
     </div>
