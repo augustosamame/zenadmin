@@ -18,7 +18,11 @@
 
       <%= render "separator" %>
 
-      <%= render "commission_targets_graph" %>
+      <% if ENV["CURRENT_ORGANIZATION"] == "jardindelzen" %>
+        <%= render "commission_targets_graph_jardindelzen" %>
+      <% else %>
+        <%= render "commission_targets_graph" %>
+      <% end %>
 
       <div class="col-span-12 p-6 bg-white rounded-lg border shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
         <div class="flex justify-between items-center">

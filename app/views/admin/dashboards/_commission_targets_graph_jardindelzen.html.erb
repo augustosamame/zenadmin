@@ -1,0 +1,13 @@
+<div id="commission_targets_graph_jardindelzen"
+  class="flex flex-col h-full col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-7 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none dark:text-slate-300"
+  data-controller="dashboards--charts"
+  data-dashboards--charts-team-goals-jardindelzen-value="<%= (@team_goals_jardindelzen || {}).to_json %>">
+  <div class="flex items-start justify-between pb-6">
+    <div class="flex-1">
+      <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Proyección de ventas vs metas (<%= @current_15day_period_text %>)</h4>
+    </div>
+  </div>
+  <div class="relative flex-grow min-h-[400px]">
+    <div class="absolute inset-0" data-dashboards--charts-target="teamGoalsJardindelzen"></div>
+  </div>
+</div>
