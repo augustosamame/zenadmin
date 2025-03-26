@@ -113,6 +113,7 @@ class Admin::DashboardsController < Admin::AdminController
         render turbo_stream: [
           turbo_stream.replace("sales_count", partial: "sales_count"),
           turbo_stream.replace("sales_amount", partial: "sales_amount"),
+          turbo_stream.replace("sales_count_this_month", partial: "sales_count_this_month"),
           turbo_stream.replace("sales_amount_this_month", partial: "sales_amount_this_month"),
           turbo_stream.replace("sales_average_per_day_this_month", partial: "sales_average_per_day_this_month"),
           turbo_stream.replace("sales_dashboard_notification_feed", partial: "sales_dashboard_notification_feed"),
@@ -129,6 +130,7 @@ class Admin::DashboardsController < Admin::AdminController
       set_sales_count_variables
       set_sales_amount_variables
       set_sales_amount_this_month_variables
+      set_sales_count_this_month_variables
       set_sales_daily_average_this_month_variables
     end
 
@@ -253,11 +255,39 @@ class Admin::DashboardsController < Admin::AdminController
 
     def set_sales_amount_this_month_variables
       Rails.logger.info("Setting sales amount this month variables")
-      @sales_amount_this_month = (filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0).round(2)
-      @sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0).round(2)
+      # Get current date and time
+      current_time = Time.zone.now
+      
+      # Calculate the same day and time for last month
+      same_time_last_month = current_time.prev_month
+      
+      # Get sales for current month up to now
+      @sales_amount_this_month = (filtered_orders.where(order_date: current_time.beginning_of_month..current_time).sum(:total_price_cents) / 100.0).round(2)
+      
+      # Get sales for last month up to the same day and time
+      @sales_amount_last_month = (filtered_orders.where(order_date: same_time_last_month.beginning_of_month..same_time_last_month).sum(:total_price_cents) / 100.0 || 0).round(2)
+      
       @sales_amount_change_since_last_month = @sales_amount_this_month - @sales_amount_last_month
       @sales_amount_change_since_last_month = format_change(@sales_amount_change_since_last_month)
       @sales_amount_change_since_last_month_percentage = calculate_percentage_change(@sales_amount_this_month, @sales_amount_last_month)
+    end
+
+    def set_sales_count_this_month_variables
+      Rails.logger.info("Setting sales count this month variables")
+      # Get current date and time
+      current_time = Time.zone.now
+      
+      # Calculate the same day and time for last month
+      same_time_last_month = current_time.prev_month
+      
+      # Get sales count for current month up to now
+      @sales_count_this_month = filtered_orders.where(order_date: current_time.beginning_of_month..current_time).count
+      
+      # Get sales count for last month up to the same day and time
+      @sales_count_last_month = filtered_orders.where(order_date: same_time_last_month.beginning_of_month..same_time_last_month).count
+      
+      @sales_count_change_since_last_month = @sales_count_this_month - @sales_count_last_month
+      @sales_count_change_since_last_month_percentage = calculate_percentage_change(@sales_count_this_month, @sales_count_last_month)
     end
 
     def set_sales_daily_average_this_month_variables

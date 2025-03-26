@@ -12,15 +12,16 @@
 
       <%= render "sales_count" %>
       <%= render "sales_amount" %>
+      <%= render "sales_count_this_month" %>
       <%= render "sales_amount_this_month" %>
-      <%= render "sales_average_per_day_this_month" %>
+      <%# <%= render "sales_average_per_day_this_month" %>
 
       <%= render "separator" %>
 
       <%= render "commission_targets_graph" %>
 
-      <div class="col-span-12 p-6 bg-white border rounded-lg shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
-        <div class="flex items-center justify-between">
+      <div class="col-span-12 p-6 bg-white rounded-lg border shadow-sm lg:col-span-5 md:col-span-6 border-slate-200 dark:bg-slate-800 dark:border-none">
+        <div class="flex justify-between items-center">
           <h4 class="m-0 text-xl font-medium tracking-tight text-slate-800 dark:text-slate-300">Notificaciones</h4>
           <%= link_to "Ver Todas", "#", class: "font-medium text-sm hover:text-primary-600 text-slate-600 dark:text-slate-400 dark:hover:text-primary-300" %>
         </div>
