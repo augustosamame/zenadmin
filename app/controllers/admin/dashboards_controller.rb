@@ -210,12 +210,12 @@ class Admin::DashboardsController < Admin::AdminController
         # First half of the month (1st to 15th)
         start_date = current_date.beginning_of_month
         end_date = current_date.beginning_of_month + 14.days
-        @current_15day_period_text = "1-15 #{current_date.strftime('%B %Y')}"
+        @current_15day_period_text = "1-15 #{I18n.l(current_date, format: '%B %Y')}"
       else
         # Second half of the month (16th to end)
         start_date = current_date.beginning_of_month + 15.days
         end_date = current_date.end_of_month
-        @current_15day_period_text = "16-#{current_date.end_of_month.day} #{current_date.strftime('%B %Y')}"
+        @current_15day_period_text = "16-#{current_date.end_of_month.day} #{I18n.l(current_date, format: '%B %Y')}"
       end
 
       # Set the date range for the current 15-day period
@@ -315,10 +315,12 @@ class Admin::DashboardsController < Admin::AdminController
           # First half of the month (1st to 15th)
           start_date = current_date.beginning_of_month
           end_date = current_date.beginning_of_month + 14.days
+          @current_15day_period_text = "1-15 #{I18n.l(current_date, format: '%B %Y')}"
         else
           # Second half of the month (16th to end)
           start_date = current_date.beginning_of_month + 15.days
           end_date = current_date.end_of_month
+          @current_15day_period_text = "16-#{current_date.end_of_month.day} #{I18n.l(current_date, format: '%B %Y')}"
         end
 
         # Get orders for the 15-day period

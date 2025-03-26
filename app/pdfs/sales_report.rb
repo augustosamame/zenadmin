@@ -47,9 +47,9 @@ class SalesReport < Prawn::Document
 
       text "Resumen", size: 10, style: :bold
       move_down 5
-      text "Total de Órdenes: #{orders.count}", size: 8
+      text "Cant de Ventas: #{orders.count}", size: 8
       text "Total de Items: #{total_items}", size: 8
-      text "Total de Ventas: S/ #{sprintf("%.2f", total_price)}", size: 8
+      text "Monto de Ventas: S/ #{sprintf("%.2f", total_price)}", size: 8
       move_down 10
       stroke_horizontal_rule
       move_down 10
