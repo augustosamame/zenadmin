@@ -422,8 +422,13 @@ class Admin::ProductsController < Admin::AdminController
       end
       
       if product_discounts.any?
-        max_discount = product_discounts.max_by(&:discount_percentage)
-        discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
+        # Filter out discounts with nil discount_percentage
+        valid_discounts = product_discounts.select { |discount| discount.discount_percentage.present? }
+        
+        if valid_discounts.any?
+          max_discount = valid_discounts.max_by(&:discount_percentage)
+          discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
+        end
       end
 
       {
