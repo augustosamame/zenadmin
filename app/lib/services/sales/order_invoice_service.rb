@@ -14,7 +14,7 @@ module Services
       def create_invoices
         invoice_data = determine_order_invoices_matrix
 
-        if [ "B002", "B003" ].include?(invoice_data&.invoice_series&.prefix)
+        if [ "B002", "B003" ].include?(invoice_data&.invoice_series&.prefix) && ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
           # ignore RUS boletas for now
           return nil
         end
@@ -28,12 +28,6 @@ module Services
 
         # Use exact tax rate
         tax_rate = 0.18
-
-        # Hard-code the expected total tax from the error message
-        expected_total_tax = 1296.61
-
-        # Log the expected values
-        Rails.logger.info("Expected Total Tax: #{expected_total_tax}")
 
         # Track the running total of tax amounts
         running_tax_total = 0
@@ -50,11 +44,6 @@ module Services
 
           # Calculate tax amount precisely - don't round yet
           line_tax_amount = line_price_total_with_tax - line_price_total_no_tax
-
-          # For the last item (index 3, which is line 4), use the exact expected value
-          if index == 3
-            line_tax_amount = 122.03389830508475
-          end
 
           # Add to running total
           running_tax_total += line_tax_amount
@@ -83,8 +72,8 @@ module Services
           }
         end
 
-        # Use the expected total tax amount
-        total_tax_amount = expected_total_tax
+        # Use the calculated total tax amount
+        total_tax_amount = running_tax_total
 
         # Log the final values
         Rails.logger.info("Sum of Line Tax Amounts: #{running_tax_total.round(2)}")
@@ -101,8 +90,8 @@ module Services
           "customer_comprobante_tipo_catalog_6": invoice_customer_doc_type,
           "customer_name": @order.wants_factura ? @order.customer.customer.factura_razon_social : @order.customer.name,
           "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : "Sin dirección",
-          "payment_term_id": 1,
-          "payment_credit_days": 0,
+          "payment_term_id": determine_payment_term_id(invoice_data.payment_method),
+          "payment_credit_days": determine_payment_term_id(invoice_data.payment_method) == 2 ? 0 : 30,
           "order_total": (@order.total_price.to_f).round(2),
           "order_discount": (@order.total_discount.to_f / 1.18).round(2),
           "tax_line_ids": [ {
@@ -145,6 +134,15 @@ module Services
         end
         invoice.save
         invoice
+      end
+
+      def determine_payment_term_id(payment_method)
+        case payment_method.name
+        when "credit"
+          2
+        else
+          1
+        end
       end
 
       def determine_order_invoices_matrix
