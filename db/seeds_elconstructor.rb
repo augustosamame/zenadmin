@@ -71,17 +71,22 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 warehouse_user_1 = User.create!(email: 'almacen_principal@sercamsrl.com', phone: "986976311", login: "almacen_principal@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
 warehouse_user_1.add_role('warehouse_manager')
 
-location_0 = Location.find_or_create_by!(name: 'Tamburco', region: region_default, email: "tamburco@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000')
+location_0 = Location.find_or_create_by!(name: 'Tamburco', region: region_default, email: "tamburco@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000', is_main: true)
 
-warehouse_0 = Warehouse.find_by!(name: "Tamburco").update(is_main: true)
+warehouse_0 = Warehouse.find_by!(name: "Almacén Tamburco").update(is_main: true)
 
 location_1 = Location.find_or_create_by!(name: 'Guadalupe', region: region_default, email: "guadalupe@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
+
+location_2 = Location.find_or_create_by!(name: 'Transporte', region: region_default, email: "transporte@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 storeuser1 = User.create!(email: 'tamburco@sercamsrl.com', phone: "986976311", location_id: location_0.id, login: "tamburco@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Tamburco", internal: true)
 storeuser1.add_role('store')
 
 storeuser2 = User.create!(email: 'guadalupe@sercamsrl.com', phone: "986976312", location_id: location_1.id, login: "guadalupe@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Guadalupe", internal: true)
 storeuser2.add_role('store')
+
+storeuser3 = User.create!(email: 'transporte@sercamsrl.com', phone: "986976313", location_id: location_2.id, login: "transporte@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Transporte", internal: true)
+storeuser3.add_role('store')
 
 supervisor_1 = User.create!(email: 'supervisor@sercamsrl.com', phone: "986976314", login: "supervisor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Constructor")
 supervisor_1.add_role('supervisor')
@@ -137,9 +142,9 @@ invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_t
 
 invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F006', next_number: 857)
 
-InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
-InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
-InvoiceSeriesMapping.find_or_create_by!(location: location_3, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_0, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 
 NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
 NotificationSetting.find_or_create_by!(trigger_type: 'preorder', media: { notification_feed: true, dashboard_alert: true, email: true })
