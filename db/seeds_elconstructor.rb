@@ -71,26 +71,19 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 warehouse_user_1 = User.create!(email: 'almacen_principal@sercamsrl.com', phone: "986976311", login: "almacen_principal@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
 warehouse_user_1.add_role('warehouse_manager')
 
-location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000')
+location_0 = Location.find_or_create_by!(name: 'Tamburco', region: region_default, email: "tamburco@sercamsrl.com", address: 'Av Confraternidad 786, Andahuaylas', phone: '900000000')
 
-warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
+warehouse_0 = Warehouse.find_by!(name: "Tamburco").update(is_main: true)
 
-location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
+location_1 = Location.find_or_create_by!(name: 'Guadalupe', region: region_default, email: "guadalupe@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
-location_2 = Location.find_or_create_by!(name: 'Eternit', region: region_default, email: "eternit@sercamsrl.com", address: 'Av. La Marina 424, San Migual', phone: '900000009')
-
-location_3 = Location.find_or_create_by!(name: 'Agricultor', region: region_default, email: "agricultor@sercamsrl.com", address: 'CC Plaza Norte, Los Olivos', phone: '900000008')
-
-storeuser1 = User.create!(email: 'talavera@sercamsrl.com', phone: "986976311", location_id: location_1.id, login: "talavera@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Talavera", internal: true)
+storeuser1 = User.create!(email: 'tamburco@sercamsrl.com', phone: "986976311", location_id: location_0.id, login: "tamburco@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Tamburco", internal: true)
 storeuser1.add_role('store')
 
-storeuser2 = User.create!(email: 'eternit@sercamsrl.com', phone: "986976312", location_id: location_2.id, login: "eternit@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Eternit", internal: true)
+storeuser2 = User.create!(email: 'guadalupe@sercamsrl.com', phone: "986976312", location_id: location_1.id, login: "guadalupe@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Guadalupe", internal: true)
 storeuser2.add_role('store')
 
-storeuser3 = User.create!(email: 'agricultor@sercamsrl.com', phone: "928855854", location_id: location_3.id, login: "agricultor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Agricultor", internal: true)
-storeuser3.add_role('store')
-
-supervisor_1 = User.create!(email: 'supervisor@sercamsrl.com', phone: "986976314", login: "supervisor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Sercam")
+supervisor_1 = User.create!(email: 'supervisor@sercamsrl.com', phone: "986976314", login: "supervisor@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Supervisor", last_name: "Constructor")
 supervisor_1.add_role('supervisor')
 
 PaymentMethod.find_or_create_by!(name: 'card', description: 'Tarj Crédito / Débito')
@@ -134,16 +127,15 @@ Customer.create!(
   user: user2,
 )
 
-invoicer1 = Invoicer.find_or_create_by!(name: 'Sercam', razon_social: 'Sercam SRL', ruc: '20527409242', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234561331", region: region_default)
+invoicer1 = Invoicer.find_or_create_by!(name: 'El Constructor', razon_social: 'Organización El Constructor SAC', ruc: '20490593293', tipo_ruc: 'RUC', default: true, einvoice_api_key: "12345678901234567502", region: region_default)
 
-invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F001', next_number: 1)
-invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B001', next_number: 1)
+invseries1 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F002', next_number: 6685)
+invseries2 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B002', next_number: 2540)
 
-invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F002', next_number: 1)
-invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B002', next_number: 1)
+invseries3 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F005', next_number: 15055)
+invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B005', next_number: 5114)
 
-invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F003', next_number: 1)
-invseries6 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'boleta', prefix: 'B003', next_number: 1)
+invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F006', next_number: 857)
 
 InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
@@ -164,7 +156,9 @@ Tag.find_or_create_by!(name: 'Materiales Eléctricos', tag_type: 'category')
 
 Tag.find_or_create_by!(name: 'Repuestos', tag_type: 'other')
 
-product_1 = Product.find_or_create_by!(name: 'Cemento APU', description: "Cemento APU", price_cents: 2200, discounted_price_cents: 2200, brand: Brand.first)
-product_1.add_tag(Tag.find_by(name: 'Cementos'))
-product_2 = Product.find_or_create_by!(name: 'Cemento Sol', description: "Cemento Sol", price_cents: 2400, discounted_price_cents: 2400, brand: Brand.first)
-product_2.add_tag(Tag.find_by(name: 'Cementos'))
+# product_1 = Product.find_or_create_by!(name: 'Cemento APU', description: "Cemento APU", price_cents: 2200, discounted_price_cents: 2200, brand: Brand.first)
+# product_1.add_tag(Tag.find_by(name: 'Cementos'))
+# product_2 = Product.find_or_create_by!(name: 'Cemento Sol', description: "Cemento Sol", price_cents: 2400, discounted_price_cents: 2400, brand: Brand.first)
+# product_2.add_tag(Tag.find_by(name: 'Cementos'))
+
+Services::Products::SercamProductImportService.new("oec_product_inventory.csv").import_products_and_stocks_oec
