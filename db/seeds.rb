@@ -4,7 +4,7 @@ when "jardindelzen"
   client_seed_file = "db/seeds_jardindelzen.rb"
 when "sercam"
   client_seed_file = "db/seeds_sercam.rb"
-when "oec"
+when "constructor"
   client_seed_file = "db/seeds_elconstructor.rb"
 end
 

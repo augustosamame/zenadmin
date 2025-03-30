@@ -13,9 +13,7 @@ class AdminMailer < ApplicationMailer
   case ENV["CURRENT_ORGANIZATION"]
   when "jardindelzen"
     PRODUCTION_EXTRA_EMAILS = PRODUCTION_EXTRA_EMAILS_JARDIN_DEL_ZEN
-  when "sercam"
-    PRODUCTION_EXTRA_EMAILS = PRODUCTION_EXTRA_EMAILS_SERCAM
-  when "oec"
+  when "sercam", "constructor"
     PRODUCTION_EXTRA_EMAILS = PRODUCTION_EXTRA_EMAILS_SERCAM
   else
     PRODUCTION_EXTRA_EMAILS = []
