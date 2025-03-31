@@ -4,7 +4,7 @@
 
 <div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
   <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
-    <%= simple_form_for :filter, url: admin_commissions_path, method: :get, html: { class: 'contents' } do |f| %>
+    <%= simple_form_for :filter, url: admin_commissions_path, method: :get, html: { class: 'contents', data: { turbo: false } } do |f| %>
       <div>
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Desde</p>
         <%= f.input :from_date, 
@@ -30,7 +30,7 @@
       </div>
 
       <div>
-        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Comisiones Pagadas</p>
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Ocultar Comisiones Pendientes de Pago</p>
         <div class="mt-2">
           <%= f.input :status_paid_out, 
               as: :boolean, 
@@ -47,19 +47,31 @@
             class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800' %>
         
         <%= link_to 'Quitar Filtros', 
-            admin_commissions_path, 
+            params[:location_id].present? ? admin_commissions_path(location_id: params[:location_id]) : admin_commissions_path, 
             class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600 dark:focus:ring-offset-slate-800' %>
       </div>
+      
+      <%# Preserve location_id parameter if present %>
+      <% if params[:location_id].present? %>
+        <%= hidden_field_tag :location_id, params[:location_id] %>
+      <% end %>
     <% end %>
   </div>
 </div>
 
-<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+<div class="px-4 mb-16" data-controller="datatable" 
+  data-datatable-options-value="<%= @datatable_options %>" 
+  data-datatable-ajax-url-value="<%= admin_commissions_path(format: :json) %>"
+  data-datatable-ajax-data-value="<%= {
+    from_date: @from_date,
+    to_date: @to_date,
+    status_paid_out: @status_paid_out
+  }.to_json %>"
+>
   <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
-          <!-- <th class="px-4 py-2 text-left">Cajero</th> -->
           <th class="px-4 py-2 text-left">Id</th>
           <th class="px-4 py-2 text-left">Vendedor</th>
           <th class="px-4 py-2 text-left">Fecha</th>
@@ -75,7 +87,6 @@
       </thead>
       <tbody>
         <% @commissions.each do |commission| %>
-          <% seller_commission_percentage = CommissionRange.find_commission_for_sales(@sales_on_month_for_location, commission.order.location, commission.order.order_date)&.commission_percentage || 0, Time.current %>
           <tr>
             <td class="px-4 py-2"><%= commission.id %></td>
             <td class="px-4 py-2"><%= commission.user.name %></td>

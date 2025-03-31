@@ -4,7 +4,9 @@ import { resourceMappings } from "./datatable_resource_mappings";
 export default class extends Controller {
   static values = {
     languageCdn: { type: String, default: '/datatables/i18n/es-ES.json' },
-    options: { type: String, default: '' }
+    options: { type: String, default: '' },
+    ajaxUrl: { type: String, default: '' },
+    ajaxData: { type: Object, default: {} }
   }
 
   static resourceMappings = resourceMappings;
@@ -112,25 +114,66 @@ export default class extends Controller {
     if (allAdditionalOptions.includes("server_side:true")) {
       options.serverSide = true;
       options.ajax = {
-        url: resourceMapping.ajaxUrl,
+        url: resourceMapping.ajaxUrl || this.ajaxUrlValue,
         type: "GET",
         data: (d) => {
-          // If date_filter is enabled, add the filter parameters
+          // Merge any existing filter parameters
+          let filterParams = { ...this.ajaxDataValue };
+          
+          // If date_filter is enabled, add the date filter parameters
           if (allAdditionalOptions.includes("date_filter:true")) {
+            // Removed duplicate code - now handled in the general form collection below
+          }
+          
+          // Add location_id parameter if it exists in the URL
+          const urlParams = new URLSearchParams(window.location.search);
+          const locationId = urlParams.get('location_id');
+          if (locationId) {
+            filterParams.location_id = locationId;
+          }
+          
+          // Get all form elements and add them to the filter params
+          const filterForm = document.querySelector('form[data-turbo="false"]');
+          if (filterForm) {
+            const formData = new FormData(filterForm);
+            for (const [key, value] of formData.entries()) {
+              if (key.startsWith('filter[') && value) {
+                const filterKey = key.replace('filter[', '').replace(']', '');
+                
+                // For checkbox inputs, handle boolean values correctly
+                if (filterKey === 'status_paid_out') {
+                  filterParams[filterKey] = value === '1' || value === 'true' || value === true;
+                } else {
+                  filterParams[filterKey] = value;
+                }
+                
+                // Also store in session via URL parameters for the first request
+                if (urlParams.has(key) && !urlParams.get(key)) {
+                  urlParams.set(key, value);
+                }
+              }
+            }
+            
+            // Log the filter parameters for debugging
+            console.log('Filter params:', filterParams);
+          } else if (allAdditionalOptions.includes("date_filter:true")) {
+            // Fallback to individual field selection if form not found
             const fromDate = document.querySelector('[name="filter[from_date]"]')?.value;
             const toDate = document.querySelector('[name="filter[to_date]"]')?.value;
+            const statusPaidOut = document.querySelector('[name="filter[status_paid_out]"]')?.checked;
 
-            if (fromDate && toDate) {
-              return {
-                ...d,
-                filter: {
-                  from_date: fromDate,
-                  to_date: toDate
-                }
-              };
+            // Only add filter params if they exist
+            if (fromDate || toDate || statusPaidOut !== undefined) {
+              filterParams.from_date = fromDate;
+              filterParams.to_date = toDate;
+              filterParams.status_paid_out = statusPaidOut;
+              
+              // Log the filter parameters for debugging
+              console.log('Filter params (fallback):', filterParams);
             }
           }
-          return d;
+          
+          return { ...d, filterParams };
         }
       };
     }
@@ -143,7 +186,7 @@ export default class extends Controller {
         startRender: function (rows, group) {
           console.log("Creating group header:", group);
           return $('<tr/>')
-            .append('<td colspan="10" class="group-header bg-slate-100 border-t border-b border-slate-200 py-2 px-4 font-semibold">' + group + '</td>');
+            .append('<td colspan="10" class="px-4 py-2 font-semibold border-t border-b group-header bg-slate-100 border-slate-200">' + group + '</td>');
         }
       };
 
