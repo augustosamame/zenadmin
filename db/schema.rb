@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_31_200300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -339,6 +339,35 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
     t.index ["region_id"], name: "index_factory_factories_on_region_id"
   end
 
+  create_table "guia_series", force: :cascade do |t|
+    t.bigint "invoicer_id", null: false
+    t.string "prefix", null: false
+    t.integer "next_number", default: 1, null: false
+    t.integer "guia_type", default: 0, null: false
+    t.boolean "active", default: true
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoicer_id"], name: "index_guia_series_on_invoicer_id"
+  end
+
+  create_table "guias", force: :cascade do |t|
+    t.bigint "stock_transfer_id", null: false
+    t.bigint "guia_series_id", null: false
+    t.string "custom_id"
+    t.integer "amount"
+    t.string "currency", default: "PEN"
+    t.integer "guia_type", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.integer "sunat_status", default: 0, null: false
+    t.text "guia_sunat_sent_text"
+    t.json "guia_sunat_response"
+    t.string "guia_url"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guia_series_id"], name: "index_guias_on_guia_series_id"
+    t.index ["stock_transfer_id"], name: "index_guias_on_stock_transfer_id"
+  end
+
   create_table "in_transit_stocks", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "stock_transfer_id", null: false
@@ -399,7 +428,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
   end
 
   create_table "invoices", force: :cascade do |t|
-    t.bigint "order_id", null: false
+    t.bigint "order_id"
     t.bigint "invoice_series_id", null: false
     t.bigint "payment_method_id", null: false
     t.integer "amount_cents", null: false
@@ -797,6 +826,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
     t.decimal "weight", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "inafecto", default: false
     t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
     t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"
@@ -1138,6 +1168,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_025459) do
   add_foreign_key "discount_filters", "discounts"
   add_foreign_key "external_invoices", "orders"
   add_foreign_key "factory_factories", "regions"
+  add_foreign_key "guia_series", "invoicers"
+  add_foreign_key "guias", "guia_series"
+  add_foreign_key "guias", "stock_transfers"
   add_foreign_key "in_transit_stocks", "products"
   add_foreign_key "in_transit_stocks", "stock_transfers"
   add_foreign_key "in_transit_stocks", "users"

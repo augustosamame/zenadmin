@@ -75,6 +75,9 @@ class Admin::ProductsController < Admin::AdminController
     # Find media records that should be deleted
     # media_to_delete = @product.media.where.not(id: media_ids_to_keep)
 
+    # Explicitly handle the inafecto attribute
+    @product.inafecto = processed_params[:inafecto]
+
     if @product.update(processed_params)
       # Delete media that are no longer associated with the product
       # media_to_delete.each(&:destroy)
@@ -385,7 +388,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def product_params
-      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, tag_ids: [], product_category_ids: [],
+      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, :inafecto, tag_ids: [], product_category_ids: [],
       media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
       price_list_items_attributes: [:id, :price_list_id, :price])
     end

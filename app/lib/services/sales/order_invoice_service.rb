@@ -35,26 +35,38 @@ module Services
         @order.order_items.each_with_index do |order_line, index|
           # Calculate unit prices without early rounding
           unit_price_with_tax = order_line.price.to_f
-          unit_price_no_tax = unit_price_with_tax / (1 + tax_rate)
-
-          # Calculate line totals
-          quantity = order_line.quantity.to_f
-          line_price_total_with_tax = unit_price_with_tax * quantity
-          line_price_total_no_tax = unit_price_no_tax * quantity
-
-          # Calculate tax amount precisely - don't round yet
-          line_tax_amount = line_price_total_with_tax - line_price_total_no_tax
-
-          # Add to running total
-          running_tax_total += line_tax_amount
+          
+          # Check if product is inafecto (tax exempt)
+          if order_line.product.inafecto
+            # For inafecto products, tax rate is 0
+            unit_price_no_tax = unit_price_with_tax
+            line_price_total_with_tax = unit_price_with_tax * order_line.quantity.to_f
+            line_price_total_no_tax = line_price_total_with_tax
+            line_tax_amount = 0
+          else
+            # For regular products, apply normal tax rate
+            unit_price_no_tax = unit_price_with_tax / (1 + tax_rate)
+            
+            # Calculate line totals
+            quantity = order_line.quantity.to_f
+            line_price_total_with_tax = unit_price_with_tax * quantity
+            line_price_total_no_tax = unit_price_no_tax * quantity
+            
+            # Calculate tax amount precisely - don't round yet
+            line_tax_amount = line_price_total_with_tax - line_price_total_no_tax
+            
+            # Add to running total
+            running_tax_total += line_tax_amount
+          end
 
           # Calculate discount
+          quantity = order_line.quantity.to_f
           line_discount = order_line.discounted_price.to_f == 0 ? 0 :
                          (unit_price_with_tax - order_line.discounted_price.to_f) * quantity
 
           # Log the calculations for debugging
           Rails.logger.info("Product: #{order_line.product.name}, Line: #{index+1}, Quantity: #{quantity}, " +
-                           "Line Tax: #{line_tax_amount.round(2)}")
+                           "Line Tax: #{line_tax_amount.round(2)}, Inafecto: #{order_line.product.inafecto}")
 
           invoice_line_ids << {
             "name": order_line.product.name,
@@ -68,7 +80,7 @@ module Services
             "line_price_total_with_tax": line_price_total_with_tax.round(2),
             "line_tax_amount": line_tax_amount.round(2),
             "line_discount": line_discount,
-            "tax_id": "IGV"
+            "tax_id": order_line.product.inafecto ? "INAFECTO" : "IGV"
           }
         end
 
