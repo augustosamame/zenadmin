@@ -283,6 +283,54 @@ class Order < ApplicationRecord
     base_query.order(Arel.sql("orders.custom_id DESC"))
   end
 
+  def self.consolidated_sales_by_payment_method(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
+    # Get the sales data grouped by payment method
+    base_query = Order.select([
+      "locations.id as location_id",
+      "locations.name as location_name",
+      "payment_methods.description as payment_method",
+      "SUM(payments.amount_cents) as payment_total",
+      "'' as custom_id",
+      "NULL as order_datetime",
+      "'' as customer_name",
+      "NULL as order_total",
+      "'' as payment_tx",
+      "'' as invoice_custom_id",
+      "NULL as invoice_status",
+      "'' as invoice_url",
+      "false as missing_commission"
+    ].join(", "))
+                 .joins("INNER JOIN locations ON locations.id = orders.location_id")
+                 .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
+                 .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                 .where("payment_methods.description IS NOT NULL") # Ensure we have a payment method
+                 .group("locations.id, locations.name, payment_methods.description")
+
+    base_query = base_query.where(location: location) if location
+    if date_range
+      start_date = date_range.begin.in_time_zone("America/Lima").beginning_of_day.utc
+      end_date = date_range.end.in_time_zone("America/Lima").end_of_day.utc
+      base_query = base_query.where("orders.order_date BETWEEN ? AND ?", start_date, end_date)
+    end
+
+    # Add ordering if specified
+    if order_column.present? && order_direction.present?
+      order_sql = case order_column
+      when "5" # payment_method
+        "payment_methods.description"
+      when "6" # payment_total
+        "SUM(payments.amount_cents)"
+      else
+        "SUM(payments.amount_cents)"
+      end
+
+      direction = order_direction.upcase
+      return base_query.order(Arel.sql("#{order_sql} #{direction}"))
+    end
+
+    base_query.order(Arel.sql("SUM(payments.amount_cents) DESC"))
+  end
+
   def self.search_consolidated_sales_sql(search_term)
     search_condition = "%#{search_term}%"
     [
