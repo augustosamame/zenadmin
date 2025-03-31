@@ -228,7 +228,11 @@ class Admin::CommissionsController < Admin::AdminController
     # Apply pagination
     start = params[:start].to_i
     length = params[:length].to_i
-    commissions = commissions.offset(start).limit(length)
+    if length <= 0
+      commissions = commissions.offset(start)
+    else
+      commissions = commissions.offset(start).limit(length)
+    end
 
     # Format data for datatable
     data = commissions.map do |commission|
