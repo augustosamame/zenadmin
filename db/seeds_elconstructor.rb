@@ -142,8 +142,10 @@ invseries4 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_t
 
 invseries5 = InvoiceSeries.find_or_create_by!(invoicer: invoicer1, comprobante_type: 'factura', prefix: 'F006', next_number: 857)
 
-InvoiceSeriesMapping.find_or_create_by!(location: location_0, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
-InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_0, invoice_series: invseries3, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_0, invoice_series: invseries4, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries1, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
+InvoiceSeriesMapping.find_or_create_by!(location: location_1, invoice_series: invseries2, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 InvoiceSeriesMapping.find_or_create_by!(location: location_2, invoice_series: invseries5, payment_method: PaymentMethod.find_by(name: 'cash'), default: true)
 
 NotificationSetting.find_or_create_by!(trigger_type: 'order', media: { notification_feed: true, dashboard_alert: true, email: true })
