@@ -1,4 +1,4 @@
-<div data-pos--payment-target="paymentContainer" class="flex flex-col hidden h-full">
+<div data-pos--payment-target="paymentContainer" class="flex hidden flex-col h-full">
 
 
   <div class="flex flex-col mb-4 space-y-4">
@@ -16,6 +16,15 @@
         <input type="checkbox" id="automatic-delivery" class="w-5 h-5 text-blue-600 form-checkbox" checked data-pos--payment-target="automaticDelivery">
         <label for="automatic-delivery" class="text-sm font-medium text-gray-700 dark:text-gray-200">
           Entrega Automática
+        </label>
+      </div>
+    <% end %>
+
+    <% if $global_settings[:feature_flag_notas_de_venta] %>
+      <div class="flex items-center space-x-2">
+        <input type="checkbox" id="nota-de-venta" class="w-5 h-5 text-blue-600 form-checkbox" data-pos--payment-target="notaDeVenta">
+        <label for="nota-de-venta" class="text-sm font-medium text-gray-700 dark:text-gray-200">
+          Generar Nota de Venta
         </label>
       </div>
     <% end %>

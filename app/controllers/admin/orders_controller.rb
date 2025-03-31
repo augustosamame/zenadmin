@@ -185,13 +185,13 @@ class Admin::OrdersController < Admin::AdminController
 
   def update_payments
     @order = Order.find(params[:id])
-    
+
     begin
       Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes])
       @order.reevaluate_payment_status
-      
+
       respond_to do |format|
-        format.turbo_stream { 
+        format.turbo_stream {
           redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente"
         }
         format.html { redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente" }
@@ -202,7 +202,7 @@ class Admin::OrdersController < Admin::AdminController
           flash[:alert] = "Error al actualizar pagos: #{e.message}"
           redirect_to edit_payments_admin_order_path(@order)
         }
-        format.html { 
+        format.html {
           flash[:alert] = "Error al actualizar pagos: #{e.message}"
           redirect_to edit_payments_admin_order_path(@order)
         }
@@ -240,7 +240,7 @@ class Admin::OrdersController < Admin::AdminController
 
     def order_params
       params.require(:order).permit(
-        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id,
+        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, :nota_de_venta,
         order_items_attributes: [ :id, :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image, :product_pack_id ],
         payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date, :_destroy ],
         sellers_attributes: [ :id, :user_id, :percentage, :amount ],

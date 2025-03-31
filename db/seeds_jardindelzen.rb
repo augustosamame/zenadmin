@@ -27,6 +27,7 @@ setting_25 = Setting.find_or_create_by!(name: 'feature_flag_birthday_discount', 
 setting_26 = Setting.find_or_create_by!(name: 'birthday_discount_percentage', data_type: 'type_integer', internal: false, localized_name: '% de descuento cumpleañero', string_value: nil, integer_value: 30, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 setting_27 = Setting.find_or_create_by!(name: 'only_pull_cash_value_from_previous_cashier_shift', data_type: 'type_boolean', internal: false, localized_name: 'Solo jalar efectivo del saldo de la caja anterior', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 setting_28 = Setting.find_or_create_by!(name: 'feature_flag_price_lists', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples listas de precios', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
+setting_29 = Setting.find_or_create_by!(name: 'feature_flag_notas_de_venta', data_type: 'type_boolean', internal: false, localized_name: 'Permite generar notas de venta', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 
 Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')

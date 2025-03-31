@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import axios from 'axios'
 
 export default class extends Controller {
-  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion', 'paymentSection', 'automaticDelivery'];
+  static targets = ['productGrid', 'paymentContainer', 'remainingAmount', 'paymentMethods', 'paymentList', 'remainingLabel', 'paymentButton', 'total', 'totalDiscount', 'rucSection', 'ruc', 'razonSocial', 'direccion', 'paymentSection', 'automaticDelivery', 'notaDeVenta'];
 
   static values = {
     creditPaymentMethodId: Number
@@ -398,7 +398,8 @@ export default class extends Controller {
         sellers_attributes: selectedSellers,
         request_id: this.requestId,
         fast_stock_transfer_flag: this.hasAutomaticDeliveryTarget ? this.automaticDeliveryTarget.checked : true,
-        order_date: orderDateInput?.value || null
+        order_date: orderDateInput?.value || null,
+        nota_de_venta: this.hasNotaDeVentaTarget ? this.notaDeVentaTarget.checked : false
       }
     };
 

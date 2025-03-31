@@ -12,6 +12,9 @@ module Services
       end
 
       def create_invoices
+        # Return early if nota_de_venta is true
+        return nil if @order.nota_de_venta
+
         invoice_data = determine_order_invoices_matrix
 
         if [ "B002", "B003" ].include?(invoice_data&.invoice_series&.prefix) && ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
