@@ -38,7 +38,7 @@ module Services
         @order.order_items.each_with_index do |order_line, index|
           # Calculate unit prices without early rounding
           unit_price_with_tax = order_line.price.to_f
-          
+
           # Check if product is inafecto (tax exempt)
           if order_line.product.inafecto
             # For inafecto products, tax rate is 0
@@ -49,15 +49,15 @@ module Services
           else
             # For regular products, apply normal tax rate
             unit_price_no_tax = unit_price_with_tax / (1 + tax_rate)
-            
+
             # Calculate line totals
             quantity = order_line.quantity.to_f
             line_price_total_with_tax = unit_price_with_tax * quantity
             line_price_total_no_tax = unit_price_no_tax * quantity
-            
+
             # Calculate tax amount precisely - don't round yet
             line_tax_amount = line_price_total_with_tax - line_price_total_no_tax
-            
+
             # Add to running total
             running_tax_total += line_tax_amount
           end
@@ -69,19 +69,19 @@ module Services
 
           # Log the calculations for debugging
           Rails.logger.info("Product: #{order_line.product.name}, Line: #{index+1}, Quantity: #{quantity}, " +
-                           "Line Tax: #{line_tax_amount.round(2)}, Inafecto: #{order_line.product.inafecto}")
+                           "Line Tax: #{line_tax_amount.round(6)}, Inafecto: #{order_line.product.inafecto}")
 
           invoice_line_ids << {
             "name": order_line.product.name,
             "description": order_line.product.description,
             "product_id": order_line.product.custom_id,
             "quantity": quantity.round(0),
-            "unit_price_no_tax": unit_price_no_tax.round(2),
+            "unit_price_no_tax": unit_price_no_tax.round(6),
             "unit_price_with_tax": unit_price_with_tax,
-            "price_subtotal": line_price_total_no_tax.round(2),
-            "line_price_total_no_tax": line_price_total_no_tax.round(2),
-            "line_price_total_with_tax": line_price_total_with_tax.round(2),
-            "line_tax_amount": line_tax_amount.round(2),
+            "price_subtotal": line_price_total_no_tax.round(6),
+            "line_price_total_no_tax": line_price_total_no_tax.round(6),
+            "line_price_total_with_tax": line_price_total_with_tax.round(6),
+            "line_tax_amount": line_tax_amount.round(6),
             "line_discount": line_discount,
             "tax_id": order_line.product.inafecto ? "INAFECTO" : "IGV"
           }
@@ -91,7 +91,7 @@ module Services
         total_tax_amount = running_tax_total
 
         # Log the final values
-        Rails.logger.info("Sum of Line Tax Amounts: #{running_tax_total.round(2)}")
+        Rails.logger.info("Sum of Line Tax Amounts: #{running_tax_total.round(6)}")
         Rails.logger.info("Total Tax Amount: #{total_tax_amount}")
 
         invoice_data_hash = {
@@ -107,8 +107,8 @@ module Services
           "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : "Sin dirección",
           "payment_term_id": determine_payment_term_id(invoice_data.payment_method),
           "payment_credit_days": determine_payment_term_id(invoice_data.payment_method) == 1 ? 0 : 30,
-          "order_total": (@order.total_price.to_f).round(4),
-          "order_discount": (@order.total_discount.to_f).round(4),
+          "order_total": (@order.total_price.to_f).round(6),
+          "order_discount": (@order.total_discount.to_f).round(6),
           "tax_line_ids": [ {
             "tax_id": "IGV",
             "amount": total_tax_amount
