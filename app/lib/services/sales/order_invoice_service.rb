@@ -34,6 +34,7 @@ module Services
 
         # Track the running total of tax amounts
         running_tax_total = 0
+        exonerados_total = 0
 
         @order.order_items.each_with_index do |order_line, index|
           # Calculate unit prices without early rounding
@@ -46,6 +47,7 @@ module Services
             line_price_total_with_tax = unit_price_with_tax * order_line.quantity.to_f
             line_price_total_no_tax = line_price_total_with_tax
             line_tax_amount = 0
+            exonerados_total += line_price_total_with_tax
           else
             # For regular products, apply normal tax rate
             unit_price_no_tax = unit_price_with_tax / (1 + tax_rate)
@@ -108,6 +110,7 @@ module Services
           "payment_term_id": determine_payment_term_id(invoice_data.payment_method),
           "payment_credit_days": determine_payment_term_id(invoice_data.payment_method) == 1 ? 0 : 30,
           "order_total": (@order.total_price.to_f).round(6),
+          "exonerados_total": exonerados_total.round(6),
           "order_discount": (@order.total_discount.to_f).round(6),
           "tax_line_ids": [ {
             "tax_id": "IGV",
