@@ -220,7 +220,7 @@
     <li>
       <%= nav_link_to "Ventas por Producto y Packs", admin_orders_per_product_index_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
-    <% if current_user.any_admin? %>
+    <% if current_user.any_admin_or_supervisor? %>
     <li>
       <%= nav_link_to "Consolidado de Ventas", send("admin_reports_consolidated_sales_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
