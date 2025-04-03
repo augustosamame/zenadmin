@@ -3,6 +3,25 @@
 <% end %>
 
 <div class="px-4 mx-auto mt-8 md:px-10">
+  <% if @account_receivable.present? %>
+    <div class="p-4 mb-6 text-green-700 bg-green-100 rounded-md border border-green-200">
+      <p class="mb-2">
+        <strong>Nota:</strong> Este pago será aplicado a la siguiente cuenta por cobrar:
+      </p>
+      <ul class="ml-4 list-disc">
+        <li><strong>ID:</strong> #<%= @account_receivable.id %></li>
+        <li><strong>Cliente:</strong> <%= @account_receivable.user.name %></li>
+        <li><strong>Fecha de creación:</strong> <%= l(@account_receivable.created_at, format: :short) %></li>
+        <li><strong>Fecha de vencimiento:</strong> <%= l(@account_receivable.due_date, format: :short) if @account_receivable.due_date.present? %></li>
+        <li><strong>Monto total:</strong> <%= humanized_money_with_symbol @account_receivable.amount %></li>
+        <li><strong>Saldo pendiente:</strong> <%= humanized_money_with_symbol @account_receivable.remaining_balance %></li>
+        <% if @account_receivable.description.present? %>
+          <li><strong>Descripción:</strong> <%= @account_receivable.description %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
   <%= simple_form_for([:admin, @payment]) do |form| %>
     <%= render 'shared/form_errors', model: @payment %>
     

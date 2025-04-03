@@ -5,7 +5,7 @@
 <div class="container px-4 py-6 mx-auto">
   <div class="mb-6">
     <h1 class="text-2xl font-bold text-gray-900">Aplicar Pago a Cuenta por Cobrar</h1>
-    <p class="text-gray-600">Cliente: <%= @payment.user.name %></p>
+    <p class="text-gray-600">Cliente: <%= @payment.payable&.user&.name %></p>
   </div>
 
   <div class="p-6 mb-6 bg-white rounded-lg shadow-md">
@@ -85,7 +85,7 @@
     </div>
 
     <div class="flex justify-between">
-      <%= link_to "Volver", admin_account_receivables_path(user_id: @payment.user_id), class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" %>
+      <%= link_to "Volver", admin_account_receivables_path(user_id: @payment.payable&.user_id), class: "bg-gray-500 hover:bg-gray-600 text-white font-bold py-2 px-4 rounded" %>
     </div>
   <% end %>
 </div>
