@@ -425,12 +425,22 @@ class Admin::ProductsController < Admin::AdminController
       end
       
       if product_discounts.any?
-        # Filter out discounts with nil discount_percentage
-        valid_discounts = product_discounts.select { |discount| discount.discount_percentage.present? }
+        # Process discounts with percentage or fixed amount
+        percentage_discounts = product_discounts.select { |discount| discount.discount_percentage.present? }
+        fixed_amount_discounts = product_discounts.select { |discount| discount.discount_fixed_amount.present? }
         
-        if valid_discounts.any?
-          max_discount = valid_discounts.max_by(&:discount_percentage)
-          discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
+        # Apply percentage discount if any
+        if percentage_discounts.any?
+          max_percentage_discount = percentage_discounts.max_by(&:discount_percentage)
+          discounted_price = original_price * (1 - max_percentage_discount.discount_percentage / 100.0)
+        end
+        
+        # Apply fixed amount discount if any
+        if fixed_amount_discounts.any?
+          max_fixed_discount = fixed_amount_discounts.max_by(&:discount_fixed_amount)
+          discounted_price = original_price - max_fixed_discount.discount_fixed_amount
+          # Ensure price doesn't go below zero
+          discounted_price = [discounted_price, 0].max
         end
       end
 
