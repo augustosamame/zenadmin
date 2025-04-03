@@ -1,6 +1,6 @@
 class Admin::CashierShiftsController < Admin::AdminController
   requires_location_selection :new
-  before_action :set_cashier_shift, only: [ :show, :edit, :update, :close ]
+  before_action :set_cashier_shift, only: [ :show, :edit, :update, :close, :modify_initial_balance ]
 
   def index
     @cashier_shifts = if @current_location
@@ -68,6 +68,76 @@ class Admin::CashierShiftsController < Admin::AdminController
       end
     else
       redirect_to admin_cashier_shift_path(@cashier_shift), alert: "Este turno de caja ya está cerrado."
+    end
+  end
+
+  def modify_initial_balance
+    # Only allow admins to modify the initial balance
+    unless current_user.any_admin?
+      redirect_to admin_cashier_shift_path(@cashier_shift), alert: "No tienes permisos para modificar el saldo inicial."
+      return
+    end
+
+    # Only allow modifying the initial balance of open shifts
+    unless @cashier_shift.open?
+      redirect_to admin_cashier_shift_path(@cashier_shift), alert: "No se puede modificar el saldo inicial de un turno cerrado."
+      return
+    end
+
+    # Get the payment method (default to cash if not found)
+    payment_method = PaymentMethod.find_by(name: "cash")
+
+    # Convert the amount parameter to cents
+    new_amount_cents = (params[:amount].to_f * 100).to_i
+    
+    # Get the current cash balance of the cashier shift
+    current_balance = @cashier_shift.total_balance.cents
+    
+    # Calculate the difference between the new amount and the current balance
+    difference_cents = new_amount_cents - current_balance
+
+    ActiveRecord::Base.transaction do
+      if difference_cents < 0
+        # If the new amount is less than the current balance, create a cash outflow
+        cash_outflow = CashOutflow.create!(
+          cashier_shift: @cashier_shift,
+          amount_cents: difference_cents.abs,
+          paid_to: current_user,
+          description: "Ajuste de saldo (#{params[:description]})"
+        )
+        
+        # Create a cashier transaction for the outflow
+        CashierTransaction.create!(
+          cashier_shift: @cashier_shift,
+          transactable: cash_outflow,
+          amount_cents: difference_cents.abs,
+          payment_method: payment_method
+        )
+      elsif difference_cents > 0
+        # If the new amount is higher than the current balance, create a cash inflow
+        cash_inflow = CashInflow.create!(
+          cashier_shift: @cashier_shift,
+          amount_cents: difference_cents,
+          received_by: current_user,
+          description: "Ajuste de saldo inicial (#{params[:description]})"
+        )
+        
+        # Create a cashier transaction for the inflow
+        CashierTransaction.create!(
+          cashier_shift: @cashier_shift,
+          transactable: cash_inflow,
+          amount_cents: difference_cents,
+          payment_method: payment_method
+        )
+      else
+        # If the amount is the same, just add a note in the log
+        Rails.logger.info("No change in balance amount for cashier shift ##{@cashier_shift.id}")
+      end
+
+      redirect_to admin_cashier_shift_path(@cashier_shift), notice: "Saldo inicial modificado exitosamente."
+    rescue => e
+      Rails.logger.error("Failed to modify initial balance: #{e.message}")
+      redirect_to admin_cashier_shift_path(@cashier_shift), alert: "Error al modificar el saldo inicial: #{e.message}"
     end
   end
 

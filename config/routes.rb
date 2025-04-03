@@ -206,6 +206,7 @@ Rails.application.routes.draw do
     resources :cashier_shifts do
       member do
         patch :close
+        patch :modify_initial_balance
       end
     end
 

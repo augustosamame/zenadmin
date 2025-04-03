@@ -13,7 +13,7 @@
       </button>
 
       <!-- Modal container -->
-      <div data-close-cashier-modal-target="container" class="fixed inset-0 z-50 flex items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
+      <div data-close-cashier-modal-target="container" class="fixed inset-0 z-50 items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
         <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
           <div data-close-cashier-modal-target="content">
             <!-- Content will be inserted here dynamically -->
@@ -43,6 +43,68 @@
       </template>
     </div>
     
+    <% if current_user.any_admin? %>
+      <div data-controller="modify-initial-balance-modal" data-action="keydown@window->modify-initial-balance-modal#closeWithEsc">
+        <!-- Button to trigger modal -->
+        <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white ml-2" data-action="click->modify-initial-balance-modal#open" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
+          Modificar Saldo Inicial
+        </button>
+
+        <!-- Modal container -->
+        <div data-modify-initial-balance-modal-target="container" class="fixed inset-0 z-50 items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
+          <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
+            <div data-modify-initial-balance-modal-target="content">
+              <!-- Content will be inserted here dynamically -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Template for modal content -->
+        <template data-modify-initial-balance-modal-target="template" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
+          <div class="mt-3 text-center">
+            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Modificar Saldo Inicial</h3>
+            <div class="py-3 mt-2 px-7">
+              <p class="text-sm text-gray-500 dark:text-gray-400">
+                Esta acción modificará el saldo inicial de la caja. Ingrese el nuevo monto y una descripción.
+              </p>
+            </div>
+            <div class="items-center px-4 py-3">
+              <%= form_with url: modify_initial_balance_admin_cashier_shift_path(@cashier_shift), method: :patch, local: true do |form| %>
+                <div class="mb-4 text-left">
+                  <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monto Actual</label>
+                  <div class="mt-1 p-2 bg-gray-100 dark:bg-gray-600 rounded">
+                    <%= format_currency(@cashier_shift.total_balance) %>
+                  </div>
+                </div>
+                
+                <div class="mb-4 text-left">
+                  <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nuevo Monto</label>
+                  <div class="mt-1 relative rounded-md shadow-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <span class="text-gray-500 sm:text-sm">S/</span>
+                    </div>
+                    <%= form.text_field :amount, class: "block w-full pl-8 pr-12 py-2 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "0.00", required: true %>
+                  </div>
+                </div>
+                
+                <div class="mb-4 text-left">
+                  <label for="description" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Descripción</label>
+                  <%= form.text_area :description, class: "mt-1 block w-full border-gray-300 rounded-md shadow-sm dark:bg-gray-700 dark:border-gray-600 dark:text-white", rows: 2, placeholder: "Razón de la modificación", required: true %>
+                </div>
+                
+                <div class="flex justify-center mt-4">
+                  <%= form.submit 'Guardar Cambios', class: 'btn btn-primary mx-2' %>
+                  
+                  <button type="button" class="mx-2 btn btn-secondary" data-action="click->modify-initial-balance-modal#close">
+                    Cancelar
+                  </button>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </template>
+      </div>
+    <% end %>
   <% end %>
 <% end %>
 

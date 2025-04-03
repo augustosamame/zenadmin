@@ -22,6 +22,7 @@ export default class extends Controller {
     if (template) {
       this.contentTarget.innerHTML = template.innerHTML;
       this.containerTarget.classList.remove('hidden');
+      this.containerTarget.classList.add('flex'); // Add flex class when opening
     } else {
       console.error('Template not found for content ID:', contentId);
     }
@@ -31,6 +32,7 @@ export default class extends Controller {
     event?.preventDefault();
     console.log('close-cashier-modal close');
     this.containerTarget.classList.add('hidden');
+    this.containerTarget.classList.remove('flex'); // Remove flex class when closing
   }
 
   closeWithEsc(event) {

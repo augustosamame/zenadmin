@@ -210,3 +210,7 @@ application.register("uppy-upload", UppyUploadController)
 
 import WebcamController from "./webcam_controller"
 application.register("webcam", WebcamController)
+
+import ModifyInitialBalanceModalController from "./modify_initial_balance_modal_controller"
+application.register("modify-initial-balance-modal", ModifyInitialBalanceModalController)
+

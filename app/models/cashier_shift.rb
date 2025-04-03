@@ -60,11 +60,12 @@ class CashierShift < ApplicationRecord
   end
 
   def total_balance
-    total_payments = Money.new(payments.sum(:amount_cents), "PEN")
-    total_inflows = Money.new(cash_inflows.sum(:amount_cents), "PEN")
-    total_outflows = Money.new(cash_outflows.sum(:amount_cents), "PEN")
-
-    total_payments + total_inflows - total_outflows
+    # Use the cashier_transactions and their amount_for_balance method to get the correct balance
+    balance_cents = cashier_transactions.sum do |transaction|
+      transaction.amount_for_balance
+    end
+    
+    Money.new(balance_cents, "PEN")
   end
 
   def daily_balance
