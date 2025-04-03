@@ -100,6 +100,10 @@ module AdminHelper
   def show_invoice_actions(order, format = "pdf")
     content = []
 
+    if order.nota_de_venta
+      return "Nota de Venta"
+    end
+
     # Show existing system invoices with URLs
     if order.last_issued_ok_invoice_urls.present?
       content << order.last_issued_ok_invoice_urls.map do |label, url|
