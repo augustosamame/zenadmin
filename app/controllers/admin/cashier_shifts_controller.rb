@@ -62,7 +62,13 @@ class Admin::CashierShiftsController < Admin::AdminController
       return
     end
 
-    @transactions = @cashier_shift.cashier_transactions.order(created_at: :desc)
+    # Paginate transactions with proper eager loading
+    @transactions = @cashier_shift.cashier_transactions
+                                  .includes(:transactable, :payment_method)
+                                  .order(created_at: :desc)
+                                  .page(params[:page])
+                                  .per(50)
+
     @sellers = User.where(id: @cashier_shift.sales_by_seller.keys).index_by(&:id)
   end
 

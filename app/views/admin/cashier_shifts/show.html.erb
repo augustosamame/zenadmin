@@ -196,7 +196,7 @@
         </tr>
       </thead>
       <tbody class="bg-white divide-y divide-gray-200 dark:bg-gray-800 dark:divide-gray-700">
-        <% @cashier_shift.cashier_transactions.includes([:transactable, :payment_method]).order(created_at: :desc).each do |transaction| %>
+        <% @transactions.each do |transaction| %>
           <tr>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= transaction.id %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= friendly_date(current_user, transaction.created_at) %></td>
@@ -213,5 +213,10 @@
         <% end %>
       </tbody>
     </table>
+  </div>
+  
+  <!-- Pagination -->
+  <div class="mt-6 flex justify-center">
+    <%= paginate @transactions %>
   </div>
 </div>
