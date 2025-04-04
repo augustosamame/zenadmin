@@ -4,9 +4,9 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def index
     @cashier_shifts = if @current_location
-      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location } ]).where(cashier: { location_id: @current_location.id }).order(id: :desc)
+      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ]).where(cashier: { location_id: @current_location.id }).order(id: :desc)
     else
-      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location } ]).order(id: :desc)
+      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ]).order(id: :desc)
     end
     @first_shift = @cashier_shifts.first
     @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name} - #{@first_shift.cashier.name}" : "Turnos de Caja"

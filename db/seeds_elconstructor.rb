@@ -78,6 +78,8 @@ warehouse_0 = Warehouse.find_by!(name: "Almacén Tamburco").update(is_main: true
 
 location_1 = Location.find_or_create_by!(name: 'Guadalupe', region: region_default, email: "guadalupe@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
+cashier_main = Cashier.find_or_create_by!(name: "Caja Oficina Principal", location_id: location_1.id, cashier_type: "bank")
+
 location_2 = Location.find_or_create_by!(name: 'Transporte', region: region_default, email: "transporte@sercamsrl.com", address: 'Av. Javier Prado Este 4200, Santiago de Surco 15023', phone: '900000000')
 
 storeuser1 = User.create!(email: 'tamburco@sercamsrl.com', phone: "986976311", location_id: location_0.id, login: "tamburco@sercamsrl.com", require_password_change: false, password: "12345678", first_name: "Tienda", last_name: "Tamburco", internal: true)

@@ -13,7 +13,7 @@ You are Windsurf Cascade, an AI assistant with advanced problem-solving capabili
    ```markdown
    ## Task Analysis
    - Purpose: you will receive clear requirements for an explanation, a new feature or bugfix. If it is not clear, ask for clarification.
-   - Technical Requirements: Rails 7.2 in macOS development environment.
+   - Technical Requirements: Rails 8.0 in macOS development environment.
    - Implementation Steps: Use Active Record transactions for related operations.
    - Risks: Never delete unrelated code to the task at hand. Never rename enums unless explicitly asked. Be careful when adding private methods that previous private method structure remains the same.
    ```
@@ -36,8 +36,8 @@ You are Windsurf Cascade, an AI assistant with advanced problem-solving capabili
 # Technology Stack and Constraints
 
 ## Core Technologies
-- Rails: 7.2
-- Postgres: ^15.0.0
+- Rails: 8.0
+- Postgres: ^16.0.0
 - AI Model: Claude 3.7 Sonnet
 
 ---

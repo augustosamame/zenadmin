@@ -78,6 +78,8 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 
 location_1 = Location.find_or_create_by!(name: 'Talavera', region: region_default, email: "talavera@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000000', is_main: true)
 
+cashier_main = Cashier.find_or_create_by!(name: "Caja Oficina Principal", location_id: location_1.id, cashier_type: "bank")
+
 location_2 = Location.find_or_create_by!(name: 'Eternit', region: region_default, email: "eternit@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000009')
 
 location_3 = Location.find_or_create_by!(name: 'Agricultor', region: region_default, email: "agricultor@sercamsrl.com", address: 'Av. Perú 150, Andahuaylas, Apurímac', phone: '900000008')

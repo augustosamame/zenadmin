@@ -78,6 +78,10 @@ class User < ApplicationRecord
     self.roles.where(name: role_names).any?
   end
 
+  def self.first_admin_or_superadmin_user
+    User.joins(:roles).where(roles: { name: [ "admin", "super_admin" ] }).first
+  end
+
   def any_admin?
     self.roles.where(name: [ "admin", "super_admin" ]).any?
   end

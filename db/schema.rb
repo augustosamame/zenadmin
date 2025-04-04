@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_31_212700) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_04_160424) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -134,7 +134,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_31_212700) do
 
   create_table "cash_outflows", force: :cascade do |t|
     t.bigint "cashier_shift_id", null: false
-    t.bigint "paid_to_id", null: false
+    t.bigint "paid_to_id"
     t.string "custom_id", null: false
     t.text "description", null: false
     t.integer "cash_outflow_type", default: 0, null: false
