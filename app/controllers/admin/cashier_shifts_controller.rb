@@ -3,11 +3,25 @@ class Admin::CashierShiftsController < Admin::AdminController
   before_action :set_cashier_shift, only: [ :show, :edit, :update, :close, :modify_initial_balance ]
 
   def index
-    @cashier_shifts = if @current_location
-      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ]).where(cashier: { location_id: @current_location.id }).order(id: :desc)
+    # Base query with includes for eager loading
+    base_query = CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ])
+
+    # Filter by location if applicable
+    location_filtered = if @current_location
+      base_query.where(cashier: { location_id: @current_location.id })
     else
-      CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ]).order(id: :desc)
+      base_query
     end
+
+    # Only admin users can see bank-type cashier shifts
+    @cashier_shifts = if current_user.any_admin?
+      # Admin users can see all cashier shifts
+      location_filtered.order(id: :desc)
+    else
+      # Non-admin users can only see non-bank cashier shifts
+      location_filtered.joins(:cashier).where.not(cashier: { cashier_type: :bank }).order(id: :desc)
+    end
+
     @first_shift = @cashier_shifts.first
     @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name} - #{@first_shift.cashier.name}" : "Turnos de Caja"
     @datatable_options = "resource_name:'CashierShift';"
@@ -42,6 +56,12 @@ class Admin::CashierShiftsController < Admin::AdminController
   end
 
   def show
+    # Only admin users can see bank-type cashier shifts
+    if !current_user.any_admin? && @cashier_shift.cashier.cashier_type == "bank"
+      redirect_to admin_cashier_shifts_path, alert: "No tienes permisos para ver turnos de caja de tipo banco."
+      return
+    end
+
     @transactions = @cashier_shift.cashier_transactions.order(created_at: :desc)
     @sellers = User.where(id: @cashier_shift.sales_by_seller.keys).index_by(&:id)
   end
@@ -89,10 +109,10 @@ class Admin::CashierShiftsController < Admin::AdminController
 
     # Convert the amount parameter to cents
     new_amount_cents = (params[:amount].to_f * 100).to_i
-    
+
     # Get the current cash balance of the cashier shift
     current_balance = @cashier_shift.total_balance.cents
-    
+
     # Calculate the difference between the new amount and the current balance
     difference_cents = new_amount_cents - current_balance
 
@@ -105,7 +125,7 @@ class Admin::CashierShiftsController < Admin::AdminController
           paid_to: current_user,
           description: "Ajuste de saldo (#{params[:description]})"
         )
-        
+
         # Create a cashier transaction for the outflow
         CashierTransaction.create!(
           cashier_shift: @cashier_shift,
@@ -121,7 +141,7 @@ class Admin::CashierShiftsController < Admin::AdminController
           received_by: current_user,
           description: "Ajuste de saldo inicial (#{params[:description]})"
         )
-        
+
         # Create a cashier transaction for the inflow
         CashierTransaction.create!(
           cashier_shift: @cashier_shift,
