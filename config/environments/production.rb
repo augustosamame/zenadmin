@@ -1,5 +1,5 @@
 require "active_support/core_ext/integer/time"
-require 'ipaddr'
+require "ipaddr"
 
 CLOUDFLARE_IPS = %w[
   173.245.48.0/20
@@ -75,14 +75,14 @@ Rails.application.configure do
   # Can be used together with config.force_ssl for Strict-Transport-Security and secure cookies.
   # config.assume_ssl = true
 
-  config.action_controller.default_url_options = { protocol: 'https' }
+  config.action_controller.default_url_options = { protocol: "https" }
 
   # Force all access to the app over SSL, use Strict-Transport-Security, and use secure cookies.
   config.action_dispatch.trusted_proxies = CLOUDFLARE_IPS
   config.force_ssl = false
   config.assume_ssl = true
 
-  config.action_dispatch.x_sendfile_header = 'X-Accel-Redirect'
+  config.action_dispatch.x_sendfile_header = "X-Accel-Redirect"
 
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
@@ -116,7 +116,14 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   config.action_mailer.raise_delivery_errors = true
 
-  config.action_mailer.default_url_options = { host: "devtechperu.com" }
+  case ENV["CURRENT_ORGANIZATION"]
+  when "jardindelzen"
+    config.action_mailer.default_url_options = { host: "jardindelzen.devtechperu.com" }
+  when "sercams"
+    config.action_mailer.default_url_options = { host: "sercam.devtechperu.net" }
+  when "constructor"
+    config.action_mailer.default_url_options = { host: "constructor.devtechperu.net" }
+  end
 
   config.action_mailer.delivery_method = :smtp
   ActionMailer::Base.smtp_settings =

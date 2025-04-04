@@ -108,6 +108,7 @@ PaymentMethod.find_or_create_by!(name: 'banco_bcp', description: 'Banco BCP', pa
 PaymentMethod.find_or_create_by!(name: 'banco_interbank', description: 'Banco Interbank', payment_method_type: "bank")
 PaymentMethod.find_or_create_by!(name: 'banco_de_la_nacion', description: 'Banco de la Nación', payment_method_type: "bank")
 PaymentMethod.find_or_create_by!(name: 'banco_bbva', description: 'Banco BBVA', payment_method_type: "bank")
+PaymentMethod.find_or_create_by!(name: 'banco_los_andes', description: 'Cooperativa Los Andes', payment_method_type: "bank")
 PaymentMethod.find_or_create_by!(name: 'credit', description: 'Crédito', payment_method_type: "credit")
 
 setting_ecommerce_active = Setting.find_by(name: 'ecommerce_active')
