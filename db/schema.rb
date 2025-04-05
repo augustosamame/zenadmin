@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_05_190756) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_05_223556) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -281,6 +281,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_190756) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "price_list_id"
+    t.string "dni_address"
     t.index ["price_list_id"], name: "index_customers_on_price_list_id"
     t.index ["referrer_id"], name: "index_customers_on_referrer_id"
     t.index ["user_id"], name: "index_customers_on_user_id"

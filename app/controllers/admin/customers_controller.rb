@@ -19,7 +19,7 @@ class Admin::CustomersController < Admin::AdminController
       end
       format.turbo_stream do
         # Check if the request is coming from the POS modal
-        in_modal = request.referer&.include?('/admin/orders/pos') || params[:in_modal].present?
+        in_modal = request.referer&.include?("/admin/orders/pos") || params[:in_modal].present?
         render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes(:user, :price_list).all, in_modal: in_modal })
       end
     end
@@ -128,6 +128,6 @@ class Admin::CustomersController < Admin::AdminController
   private
 
     def user_params
-      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :factura_direccion, :price_list_id, :_destroy ])
+      params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :dni_address, :factura_direccion, :price_list_id, :_destroy ])
     end
 end

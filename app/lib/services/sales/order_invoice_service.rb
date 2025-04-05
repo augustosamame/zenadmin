@@ -106,7 +106,7 @@ module Services
           "customer_ruc": @order.wants_factura ? @order.customer.customer.factura_ruc : @order.customer.customer.doc_id,
           "customer_comprobante_tipo_catalog_6": invoice_customer_doc_type,
           "customer_name": @order.wants_factura ? @order.customer.customer.factura_razon_social : @order.customer.name,
-          "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : "Sin dirección",
+          "customer_address": @order.wants_factura ? @order.customer.customer.factura_direccion : (@order.customer.customer.dni_address.present? ? @order.customer.customer.dni_address : "Sin dirección"),
           "payment_term_id": determine_payment_term_id(invoice_data.payment_method),
           "payment_credit_days": determine_payment_term_id(invoice_data.payment_method) == 1 ? 0 : 30,
           "order_total": (@order.total_price.to_f).round(6),

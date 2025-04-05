@@ -29,6 +29,7 @@ setting_27 = Setting.find_or_create_by!(name: 'only_pull_cash_value_from_previou
 setting_28 = Setting.find_or_create_by!(name: 'feature_flag_price_lists', data_type: 'type_boolean', internal: false, localized_name: 'Múltiples listas de precios', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 setting_29 = Setting.find_or_create_by!(name: 'feature_flag_notas_de_venta', data_type: 'type_boolean', internal: false, localized_name: 'Permite generar notas de venta', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 setting_30 = Setting.find_or_create_by!(name: 'linked_cashiers_for_payment_methods', data_type: 'type_boolean', internal: false, localized_name: 'Cada método de pago depositará en su propia caja', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
+setting_31 = Setting.find_or_create_by!(name: 'address_for_dni', data_type: 'type_boolean', internal: false, localized_name: 'Se mostrará y enviará a SUNAT dirección para boletas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 
 Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')
