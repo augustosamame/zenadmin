@@ -15,7 +15,12 @@
       <!-- Origin Warehouse -->
       <div>
         <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "form-label" %>
-        <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
+        <% if @stock_transfer.persisted? %>
+          <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input", disabled: true %>
+          <%= form.hidden_field :origin_warehouse_id %>
+        <% else %>
+          <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
+        <% end %>
       </div>
 
       <% if @is_adjustment %>
@@ -23,7 +28,12 @@
         <!-- Adjustment Type -->
         <div id="adjustment-type-field">
           <%= form.label :adjustment_type, "Tipo de Ajuste", class: "form-label" %>
-          <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
+          <% if @stock_transfer.persisted? %>
+            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input", disabled: true %>
+            <%= form.hidden_field :adjustment_type %>
+          <% else %>
+            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
+          <% end %>
         </div>
 
         <% else %>
@@ -31,7 +41,12 @@
           <!-- Destination Warehouse -->
           <div>
           <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
-          <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
+          <% if @stock_transfer.persisted? %>
+            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input", disabled: true %>
+            <%= form.hidden_field :destination_warehouse_id %>
+          <% else %>
+            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
+          <% end %>
         </div>
 
       <% end %>
@@ -52,7 +67,12 @@
 
     <div>
       <%= form.label :is_adjustment, "Ajuste de Inventario", class: "form-label hidden" %>
-      <%= form.check_box :is_adjustment, class: "form-checkbox hidden" %>
+      <% if @stock_transfer.persisted? %>
+        <%= form.check_box :is_adjustment, class: "form-checkbox hidden", disabled: true %>
+        <%= form.hidden_field :is_adjustment %>
+      <% else %>
+        <%= form.check_box :is_adjustment, class: "form-checkbox hidden" %>
+      <% end %>
     </div>
 
     <!-- Comments Field -->
