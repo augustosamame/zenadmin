@@ -55,7 +55,7 @@
         <%= "Total Saldo Actual #{@total_pending < 0 ? 'A Favor' : 'Pendiente'}" %>
       </h3>
       <p class="text-2xl font-bold dark:text-gray-100">
-        S/ <%= number_with_precision(@total_pending, precision: 2) %>
+        S/ <%= number_with_precision(@total_pending&.abs, precision: 2) %>
       </p>
     </div>
     
