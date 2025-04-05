@@ -189,12 +189,14 @@ module AdminHelper
           turbo: false
         }
       )
-      
-      content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary ml-2", data: {
-        controller: "invoice-error-modal",
-        invoice_error_modal_order_id_param: order.id,
-        action: "click->invoice-error-modal#resendInvoice"
-      })
+
+      if format == "pdf" && order.invoices.empty?
+        content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary ml-2", data: {
+          controller: "invoice-error-modal",
+          invoice_error_modal_order_id_param: order.id,
+          action: "click->invoice-error-modal#resendInvoice"
+        })
+      end
     end
 
     # Show "Aún no emitida" message if no invoices and PDF column
