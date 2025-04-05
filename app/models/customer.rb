@@ -11,6 +11,7 @@ class Customer < ApplicationRecord
 
   before_validation :set_consumer_password, on: :create
   before_validation :set_consumer_email, on: :create
+  before_validation :set_name_if_blank_and_ruc, on: :create
   after_commit :set_consumer_role_to_user, on: :create
 
   # validates :doc_id, presence: true, uniqueness: true
@@ -38,6 +39,12 @@ class Customer < ApplicationRecord
   def first_name_or_last_name_present_if_dni
     if doc_type == "dni" && doc_id.present? && (self.user.first_name.blank? || self.user.last_name.blank?)
       errors.add(:base, "El nombre y apellido son obligatorios si se proporciona un DNI. NO PRESIONAR ENTER luego de ingresar el DNI, esperar a que se complete el formulario con los datos desde RENIEC")
+    end
+  end
+
+  def set_name_if_blank_and_ruc
+    if factura_ruc.present? && user.first_name.blank? && user.last_name.blank?
+      user.first_name = factura_razon_social
     end
   end
 
