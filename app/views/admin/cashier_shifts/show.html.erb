@@ -13,8 +13,8 @@
       </button>
 
       <!-- Modal container -->
-      <div data-close-cashier-modal-target="container" class="fixed inset-0 z-50 items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
-        <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
+      <div data-close-cashier-modal-target="container" class="hidden overflow-y-auto fixed inset-0 z-50 justify-center items-center bg-black/80" role="dialog">
+        <div class="relative p-8 m-4 w-full max-w-2xl bg-white rounded shadow-xl dark:bg-slate-700">
           <div data-close-cashier-modal-target="content">
             <!-- Content will be inserted here dynamically -->
           </div>
@@ -25,7 +25,7 @@
       <template data-close-cashier-modal-target="template" data-close-cashier-modal-content-id="closeCashierShiftModal">
         <div class="mt-3 text-center">
           <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Confirmar Cierre de Caja</h3>
-          <div class="py-3 mt-2 px-7">
+          <div class="px-7 py-3 mt-2">
             <p class="text-sm text-gray-500 dark:text-gray-400">
               ¿Estás seguro de que quieres cerrar este turno de caja? Esta acción no se puede deshacer.
             </p>
@@ -46,13 +46,13 @@
     <% if current_user.any_admin? %>
       <div data-controller="modify-initial-balance-modal" data-action="keydown@window->modify-initial-balance-modal#closeWithEsc">
         <!-- Button to trigger modal -->
-        <button type="button" class="btn bg-red-600 hover:bg-red-700 text-white ml-2" data-action="click->modify-initial-balance-modal#open" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
+        <button type="button" class="ml-2 text-white bg-red-600 btn hover:bg-red-700" data-action="click->modify-initial-balance-modal#open" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
           Modificar Saldo Inicial
         </button>
 
         <!-- Modal container -->
-        <div data-modify-initial-balance-modal-target="container" class="fixed inset-0 z-50 items-center justify-center hidden overflow-y-auto bg-black/80" role="dialog">
-          <div class="relative w-full max-w-2xl p-8 m-4 bg-white rounded shadow-xl dark:bg-slate-700">
+        <div data-modify-initial-balance-modal-target="container" class="hidden overflow-y-auto fixed inset-0 z-50 justify-center items-center bg-black/80" role="dialog">
+          <div class="relative p-8 m-4 w-full max-w-2xl bg-white rounded shadow-xl dark:bg-slate-700">
             <div data-modify-initial-balance-modal-target="content">
               <!-- Content will be inserted here dynamically -->
             </div>
@@ -63,7 +63,7 @@
         <template data-modify-initial-balance-modal-target="template" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
           <div class="mt-3 text-center">
             <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Modificar Saldo Inicial</h3>
-            <div class="py-3 mt-2 px-7">
+            <div class="px-7 py-3 mt-2">
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 Esta acción modificará el saldo inicial de la caja. Ingrese el nuevo monto y una descripción.
               </p>
@@ -72,15 +72,15 @@
               <%= form_with url: modify_initial_balance_admin_cashier_shift_path(@cashier_shift), method: :patch, local: true do |form| %>
                 <div class="mb-4 text-left">
                   <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Monto Actual</label>
-                  <div class="mt-1 p-2 bg-gray-100 dark:bg-gray-600 rounded">
+                  <div class="p-2 mt-1 bg-gray-100 rounded dark:bg-gray-600">
                     <%= format_currency(@cashier_shift.total_balance) %>
                   </div>
                 </div>
                 
                 <div class="mb-4 text-left">
                   <label for="amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Nuevo Monto</label>
-                  <div class="mt-1 relative rounded-md shadow-sm">
-                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <div class="relative mt-1 rounded-md shadow-sm">
+                    <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
                       <span class="text-gray-500 sm:text-sm">S/</span>
                     </div>
                     <%= form.text_field :amount, class: "block w-full pl-8 pr-12 py-2 sm:text-sm border-gray-300 rounded-md dark:bg-gray-700 dark:border-gray-600 dark:text-white", placeholder: "0.00", required: true %>
@@ -108,7 +108,7 @@
   <% end %>
 <% end %>
 
-<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+<div class="container p-6 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
   <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-3">
     <div>
       <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Código del Turno</p>
@@ -142,7 +142,7 @@
     <div class="col-span-3">
       <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Balance por Método de Pago</p>
       <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        <% payment_method_balances(@cashier_shift).each do |balance| %>
+        <% @payment_method_balances.each do |balance| %>
           <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
             <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= balance[:description] %></p>
             <p class="text-lg font-semibold"><%= format_currency(balance[:amount]) %></p>
@@ -151,33 +151,34 @@
       </div>
     </div>
 
-    <div class="col-span-3">
-      <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Tipo de Documento</p>
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUC</p>
-          <p class="text-lg font-semibold"><%= format_currency(@cashier_shift.total_ruc_sales) %></p>
-        </div>
-        <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
-          <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUS</p>
-          <p class="text-lg font-semibold"><%= format_currency(@cashier_shift.total_rus_sales) %></p>
-        </div>
-      </div>
-    </div>
-
-    <div class="col-span-3">
-      <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Vendedor</p>
-      <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
-        <% @cashier_shift.sales_by_seller.each do |seller_id, total| %>
-          <% seller = @sellers[seller_id] %>
+    <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
+      <div class="col-span-3">
+        <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Tipo de Documento</p>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
           <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
-            <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= seller&.name || 'Vendedor Desconocido' %></p>
-            <p class="text-lg font-semibold"><%= format_currency(total) %></p>
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUC</p>
+            <p class="text-lg font-semibold"><%= format_currency(@document_type_totals[:ruc]) %></p>
           </div>
-        <% end %>
+          <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+            <p class="text-sm font-medium text-gray-600 dark:text-gray-300">RUS</p>
+            <p class="text-lg font-semibold"><%= format_currency(@document_type_totals[:rus]) %></p>
+          </div>
+        </div>
       </div>
-    </div>
 
+      <div class="col-span-3">
+        <p class="mb-2 text-sm font-medium text-gray-500 dark:text-gray-400">Ventas por Vendedor</p>
+        <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4">
+          <% @sales_by_seller.each do |seller_id, total| %>
+            <% seller = @sellers[seller_id] %>
+            <div class="p-3 bg-gray-100 rounded-lg dark:bg-gray-700">
+              <p class="text-sm font-medium text-gray-600 dark:text-gray-300"><%= seller&.name || 'Vendedor Desconocido' %></p>
+              <p class="text-lg font-semibold"><%= format_currency(total) %></p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
   </div>
 
@@ -216,7 +217,7 @@
   </div>
   
   <!-- Pagination -->
-  <div class="mt-6 flex justify-center">
+  <div class="flex justify-center mt-6">
     <%= paginate @transactions %>
   </div>
 </div>

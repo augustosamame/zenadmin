@@ -64,12 +64,36 @@ class Admin::CashierShiftsController < Admin::AdminController
 
     # Paginate transactions with proper eager loading
     @transactions = @cashier_shift.cashier_transactions
-                                  .includes(:transactable, :payment_method)
+                                  .includes(:payment_method, transactable: { payable: {} })
                                   .order(created_at: :desc)
                                   .page(params[:page])
                                   .per(50)
 
-    @sellers = User.where(id: @cashier_shift.sales_by_seller.keys).index_by(&:id)
+    # Pre-calculate payment method balances
+    @payment_method_balances = calculate_payment_method_balances(@cashier_shift)
+
+    # Only calculate sales by seller if the feature flag is enabled
+    if $global_settings[:feature_flag_sales_attributed_to_seller]
+      # Pre-load sellers data
+      @sellers = User.where(id: @cashier_shift.sales_by_seller.keys).index_by(&:id)
+
+      # Pre-calculate sales by seller
+      @sales_by_seller = @cashier_shift.sales_by_seller
+
+      # Pre-calculate document type sales totals
+      @document_type_totals = {
+        ruc: @cashier_shift.total_ruc_sales,
+        rus: @cashier_shift.total_rus_sales
+      }
+    else
+      # Set empty values when feature is disabled to avoid calculations
+      @sellers = {}
+      @sales_by_seller = {}
+      @document_type_totals = {
+        ruc: Money.new(0, "PEN"),
+        rus: Money.new(0, "PEN")
+      }
+    end
   end
 
   def edit
@@ -175,5 +199,36 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def cashier_shift_params
     params.require(:cashier_shift).permit(:cashier_id, :opened_at, :closed_at, :total_sales_cents, :opened_by, :closed_by, :status)
+  end
+
+  def calculate_payment_method_balances(cashier_shift)
+    # Fetch all transactions with payment methods in a single query
+    all_transactions = cashier_shift.cashier_transactions.includes(:payment_method).to_a
+    transactions_by_method = all_transactions.group_by(&:payment_method)
+
+    balances = []
+
+    transactions_by_method.each do |payment_method, transactions|
+      # Use amount_for_balance to correctly account for transaction types
+      total_cents = transactions.sum(&:amount_for_balance)
+      total = Money.new(total_cents, "PEN")
+
+      # Add regular balance
+      balances << {
+        description: payment_method&.description || "Sin método",
+        amount: total
+      }
+
+      # For cash payments, add daily balance excluding previous shift
+      if payment_method&.name == "cash"
+        daily_cash = total - Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
+        balances << {
+          description: "#{payment_method.description} del Día",
+          amount: daily_cash
+        }
+      end
+    end
+
+    balances
   end
 end
