@@ -22,7 +22,9 @@
           <th class="px-4 py-2 text-left">XML</th>
           <th class="px-4 py-2 text-left">Estado Pago</th>
           <th class="px-4 py-2 text-left">Estado</th>
-          <th class="px-4 py-2 text-left">Comisión</th>
+          <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
+            <th class="px-4 py-2 text-left">Comisión</th>
+          <% end %>
           <th class="px-4 py-2 text-left">Ver</th>
           <% if current_user.any_admin_or_supervisor? %>
             <th class="px-4 py-2 text-left">Editar</th>
@@ -47,13 +49,15 @@
             <td class="px-4 py-2"><%= show_invoice_actions(order, "xml") %></td>
             <td class="px-4 py-2"><%= order.translated_payment_status %></td>
             <td class="px-4 py-2"><%= order.translated_status %></td>
-            <td class="px-4 py-2">
-            <% if order.missing_commission %>
-                <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded-md ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20">
-                  Sin comisión
-                </span>
-              <% end %>
-            </td>
+            <% if $global_settings[:feature_flag_sales_attributed_to_seller] %>
+              <td class="px-4 py-2">
+              <% if order.missing_commission %>
+                  <span class="inline-flex items-center px-2 py-1 text-xs font-medium text-red-700 bg-red-50 rounded-md ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20">
+                    Sin comisión
+                  </span>
+                <% end %>
+              </td>
+            <% end %>
             <td class="px-4 py-2">
               <%= link_to admin_order_path(order), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
                 <%= icon "eye", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>

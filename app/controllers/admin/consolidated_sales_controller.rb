@@ -165,7 +165,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
             grand_total_payment = @orders.sum { |r| r.payment_total.to_f }
             # Count the number of records instead of using order_count
             grand_total_count = @orders.length
-            
+
             # Add grand total row
             grand_total_row = [
               "TODAS LAS TIENDAS (Total: #{grand_total_count} registros)",
@@ -191,10 +191,10 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
           total_payment_amount = @orders.sum { |r| r.payment_total.to_f }
           # Count the number of records instead of using order_count
           total_count = @orders.length
-          
+
           # Get location name for the total row
           location_name = @current_location ? @current_location.name : "Todas las Tiendas"
-          
+
           # Add a total row for all payment methods
           total_row = [
             location_name,
@@ -210,7 +210,7 @@ class Admin::ConsolidatedSalesController < Admin::AdminController
             "", # No commission status for summary
             ""  # No actions for summary
           ]
-          
+
           # Add to the end of the data array so it appears at the bottom
           orders_data << total_row
         end

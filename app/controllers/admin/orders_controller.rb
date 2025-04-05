@@ -353,13 +353,18 @@ class Admin::OrdersController < Admin::AdminController
             show_invoice_actions(order, "xml"),
             order.translated_payment_status,
             order.translated_status,
-            order.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20") : "",
-            render_to_string(
-              partial: "admin/orders/view_action",
-              formats: [ :html ],
-              locals: { order: order }
-            )
           ])
+
+          # Only include the commission status column if the feature flag is enabled
+          if $global_settings[:feature_flag_sales_attributed_to_seller]
+            row << (order.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20") : "")
+          end
+
+          row << render_to_string(
+            partial: "admin/orders/view_action",
+            formats: [ :html ],
+            locals: { order: order }
+          )
 
           if current_user.any_admin_or_supervisor?
             row << render_to_string(
