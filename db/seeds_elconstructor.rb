@@ -30,7 +30,8 @@ settings = [
   { name: 'default_credit_receivable_due_date', data_type: 'type_integer', internal: false, localized_name: 'Días por defecto para vencimiento de pagos al crédito', string_value: nil, integer_value: 30, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
   { name: 'feature_flag_bank_cashiers_active', data_type: 'type_boolean', internal: false, localized_name: 'Cajas tipo banco activos', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
   { name: 'feature_flag_price_lists', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de listas de precios activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
-  { name: 'feature_flag_notas_de_venta', data_type: 'type_boolean', internal: false, localized_name: 'Permite generar notas de venta', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
+  { name: 'feature_flag_notas_de_venta', data_type: 'type_boolean', internal: false, localized_name: 'Permite generar notas de venta', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
+  { name: 'linked_cashiers_for_payment_methods', data_type: 'type_boolean', internal: false, localized_name: 'Cada método de pago depositará en su propia caja', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
 ]
 
 begin

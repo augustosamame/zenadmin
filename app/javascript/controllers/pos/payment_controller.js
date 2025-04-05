@@ -17,7 +17,7 @@ export default class extends Controller {
     // Initialize based on checkbox if it exists, otherwise use setting
     const automaticPaymentCheckbox = document.getElementById('automatic-payment');
     this.canCreateUnpaidOrders = automaticPaymentCheckbox ?
-      automaticPaymentCheckbox.checked :
+      !automaticPaymentCheckbox.checked :
       this.settingAllowsUnpaidOrders;
 
     this.maxTotalSaleWithoutCustomer = parseFloat(document.getElementById('max-total-sale-without-customer').dataset.value);
@@ -177,6 +177,9 @@ export default class extends Controller {
     );
     
     if ((canCreateUnpaidOrders || hasCreditPayment) && (!selectedCustomerId || selectedCustomerId === genericCustomerId)) {
+      console.log('Selected customer ID:', selectedCustomerId);
+      console.log('canCreateUnpaidOrders:', canCreateUnpaidOrders);
+      console.log('hasCreditPayment:', hasCreditPayment);
       this.showErrorModal(
         'Error de Validación',
         'Se debe seleccionar a un cliente para ventas al crédito.',

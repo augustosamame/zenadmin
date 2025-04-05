@@ -8,30 +8,23 @@ module Services
       # payment does not need a method to add a payment, it is already done in the payment service
 
       def create_cashier_transaction(payment)
+        if $global_settings[:linked_cashiers_for_payment_methods]
+          linked_cashier_id = payment.payment_method&.cashier_linked_id
+          if linked_cashier_id
+            @cashier_shift = CashierShift.where(cashier: Cashier.find(linked_cashier_id), status: :open).first
+            if @cashier_shift.blank?
+              @cashier_shift = CashierShift.create!(cashier: Cashier.find(linked_cashier_id), opened_by: User.with_role(:super_admin).first, total_sales_cents: 0, date: DateTime.current, opened_at: DateTime.current, status: :open)
+            end
+          end
+        end
         CashierTransaction.create!(
           cashier_shift: @cashier_shift,
           transactable: payment,
           amount_cents: payment.amount_cents,
+          currency: payment.currency,
           payment_method: payment.payment_method,
           processor_transacion_id: payment.processor_transacion_id
         )
-        if payment.payment_method.payment_method_type == "bank"
-          # also create a cashier transaction in open cashier_shift for bank
-          bank_cashier = Cashier.find_by(name: payment.payment_method.description)
-          bank_cashier_shift = CashierShift.where(cashier: bank_cashier, status: :open).first
-          opening_super_admin_user = User.with_role(:super_admin).first
-          if bank_cashier_shift.blank?
-            bank_cashier_shift = CashierShift.create!(cashier: bank_cashier, opened_by: opening_super_admin_user, total_sales_cents: 0, date: DateTime.current, opened_at: DateTime.current, status: :open)
-          end
-          CashierTransaction.create!(
-            cashier_shift: bank_cashier_shift,
-            transactable: payment,
-            amount_cents: payment.amount_cents,
-            currency: payment.currency,
-            payment_method: payment.payment_method,
-            processor_transacion_id: payment.processor_transacion_id
-          )
-        end
       end
 
       def add_cash_inflow(amount_cents, received_by, comment = nil)

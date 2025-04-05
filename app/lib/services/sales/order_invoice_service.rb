@@ -23,7 +23,7 @@ module Services
         end
 
         # dont generate einvoices for pedidosya and rappi orders
-        if [ "pedidosya", "rappi" ].include?(@order&.payments&.first&.payment_method&.name)
+        if [ "pedidosya", "rappi" ].include?(@order&.payments&.first&.payment_method&.name) && ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
           return nil
         end
 
