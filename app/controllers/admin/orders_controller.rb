@@ -14,7 +14,7 @@ class Admin::OrdersController < Admin::AdminController
     respond_to do |format|
       format.html do
         @orders = if @current_location
-          Order.includes([ :invoices, :external_invoices ])
+          Order.includes([ :invoices, :external_invoices, :location ])
               .where(location_id: @current_location.id)
               .with_commission_status
               .order(id: :desc)
@@ -280,9 +280,12 @@ class Admin::OrdersController < Admin::AdminController
 
     def datatable_json
       orders = if @current_location
-        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id).with_commission_status
+        Order.includes([ :user, :invoices, :external_invoices, :location ])
+            .where(location_id: @current_location.id)
+            .with_commission_status
       else
-        Order.includes(:user, :invoices, :location, :external_invoices).with_commission_status
+        Order.includes([ :user, :invoices, :location, :external_invoices ])
+            .with_commission_status
       end
 
       # Apply search filter

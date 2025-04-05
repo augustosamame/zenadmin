@@ -26,6 +26,12 @@ export default class extends Controller {
     console.log('maxTotalSaleWithoutCustomer', this.maxTotalSaleWithoutCustomer);
     this.isProcessing = false;
     this.priceListsEnabled = window.globalSettings && window.globalSettings.feature_flag_price_lists === true;
+    
+    // Add event listener for the "Generar Nota de Venta" checkbox
+    const notaDeVentaCheckbox = document.getElementById('nota-de-venta');
+    if (notaDeVentaCheckbox) {
+      notaDeVentaCheckbox.addEventListener('change', this.toggleFactura.bind(this));
+    }
   }
 
   togglePaymentSection(event) {
@@ -36,6 +42,31 @@ export default class extends Controller {
     } else {
       this.paymentSectionTarget.classList.add('hidden');
       this.paymentListTarget.innerHTML = '';
+    }
+    
+    // Toggle the "Emitir factura" checkbox to the opposite state
+    const confirmFacturaCheckbox = document.getElementById('confirm-factura');
+    if (confirmFacturaCheckbox) {
+      confirmFacturaCheckbox.checked = !showPaymentSection;
+    }
+  }
+  
+  toggleAutomaticPayment(event) {
+    // Toggle the automatic payment checkbox to the opposite state
+    const automaticPaymentCheckbox = document.getElementById('automatic-payment');
+    if (automaticPaymentCheckbox) {
+      automaticPaymentCheckbox.checked = !event.target.checked;
+      // Trigger the change event to update the UI
+      const changeEvent = new Event('change');
+      automaticPaymentCheckbox.dispatchEvent(changeEvent);
+    }
+  }
+  
+  toggleFactura(event) {
+    // Toggle the "Emitir factura" checkbox to the opposite state
+    const confirmFacturaCheckbox = document.getElementById('confirm-factura');
+    if (confirmFacturaCheckbox) {
+      confirmFacturaCheckbox.checked = !event.target.checked;
     }
   }
 
@@ -130,6 +161,30 @@ export default class extends Controller {
         return false;
       }
     }
+    return true;
+  }
+
+  validateCustomerForCreditSale() {
+    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    const genericCustomerId = '1'; // Assuming 1 is the ID of the generic customer, adjust if needed
+    
+    // Check if the can_create_unpaid_orders checkbox is checked
+    const canCreateUnpaidOrders = this.canCreateUnpaidOrders;
+    
+    // Check if any payment method of type "credit" is selected
+    const hasCreditPayment = Array.from(this.paymentListTarget.children).some(
+      payment => payment.dataset.methodType === 'credit' || payment.dataset.methodName === 'credit'
+    );
+    
+    if ((canCreateUnpaidOrders || hasCreditPayment) && (!selectedCustomerId || selectedCustomerId === genericCustomerId)) {
+      this.showErrorModal(
+        'Error de Validación',
+        'Se debe seleccionar a un cliente para ventas al crédito.',
+        [{ label: 'OK', classes: 'btn btn-primary', action: 'click->custom-modal#close' }]
+      );
+      return false;
+    }
+    
     return true;
   }
 
@@ -266,6 +321,12 @@ export default class extends Controller {
     // Store the original text to restore it if there's an error
     const originalText = 'Crear Venta';
 
+    // Check if a customer is selected for credit sales
+    if (!this.validateCustomerForCreditSale()) {
+      this.resetButton(button, originalText);
+      return;
+    }
+
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
     const totalDiscountAmount = parseFloat(this.totalDiscountTarget.textContent.replace(/\(S\/\s*|\)/g, ''));
     let totalPayments = 0;
@@ -278,7 +339,12 @@ export default class extends Controller {
       this.orderPaymentStatus = 'paid';
     }
 
-    if (!this.canCreateUnpaidOrders && totalPayments < totalOrderAmount) {
+    // Get the automatic payment checkbox state
+    const automaticPaymentCheckbox = document.getElementById('automatic-payment');
+    const isAutomaticPaymentChecked = automaticPaymentCheckbox ? automaticPaymentCheckbox.checked : false;
+
+    // Only allow unpaid orders if canCreateUnpaidOrders is true AND automatic payment is NOT checked
+    if (totalPayments < totalOrderAmount && (!this.canCreateUnpaidOrders || isAutomaticPaymentChecked)) {
       this.showErrorModal(
         'Error',
         'El monto total de los métodos de pago debe coincidir con el monto total del pedido.',
