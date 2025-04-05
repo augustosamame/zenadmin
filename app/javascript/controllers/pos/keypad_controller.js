@@ -23,9 +23,7 @@ export default class extends Controller {
   }
 
   handleKeyboardInput(event) {
-    // Only process keyboard input if we're in price mode
-    if (this.currentMode !== 'price') return;
-
+    // Process keyboard input for both price and quantity modes
     const orderItemsController = this.getOrderItemsController();
     if (!orderItemsController || !orderItemsController.selectedItem) return;
 
@@ -36,11 +34,21 @@ export default class extends Controller {
     }
 
     if (event.key === 'Backspace') {
-      orderItemsController.handleBackspaceForPrice();
+      if (this.currentMode === 'quantity') {
+        orderItemsController.handleBackspaceForQuantity();
+      } else if (this.currentMode === 'price') {
+        orderItemsController.handleBackspaceForPrice();
+      }
     } else if (event.key === '.') {
-      orderItemsController.handleDecimalPoint();
+      if (this.currentMode === 'price') {
+        orderItemsController.handleDecimalPoint();
+      }
     } else if (this.isNumeric(event.key)) {
-      orderItemsController.handleKeypadForPrice(event.key);
+      if (this.currentMode === 'quantity') {
+        orderItemsController.updateQuantity(event.key);
+      } else if (this.currentMode === 'price') {
+        orderItemsController.handleKeypadForPrice(event.key);
+      }
     }
   }
 
