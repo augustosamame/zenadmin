@@ -97,7 +97,11 @@ class Admin::AccountReceivablePaymentsController < Admin::AdminController
       end
 
       # Link the payment to the account receivable
-      result = @payment.update!(account_receivable: @account_receivable)
+      result = @payment.update!(
+        account_receivable: @account_receivable,
+        payable_type: "Order",
+        payable_id: @account_receivable.order_id
+      )
       Rails.logger.info("PAYMENT DEBUG: Linking payment to AR - success: #{result}, payment.account_receivable_id: #{@payment.reload.account_receivable_id}")
 
       # Create the account receivable payment
