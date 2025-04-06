@@ -34,7 +34,7 @@ class Order < ApplicationRecord
   has_many :commission_payouts, through: :commissions
   has_many :sellers, through: :commissions, source: :user
 
-  has_many :invoices, dependent: :destroy
+  has_many :invoices, dependent: :nullify
   has_many :external_invoices, dependent: :destroy
   has_many :preorders, dependent: :destroy
 
@@ -150,6 +150,12 @@ class Order < ApplicationRecord
         url: nil,
         status: :pending
       }
+    end
+  end
+
+  def nota_de_venta_link
+    if nota_de_venta
+      Rails.application.routes.url_helpers.admin_nota_de_venta_path(self, format: :pdf)
     end
   end
 
@@ -281,6 +287,103 @@ class Order < ApplicationRecord
     end
 
     base_query.order(Arel.sql("orders.custom_id DESC"))
+  end
+
+  def self.consolidated_sales_by_payment_method(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
+    # Get the sales data grouped by payment method
+    base_query = Order.select([
+      "locations.id as location_id",
+      "locations.name as location_name",
+      "payment_methods.description as payment_method",
+      "SUM(payments.amount_cents) as payment_total",
+      "'' as custom_id",
+      "NULL as order_datetime",
+      "'' as customer_name",
+      "NULL as order_total",
+      "'' as payment_tx",
+      "'' as invoice_custom_id",
+      "NULL as invoice_status",
+      "'' as invoice_url",
+      "false as missing_commission"
+    ].join(", "))
+                 .joins("INNER JOIN locations ON locations.id = orders.location_id")
+                 .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
+                 .joins("LEFT JOIN payment_methods ON payment_methods.id = payments.payment_method_id")
+                 .where("payment_methods.description IS NOT NULL") # Ensure we have a payment method
+                 .group("locations.id, locations.name, payment_methods.description")
+
+    base_query = base_query.where(location: location) if location
+    if date_range
+      start_date = date_range.begin.in_time_zone("America/Lima").beginning_of_day.utc
+      end_date = date_range.end.in_time_zone("America/Lima").end_of_day.utc
+      base_query = base_query.where("orders.order_date BETWEEN ? AND ?", start_date, end_date)
+    end
+
+    # Add ordering if specified
+    if order_column.present? && order_direction.present?
+      order_sql = case order_column
+      when "5" # payment_method
+        "payment_methods.description"
+      when "6" # payment_total
+        "SUM(payments.amount_cents)"
+      else
+        "SUM(payments.amount_cents)"
+      end
+
+      direction = order_direction.upcase
+      return base_query.order(Arel.sql("#{order_sql} #{direction}"))
+    end
+
+    base_query.order(Arel.sql("SUM(payments.amount_cents) DESC"))
+  end
+
+  def self.consolidated_sales_by_location(location_id: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
+    # Get the sales data grouped by location
+    base_query = Order.select([
+      "locations.id as location_id",
+      "locations.name as location_name",
+      "'' as payment_method", # No payment method for location summary
+      "SUM(payments.amount_cents) as payment_total",
+      "'' as custom_id",
+      "NULL as order_datetime",
+      "'' as customer_name",
+      "SUM(orders.total_price_cents) as order_total",
+      "'' as payment_tx",
+      "'' as invoice_custom_id",
+      "NULL as invoice_status",
+      "'' as invoice_url",
+      "false as missing_commission",
+      "COUNT(DISTINCT orders.id) as order_count"
+    ].join(", "))
+                 .joins("INNER JOIN locations ON locations.id = orders.location_id")
+                 .joins("LEFT JOIN payments ON payments.payable_id = orders.id AND payments.payable_type = 'Order'")
+                 .group("locations.id, locations.name")
+
+    base_query = base_query.where(location_id: location_id) if location_id
+    if date_range
+      start_date = date_range.begin.in_time_zone("America/Lima").beginning_of_day.utc
+      end_date = date_range.end.in_time_zone("America/Lima").end_of_day.utc
+      base_query = base_query.where("orders.order_date BETWEEN ? AND ?", start_date, end_date)
+    end
+
+    # Add ordering if specified
+    if order_column.present? && order_direction.present?
+      order_sql = case order_column
+      when "0" # location_name
+        "locations.name"
+      when "4" # order_total
+        "SUM(orders.total_price_cents)"
+      when "6" # payment_total
+        "SUM(payments.amount_cents)"
+      else
+        "locations.name"
+      end
+
+      direction = order_direction.upcase
+      return base_query.order(Arel.sql("#{order_sql} #{direction}"))
+    end
+
+    base_query.order(Arel.sql("locations.name ASC"))
   end
 
   def self.search_consolidated_sales_sql(search_term)

@@ -1,5 +1,5 @@
 class Invoice < ApplicationRecord
-  belongs_to :order
+  belongs_to :order, optional: true
   belongs_to :invoice_series
   has_one :invoicer, through: :invoice_series
   belongs_to :payment_method

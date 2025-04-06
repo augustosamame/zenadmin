@@ -2,9 +2,10 @@ import { Controller } from "@hotwired/stimulus"
 import ApexCharts from "apexcharts"
 
 export default class extends Controller {
-  static targets = ["teamGoals"]
+  static targets = ["teamGoals", "teamGoalsJardindelzen"]
   static values = {
-    teamGoals: Object
+    teamGoals: Object,
+    teamGoalsJardindelzen: Object
   }
 
   connect() {
@@ -43,6 +44,10 @@ export default class extends Controller {
     } else {
       console.warn("Chart data not available yet")
     }
+    
+    if (this.hasTeamGoalsJardindelzenValue) {
+      this.initializeTeamGoalsJardindelzenChart()
+    }
   }
 
   destroyChart() {
@@ -50,6 +55,11 @@ export default class extends Controller {
     if (this.teamGoalsChart) {
       this.teamGoalsChart.destroy()
       this.teamGoalsChart = null
+    }
+    
+    if (this.teamGoalsJardindelzenChart) {
+      this.teamGoalsJardindelzenChart.destroy()
+      this.teamGoalsJardindelzenChart = null
     }
   }
 
@@ -61,6 +71,17 @@ export default class extends Controller {
       this.teamGoalsChart.render()
     } else {
       console.warn("Team goals target not found")
+    }
+  }
+  
+  initializeTeamGoalsJardindelzenChart() {
+    console.log("Initializing Jardín del Zen team goals chart")
+    if (this.teamGoalsJardindelzenTarget) {
+      const options = this.getTeamGoalsJardindelzenChartOptions()
+      this.teamGoalsJardindelzenChart = new ApexCharts(this.teamGoalsJardindelzenTarget, options)
+      this.teamGoalsJardindelzenChart.render()
+    } else {
+      console.warn("Jardín del Zen team goals target not found")
     }
   }
 
@@ -144,10 +165,110 @@ export default class extends Controller {
       }
     }
   }
+  
+  getTeamGoalsJardindelzenChartOptions() {
+    const { series, annotations, maxYAxis } = this.teamGoalsJardindelzenValue
+    
+    // Get current date to determine which half of the month we're in
+    const currentDate = new Date();
+    const currentDay = currentDate.getDate();
+    
+    // Set min and max dates for x-axis based on which half of the month we're in
+    let minDate, maxDate;
+    if (currentDay <= 15) {
+      // First half of the month (1st to 15th)
+      minDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getTime();
+      maxDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 15).getTime();
+    } else {
+      // Second half of the month (16th to end)
+      minDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), 16).getTime();
+      maxDate = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0).getTime();
+    }
+
+    return {
+      series,
+      chart: {
+        type: "line",
+        height: '100%',
+        width: '100%',
+        parentHeightOffset: 0,
+        toolbar: {
+          show: false
+        },
+      },
+      stroke: {
+        curve: 'smooth',
+        width: 3
+      },
+      xaxis: {
+        type: 'datetime',
+        min: minDate, // First day of current 15-day period
+        max: maxDate  // Last day of current 15-day period
+      },
+      yaxis: {
+        title: {
+          text: 'Ventas acumuladas'
+        },
+        min: 0,
+        max: maxYAxis,
+        tickAmount: 5,
+        labels: {
+          formatter: (value) => `S/ ${parseFloat(value).toFixed(0)}`
+        }
+      },
+      annotations: {
+        yaxis: annotations.yaxis.map(annotation => {
+          const yValue = parseFloat(annotation.y);
+          return {
+            y: yValue,
+            borderColor: '#00E396',
+            label: {
+              borderColor: '#00E396',
+              style: {
+                color: '#fff',
+                background: '#00E396'
+              },
+              text: `${annotation.label.text} (S/ ${yValue.toFixed(0)})`
+            }
+          };
+        })
+      },
+      dataLabels: {
+        enabled: false
+      },
+      colors: ["#00E396"],
+      title: {
+        text: '',
+        align: 'center',
+        style: { color: "#333333" }
+      },
+      tooltip: {
+        shared: true,
+        intersect: false,
+        x: {
+          format: 'dd MMM'
+        },
+        y: {
+          formatter: (value) => `S/ ${parseFloat(value).toFixed(2)}`
+        }
+      },
+      legend: {
+        horizontalAlign: 'left'
+      }
+    }
+  }
 
   handleResize() {
     if (this.teamGoalsChart) {
       this.teamGoalsChart.updateOptions({
+        chart: {
+          width: '100%'
+        }
+      })
+    }
+    
+    if (this.teamGoalsJardindelzenChart) {
+      this.teamGoalsJardindelzenChart.updateOptions({
         chart: {
           width: '100%'
         }
@@ -159,6 +280,11 @@ export default class extends Controller {
     console.log("Team goals value changed")
     this.updateTeamGoalsChart()
   }
+  
+  teamGoalsJardindelzenValueChanged() {
+    console.log("Jardín del Zen team goals value changed")
+    this.updateTeamGoalsJardindelzenChart()
+  }
 
   updateTeamGoalsChart() {
     console.log("Updating team goals chart")
@@ -167,6 +293,16 @@ export default class extends Controller {
       this.teamGoalsChart.updateOptions(options)
     } else {
       this.initializeTeamGoalsChart()
+    }
+  }
+  
+  updateTeamGoalsJardindelzenChart() {
+    console.log("Updating Jardín del Zen team goals chart")
+    if (this.teamGoalsJardindelzenChart) {
+      const options = this.getTeamGoalsJardindelzenChartOptions()
+      this.teamGoalsJardindelzenChart.updateOptions(options)
+    } else {
+      this.initializeTeamGoalsJardindelzenChart()
     }
   }
 }

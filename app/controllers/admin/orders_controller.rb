@@ -14,7 +14,7 @@ class Admin::OrdersController < Admin::AdminController
     respond_to do |format|
       format.html do
         @orders = if @current_location
-          Order.includes([ :invoices, :external_invoices ])
+          Order.includes([ :invoices, :external_invoices, :location ])
               .where(location_id: @current_location.id)
               .with_commission_status
               .order(id: :desc)
@@ -185,13 +185,13 @@ class Admin::OrdersController < Admin::AdminController
 
   def update_payments
     @order = Order.find(params[:id])
-    
+
     begin
       Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes])
       @order.reevaluate_payment_status
-      
+
       respond_to do |format|
-        format.turbo_stream { 
+        format.turbo_stream {
           redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente"
         }
         format.html { redirect_to admin_order_path(@order), notice: "Pagos actualizados exitosamente" }
@@ -202,7 +202,7 @@ class Admin::OrdersController < Admin::AdminController
           flash[:alert] = "Error al actualizar pagos: #{e.message}"
           redirect_to edit_payments_admin_order_path(@order)
         }
-        format.html { 
+        format.html {
           flash[:alert] = "Error al actualizar pagos: #{e.message}"
           redirect_to edit_payments_admin_order_path(@order)
         }
@@ -240,7 +240,7 @@ class Admin::OrdersController < Admin::AdminController
 
     def order_params
       params.require(:order).permit(
-        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id,
+        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, :nota_de_venta,
         order_items_attributes: [ :id, :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image, :product_pack_id ],
         payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date, :_destroy ],
         sellers_attributes: [ :id, :user_id, :percentage, :amount ],
@@ -280,9 +280,12 @@ class Admin::OrdersController < Admin::AdminController
 
     def datatable_json
       orders = if @current_location
-        Order.includes(:user, :invoices, :location, :external_invoices).where(location_id: @current_location.id).with_commission_status
+        Order.includes([ :user, :invoices, :external_invoices, :location ])
+            .where(location_id: @current_location.id)
+            .with_commission_status
       else
-        Order.includes(:user, :invoices, :location, :external_invoices).with_commission_status
+        Order.includes([ :user, :invoices, :location, :external_invoices ])
+            .with_commission_status
       end
 
       # Apply search filter
@@ -352,14 +355,19 @@ class Admin::OrdersController < Admin::AdminController
             show_invoice_actions(order, "pdf"),
             show_invoice_actions(order, "xml"),
             order.translated_payment_status,
-            order.translated_status,
-            order.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20") : "",
-            render_to_string(
-              partial: "admin/orders/view_action",
-              formats: [ :html ],
-              locals: { order: order }
-            )
+            order.translated_status
           ])
+
+          # Only include the commission status column if the feature flag is enabled
+          if $global_settings[:feature_flag_sales_attributed_to_seller]
+            row << (order.missing_commission ? helpers.content_tag(:span, "Sin comisión", class: "inline-flex items-center rounded-md bg-red-50 px-2 py-1 text-xs font-medium text-red-700 ring-1 ring-inset ring-red-600/10 dark:bg-red-900/20 dark:text-red-400 dark:ring-red-500/20") : "")
+          end
+
+          row << render_to_string(
+            partial: "admin/orders/view_action",
+            formats: [ :html ],
+            locals: { order: order }
+          )
 
           if current_user.any_admin_or_supervisor?
             row << render_to_string(
@@ -369,12 +377,16 @@ class Admin::OrdersController < Admin::AdminController
             )
           end
 
-          if current_user.any_admin_or_supervisor?
-            row << render_to_string(
+          # Add void action column - always include it but conditionally show content
+          row << if current_user.any_admin_or_supervisor? || ($global_settings[:feature_flag_sellers_can_void_orders] && order.created_at > 7.days.ago)
+            render_to_string(
               partial: "admin/orders/void_action",
               formats: [ :html ],
               locals: { order: order, current_user: current_user }
             )
+          else
+            # Empty string for users without permission
+            ""
           end
 
           row

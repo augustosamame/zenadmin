@@ -41,6 +41,22 @@ es:
   notification:
     types:
       order: Venta
+  views:
+    pagination:
+      first: "&laquo; Primera"
+      last: "Última &raquo;"
+      previous: "&lsaquo; Anterior"
+      next: "Siguiente &rsaquo;"
+      truncate: "&hellip;"
+  helpers:
+    page_entries_info:
+      one_page:
+        display_entries:
+          zero: "No se encontraron %{entry_name}"
+          one: "Mostrando <b>1</b> %{entry_name}"
+          other: "Mostrando <b>%{count}</b> %{entry_name}"
+      more_pages:
+        display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
       stock_transfer:
@@ -137,7 +153,7 @@ es:
         status_list:
           active: Activo
           inactive: Inactivo
-      stock_transfer:
+      stock_adjustment:
         status_list:
           active: Activo
           inactive: Inactivo

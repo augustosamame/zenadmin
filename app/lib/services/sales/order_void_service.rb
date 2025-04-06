@@ -8,6 +8,7 @@ class Services::Sales::OrderVoidService
   def void
     success = false
     message = nil
+    voided_order = nil
 
     Audited.auditing_enabled = false
 
@@ -77,6 +78,10 @@ class Services::Sales::OrderVoidService
     end
 
     Audited.auditing_enabled = true
+
+    if success
+      VoidEinvoice.perform_async(voided_order.id)
+    end
 
     return success, message
   end

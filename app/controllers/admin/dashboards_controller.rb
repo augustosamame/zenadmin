@@ -25,6 +25,11 @@ class Admin::DashboardsController < Admin::AdminController
     set_sales_variables
     set_chart_data
     set_seller_commissions_monthly_list
+
+    # Set chart data for Jardín del Zen if needed
+    if ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
+      set_chart_data_jardindelzen
+    end
   end
 
   def sales_ranking
@@ -108,17 +113,33 @@ class Admin::DashboardsController < Admin::AdminController
     set_chart_data
     set_seller_commissions_monthly_list
 
+    # Set chart data for Jardín del Zen if needed
+    if ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
+      set_chart_data_jardindelzen
+    end
+
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: [
+        streams = [
           turbo_stream.replace("sales_count", partial: "sales_count"),
           turbo_stream.replace("sales_amount", partial: "sales_amount"),
+          turbo_stream.replace("sales_count_this_month", partial: "sales_count_this_month"),
           turbo_stream.replace("sales_amount_this_month", partial: "sales_amount_this_month"),
           turbo_stream.replace("sales_average_per_day_this_month", partial: "sales_average_per_day_this_month"),
           turbo_stream.replace("sales_dashboard_notification_feed", partial: "sales_dashboard_notification_feed"),
-          turbo_stream.replace("commission_targets_graph", partial: "commission_targets_graph"),
-          turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_list")
+          turbo_stream.replace("seller_commissions_daily_list", partial: "seller_commissions_daily_list")
         ]
+
+        # Add the appropriate commission list and graph based on organization
+        if ENV["CURRENT_ORGANIZATION"] == "jardindelzen"
+          streams << turbo_stream.replace("seller_commissions_15day_list", partial: "seller_commissions_15day_list")
+          streams << turbo_stream.replace("commission_targets_graph_jardindelzen", partial: "commission_targets_graph_jardindelzen")
+        else
+          streams << turbo_stream.replace("seller_commissions_list", partial: "seller_commissions_monthly_list")
+          streams << turbo_stream.replace("commission_targets_graph", partial: "commission_targets_graph")
+        end
+
+        render turbo_stream: streams
       end
     end
   end
@@ -129,7 +150,10 @@ class Admin::DashboardsController < Admin::AdminController
       set_sales_count_variables
       set_sales_amount_variables
       set_sales_amount_this_month_variables
+      set_sales_count_this_month_variables
       set_sales_daily_average_this_month_variables
+      set_seller_commissions_daily_list
+      set_seller_commissions_15day_list
     end
 
     def set_seller_commissions_list
@@ -151,6 +175,62 @@ class Admin::DashboardsController < Admin::AdminController
                       .order("total_commission_cents DESC")
 
       @seller_commissions_list = if @selected_location.present?
+        base_query.where(orders: { location_id: @selected_location.id })
+      else
+        base_query
+      end
+    end
+
+    def set_seller_commissions_daily_list
+      # Set the date range for today
+      today_range = Time.zone.now.beginning_of_day..Time.zone.now.end_of_day
+
+      # Create the base query to get sellers with their commission totals for today
+      base_query = User.joins(:commissions)
+                      .joins("INNER JOIN orders ON orders.id = commissions.order_id")
+                      .where(orders: { order_date: today_range })
+                      .group("users.id")
+                      .select("users.*, SUM(commissions.sale_amount_cents) as total_commission_cents")
+                      .order("total_commission_cents DESC")
+
+      # Apply location filter if a location is selected
+      @seller_commissions_daily_list = if @selected_location.present?
+        base_query.where(orders: { location_id: @selected_location.id })
+      else
+        base_query
+      end
+    end
+
+    def set_seller_commissions_15day_list
+      # Get current date
+      current_date = Time.zone.now
+
+      # Determine which half of the month we're in
+      if current_date.day <= 15
+        # First half of the month (1st to 15th)
+        start_date = current_date.beginning_of_month
+        end_date = current_date.beginning_of_month + 14.days
+        @current_15day_period_text = "1-15 #{I18n.l(current_date, format: '%B %Y')}"
+      else
+        # Second half of the month (16th to end)
+        start_date = current_date.beginning_of_month + 15.days
+        end_date = current_date.end_of_month
+        @current_15day_period_text = "16-#{current_date.end_of_month.day} #{I18n.l(current_date, format: '%B %Y')}"
+      end
+
+      # Set the date range for the current 15-day period
+      current_15day_range = start_date.beginning_of_day..end_date.end_of_day
+
+      # Create the base query to get sellers with their commission totals for the 15-day period
+      base_query = User.joins(:commissions)
+                      .joins("INNER JOIN orders ON orders.id = commissions.order_id")
+                      .where(orders: { order_date: current_15day_range })
+                      .group("users.id")
+                      .select("users.*, SUM(commissions.sale_amount_cents) as total_commission_cents")
+                      .order("total_commission_cents DESC")
+
+      # Apply location filter if a location is selected
+      @seller_commissions_15day_list = if @selected_location.present?
         base_query.where(orders: { location_id: @selected_location.id })
       else
         base_query
@@ -223,6 +303,95 @@ class Admin::DashboardsController < Admin::AdminController
       end
     end
 
+    def set_chart_data_jardindelzen
+      if @selected_location.present?
+        # Get current date
+        current_date = Time.zone.now
+
+        # Determine which half of the month we're in and get the current period
+        current_period = SellerBiweeklySalesTarget.current_year_month_period
+
+        if current_date.day <= 15
+          # First half of the month (1st to 15th)
+          start_date = current_date.beginning_of_month
+          end_date = current_date.beginning_of_month + 14.days
+          @current_15day_period_text = "1-15 #{I18n.l(current_date, format: '%B %Y')}"
+        else
+          # Second half of the month (16th to end)
+          start_date = current_date.beginning_of_month + 15.days
+          end_date = current_date.end_of_month
+          @current_15day_period_text = "16-#{current_date.end_of_month.day} #{I18n.l(current_date, format: '%B %Y')}"
+        end
+
+        # Get orders for the 15-day period
+        orders = filtered_orders.where(order_date: start_date..end_date)
+
+        # Group orders by date
+        daily_sales = orders.map { |order| [ order.order_date.to_date, order.total_price_cents ] }
+                    .group_by { |date, _| date }
+                    .transform_values { |vals| vals.sum { |_, price| price } }
+
+        # Calculate accumulated sales for each day in the period
+        cumulative_sales = []
+        running_total = 0
+
+        # Create an array of all dates in the period
+        all_dates = (start_date.to_date..end_date.to_date).to_a
+
+        # Calculate accumulated sales for each day
+        all_dates.each do |date|
+          # Skip future dates
+          next if date > current_date.to_date
+
+          # Add daily sales to running total
+          running_total += (daily_sales[date] || 0) / 100.0
+
+          # Add data point
+          timestamp = date.to_time.to_i * 1000
+          cumulative_sales << { x: timestamp, y: running_total.round(2) }
+        end
+
+        # Get the total sales target for the location from SellerBiweeklySalesTarget
+        location_target = SellerBiweeklySalesTarget
+                            .where(location_id: @selected_location.id, year_month_period: current_period)
+                            .sum(:sales_target_cents) / 100.0
+
+        # Calculate max y-axis value
+        max_sales = [ cumulative_sales.last&.dig(:y) || 0, location_target || 0 ].max
+        max_y_axis = (max_sales * 1.1).round(-2) # 10% higher than the max value, rounded to nearest 100
+
+        # Set chart data with a single annotation for the location target
+        @team_goals_jardindelzen = {
+          series: [
+            {
+              name: "Ventas acumuladas",
+              type: "line",
+              data: cumulative_sales
+            }
+          ],
+          annotations: {
+            yaxis: [
+              {
+                y: location_target.round(2),
+                borderColor: "#00E396",
+                label: {
+                  borderColor: "#00E396",
+                  style: {
+                    color: "#fff",
+                    background: "#00E396"
+                  },
+                  text: "Meta de Ventas"
+                }
+              }
+            ]
+          },
+          maxYAxis: max_y_axis
+        }
+      else
+        @team_goals_jardindelzen = { series: [], annotations: { yaxis: [] }, maxYAxis: 1000 }
+      end
+    end
+
     def generate_color(index)
       # Generate a color based on the index
       hue = (index * 137.5) % 360
@@ -253,11 +422,39 @@ class Admin::DashboardsController < Admin::AdminController
 
     def set_sales_amount_this_month_variables
       Rails.logger.info("Setting sales amount this month variables")
-      @sales_amount_this_month = (filtered_orders.where(order_date: Time.zone.now.beginning_of_month..Time.zone.now.end_of_month).sum(:total_price_cents) / 100.0).round(2)
-      @sales_amount_last_month = (filtered_orders.where(order_date: 1.month.ago.beginning_of_month..1.month.ago.end_of_month).sum(:total_price_cents) / 100.0 || 0).round(2)
+      # Get current date and time
+      current_time = Time.zone.now
+
+      # Calculate the same day and time for last month
+      same_time_last_month = current_time.prev_month
+
+      # Get sales for current month up to now
+      @sales_amount_this_month = (filtered_orders.where(order_date: current_time.beginning_of_month..current_time).sum(:total_price_cents) / 100.0).round(2)
+
+      # Get sales for last month up to the same day and time
+      @sales_amount_last_month = (filtered_orders.where(order_date: same_time_last_month.beginning_of_month..same_time_last_month).sum(:total_price_cents) / 100.0 || 0).round(2)
+
       @sales_amount_change_since_last_month = @sales_amount_this_month - @sales_amount_last_month
       @sales_amount_change_since_last_month = format_change(@sales_amount_change_since_last_month)
       @sales_amount_change_since_last_month_percentage = calculate_percentage_change(@sales_amount_this_month, @sales_amount_last_month)
+    end
+
+    def set_sales_count_this_month_variables
+      Rails.logger.info("Setting sales count this month variables")
+      # Get current date and time
+      current_time = Time.zone.now
+
+      # Calculate the same day and time for last month
+      same_time_last_month = current_time.prev_month
+
+      # Get sales count for current month up to now
+      @sales_count_this_month = filtered_orders.where(order_date: current_time.beginning_of_month..current_time).count
+
+      # Get sales count for last month up to the same day and time
+      @sales_count_last_month = filtered_orders.where(order_date: same_time_last_month.beginning_of_month..same_time_last_month).count
+
+      @sales_count_change_since_last_month = @sales_count_this_month - @sales_count_last_month
+      @sales_count_change_since_last_month_percentage = calculate_percentage_change(@sales_count_this_month, @sales_count_last_month)
     end
 
     def set_sales_daily_average_this_month_variables

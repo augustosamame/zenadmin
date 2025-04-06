@@ -5,10 +5,12 @@ class Admin::VoidedOrdersController <  Admin::AdminController
                                  .where(location_id: @current_location.id)
                                  .order(created_at: :desc)
                                  .page(params[:page])
+                                 .per(25)
     else
       @voided_orders = VoidedOrder.includes(:location, :user)
                                  .order(created_at: :desc)
                                  .page(params[:page])
+                                 .per(25)
     end
   end
 

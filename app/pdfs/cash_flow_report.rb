@@ -84,8 +84,10 @@ class CashFlowReport < Prawn::Document
               sprintf("S/ %.2f", cashier_transaction.amount)
             ]
 
-            shift_totals[cashier_transaction.payment_method.description] += cashier_transaction.amount
-            global_totals[cashier_transaction.payment_method.description] += cashier_transaction.amount
+            # Use amount_for_balance to correctly handle inflows and outflows
+            amount_for_balance = Money.new(cashier_transaction.amount_for_balance, "PEN")
+            shift_totals[cashier_transaction.payment_method.description] += amount_for_balance
+            global_totals[cashier_transaction.payment_method.description] += amount_for_balance
           end
 
           table cashier_transaction_lines_data do

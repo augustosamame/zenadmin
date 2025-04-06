@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -134,7 +134,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
 
   create_table "cash_outflows", force: :cascade do |t|
     t.bigint "cashier_shift_id", null: false
-    t.bigint "paid_to_id", null: false
+    t.bigint "paid_to_id"
     t.string "custom_id", null: false
     t.text "description", null: false
     t.integer "cash_outflow_type", default: 0, null: false
@@ -246,6 +246,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["order_id", "user_id"], name: "index_commissions_on_order_id_and_user_id"
     t.index ["order_id"], name: "index_commissions_on_order_id"
     t.index ["user_id"], name: "index_commissions_on_user_id"
   end
@@ -280,6 +281,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "price_list_id"
+    t.string "dni_address"
     t.index ["price_list_id"], name: "index_customers_on_price_list_id"
     t.index ["referrer_id"], name: "index_customers_on_referrer_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
@@ -428,7 +430,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
   end
 
   create_table "invoices", force: :cascade do |t|
-    t.bigint "order_id", null: false
+    t.bigint "order_id"
     t.bigint "invoice_series_id", null: false
     t.bigint "payment_method_id", null: false
     t.integer "amount_cents", null: false
@@ -442,6 +444,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "void_url"
+    t.text "void_sunat_response"
     t.index ["custom_id", "invoice_type", "status"], name: "index_invoices_on_custom_id_and_invoice_type_and_status", unique: true
     t.index ["invoice_series_id"], name: "index_invoices_on_invoice_series_id"
     t.index ["order_id"], name: "index_invoices_on_order_id"
@@ -576,6 +580,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.boolean "fast_stock_transfer_flag", default: true
     t.boolean "is_credit_sale", default: false
     t.integer "price_list_id"
+    t.boolean "nota_de_venta", default: false
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
@@ -600,6 +605,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.datetime "updated_at", null: false
     t.integer "payment_method_type", default: 0
     t.string "cashier_name"
+    t.integer "cashier_linked_id"
     t.index ["payment_method_type"], name: "index_payment_methods_on_payment_method_type"
   end
 
@@ -826,6 +832,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_24_051230) do
     t.decimal "weight", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "inafecto", default: false
     t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
     t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"

@@ -60,6 +60,19 @@ class WarehouseInventory < ApplicationRecord
     end
   end
 
+  def self.reconstruct_single_stock_transfer_stock(stock_transfer)
+    StockTransferLine.joins(:stock_transfer).where(stock_transfer: { id: stock_transfer.id }).each do |stock_transfer_line|
+      warehouse_inventory_origin = WarehouseInventory.find_by(warehouse: stock_transfer.origin_warehouse, product: stock_transfer_line.product)
+      if warehouse_inventory_origin
+        WarehouseInventory.reconstruct_single_inventory_stock(warehouse_inventory_origin)
+      end
+      warehouse_inventory_destination = WarehouseInventory.find_by(warehouse: stock_transfer.destination_warehouse, product: stock_transfer_line.product)
+      if warehouse_inventory_destination
+        WarehouseInventory.reconstruct_single_inventory_stock(warehouse_inventory_destination)
+      end
+    end
+  end
+
   def self.fix_all_inventory_adjustment_fields_based_on_stock(warehouse_id)
     warehouse = Warehouse.find(warehouse_id)
     warehouse_inventory_records = WarehouseInventory.where(warehouse: warehouse)

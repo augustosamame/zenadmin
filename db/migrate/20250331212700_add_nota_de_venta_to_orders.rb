@@ -1,0 +1,5 @@
+class AddNotaDeVentaToOrders < ActiveRecord::Migration[8.0]
+  def change
+    add_column :orders, :nota_de_venta, :boolean, default: false
+  end
+end

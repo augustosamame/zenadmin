@@ -305,6 +305,68 @@ module Services
         end
       end
 
+      def import_products_and_stocks_oec
+        # inventario inicial oficina principal
+        ActiveRecord::Base.transaction do
+          brand = Brand.first
+          warehouse_tamburco = Warehouse.find_by!(name: "Almacén Tamburco")
+          user_warehouse_tamburco = User.find_by!(email: "tamburco@sercamsrl.com")
+          warehouse_guadalupe = Warehouse.find_by!(name: "Almacén Guadalupe")
+          user_warehouse_guadalupe = User.find_by!(email: "guadalupe@sercamsrl.com")
+
+          tamburco_stock_transfer = StockTransfer.create!(
+            user: user_warehouse_tamburco,
+            origin_warehouse: nil, # es inventario inicial
+            destination_warehouse: warehouse_tamburco,
+            transfer_date: Time.current,
+            status: :active,
+            stage: :pending,
+          )
+          guadalupe_stock_transfer = StockTransfer.create!(
+            user: user_warehouse_guadalupe,
+            origin_warehouse: nil, # es inventario inicial
+            destination_warehouse: warehouse_guadalupe,
+            transfer_date: Time.current,
+            status: :active,
+            stage: :pending,
+          )
+
+          CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
+            break if index > (@max_rows || 100000)
+            product_name = row[0]
+            stock_tamburco = row[1]&.to_i
+            stock_guadalupe = row[2]&.to_i
+            next if stock_tamburco.blank? && stock_guadalupe.blank?
+            price = lookup_price(product_name)
+            found_product = Product.find_by("UPPER(name) = ?", product_name.strip.upcase)
+            found_product = Product.create!(
+              name: product_name.strip.titleize,
+              price_cents: price.to_f * 100,
+              discounted_price_cents: price.to_f * 100,
+              brand: brand,
+              description: product_name.strip.titleize
+            ) if found_product.nil?
+            # stock
+            if stock_tamburco.present? && stock_tamburco > 0
+              StockTransferLine.create!(
+                stock_transfer: tamburco_stock_transfer,
+                product: found_product,
+                quantity: stock_tamburco
+              )
+            end
+            if stock_guadalupe.present? && stock_guadalupe > 0
+              StockTransferLine.create!(
+                stock_transfer: guadalupe_stock_transfer,
+                product: found_product,
+                quantity: stock_guadalupe
+              )
+            end
+          end
+          tamburco_stock_transfer.finish_transfer!
+          guadalupe_stock_transfer.finish_transfer!
+        end
+      end
+
       def create_missing_products
         CSV.foreach(@file_path, headers: true).with_index(1) do |row, index|
           product_name = row[2]

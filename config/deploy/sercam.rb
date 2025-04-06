@@ -7,11 +7,11 @@
 # server "example.com", user: "deploy", roles: %w{app web}, other_property: :other_value
 # server "db.example.com", user: "deploy", roles: %w{db}
 
-server "ubuntu-template.devtechperu.net",
+server "sercam.devtechperu.net",
   user: "deploy",
   roles: %w[app db web],
   ssh_options: {
-    proxy: Net::SSH::Proxy::Command.new("cloudflared access ssh --hostname ubuntu-template.devtechperu.net"),
+    proxy: Net::SSH::Proxy::Command.new("cloudflared access ssh --hostname ssh-sercam.devtechperu.net"),
     forward_agent: true,
     auth_methods: %w[publickey]
   }

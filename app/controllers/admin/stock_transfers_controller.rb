@@ -114,18 +114,18 @@ class Admin::StockTransfersController < Admin::AdminController
   def edit
     @is_adjustment = @stock_transfer.is_adjustment
     @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
-    @destination_warehouses = Warehouse.all - @origin_warehouses
+    @destination_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : (Warehouse.all - @origin_warehouses)
     set_form_variables
   end
 
   def update
     if @stock_transfer.update(stock_transfer_params)
-      if @stock_transfer == "in_transit"
+      if @stock_transfer.in_transit?
         @stock_transfer.start_transfer! unless @stock_transfer.in_transit?
-      elsif @stock_transfer == "complete"
+      elsif @stock_transfer.complete?
         @stock_transfer.finish_transfer! unless @stock_transfer.complete?
       end
-
+      WarehouseInventory.reconstruct_single_stock_transfer_stock(@stock_transfer)
       redirect_to admin_stock_transfers_path, notice: "La transferencia de Stock se actualizó correctamente."
     else
       @is_adjustment = @stock_transfer.is_adjustment

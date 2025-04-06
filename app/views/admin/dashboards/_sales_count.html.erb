@@ -1,18 +1,16 @@
 <div id="sales_count"
-  class="col-span-12 p-4 bg-white border rounded-lg shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
+  class="col-span-12 p-4 bg-white rounded-lg border shadow-sm md:col-span-6 lg:col-span-3 border-slate-200 dark:bg-slate-800 dark:border-none">
   <div class="flex items-start space-x-3">
-    <div class="flex items-center justify-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-600/30">
+    <div class="flex justify-center items-center w-10 h-10 rounded-full bg-primary-50 dark:bg-primary-600/30">
       <%= icon "currency-dollar", classes: "w-5 h-5 text-primary-600 stroke-current dark:text-primary-300" %>
     </div>
     <div class="flex-1">
       <span class="text-sm font-medium text-primary-500 dark:text-primary-400/90">Cant de Ventas Hoy</span>
       <div class="flex items-center mt-1 mb-2 space-x-2">
         <h3 class="text-4xl font-bold tracking-tight"><%= @sales_count %></h3>
-        <p class="text-red-600"><%= @sales_count_change_since_yesterday %></p>
+        
       </div>
-      <p class="text-sm text-slate-400">vs último mes: <strong
-          class="text-slate-600 dark:text-slate-400"><%= @sales_count_change_since_last_month %></strong>
-      </p>
+      
     </div>
   </div>
 </div>

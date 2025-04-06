@@ -39,6 +39,10 @@
     </div>
 
     <div>
+      <%= form.input :inafecto, as: :boolean, label: "Inafecto (IGV 0%)", input_html: { class: "form-checkbox mr-2" }, label_html: { class: "form-label" } %>
+    </div>
+
+    <div>
       <%= form.input :status, label: "Estado", collection: Product.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
     </div>
 

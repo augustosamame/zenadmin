@@ -82,18 +82,18 @@ class Admin::AccountReceivablesController < Admin::AdminController
 
     # Find or create a special cashier and cashier shift for initial balances
     initial_balance_cashier = Cashier.find_by(name: "Caja Balance Inicial")
-    
+
     if initial_balance_cashier.nil?
       # Create a special cashier for initial balances
       initial_balance_cashier = Cashier.create!(
-        name: "Caja Balance Inicial", 
+        name: "Caja Balance Inicial",
         location: Location.first
       )
     end
-    
+
     # Find or create an open cashier shift for the initial balance cashier
     initial_balance_shift = CashierShift.where(cashier_id: initial_balance_cashier.id, status: :open).first
-    
+
     if initial_balance_shift.nil?
       # Create a new open cashier shift
       initial_balance_shift = CashierShift.create!(

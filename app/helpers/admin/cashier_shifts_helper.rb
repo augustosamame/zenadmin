@@ -5,7 +5,9 @@ module Admin::CashierShiftsHelper
     balances = []
 
     transactions_by_method.each do |payment_method, transactions|
-      total = transactions.sum(&:amount)
+      # Use amount_for_balance to correctly account for transaction types
+      total_cents = transactions.sum(&:amount_for_balance)
+      total = Money.new(total_cents, "PEN")
 
       # Add regular balance
       balances << {

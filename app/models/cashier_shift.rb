@@ -45,10 +45,10 @@ class CashierShift < ApplicationRecord
       user_id = pair.user_id
       # If percentage is available, use it, otherwise default to 1.0 (100%)
       raw_percentage = pair.percentage.present? ? pair.percentage.to_f : 100.0
-      
+
       # Special case handling for 33%
       raw_percentage = 33.3333 if raw_percentage == 33.0
-      
+
       percentage = raw_percentage / 100.0
       amount = (pair.amount_cents.to_f / 100.0) * percentage
 
@@ -60,11 +60,12 @@ class CashierShift < ApplicationRecord
   end
 
   def total_balance
-    total_payments = Money.new(payments.sum(:amount_cents), "PEN")
-    total_inflows = Money.new(cash_inflows.sum(:amount_cents), "PEN")
-    total_outflows = Money.new(cash_outflows.sum(:amount_cents), "PEN")
+    # Use the cashier_transactions and their amount_for_balance method to get the correct balance
+    balance_cents = cashier_transactions.sum do |transaction|
+      transaction.amount_for_balance
+    end
 
-    total_payments + total_inflows - total_outflows
+    Money.new(balance_cents, "PEN")
   end
 
   def daily_balance
@@ -100,9 +101,10 @@ class CashierShift < ApplicationRecord
   end
 
   def self.automatic_close_all_shifts
-    closed_by_user = User.find_by!(email: "almacen_principal@jardindelzen.com")
+    closed_by_user = User.first_admin_or_superadmin_user
     Location.all.each do |location|
       location.cashiers.each do |cashier|
+        next if cashier.cashier_type == "bank"
         cashier.cashier_shifts.open.each do |open_shift|
           Services::Sales::CashierTransactionService.new(open_shift).close_shift(closed_by_user)
         end

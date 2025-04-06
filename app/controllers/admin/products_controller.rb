@@ -75,6 +75,9 @@ class Admin::ProductsController < Admin::AdminController
     # Find media records that should be deleted
     # media_to_delete = @product.media.where.not(id: media_ids_to_keep)
 
+    # Explicitly handle the inafecto attribute
+    @product.inafecto = processed_params[:inafecto]
+
     if @product.update(processed_params)
       # Delete media that are no longer associated with the product
       # media_to_delete.each(&:destroy)
@@ -385,7 +388,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def product_params
-      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, tag_ids: [], product_category_ids: [],
+      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, :inafecto, tag_ids: [], product_category_ids: [],
       media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
       price_list_items_attributes: [:id, :price_list_id, :price])
     end
@@ -422,8 +425,23 @@ class Admin::ProductsController < Admin::AdminController
       end
       
       if product_discounts.any?
-        max_discount = product_discounts.max_by(&:discount_percentage)
-        discounted_price = original_price * (1 - max_discount.discount_percentage / 100.0)
+        # Process discounts with percentage or fixed amount
+        percentage_discounts = product_discounts.select { |discount| discount.discount_percentage.present? }
+        fixed_amount_discounts = product_discounts.select { |discount| discount.discount_fixed_amount.present? }
+        
+        # Apply percentage discount if any
+        if percentage_discounts.any?
+          max_percentage_discount = percentage_discounts.max_by(&:discount_percentage)
+          discounted_price = original_price * (1 - max_percentage_discount.discount_percentage / 100.0)
+        end
+        
+        # Apply fixed amount discount if any
+        if fixed_amount_discounts.any?
+          max_fixed_discount = fixed_amount_discounts.max_by(&:discount_fixed_amount)
+          discounted_price = original_price - max_fixed_discount.discount_fixed_amount
+          # Ensure price doesn't go below zero
+          discounted_price = [discounted_price, 0].max
+        end
       end
 
       {

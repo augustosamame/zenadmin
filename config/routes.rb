@@ -86,6 +86,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :products_stock, only: [:index]
+
     post "face_recognition", to: "face_recognition#recognize"
 
     resources :product_categories, except: [ :show ] do
@@ -206,6 +208,7 @@ Rails.application.routes.draw do
     resources :cashier_shifts do
       member do
         patch :close
+        patch :modify_initial_balance
       end
     end
 
@@ -280,6 +283,8 @@ Rails.application.routes.draw do
     get "messages", to: "page#messages"
     get "project", to: "page#project"
     get "projects", to: "page#projects"
+
+    get 'nota_de_venta/:id', to: 'nota_de_venta#show', as: 'nota_de_venta'
 
     get "edit_temp_password", to: "users#edit_temp_password", as: :edit_temp_password
     patch "update_temp_password", to: "users#update_temp_password", as: :update_temp_password

@@ -71,6 +71,15 @@
         </div>
       </div>
 
+      <% if $global_settings[:address_for_dni] %>
+        <div class="col-span-2">
+          <%= customer_form.input :dni_address,
+            label: "Dirección para boletas",
+            input_html: { class: "form-input" },
+            label_html: { class: "form-label" } %>
+        </div>
+      <% end %>
+
       <div class="flex col-span-2 space-x-4">
         <div class="flex-1">
           <%= form.input :email, 

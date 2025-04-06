@@ -100,6 +100,11 @@ module AdminHelper
   def show_invoice_actions(order, format = "pdf")
     content = []
 
+    if order.nota_de_venta
+      return link_to("Nota de Venta", order.nota_de_venta_link, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline mr-2") if format == "pdf"
+      return "" if format == "xml"
+    end
+
     # Show existing system invoices with URLs
     if order.last_issued_ok_invoice_urls.present?
       content << order.last_issued_ok_invoice_urls.map do |label, url|
@@ -185,6 +190,14 @@ module AdminHelper
           turbo: false
         }
       )
+
+      if format == "pdf" && order.invoices.empty?
+        content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary ml-2", data: {
+          controller: "invoice-error-modal",
+          invoice_error_modal_order_id_param: order.id,
+          action: "click->invoice-error-modal#resendInvoice"
+        })
+      end
     end
 
     # Show "Aún no emitida" message if no invoices and PDF column
