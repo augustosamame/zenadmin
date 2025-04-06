@@ -225,6 +225,7 @@ module Services
             # send to sunat and void invoice here. If successful, update invoice status to voided
             void_invoice_data_hash = {
               "number": invoice.custom_id,
+              "efact_client_token": invoice.invoicer.einvoice_api_key,
               "state": "cancel"
             }
 
@@ -232,9 +233,9 @@ module Services
             Rails.logger.info("Response: #{response.parsed_response}")
             Rails.logger.info("Response text: #{response.parsed_response["response_text"]}")
             if response.parsed_response["response_text"] == "OK"
-              invoice.update(sunat_status: "voided", void_url: response.parsed_response["response_url"], void_sunat_response: response.parsed_response)
+              invoice.update(status: "voided", void_url: response.parsed_response["response_url"], void_sunat_response: response.parsed_response)
             else
-              invoice.update(sunat_status: "void_error", void_sunat_response: response.parsed_response)
+              invoice.update(void_sunat_response: response.parsed_response)
               Rails.logger.error("Invoice voiding failed: #{response.parsed_response["response_text"]}")
             end
           else
