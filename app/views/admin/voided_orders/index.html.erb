@@ -37,10 +37,10 @@
                 <%= l voided_order.voided_at, format: :short %>
               </td>
               <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                <%= voided_order.void_reason.presence || "-" %>
+                <%= link_to "Ver", voided_order.last_invoice_void_url, target: "_blank" if voided_order.last_invoice_void_url.present? %>
               </td>
               <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
-                <%= voided_order.last_invoice_void_url %>
+                <%= voided_order.void_reason.presence || "-" %>
               </td>
               <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
                 <%= link_to "Ver Detalles", admin_voided_order_path(voided_order), 
