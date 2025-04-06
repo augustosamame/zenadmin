@@ -282,6 +282,8 @@ Rails.application.routes.draw do
     get "project", to: "page#project"
     get "projects", to: "page#projects"
 
+    get 'nota_de_venta/:id', to: 'nota_de_venta#show', as: 'nota_de_venta'
+
     get "edit_temp_password", to: "users#edit_temp_password", as: :edit_temp_password
     patch "update_temp_password", to: "users#update_temp_password", as: :update_temp_password
   end

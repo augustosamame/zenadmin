@@ -153,6 +153,12 @@ class Order < ApplicationRecord
     end
   end
 
+  def nota_de_venta_link
+    if nota_de_venta
+      Rails.application.routes.url_helpers.admin_nota_de_venta_path(self, format: :pdf)
+    end
+  end
+
   def update_loyalty_tier
     Services::Sales::LoyaltyTierService.new(self.user).update_loyalty_tier
   end

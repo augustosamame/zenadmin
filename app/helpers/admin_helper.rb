@@ -101,7 +101,8 @@ module AdminHelper
     content = []
 
     if order.nota_de_venta
-      return "Nota de Venta"
+      return link_to("Nota de Venta", order.nota_de_venta_link, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline mr-2") if format == "pdf"
+      return "" if format == "xml"
     end
 
     # Show existing system invoices with URLs
