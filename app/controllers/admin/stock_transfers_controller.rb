@@ -90,14 +90,14 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer.user_id = current_user.id
     if @stock_transfer.save
       @stock_transfer.finish_transfer! if @stock_transfer.origin_warehouse_id.nil? # inventario inicial
-      
+
       # Create guia if requested and allowed by settings
-      if !@stock_transfer.is_adjustment && 
-         params[:stock_transfer][:create_guia] == "1" && 
-         $global_settings[:show_sunat_guia_for_stock_transfers]
-        Services::Inventory::StockTransferGuiaService.new(@stock_transfer).create_guias
+      if !@stock_transfer.is_adjustment &&
+         params[:stock_transfer][:create_guia] == "1" &&
+         $global_settings[:show_sunat_guia_for_stock_transfers] # && ENV["RAILS_ENV"] == "production"
+        GenerateEguiaFromStockTransfer.perform_async(@stock_transfer.id)
       end
-      
+
       if @stock_transfer.is_adjustment
         @stock_transfer.finish_transfer!
         redirect_to index_stock_adjustments_admin_stock_transfers_path, notice: "El ajuste de Stock se creó correctamente."

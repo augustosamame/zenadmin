@@ -59,6 +59,10 @@ es:
         display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
+      guia_series:
+        guia_type_list:
+          guia_remision: Guía de Remisión
+          guia_transportista: Guía de Remisión Transportista
       stock_transfer:
         status_list:
           active: Activo

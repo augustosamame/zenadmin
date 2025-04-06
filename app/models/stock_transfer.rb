@@ -33,6 +33,8 @@ class StockTransfer < ApplicationRecord
   has_many :in_transit_stocks, dependent: :destroy
   has_many :notifications, as: :notifiable, dependent: :destroy
 
+  after_save :set_date_guia
+
   before_destroy :check_if_can_be_destroyed, prepend: true
   before_destroy :cache_lines, prepend: true
   before_destroy :revert_stocks
@@ -88,11 +90,15 @@ class StockTransfer < ApplicationRecord
     end
   end
 
+  def set_date_guia
+    self.date_guia ||= self.created_at
+  end
+
   def revert_stocks
     Rails.logger.info "Starting revert_stocks for StockTransfer ##{id}"
     Rails.logger.info "Stage: #{stage}, Current State: #{aasm.current_state}"
     Rails.logger.info "Number of cached lines: #{cached_lines&.size}"
-    
+
     unless cached_lines.present?
       Rails.logger.error "No cached lines found for StockTransfer ##{id}, cannot revert stocks"
       return

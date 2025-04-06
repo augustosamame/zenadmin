@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_06_222126) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -352,6 +352,16 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
     t.index ["invoicer_id"], name: "index_guia_series_on_invoicer_id"
   end
 
+  create_table "guia_series_mappings", force: :cascade do |t|
+    t.bigint "guia_series_id", null: false
+    t.bigint "location_id", null: false
+    t.boolean "default", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["guia_series_id"], name: "index_guia_series_mappings_on_guia_series_id"
+    t.index ["location_id"], name: "index_guia_series_mappings_on_location_id"
+  end
+
   create_table "guias", force: :cascade do |t|
     t.bigint "stock_transfer_id", null: false
     t.bigint "guia_series_id", null: false
@@ -424,6 +434,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "address"
     t.index ["name"], name: "index_invoicers_on_name", unique: true
     t.index ["region_id"], name: "index_invoicers_on_region_id"
     t.index ["ruc"], name: "index_invoicers_on_ruc", unique: true
@@ -833,6 +844,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "inafecto", default: false
+    t.string "unit_of_measure", default: "NIU"
     t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
     t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"
@@ -981,6 +993,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "planned_stock_transfer_id"
+    t.datetime "date_guia"
     t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
@@ -1175,6 +1188,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
   add_foreign_key "external_invoices", "orders"
   add_foreign_key "factory_factories", "regions"
   add_foreign_key "guia_series", "invoicers"
+  add_foreign_key "guia_series_mappings", "guia_series"
+  add_foreign_key "guia_series_mappings", "locations"
   add_foreign_key "guias", "guia_series"
   add_foreign_key "guias", "stock_transfers"
   add_foreign_key "in_transit_stocks", "products"
