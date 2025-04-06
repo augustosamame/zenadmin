@@ -29,9 +29,7 @@
           <% if current_user.any_admin_or_supervisor? %>
             <th class="px-4 py-2 text-left">Editar</th>
           <% end %>
-          <% if current_user.any_admin_or_supervisor? || $global_settings[:feature_flag_sellers_can_void_orders] %>
-            <th class="px-4 py-2 text-left">Anular</th>
-          <% end %>
+          <th class="px-4 py-2 text-left">Anular</th>
         </tr>
       </thead>
       <tbody>
@@ -72,13 +70,13 @@
                 <% end %>
               </td>
             <% end %>
-            <% if current_user.any_admin_or_supervisor? || $global_settings[:feature_flag_sellers_can_void_orders] %>
-              <td class="px-4 py-2">
-                <%= link_to void_admin_order_path(order), method: :post, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+            <td class="px-4 py-2">
+              <% if current_user.any_admin_or_supervisor? || ($global_settings[:feature_flag_sellers_can_void_orders] && order.created_at > 3.days.ago) %>
+                <%= link_to void_admin_order_path(order), data: { turbo_confirm: "¿Estás seguro de que deseas anular esta orden?", turbo_method: :post }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
                   <%= icon "x-mark", classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
                 <% end %>
-              </td>
-            <% end %>
+              <% end %>
+            </td>
           </tr>
         <% end %>
       </tbody>

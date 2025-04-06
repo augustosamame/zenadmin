@@ -377,12 +377,16 @@ class Admin::OrdersController < Admin::AdminController
             )
           end
 
-          if current_user.any_admin_or_supervisor? || $global_settings[:feature_flag_sellers_can_void_orders]
-            row << render_to_string(
+          # Add void action column - always include it but conditionally show content
+          row << if current_user.any_admin_or_supervisor? || ($global_settings[:feature_flag_sellers_can_void_orders] && order.created_at > 7.days.ago)
+            render_to_string(
               partial: "admin/orders/void_action",
               formats: [ :html ],
               locals: { order: order, current_user: current_user }
             )
+          else
+            # Empty string for users without permission
+            ""
           end
 
           row
