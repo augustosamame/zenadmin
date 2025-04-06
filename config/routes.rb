@@ -86,6 +86,8 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :products_stock, only: [:index]
+
     post "face_recognition", to: "face_recognition#recognize"
 
     resources :product_categories, except: [ :show ] do
