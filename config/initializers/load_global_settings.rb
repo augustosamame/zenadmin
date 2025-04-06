@@ -19,7 +19,8 @@ Rails.application.config.after_initialize do
     { name: :logo_path, default: "logo_jardin_del_zen.png", data_type: "type_string", localized_name: "Ruta del logo", internal: false },
     { name: :feature_flag_notas_de_venta, default: false, data_type: "type_boolean", localized_name: "Permite generar notas de venta", internal: false },
     { name: :linked_cashiers_for_payment_methods, default: false, data_type: "type_boolean", localized_name: "Cada método de pago depositará en su propia caja", internal: false },
-    { name: :address_for_dni, default: false, data_type: "type_boolean", localized_name: "Se mostrará y enviará a SUNAT dirección para boletas", internal: false }
+    { name: :address_for_dni, default: false, data_type: "type_boolean", localized_name: "Se mostrará y enviará a SUNAT dirección para boletas", internal: false },
+    { name: :feature_flag_sellers_can_void_orders, default: false, data_type: "type_boolean", localized_name: "Vendedores pueden anular órdenes", internal: false }
   ]
 
   def load_global_settings

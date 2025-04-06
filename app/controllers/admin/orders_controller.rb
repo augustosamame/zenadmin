@@ -355,7 +355,7 @@ class Admin::OrdersController < Admin::AdminController
             show_invoice_actions(order, "pdf"),
             show_invoice_actions(order, "xml"),
             order.translated_payment_status,
-            order.translated_status,
+            order.translated_status
           ])
 
           # Only include the commission status column if the feature flag is enabled
@@ -377,7 +377,7 @@ class Admin::OrdersController < Admin::AdminController
             )
           end
 
-          if current_user.any_admin_or_supervisor?
+          if current_user.any_admin_or_supervisor? || $global_settings[:feature_flag_sellers_can_void_orders]
             row << render_to_string(
               partial: "admin/orders/void_action",
               formats: [ :html ],

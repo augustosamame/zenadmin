@@ -32,7 +32,8 @@ settings = [
   { name: 'feature_flag_price_lists', data_type: 'type_boolean', internal: false, localized_name: 'Módulo de listas de precios activo', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
   { name: 'feature_flag_notas_de_venta', data_type: 'type_boolean', internal: false, localized_name: 'Permite generar notas de venta', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
   { name: 'linked_cashiers_for_payment_methods', data_type: 'type_boolean', internal: false, localized_name: 'Cada método de pago depositará en su propia caja', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
-  { name: 'address_for_dni', data_type: 'type_boolean', internal: false, localized_name: 'Se mostrará y enviará a SUNAT dirección para boletas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
+  { name: 'address_for_dni', data_type: 'type_boolean', internal: false, localized_name: 'Se mostrará y enviará a SUNAT dirección para boletas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' },
+  { name: 'feature_flag_sellers_can_void_orders', data_type: 'type_boolean', internal: false, localized_name: 'Vendedores pueden anular órdenes', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active' }
 ]
 
 begin

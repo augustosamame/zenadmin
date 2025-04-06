@@ -16,5 +16,13 @@ module Integrations
       }
       self.class.post("/invoice", body: invoice_data, headers: headers)
     end
+
+    def anular_comprobante(invoice_data)
+      headers = {
+        "Content-Type" => "application/json",
+        "authorization" => "#{JSON.parse(invoice_data)['efact_client_token']}"
+      }
+      self.class.post("/invoice", body: invoice_data, headers: headers)
+    end
   end
 end

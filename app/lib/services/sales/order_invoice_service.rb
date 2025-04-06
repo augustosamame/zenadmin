@@ -211,6 +211,38 @@ module Services
         invoice_data
       end
 
+      def void_invoice
+        return if @order.invoice_list.blank?
+
+        # Split the comma-separated invoice_list string into an array of invoice custom IDs
+        invoice_custom_ids = @order.invoice_list.split(", ").map(&:strip)
+
+        invoice_custom_ids.each do |invoice_custom_id|
+          # Find the invoice by custom_id
+          invoice = Invoice.find_by(custom_id: invoice_custom_id)
+
+          if invoice && invoice.status == "issued"
+            # send to sunat and void invoice here. If successful, update invoice status to voided
+            void_invoice_data_hash = {
+              "number": invoice.custom_id,
+              "state": "cancel"
+            }
+
+            response = Integrations::Nubefact.new.anular_comprobante(void_invoice_data_hash.to_json)
+            Rails.logger.info("Response: #{response.parsed_response}")
+            Rails.logger.info("Response text: #{response.parsed_response["response_text"]}")
+            if response.parsed_response["response_text"] == "OK"
+              invoice.update(sunat_status: "voided", void_url: response.parsed_response["response_url"], void_sunat_response: response.parsed_response)
+            else
+              invoice.update(sunat_status: "void_error", void_sunat_response: response.parsed_response)
+              Rails.logger.error("Invoice voiding failed: #{response.parsed_response["response_text"]}")
+            end
+          else
+            Rails.logger.error("Invoice with custom_id #{invoice_custom_id} not found")
+          end
+        end
+      end
+
       private
 
       def invoice_customer_doc_type

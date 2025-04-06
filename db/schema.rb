@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_05_223556) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_05_235331) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -444,6 +444,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_05_223556) do
     t.integer "status", default: 0, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "void_url"
+    t.text "void_sunat_response"
     t.index ["custom_id", "invoice_type", "status"], name: "index_invoices_on_custom_id_and_invoice_type_and_status", unique: true
     t.index ["invoice_series_id"], name: "index_invoices_on_invoice_series_id"
     t.index ["order_id"], name: "index_invoices_on_order_id"
