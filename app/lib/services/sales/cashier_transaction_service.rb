@@ -23,8 +23,10 @@ module Services
           amount_cents: payment.amount_cents,
           currency: payment.currency,
           payment_method: payment.payment_method,
-          processor_transacion_id: payment.processor_transacion_id
+          processor_transacion_id: payment.processor_transacion_id,
+          created_at: payment.payment_date
         )
+        payment.update_columns(cashier_shift_id: @cashier_shift.id)
       end
 
       def add_cash_inflow(amount_cents, received_by, comment = nil)

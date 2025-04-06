@@ -107,10 +107,6 @@
             <td class="px-4 py-2"><%= payment.translated_status %></td>
             <td class="px-4 py-2">
               <div class="flex space-x-2">
-                <%= link_to admin_payment_path(payment), 
-                    class: "btn btn-primary" do %>
-                  <i class="mr-1 fas fa-eye"></i> Ver
-                <% end %>
                 
                 <%= link_to new_admin_account_receivable_payment_path(payment_id: payment.id), 
                     class: "btn btn-secondary" do %>

@@ -74,6 +74,37 @@
       </div>
     </div>
 
+    <!-- Created at Date Field and Cashier Shift selection - side by side -->
+    <% if current_user.any_admin_or_supervisor? %>
+      <div class="grid grid-cols-1 gap-4 mt-6 md:grid-cols-2">
+        <div>
+          <%= form.association :cashier_shift,
+              collection: @open_cashier_shifts,
+              label: "Turnos de Caja Abiertos",
+              prompt: "Seleccione turno de caja",
+              label_method: lambda { |shift| "#{shift.cashier.name}" },
+              input_html: { 
+                class: "form-input",
+                data: {
+                  controller: "select",
+                  select_placeholder_value: "Seleccione turno de caja"
+                }
+              },
+              label_html: { class: "form-label" } %>
+        </div>
+        <div>
+          <%= form.label :payment_date, "Fecha de Pago", class: "form-label" %>
+          <div class="relative" data-controller="payment-date-picker">
+            <%= form.text_field :payment_date,
+                value: Time.current.strftime('%Y-%m-%dT%H:%M'),
+                class: "form-input w-full",
+                type: "datetime-local",
+                data: { payment_date_picker_target: "input" } %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
     <!-- Comments -->
     <div class="mt-6">
       <%= form.input :comment,
