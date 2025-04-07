@@ -125,6 +125,15 @@ class Admin::StockTransfersController < Admin::AdminController
       elsif @stock_transfer.complete?
         @stock_transfer.finish_transfer! unless @stock_transfer.complete?
       end
+      
+      # Create guia if requested and allowed by settings
+      if !@stock_transfer.is_adjustment &&
+         params[:stock_transfer][:create_guia] == "1" &&
+         $global_settings[:show_sunat_guia_for_stock_transfers] &&
+         @stock_transfer.guias.empty?
+        GenerateEguiaFromStockTransfer.perform_async(@stock_transfer.id)
+      end
+      
       WarehouseInventory.reconstruct_single_stock_transfer_stock(@stock_transfer)
       redirect_to admin_stock_transfers_path, notice: "La transferencia de Stock se actualizó correctamente."
     else
