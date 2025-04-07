@@ -76,6 +76,7 @@ module Services
           "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%Y-%m-%d") || Time.current.strftime("%Y-%m-%d"),
           "envio_descripcion_traslado": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "envio_unidad_medida_peso": "KGM",
+          "envio_modalidad_traslado": "02",
           "observaciones": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "move_lines": guia_lines
         }
