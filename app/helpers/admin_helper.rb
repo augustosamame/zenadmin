@@ -73,6 +73,17 @@ module AdminHelper
     end
   end
 
+  def get_header_title_cash_flow(transactable_type, cashier_shift)
+    case transactable_type
+    when "cash_outflow"
+      "Agregar Salida de Dinero desde #{name_with_location_cashier(cashier_shift.cashier)}"
+    when "cash_inflow"
+      "Agregar Entrada de Dinero hacia #{name_with_location_cashier(cashier_shift.cashier)}"
+    else
+      raise "invalid transactable type"
+    end
+  end
+
   def friendly_transactable_object_custom_id(transaction)
     case transaction&.transactable&.class&.name
     when "Payment"

@@ -157,7 +157,7 @@
     <div class="relative flex flex-wrap items-center justify-between">
       <% if local_assigns[:header_title].present? %>
         <% if local_assigns[:back_icon] %>
-          <%= link_to request.referer, class: "text-white hover:text-primary-500" do %>
+          <%= link_to local_assigns[:back_path] || request.referer, class: "text-white hover:text-primary-500" do %>
             <%= icon "arrow-left-circle", classes: "w-8 h-8 mr-4" %>
           <% end %>
         <% end %>

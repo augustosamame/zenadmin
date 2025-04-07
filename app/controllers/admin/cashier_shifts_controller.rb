@@ -23,7 +23,7 @@ class Admin::CashierShiftsController < Admin::AdminController
     end
 
     @first_shift = @cashier_shifts.first
-    @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name} - #{@first_shift.cashier.name}" : "Turnos de Caja"
+    @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name}" : "Turnos de Caja"
     @datatable_options = "resource_name:'CashierShift';"
   end
 
@@ -195,6 +195,8 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def set_cashier_shift
     @cashier_shift = CashierShift.find(params[:id])
+    @current_cashier = @cashier_shift.cashier
+    @current_cashier_shift = @cashier_shift
   end
 
   def cashier_shift_params

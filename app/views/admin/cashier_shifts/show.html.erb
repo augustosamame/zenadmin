@@ -1,4 +1,4 @@
-<%= render "shared/admin/nav", { header_title: "Detalles de #{@cashier_shift.cashier.name}", back_icon: true } do %>
+<%= render "shared/admin/nav", { header_title: "Detalles de #{@cashier_shift.cashier.name}", back_icon: true, back_path: admin_cashier_shifts_path } do %>
   <% if current_user.any_admin? %>
     <%= link_to 'Editar', edit_admin_cashier_shift_path(@cashier_shift), class: 'btn btn-secondary mr-2' %>
   <% end %>
