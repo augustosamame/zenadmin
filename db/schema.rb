@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_06_222126) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_07_034927) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -363,7 +363,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_06_222126) do
   end
 
   create_table "guias", force: :cascade do |t|
-    t.bigint "stock_transfer_id", null: false
+    t.bigint "stock_transfer_id"
     t.bigint "guia_series_id", null: false
     t.string "custom_id"
     t.integer "amount"

@@ -1,6 +1,8 @@
 # app/models/guia.rb
 class Guia < ApplicationRecord
-  belongs_to :stock_transfer
+  self.table_name = "guias"
+
+  belongs_to :stock_transfer, optional: true
   belongs_to :guia_series
   has_one :invoicer, through: :guia_series
 
