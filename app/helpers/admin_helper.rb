@@ -163,7 +163,7 @@ module AdminHelper
         modal_content << button_tag("Error", type: "button", class: "text-red-600 underline cursor-pointer", data: { action: "click->invoice-error-modal#open" })
         modal_content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary", data: {
           action: "click->invoice-error-modal#resendInvoice",
-          invoice_error_modal_order_id_param: order.id
+          invoice_error_modal_order_id_value: order.id
         })
         modal_content << content_tag(:div, class: "hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full", data: { invoice_error_modal_target: "modal" }) do
           inner_modal = []
@@ -194,7 +194,7 @@ module AdminHelper
       if format == "pdf" && order.invoices.empty?
         content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary ml-2", data: {
           controller: "invoice-error-modal",
-          invoice_error_modal_order_id_param: order.id,
+          invoice_error_modal_order_id_value: order.id,
           action: "click->invoice-error-modal#resendInvoice"
         })
       end

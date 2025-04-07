@@ -3,8 +3,8 @@
   <%= render 'shared/form_errors', model: @stock_transfer %>
 
   <!-- Header Section -->
-  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
-    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+  <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
 
       <!-- Transfer Date -->
       <div>
@@ -52,7 +52,7 @@
       <% end %>
     </div>
 
-      <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+      <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
         <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
           <div>
             <%= form.label :guia, "Número de Guía", class: "form-label" %>
@@ -60,7 +60,7 @@
           </div>
           
           <div class="flex items-center">
-            <%= form.check_box :create_guia, { checked: true, class: "form-checkbox mr-2" } %>
+            <%= form.check_box :create_guia, { checked: false, class: "form-checkbox mr-2" } %>
             <%= form.label :create_guia, "Generar Guía de Remisión", class: "form-label mb-0" %>
           </div>
         <% end %>
@@ -94,7 +94,7 @@
     </div>
 
   <!-- Products Section -->
-    <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
       <div class="flex items-end space-x-4">
         <div id="stock-transfer-form-lines" class="flex-grow" data-stock-transfer-form-target="lines">
           <%= form.simple_fields_for :stock_transfer_lines do |line_form| %>
