@@ -72,7 +72,7 @@ class Payment < ApplicationRecord
       "#{payable_type.underscore.humanize} #{payable&.custom_id}"
     end
 
-    "Pago de #{payable_name}"
+    "Pago de #{payable_name} #{self.location&.name}"
   end
 
   def payable_attributes=(attributes)
