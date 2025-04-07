@@ -64,6 +64,7 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def create
     @requisition = Requisition.new(requisition_params)
+    @requisition.warehouse_id = @requisition.location&.warehouses&.first&.id
     @requisition.user_id = current_user.id
     @requisition.requisition_type = "manual"
 
@@ -112,6 +113,7 @@ class Admin::RequisitionsController < Admin::AdminController
   def edit
     # Optimize edit action with proper eager loading
     @requisition = Requisition.find(params[:id])
+    @requisition.update_columns(warehouse_id: @requisition.location&.warehouses&.first&.id)
     @current_warehouse = @requisition.warehouse
 
     @requisition_lines = RequisitionLine
