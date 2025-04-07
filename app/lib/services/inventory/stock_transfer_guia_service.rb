@@ -75,6 +75,7 @@ module Services
           "efact_client_token": guia_series.invoicer.einvoice_api_key,
           "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%Y-%m-%d") || Time.current.strftime("%Y-%m-%d"),
           "envio_descripcion_traslado": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
+          "envio_unidad_medida_peso": "KGM",
           "observaciones": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "move_lines": guia_lines
         }
@@ -85,7 +86,7 @@ module Services
 
         guia = Guia.new(
           stock_transfer: @stock_transfer,
-          custom_id: "#{guia_data[:serie]}-#{guia_data[:correlativo]}",
+          custom_id: guia_data[:correlativo],
           guia_series: guia_series,
           amount: @stock_transfer.total_products,
           guia_type: "guia_remision",
