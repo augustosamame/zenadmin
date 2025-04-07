@@ -1,0 +1,10 @@
+<%= render "shared/admin/nav", { header_title: "Editar Transportista" } do %>
+  <%= link_to "Volver a Transportistas", admin_transportistas_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" %>
+<% end %>
+
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-3xl mx-auto">
+    <h1 class="text-2xl font-semibold text-gray-900 mb-6">Editar Transportista</h1>
+    <%= render 'form', transportista: @transportista %>
+  </div>
+</div>

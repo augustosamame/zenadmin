@@ -54,8 +54,9 @@ module Services
           "envio_codigo_traslado": "04",
           "guia_tipo_doc_sent_to_efact": guia_series.guia_type == "guia_remision" ? "remitente" : "transportista",
           "tipo_doc": "09",
-          "date_guia": @stock_transfer.date_guia&.strftime("%Y-%m-%d") || Time.current.strftime("%Y-%m-%d"),
-          "correlativo": guia_series.next_invoice_number,
+          "date_guia": @stock_transfer.date_guia&.strftime("%d-%m-%Y") || Time.current.strftime("%d-%m-%Y"),
+          "datetime_guia": @stock_transfer.date_guia&.strftime("%d-%m-%Y %H:%M:%S") || Time.current.strftime("%d-%m-%Y %H:%M:%S"),
+          "correlativo": guia_series.next_invoice_number.split("-").last,
           "stock_transfer_custom_id": @stock_transfer.custom_id,
           "document_type": "09", # 09 is the code for Guia de Remision
           "destinatario_tipo_doc": "6", # RUC
@@ -73,7 +74,7 @@ module Services
           "transfer_reason": "01", # 01 is the code for Sale
           "transport_mode": "01", # 01 is the code for Public transport
           "efact_client_token": guia_series.invoicer.einvoice_api_key,
-          "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%Y-%m-%d") || Time.current.strftime("%Y-%m-%d"),
+          "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%d-%m-%Y") || Time.current.strftime("%d-%m-%Y"),
           "envio_descripcion_traslado": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "envio_peso_bruto_total": 10,
           "envio_unidad_medida_peso": "KGM",
@@ -83,7 +84,19 @@ module Services
           "llegada_ubigeo": "030109",
           "llegada_direccion": @stock_transfer.destination_warehouse.location.address,
           "observaciones": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
-          "move_lines": guia_lines
+          "move_lines": guia_lines,
+          # Additional fields required by Nubefact
+          "transportista_indicador_m1l": nil,
+          "transportista_tipo_doc": "6", # RUC
+          "transportista_num_doc": guia_series.invoicer.ruc,
+          "transportista_razon_social": guia_series.invoicer.razon_social,
+          "transportista_numero_mtc": nil,
+          "transportista_chofer_tipo_doc": "1", # DNI
+          "transportista_chofer_num_doc": "09344556",
+          "transportista_chofer_num_licencia": "Q09344556",
+          "transportista_chofer_nombres": "Augusto",
+          "transportista_chofer_apellidos": "Samame Barrientos",
+          "transportista_placa": "ABC-123"
         }
 
         response = Integrations::Nubefact.new.emitir_guia(guia_data.to_json)
@@ -92,7 +105,7 @@ module Services
 
         guia = Guia.new(
           stock_transfer: @stock_transfer,
-          custom_id: guia_data[:correlativo],
+          custom_id: "#{guia_data[:serie]}-#{guia_data[:correlativo]}",
           guia_series: guia_series,
           amount: @stock_transfer.total_products,
           guia_type: "guia_remision",

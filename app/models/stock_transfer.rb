@@ -91,7 +91,7 @@ class StockTransfer < ApplicationRecord
   end
 
   def set_date_guia
-    self.date_guia ||= self.created_at
+    self.date_guia = self.transfer_date
   end
 
   def revert_stocks

@@ -1,0 +1,125 @@
+<%= simple_form_for(@transportista, url: @transportista.new_record? ? admin_transportistas_path : admin_transportista_path(@transportista), html: { class: "space-y-8 divide-y divide-gray-200", data: { controller: "transportista-form" } }) do |form| %>
+  <div class="space-y-8 divide-y divide-gray-200">
+    <div>
+      <div>
+        <h3 class="text-lg font-medium leading-6 text-gray-900">Información del Transportista</h3>
+        <p class="mt-1 text-sm text-gray-500">Ingrese los datos del transportista para las guías de remisión.</p>
+      </div>
+
+      <% if @transportista.errors.any? %>
+        <div class="p-4 mt-4 bg-red-50 rounded-md">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="w-5 h-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3">
+              <h3 class="text-sm font-medium text-red-800">Se encontraron <%= pluralize(@transportista.errors.count, "error") %></h3>
+              <div class="mt-2 text-sm text-red-700">
+                <ul class="pl-5 space-y-1 list-disc">
+                  <% @transportista.errors.full_messages.each do |message| %>
+                    <li><%= message %></li>
+                  <% end %>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+
+      <div class="grid grid-cols-1 gap-x-4 gap-y-6 mt-6 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <%= form.input :transportista_type, 
+              collection: Transportista.transportista_types.keys.map { |type| [type.titleize, type] },
+              include_blank: "Seleccione un tipo",
+              label: "Tipo de Transportista",
+              input_html: { 
+                class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md"
+              } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.input :doc_type, 
+              collection: Transportista.doc_types.keys.map { |type| [type.upcase, type] },
+              include_blank: "Seleccione un tipo",
+              label: "Tipo de Documento",
+              input_html: { 
+                class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md",
+                data: { action: "change->transportista-form#toggleDocTypeFields" }
+              } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.input :status, 
+              collection: Transportista.statuses.keys.map { |status| [status.titleize, status] },
+              include_blank: "Seleccione un estado",
+              label: "Estado",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 ruc-field" style="<%= @transportista.ruc? ? '' : 'display: none;' %>">
+          <%= form.input :razon_social, 
+              label: "Razón Social",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 ruc-field" style="<%= @transportista.ruc? ? '' : 'display: none;' %>">
+          <%= form.input :ruc_number, 
+              label: "Número de RUC",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 dni-field" style="<%= @transportista.dni? ? '' : 'display: none;' %>">
+          <%= form.input :first_name, 
+              label: "Nombres",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 dni-field" style="<%= @transportista.dni? ? '' : 'display: none;' %>">
+          <%= form.input :last_name, 
+              label: "Apellidos",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 dni-field" style="<%= @transportista.dni? ? '' : 'display: none;' %>">
+          <%= form.input :dni_number, 
+              label: "Número de DNI",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3 dni-field" style="<%= @transportista.dni? ? '' : 'display: none;' %>">
+          <%= form.input :license_number, 
+              label: "Número de Licencia",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.input :vehicle_plate, 
+              label: "Placa del Vehículo",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.input :numero_mtc, 
+              label: "Número MTC",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.input :m1l_indicator, 
+              label: "Indicador M1L",
+              input_html: { class: "shadow-sm focus:ring-primary-500 focus:border-primary-500 block w-full sm:text-sm border-gray-300 rounded-md" } %>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="pt-5">
+    <div class="flex justify-end">
+      <%= link_to "Cancelar", admin_transportistas_path, class: "bg-white py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" %>
+      <%= form.button :submit, "Guardar", class: "ml-3 inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" %>
+    </div>
+  </div>
+<% end %>

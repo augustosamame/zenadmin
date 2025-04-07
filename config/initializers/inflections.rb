@@ -14,3 +14,8 @@
 # ActiveSupport::Inflector.inflections(:en) do |inflect|
 #   inflect.acronym "RESTful"
 # end
+
+# Custom inflections for Spanish words
+ActiveSupport::Inflector.inflections(:en) do |inflect|
+  inflect.irregular "transportista", "transportistas"
+end

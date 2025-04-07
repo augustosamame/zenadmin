@@ -4,7 +4,7 @@ module Integrations
 
     include ActionView::Helpers::NumberHelper
     include HTTParty
-    base_uri Rails.env.production? ? "https://efactsunat.devtechperu.com" : "http://localhost:3002"
+    base_uri Rails.env.production? ? "https://efactsunat.devtechperu.com" : "https://efactsunat.devtechperu.com"
 
     def initialize
     end

@@ -33,16 +33,59 @@ export default class extends Controller {
 
   handleAction(event) {
     event.preventDefault()
+    const objectId = event.currentTarget.dataset.objectId
     const eventName = event.currentTarget.dataset.eventName
-    const editUrl = event.currentTarget.dataset.editUrl
-    const destroyUrl = event.currentTarget.dataset.destroyUrl
     this.menuTarget.classList.add('hidden') // Hide the dropdown
 
     // Dispatch to the appropriate handler based on the event name
-    if (this[eventName]) {
-      this[eventName](editUrl, destroyUrl)
+    if (eventName === 'edit') {
+      this.editAction(objectId)
+    } else if (eventName === 'delete') {
+      this.deleteAction(objectId)
+    } else if (this[eventName]) {
+      this[eventName]()
     } else {
       console.warn(`No handler defined for event: ${eventName}`)
+    }
+  }
+
+  editAction(objectId) {
+    const resourceType = window.location.pathname.split('/')[2] // Gets 'transportistas' from '/admin/transportistas'
+    if (resourceType && objectId) {
+      window.location.href = `/admin/${resourceType}/${objectId}/edit`
+    } else {
+      console.warn('Unable to determine edit URL')
+    }
+  }
+
+  deleteAction(objectId) {
+    const resourceType = window.location.pathname.split('/')[2] // Gets 'transportistas' from '/admin/transportistas'
+    if (resourceType && objectId) {
+      if (confirm('¿Está seguro que desea eliminar este registro?')) {
+        const csrfToken = document.querySelector('meta[name="csrf-token"]').content
+        
+        fetch(`/admin/${resourceType}/${objectId}`, {
+          method: 'DELETE',
+          headers: {
+            'X-CSRF-Token': csrfToken,
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          credentials: 'same-origin'
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Network response was not ok')
+          }
+          window.location.reload()
+        })
+        .catch(error => {
+          console.error('Error:', error)
+          alert('Error al eliminar el registro')
+        })
+      }
+    } else {
+      console.warn('Unable to determine delete URL')
     }
   }
 

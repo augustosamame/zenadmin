@@ -145,5 +145,10 @@ export const resourceMappings = {
     paging: true,
     info: true,
     page_length: 10
+  },
+  Transportista: {
+    buttonText: "Crear Transportista",
+    buttonUrl: "/admin/transportistas/new",
+    ajaxUrl: "/admin/transportistas.json"
   }
 }

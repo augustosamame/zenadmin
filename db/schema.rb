@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_07_034927) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_07_045122) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1041,6 +1041,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_034927) do
     t.index ["status"], name: "index_tags_on_status"
     t.index ["tag_type"], name: "index_tags_on_tag_type"
     t.index ["visible_filter"], name: "index_tags_on_visible_filter"
+  end
+
+  create_table "transportistas", force: :cascade do |t|
+    t.integer "transportista_type", default: 0, null: false
+    t.integer "doc_type", default: 0, null: false
+    t.string "first_name"
+    t.string "last_name"
+    t.string "license_number"
+    t.string "dni_number"
+    t.string "razon_social"
+    t.string "ruc_number"
+    t.string "vehicle_plate"
+    t.string "numero_mtc"
+    t.string "m1l_indicator"
+    t.integer "transportista_order", default: 0
+    t.integer "status", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
   end
 
   create_table "user_attendance_logs", force: :cascade do |t|

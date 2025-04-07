@@ -1,0 +1,68 @@
+<%= render "shared/admin/nav", { header_title: "Transportistas" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">Tipo de Transportista</th>
+          <th class="px-4 py-2 text-left">Nombre/Razón Social</th>
+          <th class="px-4 py-2 text-left">Documento</th>
+          <th class="px-4 py-2 text-left">Placa</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @transportistas.each do |transportista| %>
+          <tr>
+            <td class="px-4 py-2"><%= transportista.transportista_type.titleize %></td>
+            <td class="px-4 py-2">
+              <% if transportista.ruc? %>
+                <%= transportista.razon_social %>
+              <% else %>
+                <%= "#{transportista.first_name} #{transportista.last_name}" %>
+              <% end %>
+            </td>
+            <td class="px-4 py-2">
+              <% if transportista.ruc? %>
+                RUC: <%= transportista.ruc_number %>
+              <% else %>
+                DNI: <%= transportista.dni_number %>
+              <% end %>
+            </td>
+            <td class="px-4 py-2"><%= transportista.vehicle_plate %></td>
+            <td class="px-4 py-2">
+              <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 <%= transportista.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                <%= transportista.status.titleize %>
+              </span>
+            </td>
+            <td class="px-4 py-2">
+              <div data-controller="dropdown" class="relative">
+                <button data-action="click->dropdown#toggle click@window->dropdown#hide" class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
+                  <%= icon('cog-6-tooth', classes: 'w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400') %>
+                </button>
+                <ul data-dropdown-target="menu" class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
+                  <li>
+                    <a href="#" data-action="click->dropdown#handleAction" data-object-id="<%= transportista.id %>" data-event-name="edit" class="px-4 py-[.4rem] group flex items-center justify-start space-x-3">
+                      <%= icon('pencil-square', classes: 'stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400') %>
+                      <span>Editar</span>
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" data-action="click->dropdown#handleAction" data-object-id="<%= transportista.id %>" data-event-name="delete" class="px-4 py-[.4rem] group flex items-center justify-start space-x-3">
+                      <%= icon('trash', classes: 'stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400') %>
+                      <span>Eliminar</span>
+                    </a>
+                  </li>
+                </ul>
+              </div>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

@@ -214,3 +214,5 @@ application.register("webcam", WebcamController)
 import ModifyInitialBalanceModalController from "./modify_initial_balance_modal_controller"
 application.register("modify-initial-balance-modal", ModifyInitialBalanceModalController)
 
+import TransportistaFormController from "./transportista_form_controller"
+application.register("transportista-form", TransportistaFormController)

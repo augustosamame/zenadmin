@@ -198,7 +198,7 @@ Rails.application.routes.draw do
       end
     end
     resources :in_transit_stocks
-
+    resources :transportistas
     resources :combo_products
     resources :product_packs
     resources :discount_products

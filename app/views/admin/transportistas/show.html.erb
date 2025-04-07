@@ -1,0 +1,88 @@
+<%= render "shared/admin/nav", { header_title: "Detalle de Transportista" } do %>
+  <%= link_to "Volver a Transportistas", admin_transportistas_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-primary-700 bg-primary-100 hover:bg-primary-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" %>
+<% end %>
+
+<div class="px-4 sm:px-6 lg:px-8 py-8">
+  <div class="max-w-3xl mx-auto">
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <div class="px-4 py-5 sm:px-6 flex justify-between items-center">
+        <div>
+          <h3 class="text-lg leading-6 font-medium text-gray-900">Información del Transportista</h3>
+          <p class="mt-1 max-w-2xl text-sm text-gray-500">Detalles y atributos del transportista.</p>
+        </div>
+        <div>
+          <%= link_to "Editar", edit_admin_transportista_path(@transportista), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500" %>
+        </div>
+      </div>
+      <div class="border-t border-gray-200">
+        <dl>
+          <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Tipo de Transportista</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.transportista_type.titleize %></dd>
+          </div>
+          
+          <% if @transportista.company? %>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Razón Social</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.razon_social %></dd>
+            </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Número de RUC</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.ruc_number %></dd>
+            </div>
+          <% else %>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Nombres</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.first_name %></dd>
+            </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Apellidos</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.last_name %></dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Tipo de Documento</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.doc_type.upcase %></dd>
+            </div>
+            <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Número de DNI</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.dni_number %></dd>
+            </div>
+            <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+              <dt class="text-sm font-medium text-gray-500">Número de Licencia</dt>
+              <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.license_number %></dd>
+            </div>
+          <% end %>
+          
+          <div class="<%= @transportista.company? ? 'bg-white' : 'bg-gray-50' %> px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Placa del Vehículo</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.vehicle_plate %></dd>
+          </div>
+          
+          <div class="<%= @transportista.company? ? 'bg-gray-50' : 'bg-white' %> px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Número MTC</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.numero_mtc %></dd>
+          </div>
+          
+          <div class="<%= @transportista.company? ? 'bg-white' : 'bg-gray-50' %> px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Indicador M1L</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.m1l_indicator %></dd>
+          </div>
+          
+          <div class="<%= @transportista.company? ? 'bg-gray-50' : 'bg-white' %> px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Orden de Visualización</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @transportista.transportista_order %></dd>
+          </div>
+          
+          <div class="<%= @transportista.company? ? 'bg-white' : 'bg-gray-50' %> px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Estado</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <span class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 <%= @transportista.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                <%= @transportista.status.titleize %>
+              </span>
+            </dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+  </div>
+</div>

@@ -170,6 +170,11 @@
       <%= nav_link_to "Mínimos, Máximos y Factores de Reposición", send("admin_inventory_product_min_max_stocks_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
     <% end %>
+    <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+    <li>
+      <%= nav_link_to "Transportistas", send("admin_transportistas_path"), class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
   </ul>
 </li>
 <li data-controller="dropdown" class="relative">
