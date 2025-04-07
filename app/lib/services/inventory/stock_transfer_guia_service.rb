@@ -77,6 +77,10 @@ module Services
           "envio_descripcion_traslado": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "envio_unidad_medida_peso": "KGM",
           "envio_modalidad_traslado": "02",
+          "partida_ubigeo": "030109",
+          "partida_direccion": @stock_transfer.origin_warehouse.location.address,
+          "llegada_ubigeo": "030109",
+          "llegada_direccion": @stock_transfer.destination_warehouse.location.address,
           "observaciones": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "move_lines": guia_lines
         }
