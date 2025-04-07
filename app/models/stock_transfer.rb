@@ -9,9 +9,12 @@ class StockTransfer < ApplicationRecord
   belongs_to :destination_warehouse, class_name: "Warehouse", optional: true
   belongs_to :periodic_inventory, class_name: "PeriodicInventory", optional: true
   belongs_to :planned_stock_transfer, optional: true
-  has_many :guias, dependent: :destroy
+  belongs_to :transportista, optional: true
+  has_many :guias, dependent: :nullify
 
   attr_accessor :current_user_for_destroy, :cached_lines, :create_guia
+
+  validates :transportista_id, presence: true, if: -> { create_guia == "1" || create_guia == true }
 
   def cache_lines
     Rails.logger.info "Starting to cache lines for StockTransfer ##{id}"

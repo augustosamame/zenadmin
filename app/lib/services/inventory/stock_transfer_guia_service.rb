@@ -87,16 +87,57 @@ module Services
           "move_lines": guia_lines,
           # Additional fields required by Nubefact
           "transportista_indicador_m1l": nil,
-          "transportista_tipo_doc": "6", # RUC
-          "transportista_num_doc": guia_series.invoicer.ruc,
-          "transportista_razon_social": guia_series.invoicer.razon_social,
+          "transportista_tipo_doc":
+            if @stock_transfer.transportista&.ruc?
+              "6" # RUC
+            elsif @stock_transfer.transportista&.dni?
+              "1" # DNI
+            else
+              "6" # Default to RUC as fallback
+            end,
+          "transportista_num_doc":
+            if @stock_transfer.transportista&.ruc?
+              @stock_transfer.transportista.ruc_number
+            elsif @stock_transfer.transportista&.dni?
+              @stock_transfer.transportista.dni_number
+            else
+              guia_series.invoicer.ruc # Fallback to invoicer
+            end,
+          "transportista_razon_social":
+            if @stock_transfer.transportista&.ruc?
+              @stock_transfer.transportista.razon_social
+            elsif @stock_transfer.transportista&.dni?
+              "#{@stock_transfer.transportista.first_name} #{@stock_transfer.transportista.last_name}"
+            else
+              guia_series.invoicer.razon_social # Fallback to invoicer
+            end,
           "transportista_numero_mtc": nil,
-          "transportista_chofer_tipo_doc": "1", # DNI
-          "transportista_chofer_num_doc": "09344556",
-          "transportista_chofer_num_licencia": "Q09344556",
-          "transportista_chofer_nombres": "Augusto",
-          "transportista_chofer_apellidos": "Samame Barrientos",
-          "transportista_placa": "ABC-123"
+          "transportista_chofer_tipo_doc": "1", # Always DNI for driver
+          "transportista_chofer_num_doc":
+            if @stock_transfer.transportista&.dni?
+              @stock_transfer.transportista.dni_number
+            else
+              "09344556" # Default fallback
+            end,
+          "transportista_chofer_num_licencia":
+            if @stock_transfer.transportista&.dni?
+              @stock_transfer.transportista.license_number
+            else
+              "Q09344556" # Default fallback
+            end,
+          "transportista_chofer_nombres":
+            if @stock_transfer.transportista&.dni?
+              @stock_transfer.transportista.first_name
+            else
+              "Augusto" # Default fallback
+            end,
+          "transportista_chofer_apellidos":
+            if @stock_transfer.transportista&.dni?
+              @stock_transfer.transportista.last_name
+            else
+              "Samame Barrientos" # Default fallback
+            end,
+          "transportista_placa": @stock_transfer.transportista&.vehicle_plate
         }
 
         response = Integrations::Nubefact.new.emitir_guia(guia_data.to_json)

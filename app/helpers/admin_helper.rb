@@ -270,4 +270,12 @@ module AdminHelper
       "Cumplido"
     end
   end
+
+  def stock_transfer_guia_link(stock_transfer)
+    return unless $global_settings[:show_sunat_guia_for_stock_transfers]
+    return unless stock_transfer.guias.last.present?
+
+    guia = stock_transfer.guias.last
+    link_to("#{guia.custom_id}", guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline")
+  end
 end

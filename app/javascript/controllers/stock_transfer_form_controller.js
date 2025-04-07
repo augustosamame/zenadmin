@@ -2,10 +2,27 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form"]
+  static targets = ["line", "lines", "form", "guiaFields"]
 
   connect() {
     console.log("Stock transfer controller connected")
+    // Initialize guia fields visibility on page load
+    if (this.hasGuiaFieldsTarget) {
+      const createGuiaCheckbox = document.querySelector('input[name="stock_transfer[create_guia]"]')
+      if (createGuiaCheckbox && createGuiaCheckbox.checked) {
+        this.guiaFieldsTarget.classList.remove('hidden')
+      }
+    }
+  }
+
+  toggleGuiaFields(event) {
+    if (this.hasGuiaFieldsTarget) {
+      if (event.target.checked) {
+        this.guiaFieldsTarget.classList.remove('hidden')
+      } else {
+        this.guiaFieldsTarget.classList.add('hidden')
+      }
+    }
   }
 
   toggleAdjustmentType(event) {

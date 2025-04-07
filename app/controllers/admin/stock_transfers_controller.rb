@@ -216,9 +216,10 @@ class Admin::StockTransfersController < Admin::AdminController
       @button_label = "Grabar Transferencia de Stock"
       @almacen_de_origen_label = "Almacén de Origen"
     end
+    @transportistas = Transportista.where(status: :active)
   end
 
   def stock_transfer_params
-    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, :create_guia, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
+    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, :create_guia, :transportista_id, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
   end
 end

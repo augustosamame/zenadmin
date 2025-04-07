@@ -27,4 +27,12 @@ class Transportista < ApplicationRecord
   validates :last_name, presence: true, if: -> { dni? }
   validates :dni_number, presence: true, if: -> { dni? }
   validates :license_number, presence: true, if: -> { dni? }
+  
+  def display_name
+    if ruc?
+      "#{razon_social} (RUC: #{ruc_number})"
+    else
+      "#{first_name} #{last_name} (DNI: #{dni_number})"
+    end
+  end
 end
