@@ -21,7 +21,7 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def show
     @requisition = Requisition.includes(
-      requisition_lines: [:product],
+      requisition_lines: [ :product ],
       location: {
         warehouses: :warehouse_inventories
       }
@@ -112,6 +112,7 @@ class Admin::RequisitionsController < Admin::AdminController
   def edit
     # Optimize edit action with proper eager loading
     @requisition = Requisition.find(params[:id])
+    @current_warehouse = @requisition.warehouse
 
     @requisition_lines = RequisitionLine
       .joins(:product)
