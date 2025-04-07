@@ -73,11 +73,11 @@ module Services
           "transfer_reason": "01", # 01 is the code for Sale
           "transport_mode": "01", # 01 is the code for Public transport
           "efact_client_token": @guia_series.invoicer.einvoice_api_key,
+          "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%Y-%m-%d") || Time.current.strftime("%Y-%m-%d"),
           "envio_descripcion_traslado": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "observaciones": @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}",
           "move_lines": guia_lines
         }
-
 
         response = Integrations::Nubefact.new.emitir_guia(guia_data.to_json)
         Rails.logger.info("Guia Response: #{response.parsed_response}")
@@ -85,7 +85,7 @@ module Services
 
         guia = Guia.new(
           stock_transfer: @stock_transfer,
-          custom_id: "#{@guia_data["serie"]}-#{@guia_data["correlativo"]}",
+          custom_id: "#{@guia_data[:serie]}-#{@guia_data[:correlativo]}",
           guia_series: @guia_series,
           amount: @stock_transfer.total_products,
           guia_type: "guia_remision",
