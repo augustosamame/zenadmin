@@ -55,11 +55,15 @@ class Admin::VendorsController < Admin::AdminController
   end
 
   def destroy
-    if @vendor.purchase_orders.any?
-      redirect_to admin_vendors_path, alert: "Cannot delete vendor with associated purchase orders."
-    else
-      @vendor.destroy
-      redirect_to admin_vendors_path, notice: "Vendor was successfully deleted."
+    respond_to do |format|
+      if @vendor.purchase_orders.any?
+        format.html { redirect_to admin_vendors_path, alert: "Cannot delete vendor with associated purchase orders." }
+        format.turbo_stream { redirect_to admin_vendors_path, alert: "Cannot delete vendor with associated purchase orders." }
+      else
+        @vendor.destroy
+        format.html { redirect_to admin_vendors_path, notice: "Vendor was successfully deleted." }
+        format.turbo_stream { redirect_to admin_vendors_path, notice: "Vendor was successfully deleted." }
+      end
     end
   end
 
