@@ -4,7 +4,6 @@ class Admin::PurchaseOrdersController < Admin::AdminController
   include AdminHelper
 
   before_action :set_purchase_order, only: [ :show, :edit, :update, :create_purchase ]
-  before_action :ensure_custom_numbering, only: [ :new, :create ]
 
   def index
     respond_to do |format|
@@ -87,19 +86,6 @@ class Admin::PurchaseOrdersController < Admin::AdminController
 
   def set_purchase_order
     @purchase_order = Purchases::PurchaseOrder.find(params[:id])
-  end
-
-  def ensure_custom_numbering
-    # Create the custom numbering record for purchase orders if it doesn't exist
-    unless CustomNumbering.exists?(record_type: :purchases_purchase_order)
-      CustomNumbering.create!(
-        record_type: :purchases_purchase_order,
-        prefix: "POO",
-        next_number: 1,
-        length: 6,
-        status: :active
-      )
-    end
   end
 
   def purchase_order_params

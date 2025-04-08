@@ -1,17 +1,17 @@
 class CustomNumbering < ApplicationRecord
   include TranslateEnum
 
-  enum :record_type, { 
-    purchases_vendor: 0, 
-    supplier: 1, 
-    purchase: 2, 
-    product: 3, 
-    order: 4, 
-    cash_inflow: 5, 
-    cash_outflow: 6, 
-    payment: 7, 
-    stock_transfer: 8, 
-    requisition: 9, 
+  enum :record_type, {
+    purchases_vendor: 0,
+    supplier: 1,
+    purchase: 2,
+    product: 3,
+    order: 4,
+    cash_inflow: 5,
+    cash_outflow: 6,
+    payment: 7,
+    stock_transfer: 8,
+    requisition: 9,
     planned_stock_transfer: 10,
     purchases_purchase_order: 11
   }, prefix: :numbering
