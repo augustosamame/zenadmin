@@ -24,7 +24,7 @@ class Admin::CashierShiftsController < Admin::AdminController
 
     @first_shift = @cashier_shifts.first
     @header_title = @first_shift ? "Turnos de Caja - #{@first_shift.cashier.location.name}" : "Turnos de Caja"
-    @datatable_options = "resource_name:'CashierShift';"
+    @datatable_options = "resource_name:'CashierShift';sort_5_asc;"
   end
 
   def new
