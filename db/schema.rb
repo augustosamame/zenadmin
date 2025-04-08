@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_051600) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_204132) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1167,6 +1167,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_051600) do
     t.datetime "reached_loyalty_tier_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "account_receivable_initial_balance_cents", default: 0
+    t.string "account_receivable_initial_balance_currency", default: "PEN"
     t.index ["email"], name: "index_users_on_email"
     t.index ["internal"], name: "index_users_on_internal"
     t.index ["location_id"], name: "index_users_on_location_id"

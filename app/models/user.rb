@@ -17,6 +17,8 @@ class User < ApplicationRecord
   has_many :orders
   has_many :user_attendance_logs
 
+  # Monetize the account_receivable_initial_balance field
+  monetize :account_receivable_initial_balance_cents
 
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable

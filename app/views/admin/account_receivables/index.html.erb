@@ -1,16 +1,16 @@
 <%= render "shared/admin/nav", { header_title: params[:user_id].present? ? "Estado de Cuenta - #{User.find(params[:user_id]).name}" : "Todas las Cuentas por Cobrar" } do %>
   <%= link_to 'Volver a Clientes', users_index_admin_account_receivables_path, class: 'btn btn-secondary' %>
   <% if params[:user_id].present? %>
-    <% if !@has_transactions %>
+    <%= link_to new_admin_payment_path(user_id: params[:user_id]), class: 'btn btn-primary ml-2' do %>
+      <i class="mr-1 fas fa-plus"></i> Registrar Nuevo Pago
+    <% end %>
+    <% if current_user.any_admin? %>
       <div data-controller="initial-balance-modal" class="inline-block">
-        <button type="button" class="ml-2 btn btn-primary" data-action="click->initial-balance-modal#open">
-          Crear Saldo Inicial
+        <button type="button" class="ml-2 text-white bg-red-600 btn hover:bg-red-700" data-action="click->initial-balance-modal#open">
+          <i class="mr-1 fas fa-balance-scale"></i> Saldo Inicial Cliente
         </button>
         <%= render 'initial_balance_modal', user: @user %>
       </div>
-    <% end %>
-    <%= link_to new_admin_payment_path(user_id: params[:user_id]), class: 'btn btn-primary ml-2' do %>
-      <i class="mr-1 fas fa-plus"></i> Registrar Nuevo Pago
     <% end %>
   <% end %>
 <% end %>

@@ -73,7 +73,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
       @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
-      @total_pending_previous_period = 0
+      @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
       @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
 
       # Check if customer has any account receivables or payments
@@ -149,53 +149,113 @@ class Admin::AccountReceivablesController < Admin::AdminController
       )
     end
 
-    ActiveRecord::Base.transaction do
-      if amount > 0
-        # Create an account receivable for positive balance (customer owes money)
-        account_receivable = AccountReceivable.new(
-          user: @user,
-          amount: amount,
-          currency: "PEN",
-          status: :pending,
-          order_id: nil,
-          payment_id: nil,
-          description: "Saldo inicial",
-          due_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
-        )
+    success = false
+    message = ""
 
-        if account_receivable.save
-            flash[:notice] = "Saldo inicial por cobrar creado exitosamente"
+    ActiveRecord::Base.transaction do
+      # Update the user's initial balance field
+      @user.update!(account_receivable_initial_balance: amount)
+      
+      if amount > 0
+        # Find existing initial balance account receivable or create a new one
+        existing_initial_balance = AccountReceivable.find_by(user: @user, description: "Saldo inicial", order_id: nil)
+        
+        if existing_initial_balance.present?
+          # Update the existing account receivable
+          if existing_initial_balance.update(
+              amount: amount,
+              due_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
+            )
+            success = true
+            message = "Saldo inicial por cobrar actualizado exitosamente"
+            flash[:notice] = message
+          else
+            message = "Error al actualizar el saldo inicial: #{existing_initial_balance.errors.full_messages.join(', ')}"
+            flash[:alert] = message
+            raise ActiveRecord::Rollback
+          end
         else
-          flash[:alert] = "Error al crear el saldo inicial: #{account_receivable.errors.full_messages.join(', ')}"
-          raise ActiveRecord::Rollback
+          # Create a new account receivable for positive balance (customer owes money)
+          account_receivable = AccountReceivable.new(
+            user: @user,
+            amount: amount,
+            currency: "PEN",
+            status: :pending,
+            order_id: nil,
+            payment_id: nil,
+            description: "Saldo inicial",
+            due_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
+          )
+
+          if account_receivable.save
+            success = true
+            message = "Saldo inicial por cobrar creado exitosamente"
+            flash[:notice] = message
+          else
+            message = "Error al crear el saldo inicial: #{account_receivable.errors.full_messages.join(', ')}"
+            flash[:alert] = message
+            raise ActiveRecord::Rollback
+          end
         end
       elsif amount < 0
-        # Create a payment for negative balance (customer has credit)
-        payment = Payment.new(
-          user: @user,
-          amount: amount.abs,
-          currency: "PEN",
-          status: :paid,
-          payment_method: PaymentMethod.find_by(name: "cash") || PaymentMethod.first,
-          payment_date: Time.current,
-          cashier_shift: initial_balance_shift,
-          description: "Saldo inicial a favor",
-          comment: "Saldo inicial a favor del cliente"
-        )
-
-        if payment.save
-            flash[:notice] = "Saldo inicial a favor creado exitosamente"
+        # Find existing initial balance payment or create a new one
+        existing_initial_balance = Payment.find_by(user: @user, description: "Saldo inicial a favor")
+        
+        if existing_initial_balance.present?
+          # Update the existing payment
+          if existing_initial_balance.update(
+              amount: amount.abs,
+              payment_date: Time.current
+            )
+            success = true
+            message = "Saldo inicial a favor actualizado exitosamente"
+            flash[:notice] = message
+          else
+            message = "Error al actualizar el saldo inicial: #{existing_initial_balance.errors.full_messages.join(', ')}"
+            flash[:alert] = message
+            raise ActiveRecord::Rollback
+          end
         else
-          flash[:alert] = "Error al crear el saldo inicial: #{payment.errors.full_messages.join(', ')}"
-          raise ActiveRecord::Rollback
+          # Create a new payment for negative balance (customer has credit)
+          payment = Payment.new(
+            user: @user,
+            amount: amount.abs,
+            currency: "PEN",
+            status: :paid,
+            payment_method: PaymentMethod.find_by(name: "cash") || PaymentMethod.first,
+            payment_date: Time.current,
+            cashier_shift: initial_balance_shift,
+            description: "Saldo inicial a favor",
+            comment: "Saldo inicial a favor del cliente"
+          )
+
+          if payment.save
+            success = true
+            message = "Saldo inicial a favor creado exitosamente"
+            flash[:notice] = message
+          else
+            message = "Error al crear el saldo inicial: #{payment.errors.full_messages.join(', ')}"
+            flash[:alert] = message
+            raise ActiveRecord::Rollback
+          end
         end
       else
-        flash[:alert] = "El monto debe ser diferente de cero"
+        message = "El monto debe ser diferente de cero"
+        flash[:alert] = message
         raise ActiveRecord::Rollback
       end
     end
 
-    redirect_to admin_account_receivables_path(user_id: @user.id)
+    respond_to do |format|
+      format.html { redirect_to admin_account_receivables_path(user_id: @user.id), turbolinks: false }
+      format.json do
+        if success
+          render json: { success: true, message: message }, status: :ok
+        else
+          render json: { success: false, error: message }, status: :unprocessable_entity
+        end
+      end
+    end
   end
 
   private

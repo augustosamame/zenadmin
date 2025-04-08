@@ -62,7 +62,7 @@
         <!-- Template for modal content -->
         <template data-modify-initial-balance-modal-target="template" data-modify-initial-balance-modal-content-id="modifyInitialBalanceModal">
           <div class="mt-3 text-center">
-            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Modificar Saldo Inicial</h3>
+            <h3 class="text-lg font-medium leading-6 text-gray-900 dark:text-gray-100">Modificar Saldo Actual</h3>
             <div class="px-7 py-3 mt-2">
               <p class="text-sm text-gray-500 dark:text-gray-400">
                 Esta acción modificará el saldo inicial de la caja. Ingrese el nuevo monto y una descripción.
@@ -137,7 +137,7 @@
       <p class="mt-1 text-lg font-semibold"><%= format_currency(@cashier_shift.daily_balance) %></p>
     </div>
     <div>
-      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Balance Total</p>
+      <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Saldo Final</p>
       <p class="mt-1 text-lg font-semibold"><%= format_currency(@cashier_shift.total_balance) %></p>
     </div>
 

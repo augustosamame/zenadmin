@@ -5,7 +5,7 @@
         Crear Saldo Inicial para <%= user.name %>
       </h2>
       
-      <%= form_with url: create_initial_balance_admin_account_receivables_path(user_id: user.id), method: :post, class: "mt-4", data: { controller: "initial-balance-form" } do |form| %>
+      <%= form_with url: create_initial_balance_admin_account_receivables_path(user_id: user.id), method: :post, class: "mt-4", data: { controller: "initial-balance-form", remote: true } do |form| %>
         <div class="mb-4">
           <%= form.label :amount, "Monto", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200" %>
           <div class="flex items-center">
