@@ -223,22 +223,30 @@ class Admin::CashierShiftsController < Admin::AdminController
   end
 
   def calculate_payment_method_balances(cashier_shift)
-    # Fetch all transactions with payment methods in a single query
     all_transactions = cashier_shift.cashier_transactions
-                                   .includes(:payment_method)
                                    .where.not(transactable_type: [ "CashInflow", "CashOutflow" ])
                                    .to_a
     transactions_by_method = all_transactions.group_by(&:payment_method)
+
+    # Get cash inflows and outflows separately
+    cash_inflows = cashier_shift.cashier_transactions
+                               .where(transactable_type: "CashInflow")
+                               .to_a
+
+    cash_outflows = cashier_shift.cashier_transactions
+                                .where(transactable_type: "CashOutflow")
+                                .to_a
 
     balances = []
 
     # Add previous shift balance once, outside the payment method loop
     balances << {
-      description: "Saldo Efectivo Anterior",
+      description: "Saldo Inicial",
       amount: Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
     }
 
     transactions_by_method.each do |payment_method, transactions|
+      next if payment_method&.name == "credit"
       # Use amount_for_balance to correctly account for transaction types
       total_cents = transactions.sum(&:amount_for_balance)
       total = Money.new(total_cents, "PEN")
@@ -248,15 +256,24 @@ class Admin::CashierShiftsController < Admin::AdminController
         description: "Ventas #{payment_method&.description || 'sin método de pago'}",
         amount: total
       }
+    end
 
-      # For cash payments, add daily balance excluding previous shift
-      if payment_method&.name == "cash"
-        daily_cash = total - Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
-        balances << {
-          description: "#{payment_method.description} del Día",
-          amount: daily_cash
-        }
-      end
+    # Add cash inflows as a separate entry
+    if cash_inflows.any?
+      inflow_total_cents = cash_inflows.sum(&:amount_for_balance)
+      balances << {
+        description: "Ingresos a Caja",
+        amount: Money.new(inflow_total_cents, "PEN")
+      }
+    end
+
+    # Add cash outflows as a separate entry
+    if cash_outflows.any?
+      outflow_total_cents = cash_outflows.sum(&:amount_for_balance).abs
+      balances << {
+        description: "Salidas de Caja",
+        amount: Money.new(outflow_total_cents, "PEN")
+      }
     end
 
     balances
