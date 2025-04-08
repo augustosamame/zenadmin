@@ -9,7 +9,12 @@ module CustomNumberable
   private
 
   def set_custom_id
-    return if self.custom_id.present?
+    # Dynamically determine the column name for the custom ID
+    custom_id_column = self.class.custom_id_column
+    
+    # Return if the custom ID is already set
+    return if self[custom_id_column].present?
+    
     # Get the record type dynamically from the model class name
     record_type = CustomNumbering.record_type_for_model(self.class.name)
 
@@ -21,8 +26,7 @@ module CustomNumberable
       config = CustomNumbering.for_record_type(record_type)
     end
 
-    # Dynamically determine the column name for the custom ID
-    custom_id_column = self.class.custom_id_column
+    # Set the custom ID using the determined column
     self[custom_id_column] = "#{config.prefix}#{config.next_number.to_s.rjust(config.length, '0')}"
 
     # Increment the next_number for the next record

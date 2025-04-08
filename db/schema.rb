@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_07_153700) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_051600) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -857,22 +857,56 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_153700) do
     t.bigint "purchase_id"
     t.bigint "product_id"
     t.integer "quantity", null: false
-    t.decimal "price", precision: 10, scale: 2
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "unit_price_cents", default: 0, null: false
+    t.string "unit_price_currency", default: "PEN", null: false
     t.index ["product_id"], name: "index_purchases_purchase_lines_on_product_id"
     t.index ["purchase_id"], name: "index_purchases_purchase_lines_on_purchase_id"
+  end
+
+  create_table "purchases_purchase_order_lines", force: :cascade do |t|
+    t.bigint "purchase_order_id", null: false
+    t.bigint "product_id", null: false
+    t.integer "quantity"
+    t.integer "unit_price_cents", default: 0, null: false
+    t.string "unit_price_currency", default: "PEN", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_id"], name: "index_purchases_purchase_order_lines_on_product_id"
+    t.index ["purchase_order_id"], name: "index_purchases_purchase_order_lines_on_purchase_order_id"
+  end
+
+  create_table "purchases_purchase_orders", force: :cascade do |t|
+    t.string "purchase_order_number"
+    t.bigint "region_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "vendor_id", null: false
+    t.date "order_date"
+    t.text "notes"
+    t.integer "status", default: 0
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["purchase_order_number"], name: "index_purchases_purchase_orders_on_purchase_order_number", unique: true
+    t.index ["region_id"], name: "index_purchases_purchase_orders_on_region_id"
+    t.index ["user_id"], name: "index_purchases_purchase_orders_on_user_id"
+    t.index ["vendor_id"], name: "index_purchases_purchase_orders_on_vendor_id"
   end
 
   create_table "purchases_purchases", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "region_id", null: false
-    t.string "custom_id", null: false
+    t.string "purchase_number", null: false
     t.datetime "purchase_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.index ["custom_id"], name: "index_purchases_purchases_on_custom_id", unique: true
+    t.bigint "user_id", null: false
+    t.bigint "purchase_order_id"
+    t.text "notes"
+    t.index ["purchase_number"], name: "index_purchases_purchases_on_purchase_number", unique: true
+    t.index ["purchase_order_id"], name: "index_purchases_purchases_on_purchase_order_id"
     t.index ["region_id"], name: "index_purchases_purchases_on_region_id"
+    t.index ["user_id"], name: "index_purchases_purchases_on_user_id"
     t.index ["vendor_id"], name: "index_purchases_purchases_on_vendor_id"
   end
 
@@ -882,6 +916,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_153700) do
     t.bigint "region_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "contact_name"
+    t.string "email"
+    t.string "phone"
+    t.string "address"
+    t.string "tax_id"
+    t.text "notes"
     t.index ["custom_id"], name: "index_purchases_vendors_on_custom_id", unique: true
     t.index ["region_id"], name: "index_purchases_vendors_on_region_id"
   end
@@ -1264,8 +1304,15 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_07_153700) do
   add_foreign_key "product_pack_items", "product_packs"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
+  add_foreign_key "purchases_purchase_order_lines", "products"
+  add_foreign_key "purchases_purchase_order_lines", "purchases_purchase_orders", column: "purchase_order_id"
+  add_foreign_key "purchases_purchase_orders", "purchases_vendors", column: "vendor_id"
+  add_foreign_key "purchases_purchase_orders", "regions"
+  add_foreign_key "purchases_purchase_orders", "users"
+  add_foreign_key "purchases_purchases", "purchases_purchase_orders", column: "purchase_order_id"
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchases", "regions"
+  add_foreign_key "purchases_purchases", "users"
   add_foreign_key "purchases_vendors", "regions"
   add_foreign_key "requisition_lines", "products"
   add_foreign_key "requisition_lines", "requisitions"

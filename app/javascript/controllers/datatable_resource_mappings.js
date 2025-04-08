@@ -150,5 +150,20 @@ export const resourceMappings = {
     buttonText: "Crear Transportista",
     buttonUrl: "/admin/transportistas/new",
     ajaxUrl: "/admin/transportistas.json"
+  },
+  PurchaseOrder: {
+    buttonText: "Crear Orden de Compra",
+    buttonUrl: "/admin/purchase_orders/new",
+    ajaxUrl: "/admin/purchase_orders.json"
+  },
+  Purchase: {
+    buttonText: "Crear Compra",
+    buttonUrl: "/admin/purchases/new",
+    ajaxUrl: "/admin/purchases.json"
+  },
+  Vendor: {
+    buttonText: "Crear Proveedor",
+    buttonUrl: "/admin/vendors/new",
+    ajaxUrl: "/admin/vendors.json"
   }
 }

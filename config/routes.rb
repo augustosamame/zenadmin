@@ -236,6 +236,16 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :purchase_orders do
+      member do
+        post :create_purchase
+      end
+    end
+
+    resources :purchases
+
+    resources :vendors
+    
     resources :orders_per_product, only: [ :index ]
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"

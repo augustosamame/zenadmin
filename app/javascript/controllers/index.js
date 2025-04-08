@@ -216,3 +216,9 @@ application.register("modify-initial-balance-modal", ModifyInitialBalanceModalCo
 
 import TransportistaFormController from "./transportista_form_controller"
 application.register("transportista-form", TransportistaFormController)
+
+import PurchaseOrderFormController from "./purchase_order_form_controller"
+application.register("purchase-order-form", PurchaseOrderFormController)
+
+import PurchaseFormController from "./purchase_form_controller"
+application.register("purchase-form", PurchaseFormController)
