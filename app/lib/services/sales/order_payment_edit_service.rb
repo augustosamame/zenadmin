@@ -1,7 +1,7 @@
 module Services
   module Sales
     class OrderPaymentEditService
-      def self.update_payments(order, payments_attributes)
+      def self.update_payments(order, payments_attributes, current_cashier, current_cashier_shift)
         ActiveRecord::Base.transaction do
           payments_attributes.each do |_, payment_attrs|
             if payment_attrs[:id].present?
@@ -15,7 +15,7 @@ module Services
                   amount_cents: amount_cents,
                   payment_method_id: payment_attrs[:payment_method_id]
                 )
-                
+
                 # Update associated cashier transaction if exists
                 if (transaction = payment.cashier_transaction)
                   transaction.update!(
@@ -42,13 +42,14 @@ module Services
             else
               # Create new payment
               next if payment_attrs[:_destroy] == "1"
-              
+
               amount_cents = (payment_attrs[:amount].to_f * 100).to_i
               payment = order.payments.create!(
                 payment_method_id: payment_attrs[:payment_method_id],
                 amount_cents: amount_cents,
                 user_id: order.user_id,
-                currency: order.currency || 'PEN'
+                currency: order.currency || "PEN",
+                cashier_shift: order.determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift)
               )
 
               # Handle bank cashier transaction for new payments
@@ -63,8 +64,7 @@ module Services
                     transactable: payment,
                     cashier_shift: bank_cashier_shift,
                     amount_cents: amount_cents,
-                    payment_method_id: payment_attrs[:payment_method_id],
-                    transaction_type: 'credit'
+                    payment_method_id: payment_attrs[:payment_method_id]
                   )
                 end
               end

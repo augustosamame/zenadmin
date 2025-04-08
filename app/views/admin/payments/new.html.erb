@@ -68,7 +68,8 @@
             input_html: { 
               step: 0.01,
               class: "form-input",
-              min: 0
+              min: 0,
+              readonly: @payment.amount.present?
             },
             label_html: { class: "form-label" } %>
       </div>

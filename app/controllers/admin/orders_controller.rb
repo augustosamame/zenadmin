@@ -69,7 +69,7 @@ class Admin::OrdersController < Admin::AdminController
               payment.merge(
                 payment_date: @order.order_date,
                 payable: @order,
-                cashier_shift: determine_cashier_shift_based_on_order_date,
+                cashier_shift: @order.determine_cashier_shift_based_on_order_date(@current_cashier, @current_cashier_shift),
                 status: @order.origin == "pos" && (payment[:payment_method_id]&.to_i != credit_payment_method&.id) ? "paid" : "pending"
               )
             )
@@ -187,7 +187,7 @@ class Admin::OrdersController < Admin::AdminController
     @order = Order.find(params[:id])
 
     begin
-      Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes])
+      Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes], @current_cashier, @current_cashier_shift)
       @order.reevaluate_payment_status
 
       respond_to do |format|
@@ -245,27 +245,6 @@ class Admin::OrdersController < Admin::AdminController
         payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date, :_destroy ],
         sellers_attributes: [ :id, :user_id, :percentage, :amount ],
         commissions_attributes: [ :id, :percentage, :amount_cents, :sale_amount_cents, :sale_amount, :currency, :status, :user_id, :order_id ])
-    end
-
-    def determine_cashier_shift_based_on_order_date
-      if @order.order_date > @current_cashier_shift.opened_at
-        @current_cashier_shift
-      else
-        found_cashier_shift = CashierShift.where(cashier_id: @current_cashier.id, opened_at: @order.order_date.beginning_of_day..@order.order_date.end_of_day).first
-        if found_cashier_shift.blank?
-          found_cashier_shift = CashierShift.create!(
-            cashier_id: @current_cashier.id,
-            opened_at: @order.order_date,
-            closed_at: @order.order_date + 5.seconds,
-            status: "closed",
-            total_sales_cents: 0,
-            date: @order.order_date,
-            opened_by: current_user,
-            retroactive_order_override: true
-          )
-        end
-        found_cashier_shift
-      end
     end
 
     def get_generic_customer_id

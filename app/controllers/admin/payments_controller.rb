@@ -63,11 +63,12 @@ class Admin::PaymentsController < Admin::AdminController
       session[:account_receivable_id] = params[:account_receivable_id]
       @account_receivable = AccountReceivable.find(params[:account_receivable_id])
 
-      # Pre-select the user from the account receivable
-      @payment.user_id = @account_receivable.user_id if @account_receivable.present?
-
-      # Pre-populate the amount with the remaining balance
-      @payment.amount = @account_receivable.remaining_balance if @account_receivable.present?
+      if @account_receivable.present?
+        # Pre-select the user from the account receivable
+        @payment.user_id = @account_receivable.user_id
+        # Pre-populate the amount with the remaining balance
+        @payment.amount = @account_receivable.remaining_balance
+      end
     elsif params[:from_account_receivable].blank?
       # Clear the session if not explicitly coming from account receivable
       session.delete(:account_receivable_id)
@@ -75,8 +76,12 @@ class Admin::PaymentsController < Admin::AdminController
       # Only load the account receivable if we're coming from account receivable
       @account_receivable = AccountReceivable.find(session[:account_receivable_id])
 
-      # Pre-populate the amount with the remaining balance
-      @payment.amount = @account_receivable.remaining_balance if @account_receivable.present?
+      if @account_receivable.present?
+        # Pre-select the user from the account receivable
+        @payment.user_id = @account_receivable.user_id
+        # Pre-populate the amount with the remaining balance
+        @payment.amount = @account_receivable.remaining_balance
+      end
     end
   end
 
@@ -94,6 +99,7 @@ class Admin::PaymentsController < Admin::AdminController
         if session[:account_receivable_id].present?
           account_receivable_id = session[:account_receivable_id]
           account_receivable = AccountReceivable.find(account_receivable_id)
+          old_credit_payment_id = account_receivable.payment_id
 
           # Apply the payment to the account receivable
           # Calculate the amount to apply
@@ -106,7 +112,7 @@ class Admin::PaymentsController < Admin::AdminController
             # Update the original payment amount
             @payment.update!(amount_cents: amount_to_apply)
 
-            # Create a new payment for the remainder
+            # Create a new payment without cashier transaction for the remainder
             new_payment = Payment.create!(
               payment_method_id: @payment.payment_method_id,
               user_id: @payment.user_id,
@@ -131,6 +137,15 @@ class Admin::PaymentsController < Admin::AdminController
             currency: @payment.currency,
             notes: @payment.comment
           )
+
+          # update old_credit_payment_to_reduce_saldo
+
+          old_credit_payment = Payment.find(old_credit_payment_id)
+          old_credit_payment.update_columns(
+            status: "paid",
+            account_receivable_id: account_receivable.id
+          )
+
 
           # Clear the session
           session.delete(:account_receivable_id)

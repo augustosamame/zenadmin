@@ -98,6 +98,6 @@ class Payment < ApplicationRecord
   private
 
     def create_cashier_transaction
-      Services::Sales::CashierTransactionService.new(self.cashier_shift).create_cashier_transaction(self)
+      Services::Sales::CashierTransactionService.new(self.cashier_shift).create_cashier_transaction(self) unless original_payment_id.present? # don't create cashier transaction if payment is created from original payment
     end
 end

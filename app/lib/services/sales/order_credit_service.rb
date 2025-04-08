@@ -23,6 +23,7 @@ module Services
                 @order.update_columns(payment_status: :unpaid, is_credit_sale: true)
               end
               create_credit_receivable if operation == :create
+              evaluate_credit_receivable if operation == :update
             else
               payment_amount = payments.sum(:amount_cents)
               if payment_amount >= @order.total_price_cents
@@ -86,6 +87,73 @@ module Services
                 amount_cents: payment.amount_cents,
                 currency: payment.currency
               )
+            end
+          end
+        rescue ActiveRecord::RecordInvalid => e
+          Rails.logger.error "Failed to create credit receivable: #{e.message}"
+          raise e
+        end
+      end
+
+      def evaluate_credit_receivable
+        default_due_date_days = $global_settings[:default_credit_receivable_due_date] || 30
+
+        ActiveRecord::Base.transaction do
+          @order.payments.each do |payment|
+            if payment.payment_method == @credit_payment_method
+              account_receivable = AccountReceivable.find_by(order: @order, payment: payment)
+              due_date = payment.due_date || (payment.created_at + default_due_date_days.days)
+              payment.update_columns(
+                amount_cents: payment.amount_cents,
+                currency: payment.currency,
+                due_date: due_date
+              )
+              if account_receivable.present?
+                account_receivable.update_columns(
+                  amount_cents: payment.amount_cents,
+                  currency: payment.currency,
+                  due_date: due_date
+                )
+              else
+                AccountReceivable.create!(
+                  user: @order.user,
+                  order: @order,
+                  payment: payment,
+                  amount_cents: payment.amount_cents,
+                  currency: payment.currency,
+                  due_date: payment.due_date || payment.created_at + default_due_date_days.days
+                )
+              end
+            else
+              account_receivable = AccountReceivable.find_by(order: @order, payment: payment)
+              payment.update_columns(
+                amount_cents: payment.amount_cents,
+                currency: payment.currency,
+                status: "paid"
+              )
+              if account_receivable.present?
+                account_receivable.update_columns(
+                  amount_cents: payment.amount_cents,
+                  currency: payment.currency,
+                  status: "paid"
+                )
+              else
+                account_receivable = AccountReceivable.create!(
+                  user: @order.user,
+                  order: @order,
+                  payment: payment,
+                  amount_cents: payment.amount_cents,
+                  currency: payment.currency,
+                  due_date: payment.due_date || payment.created_at + default_due_date_days.days
+                )
+                AccountReceivablePayment.create!(
+                  account_receivable: account_receivable,
+                  payment: payment,
+                  amount_cents: payment.amount_cents,
+                  currency: payment.currency
+                )
+              end
+              payment.update_column(:account_receivable_id, account_receivable.id)
             end
           end
         rescue ActiveRecord::RecordInvalid => e

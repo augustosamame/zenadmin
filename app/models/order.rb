@@ -159,6 +159,27 @@ class Order < ApplicationRecord
     end
   end
 
+  def determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift)
+    if self.order_date > current_cashier_shift.opened_at
+      current_cashier_shift
+    else
+      found_cashier_shift = CashierShift.where(cashier_id: current_cashier.id, opened_at: self.order_date.beginning_of_day..self.order_date.end_of_day).first
+      if found_cashier_shift.blank?
+        found_cashier_shift = CashierShift.create!(
+          cashier_id: current_cashier.id,
+          opened_at: self.order_date,
+          closed_at: self.order_date + 5.seconds,
+          status: "closed",
+          total_sales_cents: 0,
+          date: self.order_date,
+          opened_by: current_user,
+          retroactive_order_override: true
+        )
+      end
+      found_cashier_shift
+    end
+  end
+
   def update_loyalty_tier
     Services::Sales::LoyaltyTierService.new(self.user).update_loyalty_tier
   end
