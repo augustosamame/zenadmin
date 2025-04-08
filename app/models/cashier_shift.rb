@@ -100,6 +100,41 @@ class CashierShift < ApplicationRecord
     Money.new(total_cents, "PEN")
   end
 
+  def self.reset_all_saldo_inicial
+    Cashier.all.each do |cashier|
+      cashier.cashier_shifts.order(id: :asc).each do |cashier_shift|
+        cashier_shift.reset_saldo_inicial
+      end
+    end
+  end
+
+  def reset_saldo_inicial
+    cashier_shift = self
+    cashier_shift.cash_inflows.where("description LIKE ?", "Saldo de caja anterior -%").destroy_all
+    # Get the last shift for this cashier, regardless of status
+    last_shift = cashier_shift.cashier.cashier_shifts.where("id < ?", cashier_shift.id).order(id: :desc).first
+    if last_shift
+      # last_shift.cashier_transactions.includes(:payment_method).group_by(&:payment_method).each do |payment_method, transactions|
+      #  next if payment_method&.name != "cash"
+      #  total_amount_cents = transactions.sum(&:amount_cents)
+      total_amount_cents = last_shift.total_balance.cents
+      CashierTransaction.create!(
+        cashier_shift: cashier_shift,
+        amount_cents: total_amount_cents,
+        payment_method: PaymentMethod.find_by(name: "cash"),
+        created_at: last_shift.created_at - 1.second,
+        updated_at: last_shift.created_at - 1.second,
+        transactable: CashInflow.new(
+          cashier_shift: cashier_shift, # Ensure the cashier_shift is set
+          amount_cents: total_amount_cents,
+          received_by: cashier_shift.opened_by,
+          description: "Saldo de caja anterior - #{PaymentMethod.find_by(name: "cash")&.description || 'Sin método de pago'}"
+        )
+      )
+      # end
+    end
+  end
+
   def reset_payment_methods_all_cashiers
     cash_payment_method = PaymentMethod.find_by(name: "cash")
     Cashier.all.includes(:cashier_shifts).each do |cashier|

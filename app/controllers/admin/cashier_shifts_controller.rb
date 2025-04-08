@@ -237,11 +237,15 @@ class Admin::CashierShiftsController < Admin::AdminController
       total_cents = transactions.sum(&:amount_for_balance)
       total = Money.new(total_cents, "PEN")
 
-      cash_description = "Saldo Efectivo Anterior"
+      # add balance for transactables with description: "Saldo Efectivo Anterior"
+      balances << {
+        description: "Saldo Efectivo Anterior",
+        amount: Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
+      }
 
       # Add regular balance
       balances << {
-        description: payment_method&.name == "cash" ? cash_description : (payment_method&.description || "Sin método"),
+        description: payment_method&.description || "Sin método",
         amount: total
       }
 
