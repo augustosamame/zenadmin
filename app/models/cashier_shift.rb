@@ -101,22 +101,39 @@ class CashierShift < ApplicationRecord
   end
 
   def self.reset_all_saldo_inicial
+    # Use a direct SQL approach to avoid the media association issue
+    ActiveRecord::Base.transaction do
+      # First, get all CashInflow IDs that match our criteria
+      inflow_ids = CashInflow.where("description LIKE ?", "Saldo de caja anterior -%").pluck(:id)
+      
+      if inflow_ids.any?
+        # Delete associated cashier transactions first
+        CashierTransaction.where(transactable_type: 'CashInflow', transactable_id: inflow_ids).delete_all
+        
+        # Then delete the cash inflows directly
+        CashInflow.where(id: inflow_ids).delete_all
+        
+        puts "Successfully deleted #{inflow_ids.count} CashInflow records"
+      else
+        puts "No CashInflow records found matching 'Saldo de caja anterior -'"
+      end
+    end
+    
+    # Now proceed with adding new balances
     Cashier.all.each do |cashier|
       cashier.cashier_shifts.order(id: :asc).each do |cashier_shift|
-        cashier_shift.reset_saldo_inicial
+        # Skip the deletion part since we've already done it
+        cashier_shift.add_previous_balance
       end
     end
   end
-
-  def reset_saldo_inicial
+  
+  # New method to add previous balance without trying to delete first
+  def add_previous_balance
     cashier_shift = self
-    cashier_shift.cash_inflows.where("description LIKE ?", "Saldo de caja anterior -%").destroy_all
     # Get the last shift for this cashier, regardless of status
     last_shift = cashier_shift.cashier.cashier_shifts.where("id < ?", cashier_shift.id).order(id: :desc).first
     if last_shift
-      # last_shift.cashier_transactions.includes(:payment_method).group_by(&:payment_method).each do |payment_method, transactions|
-      #  next if payment_method&.name != "cash"
-      #  total_amount_cents = transactions.sum(&:amount_cents)
       total_amount_cents = last_shift.total_balance.cents
       CashierTransaction.create!(
         cashier_shift: cashier_shift,
@@ -131,7 +148,31 @@ class CashierShift < ApplicationRecord
           description: "Saldo de caja anterior - #{PaymentMethod.find_by(name: "cash")&.description || 'Sin método de pago'}"
         )
       )
-      # end
+    end
+  end
+  
+  # Keep the original method but modify it to use the new approach
+  def reset_saldo_inicial
+    # First delete any existing "Saldo de caja anterior" records using direct SQL
+    inflow_ids = self.cash_inflows.where("description LIKE ?", "Saldo de caja anterior -%").pluck(:id)
+    if inflow_ids.any?
+      CashierTransaction.where(transactable_type: 'CashInflow', transactable_id: inflow_ids).delete_all
+      CashInflow.where(id: inflow_ids).delete_all
+    end
+    
+    # Then add the new balance
+    add_previous_balance
+  end
+
+  def self.automatic_close_all_shifts
+    closed_by_user = User.first_admin_or_superadmin_user
+    Location.all.each do |location|
+      location.cashiers.each do |cashier|
+        next if cashier.cashier_type == "bank"
+        cashier.cashier_shifts.open.each do |open_shift|
+          Services::Sales::CashierTransactionService.new(open_shift).close_shift(closed_by_user)
+        end
+      end
     end
   end
 
@@ -158,18 +199,6 @@ class CashierShift < ApplicationRecord
               cashier_transaction.update_columns(payment_method_id: cash_payment_method.id)
             end
           end
-        end
-      end
-    end
-  end
-
-  def self.automatic_close_all_shifts
-    closed_by_user = User.first_admin_or_superadmin_user
-    Location.all.each do |location|
-      location.cashiers.each do |cashier|
-        next if cashier.cashier_type == "bank"
-        cashier.cashier_shifts.open.each do |open_shift|
-          Services::Sales::CashierTransactionService.new(open_shift).close_shift(closed_by_user)
         end
       end
     end
