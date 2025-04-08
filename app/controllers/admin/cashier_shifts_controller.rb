@@ -232,20 +232,20 @@ class Admin::CashierShiftsController < Admin::AdminController
 
     balances = []
 
+    # Add previous shift balance once, outside the payment method loop
+    balances << {
+      description: "Saldo Efectivo Anterior",
+      amount: Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
+    }
+
     transactions_by_method.each do |payment_method, transactions|
       # Use amount_for_balance to correctly account for transaction types
       total_cents = transactions.sum(&:amount_for_balance)
       total = Money.new(total_cents, "PEN")
 
-      # add balance for transactables with description: "Saldo Efectivo Anterior"
-      balances << {
-        description: "Saldo Efectivo Anterior",
-        amount: Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
-      }
-
       # Add regular balance
       balances << {
-        description: payment_method&.description || "Sin método",
+        description: "Ventas #{payment_method&.description || 'sin método de pago'}",
         amount: total
       }
 
