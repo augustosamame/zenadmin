@@ -70,14 +70,14 @@ class Admin::CashierShiftsController < Admin::AdminController
                                   .per(50)
 
     # Preload all Payment transactables with their associations to avoid N+1 queries
-    payment_transactions = @transactions.select { |t| t.transactable_type == 'Payment' }
-    
+    payment_transactions = @transactions.select { |t| t.transactable_type == "Payment" }
+
     if payment_transactions.any?
       payment_ids = payment_transactions.map(&:transactable_id)
       @preloaded_payments = Payment.includes(:cashier, :cashier_shift, :location, payable: {})
                                    .where(id: payment_ids)
                                    .index_by(&:id)
-      
+
       # Manually assign the preloaded payments to their transactions to avoid N+1 queries
       payment_transactions.each do |transaction|
         # Only replace the transactable if we have a preloaded version
@@ -224,7 +224,10 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def calculate_payment_method_balances(cashier_shift)
     # Fetch all transactions with payment methods in a single query
-    all_transactions = cashier_shift.cashier_transactions.includes(:payment_method).to_a
+    all_transactions = cashier_shift.cashier_transactions
+                                   .includes(:payment_method)
+                                   .where.not(transactable_type: [ "CashInflow", "CashOutflow" ])
+                                   .to_a
     transactions_by_method = all_transactions.group_by(&:payment_method)
 
     balances = []
