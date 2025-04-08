@@ -7,9 +7,9 @@
   <%= hidden_field_tag :debug_commit_value, '', data: { requisition_form_target: "debugCommit" } %>
   
   <!-- Header Section -->
-  <div class="p-6 mb-2 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+  <div class="p-6 mb-2 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
 
-    <div class="grid items-center grid-cols-1 gap-6 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+    <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
       <!-- Requisition Date -->
       <div>
         <%= form.label :requisition_date, "Fecha de Pedido", class: "form-label" %>
@@ -44,7 +44,7 @@
   </div>
 
   <!-- Products Section -->
-  <div class="p-2 mt-8 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+  <div class="p-2 mt-8 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
     <h3 class="mb-4 text-lg font-semibold text-slate-900 dark:text-slate-100">Productos</h3>
     <div id="requisition-form-lines" data-requisition-form-target="lines">
       <%= form.simple_fields_for :requisition_lines, @requisition_lines do |line_form| %>
@@ -55,7 +55,7 @@
     <!-- Add Product Button (always visible) -->
     <div class="flex justify-end mt-4">
       <button type="button" class="flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" data-action="click->requisition-form#add">
-        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
         </svg>
         Agregar Producto
@@ -71,7 +71,7 @@
 
   <!-- Form Actions -->
   <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
-    <% if @current_warehouse.is_main? && @requisition.req_submitted? %>
+    <% if current_user.has_any_role?("admin", "superadmin", "supervisor", "warehouse", "warehouse_manager") && @requisition.req_submitted? %>
       <button type="submit" 
           name="commit" 
           value="plan" 
