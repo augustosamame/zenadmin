@@ -39,6 +39,7 @@ Rails.application.config.after_initialize do
   end
 
   def check_custom_numberings
+    return
     return unless ActiveRecord::Base.connection.table_exists?("custom_numberings")
 
     CustomNumbering.record_types.keys.each do |record_type|
