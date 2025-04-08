@@ -4,7 +4,7 @@ class Admin::CashierShiftsController < Admin::AdminController
 
   def index
     # Base query with includes for eager loading
-    base_query = CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, :cashier_transactions ])
+    base_query = CashierShift.includes([ :opened_by, :closed_by, :cashier, :location, { cashier: :location }, { cashier_transactions: :payment_method } ])
 
     # Filter by location if applicable
     location_filtered = if @current_location
@@ -62,12 +62,31 @@ class Admin::CashierShiftsController < Admin::AdminController
       return
     end
 
-    # Paginate transactions with proper eager loading
+    # Paginate transactions with proper eager loading for payment methods
     @transactions = @cashier_shift.cashier_transactions
-                                  .includes(:payment_method, transactable: { payable: {} })
+                                  .includes(:payment_method, :transactable)
                                   .order(created_at: :desc)
                                   .page(params[:page])
                                   .per(50)
+
+    # Preload all Payment transactables with their associations to avoid N+1 queries
+    payment_transactions = @transactions.select { |t| t.transactable_type == 'Payment' }
+    
+    if payment_transactions.any?
+      payment_ids = payment_transactions.map(&:transactable_id)
+      @preloaded_payments = Payment.includes(:cashier, :cashier_shift, :location, payable: {})
+                                   .where(id: payment_ids)
+                                   .index_by(&:id)
+      
+      # Manually assign the preloaded payments to their transactions to avoid N+1 queries
+      payment_transactions.each do |transaction|
+        # Only replace the transactable if we have a preloaded version
+        if @preloaded_payments[transaction.transactable_id]
+          # Use instance_variable_set to bypass any potential readonly restrictions
+          transaction.instance_variable_set(:@transactable, @preloaded_payments[transaction.transactable_id])
+        end
+      end
+    end
 
     # Pre-calculate payment method balances
     @payment_method_balances = calculate_payment_method_balances(@cashier_shift)

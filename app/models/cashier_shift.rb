@@ -61,7 +61,7 @@ class CashierShift < ApplicationRecord
 
   def total_balance
     # Use the cashier_transactions and their amount_for_balance method to get the correct balance
-    balance_cents = cashier_transactions.sum do |transaction|
+    balance_cents = cashier_transactions.reject { |transaction| transaction.payment_method.name == "credit" }.sum do |transaction|
       transaction.amount_for_balance
     end
 

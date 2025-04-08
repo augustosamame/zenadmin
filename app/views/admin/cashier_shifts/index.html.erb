@@ -3,7 +3,7 @@
 <% end %>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
-  <div class="container p-2 mx-auto mt-6 overflow-x-auto bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="container overflow-x-auto p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
       <thead>
         <tr>
@@ -18,6 +18,7 @@
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Hora de Cierre</th>
           <th class="px-4 py-2 text-left">Cerrado Por</th>
+          <th class="px-4 py-2 text-left">Balance Del Día</th>
           <th class="px-4 py-2 text-left">Balance Total</th>
           <th class="px-4 py-2 text-left">Acciones</th>
         </tr>
@@ -36,6 +37,7 @@
             <td class="px-4 py-2"><%= cashier_shift.translated_status %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, cashier_shift.closed_at) %></td>
             <td class="px-4 py-2"><%= cashier_shift.closed_by&.name %></td>
+            <td class="px-4 py-2"><%= format_currency(cashier_shift.daily_balance) %></td>
             <td class="px-4 py-2"><%= format_currency(cashier_shift.total_balance) %></td>
             <td class="px-4 py-2">
               <%= link_to 'Ver', admin_cashier_shift_path(cashier_shift), class: 'btn btn-secondary' %>
