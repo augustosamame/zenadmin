@@ -1,0 +1,84 @@
+<%= form_with(model: [:admin, purchase], url: purchase.new_record? ? admin_purchases_path : admin_purchase_path(purchase), data: { controller: "purchase-form" }) do |form| %>
+  <% if purchase.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2><%= pluralize(purchase.errors.count, "error") %> prohibited this purchase from being saved:</h2>
+      <ul>
+        <% purchase.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <%= form.label :vendor_id, "Proveedor", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.collection_select :vendor_id, 
+          Purchases::Vendor.all, 
+          :id, 
+          :name, 
+          { prompt: "Seleccionar Proveedor" }, 
+          { 
+            class: "form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+            data: {
+              controller: "select",
+              select_placeholder_value: "Seleccionar Proveedor",
+              select_dropdown_parent: "body"
+            },
+            style: "z-index: 1000;"
+          } 
+      %>
+    </div>
+
+    <div>
+      <%= form.label :purchase_date, "Fecha de Compra", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.date_field :purchase_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :notes, "Notas", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+  </div>
+
+  <h3 class="text-lg font-medium text-gray-900 mb-4">Productos</h3>
+
+  <div class="mb-6 overflow-x-auto" style="overflow: visible !important;">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        </tr>
+      </thead>
+      <tbody data-purchase-form-target="lineItems" class="bg-white divide-y divide-gray-200">
+        <%= form.fields_for :purchase_lines do |line_form| %>
+          <%= render "purchase_line_fields", f: line_form %>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Add 100px of vertical space -->
+  <div style="height: 100px;"></div>
+
+  <div class="mb-6">
+    <%= link_to "Agregar Producto", "#", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { action: "click->purchase-form#addLine" } %>
+  </div>
+
+  <div class="flex justify-end">
+    <%= form.submit "Guardar", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <%= link_to "Cancelar", admin_purchases_path, class: "ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+  </div>
+  
+  <% content_for :templates do %>
+    <template id="purchase-line-template">
+      <%= form.fields_for :purchase_lines, Purchases::PurchaseLine.new, child_index: "NEW_RECORD" do |line_form| %>
+        <%= render "purchase_line_fields", f: line_form %>
+      <% end %>
+    </template>
+  <% end %>
+<% end %>

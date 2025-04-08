@@ -1,0 +1,8 @@
+<%= render "shared/admin/nav", { header_title: "Nueva Compra" } do %>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= render "form", purchase: @purchase %>
+  </div>
+</div>

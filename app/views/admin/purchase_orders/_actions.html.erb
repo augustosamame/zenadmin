@@ -1,0 +1,15 @@
+<div class="flex space-x-2">
+  <%= link_to admin_purchase_order_path(purchase_order), class: "text-blue-600 hover:text-blue-800" do %>
+    <%= render "shared/icons/eye" %>
+  <% end %>
+  
+  <%= link_to edit_admin_purchase_order_path(purchase_order), class: "text-yellow-600 hover:text-yellow-800" do %>
+    <%= render "shared/icons/edit" %>
+  <% end %>
+  
+  <% if purchase_order.purchase.blank? && purchase_order.status != "cancelled" %>
+    <%= button_to create_purchase_admin_purchase_order_path(purchase_order), method: :post, class: "text-green-600 hover:text-green-800", form: { data: { turbo_confirm: "¿Estás seguro de crear una compra a partir de esta orden?" } } do %>
+      <%= render "shared/icons/truck" %>
+    <% end %>
+  <% end %>
+</div>

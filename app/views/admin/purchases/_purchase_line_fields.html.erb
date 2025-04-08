@@ -1,0 +1,35 @@
+<tr class="purchase-line">
+  <td class="px-6 py-4 whitespace-nowrap">
+    <%= f.collection_select :product_id, 
+        Product.all, 
+        :id, 
+        :name, 
+        { prompt: "Seleccionar Producto" }, 
+        { 
+          class: "form-select block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+          data: {
+            controller: "select",
+            select_dropdown_parent: "body",
+            action: "change->purchase-form#updateLineTotal"
+          }
+        } 
+    %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <%= f.number_field :quantity, min: 1, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "change->purchase-form#updateLineTotal" } %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap">
+    <%= f.text_field :unit_price, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "change->purchase-form#updateLineTotal" } %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap line-total">
+    <%= humanized_money_with_symbol(f.object.total_price) if f.object.persisted? %>
+  </td>
+  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+    <% if f.object.persisted? %>
+      <%= f.hidden_field :_destroy %>
+      <%= link_to "Eliminar", "#", class: "text-red-600 hover:text-red-900", data: { action: "click->purchase-form#removeLine" } %>
+    <% else %>
+      <%= link_to "Eliminar", "#", class: "text-red-600 hover:text-red-900", data: { action: "click->purchase-form#removeLine" } %>
+    <% end %>
+  </td>
+</tr>

@@ -1,0 +1,123 @@
+<%= form_with(model: purchase_order, url: purchase_order.new_record? ? admin_purchase_orders_path : admin_purchase_order_path(purchase_order), data: { controller: "purchase-order-form" }, scope: :purchase_order) do |form| %>
+  <% if purchase_order.errors.any? %>
+    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+      <h2><%= pluralize(purchase_order.errors.count, "error") %> prohibited this purchase order from being saved:</h2>
+      <ul>
+        <% purchase_order.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+    <div>
+      <%= form.label :vendor_id, "Proveedor", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.collection_select :vendor_id, 
+          Purchases::Vendor.all, 
+          :id, 
+          :name, 
+          { prompt: "Seleccionar Proveedor" }, 
+          { 
+            class: "form-input mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+            data: {
+              controller: "select",
+              select_placeholder_value: "Seleccionar Proveedor",
+              select_dropdown_parent: "body"
+            },
+            style: "z-index: 1000;"
+          } 
+      %>
+    </div>
+
+    <div>
+      <%= form.label :order_date, "Fecha de Orden", class: "block text-sm font-medium text-gray-700" %>
+      <%= form.date_field :order_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+  </div>
+
+  <div class="mb-6">
+    <%= form.label :notes, "Notas", class: "block text-sm font-medium text-gray-700" %>
+    <%= form.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+  </div>
+
+  <h3 class="text-lg font-medium text-gray-900 mb-4">Productos</h3>
+
+  <div class="mb-10 overflow-x-auto" style="overflow: visible !important;">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+        </tr>
+      </thead>
+      <tbody data-purchase-order-form-target="lineItems" class="bg-white divide-y divide-gray-200">
+        <%= form.fields_for :purchase_order_lines do |line_form| %>
+          <tr class="purchase-order-line">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <select name="purchase_order[purchase_order_lines_attributes][<%= line_form.object.id || 0 %>][product_id]" class="form-select block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" data-controller="select" data-select-dropdown-parent="body">
+                <option value="">Seleccionar Producto</option>
+                <% Product.all.each do |product| %>
+                  <option value="<%= product.id %>" <%= line_form.object.product_id == product.id ? 'selected' : '' %>><%= product.name %></option>
+                <% end %>
+              </select>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <input type="number" name="purchase_order[purchase_order_lines_attributes][<%= line_form.object.id || 0 %>][quantity]" class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" min="1" step="1" data-action="change->purchase-order-form#updateLineTotal" value="<%= line_form.object.quantity %>">
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <input type="number" name="purchase_order[purchase_order_lines_attributes][<%= line_form.object.id || 0 %>][unit_price]" class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" min="0.01" step="0.01" data-action="change->purchase-order-form#updateLineTotal" value="<%= line_form.object.unit_price %>">
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="line-total">S/. <%= (line_form.object.quantity || 0) * (line_form.object.unit_price || 0) %></span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <a href="#" class="text-red-600 hover:text-red-900" data-action="click->purchase-order-form#removeLine">Eliminar</a>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  
+  <!-- Add 100px of vertical space -->
+  <div style="height: 100px;"></div>
+
+  <div class="mb-10">
+    <%= link_to "Agregar Producto", "#", class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500", data: { action: "click->purchase-order-form#addLine" } %>
+  </div>
+
+  <div class="flex justify-end">
+    <%= form.submit "Guardar", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+    <%= link_to "Cancelar", admin_purchase_orders_path, class: "ml-3 inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
+  </div>
+<% end %>
+
+<!-- Place template outside the form -->
+<template id="purchase-order-line-template" data-purchase-order-form-target="template">
+  <tr class="purchase-order-line">
+    <td class="px-6 py-4 whitespace-nowrap">
+      <select name="purchase_order[purchase_order_lines_attributes][NEW_RECORD][product_id]" class="form-select block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" data-controller="select" data-select-dropdown-parent="body">
+        <option value="">Seleccionar Producto</option>
+        <% Product.all.each do |product| %>
+          <option value="<%= product.id %>"><%= product.name %></option>
+        <% end %>
+      </select>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <input type="number" name="purchase_order[purchase_order_lines_attributes][NEW_RECORD][quantity]" class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" min="1" step="1" data-action="change->purchase-order-form#updateLineTotal">
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <input type="number" name="purchase_order[purchase_order_lines_attributes][NEW_RECORD][unit_price]" class="form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" min="0.01" step="0.01" data-action="change->purchase-order-form#updateLineTotal">
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <span class="line-total">S/. 0.00</span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <a href="#" class="text-red-600 hover:text-red-900" data-action="click->purchase-order-form#removeLine">Eliminar</a>
+    </td>
+  </tr>
+</template>

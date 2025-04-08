@@ -1,0 +1,9 @@
+<div class="flex space-x-2">
+  <%= link_to admin_purchase_path(purchase), class: "text-blue-600 hover:text-blue-800" do %>
+    <%= render "shared/icons/eye" %>
+  <% end %>
+  
+  <%= link_to edit_admin_purchase_path(purchase), class: "text-yellow-600 hover:text-yellow-800" do %>
+    <%= render "shared/icons/edit" %>
+  <% end %>
+</div>

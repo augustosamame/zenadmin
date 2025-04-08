@@ -1,0 +1,105 @@
+<%= render "shared/admin/nav", { header_title: "Detalles del Proveedor" } do %>
+  <%= link_to 'Volver a Proveedores', admin_vendors_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="p-6">
+      <div class="flex justify-between items-center mb-6">
+        <h2 class="text-xl font-semibold"><%= @vendor.name %></h2>
+        <div class="flex space-x-2">
+          <%= link_to edit_admin_vendor_path(@vendor), class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+            <i class="fas fa-edit mr-2"></i> Editar
+          <% end %>
+          <%= link_to admin_vendor_path(@vendor), method: :delete, data: { confirm: "¿Estás seguro de eliminar este proveedor?" }, class: "inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" do %>
+            <i class="fas fa-trash-alt mr-2"></i> Eliminar
+          <% end %>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">ID</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.id %></p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Nombre</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.name %></p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Nombre de Contacto</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.contact_name || "-" %></p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Email</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.email || "-" %></p>
+          </div>
+        </div>
+        
+        <div class="space-y-4">
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Teléfono</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.phone || "-" %></p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">Dirección</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.address || "-" %></p>
+          </div>
+          
+          <div>
+            <h3 class="text-sm font-medium text-gray-500">RUC/DNI</h3>
+            <p class="mt-1 text-sm text-gray-900"><%= @vendor.tax_id || "-" %></p>
+          </div>
+        </div>
+      </div>
+      
+      <% if @vendor.notes.present? %>
+        <div class="mt-6">
+          <h3 class="text-sm font-medium text-gray-500">Notas</h3>
+          <div class="mt-2 p-4 bg-gray-50 rounded-md">
+            <p class="text-sm text-gray-900"><%= @vendor.notes %></p>
+          </div>
+        </div>
+      <% end %>
+      
+      <% if @vendor.purchase_orders.present? && @vendor.purchase_orders.any? %>
+        <div class="mt-8">
+          <h3 class="text-lg font-medium text-gray-900 mb-4">Órdenes de Compra</h3>
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% @vendor.purchase_orders.order(created_at: :desc).each do |po| %>
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= po.purchase_order_number %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= po.order_date&.strftime('%d/%m/%Y') %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= po.status.humanize %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= number_to_currency(po.total_amount) %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <%= link_to admin_purchase_order_path(po), class: "text-indigo-600 hover:text-indigo-900" do %>
+                        <i class="fas fa-eye"></i> Ver
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

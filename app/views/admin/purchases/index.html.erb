@@ -1,0 +1,36 @@
+<%= render "shared/admin/nav", { header_title: "Compras" } do %>
+  <%= link_to 'Nueva Compra', new_admin_purchase_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">ID</th>
+          <th class="px-4 py-2 text-left">Número</th>
+          <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Proveedor</th>
+          <th class="px-4 py-2 text-left">Usuario</th>
+          <th class="px-4 py-2 text-left">Orden de Compra</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @purchases.each do |purchase| %>
+          <tr>
+            <td class="px-4 py-2"><%= purchase.id %></td>
+            <td class="px-4 py-2"><%= purchase.purchase_number %></td>
+            <td class="px-4 py-2"><%= friendly_date(current_user, purchase.purchase_date) %></td>
+            <td class="px-4 py-2"><%= purchase.vendor.name %></td>
+            <td class="px-4 py-2"><%= purchase.user.name %></td>
+            <td class="px-4 py-2"><%= purchase.purchase_order&.purchase_order_number || "-" %></td>
+            <td class="px-4 py-2">
+              <%= render partial: "actions", locals: { purchase: purchase } %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
