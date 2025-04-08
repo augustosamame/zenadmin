@@ -9,9 +9,11 @@ module Admin::CashierShiftsHelper
       total_cents = transactions.sum(&:amount_for_balance)
       total = Money.new(total_cents, "PEN")
 
+      cash_description = "Saldo Efectivo anterior"
+
       # Add regular balance
       balances << {
-        description: payment_method&.description || "Sin método",
+        description: payment_method&.name == "cash" ? cash_description : (payment_method&.description || "Sin método"),
         amount: total
       }
 

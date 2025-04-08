@@ -100,6 +100,34 @@ class CashierShift < ApplicationRecord
     Money.new(total_cents, "PEN")
   end
 
+  def reset_payment_methods_all_cashiers
+    cash_payment_method = PaymentMethod.find_by(name: "cash")
+    Cashier.all.includes(:cashier_shifts).each do |cashier|
+      cashier.cashier_shifts.each do |cashier_shift|
+        if cashier.cashier_type == "standard"
+          cashier_shift.cashier_transactions.each do |cashier_transaction|
+            case cashier_transaction.payment_method.name
+            when "cash", "credit"
+              next
+            else
+              cashier_transaction.update_columns(payment_method_id: cash_payment_method.id)
+            end
+          end
+        end
+        if cashier.cashier_type == "bank"
+          cashier_shift.cashier_transactions.each do |cashier_transaction|
+            case cashier_transaction.payment_method.name
+            when "cash"
+              next
+            else
+              cashier_transaction.update_columns(payment_method_id: cash_payment_method.id)
+            end
+          end
+        end
+      end
+    end
+  end
+
   def self.automatic_close_all_shifts
     closed_by_user = User.first_admin_or_superadmin_user
     Location.all.each do |location|
