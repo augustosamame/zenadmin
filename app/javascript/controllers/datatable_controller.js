@@ -265,6 +265,26 @@ export default class extends Controller {
       this.parseHideOption(option, options);
     } else if (option.startsWith("sort_")) {
       this.parseSortOption(option, options);
+    } else if (option.startsWith("balance_sort_")) {
+      // Handle balance sorting
+      const [, colIndex] = option.split("_");
+      if (!options.columnDefs) options.columnDefs = [];
+      
+      options.columnDefs.push({
+        targets: parseInt(colIndex, 10),
+        type: 'num',
+        render: function(data, type, row, meta) {
+          if (type === 'sort') {
+            // Find the TD element
+            const cell = $('td:eq(' + meta.col + ')', row);
+            // Get the data-sort-value attribute
+            const sortValue = cell.attr('data-sort-value');
+            // Return as a number for sorting
+            return sortValue ? parseFloat(sortValue) : 0;
+          }
+          return data;
+        }
+      });
     } else {
       let [key, value] = option.split(':');
       if (key && value) {

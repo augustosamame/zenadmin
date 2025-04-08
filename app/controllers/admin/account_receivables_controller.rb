@@ -11,7 +11,50 @@ class Admin::AccountReceivablesController < Admin::AdminController
                        .joins(:roles)
                        .where(roles: { name: "customer" })
                        .where.not(id: generic_user.id)
-        @datatable_options = "resource_name:'User';sort_0_desc;create_button:false;"
+        
+        # Precompute balances for all users to avoid N+1 queries
+        @user_balances = {}
+        
+        # Get all user IDs
+        user_ids = @users.pluck(:id)
+        
+        # Get all account receivables in one query
+        receivables_by_user = AccountReceivable.where(user_id: user_ids)
+                                              .group(:user_id)
+                                              .sum(:amount_cents)
+        
+        # Get all applied payments in one query
+        applied_payments_by_user = {}
+        
+        # This query gets all payments applied to orders for each user
+        applied_payments_query = Payment.where(payable_type: "Order")
+                                        .joins("INNER JOIN orders ON orders.id = payments.payable_id")
+                                        .where(orders: { user_id: user_ids, is_credit_sale: true })
+                                        .where.not(account_receivable_id: nil)
+                                        .group("orders.user_id")
+                                        .sum(:amount_cents)
+                                        
+        applied_payments_query.each do |user_id, amount|
+          applied_payments_by_user[user_id] = amount
+        end
+        
+        # Get all unapplied payments in one query
+        unapplied_payments_by_user = Payment.unapplied
+                                           .where(user_id: user_ids)
+                                           .group(:user_id)
+                                           .sum(:amount_cents)
+        
+        @users.each do |user|
+          total_receivables = receivables_by_user[user.id] || 0
+          total_applied_payments = applied_payments_by_user[user.id] || 0
+          total_unapplied_payments = unapplied_payments_by_user[user.id] || 0
+          total_payments = total_applied_payments + total_unapplied_payments
+          
+          # Calculate balance (receivables - payments)
+          @user_balances[user.id] = (total_receivables - total_payments) / 100.0
+        end
+        
+        @datatable_options = "resource_name:'User';sort_0_desc;create_button:false;balance_sort_5;"
       end
     end
   end
