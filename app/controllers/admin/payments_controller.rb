@@ -48,6 +48,11 @@ class Admin::PaymentsController < Admin::AdminController
     @payment = Payment.new
     generic_customer = User.find_by(email: "generic_customer@devtechperu.com")
     @customer_users = User.with_role("customer") - [ generic_customer ]
+    if current_user.any_admin?
+      @elligible_payment_methods = PaymentMethod.active
+    else
+      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
+    end
 
     # Load open cashier shifts for admins and supervisors
     @open_cashier_shifts = CashierShift.includes(:cashier).where(status: :open).order("cashiers.name")
@@ -90,6 +95,12 @@ class Admin::PaymentsController < Admin::AdminController
     @payment.status = "paid"
 
     @open_cashier_shifts = CashierShift.includes(:cashier).where(status: :open).order("cashiers.name")
+
+    if current_user.any_admin?
+      @elligible_payment_methods = PaymentMethod.active
+    else
+      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
+    end
 
     @payment.cashier_shift ||= @current_cashier_shift
 

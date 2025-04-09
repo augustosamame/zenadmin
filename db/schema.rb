@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_031300) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_201657) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -190,6 +190,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_031300) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.integer "cashier_type", default: 0
+    t.string "access", default: "all", null: false
     t.index ["cashier_type"], name: "index_cashiers_on_cashier_type"
     t.index ["location_id"], name: "index_cashiers_on_location_id"
   end
@@ -617,6 +618,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_031300) do
     t.integer "payment_method_type", default: 0
     t.string "cashier_name"
     t.integer "cashier_linked_id"
+    t.string "access", default: "all", null: false
     t.index ["payment_method_type"], name: "index_payment_methods_on_payment_method_type"
   end
 

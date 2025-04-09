@@ -5,7 +5,11 @@ class Admin::PaymentMethodsController < Admin::AdminController
     @datatable_options = "resource_name:'PaymentMethod';create_button:true;"
     if $global_settings[:feature_flag_bank_cashiers_active]
       if $global_settings[:pos_can_create_unpaid_orders]
-        @filtered_payment_methods = PaymentMethod.active.order(:payment_method_type, :id)
+        if current_user.any_admin?
+          @filtered_payment_methods = PaymentMethod.active.order(:payment_method_type, :id)
+        else
+          @filtered_payment_methods = PaymentMethod.active.where(access: "all").order(:payment_method_type, :id)
+        end
       else
         @filtered_payment_methods = PaymentMethod.active.where.not(payment_method_type: "credit").order(:payment_method_type, :id)
       end

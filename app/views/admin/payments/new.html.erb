@@ -47,7 +47,7 @@
       <!-- Payment Method Selection -->
       <div>
         <%= form.association :payment_method,
-            collection: PaymentMethod.active.map { |pm| [pm.description, pm.id] },
+            collection: @elligible_payment_methods.map { |pm| [pm.description, pm.id] },
             label: "Método de Pago",
             prompt: "Seleccione método de pago",
             input_html: { 
