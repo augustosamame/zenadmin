@@ -93,6 +93,7 @@ class Admin::PurchaseOrdersController < Admin::AdminController
       :vendor_id,
       :order_date,
       :notes,
+      :transportista_id,
       purchase_order_lines_attributes: [
         :id,
         :product_id,

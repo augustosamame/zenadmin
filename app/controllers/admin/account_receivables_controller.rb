@@ -11,21 +11,21 @@ class Admin::AccountReceivablesController < Admin::AdminController
                        .joins(:roles)
                        .where(roles: { name: "customer" })
                        .where.not(id: generic_user.id)
-        
+
         # Precompute balances for all users to avoid N+1 queries
         @user_balances = {}
-        
+
         # Get all user IDs
         user_ids = @users.pluck(:id)
-        
+
         # Get all account receivables in one query
         receivables_by_user = AccountReceivable.where(user_id: user_ids)
                                               .group(:user_id)
                                               .sum(:amount_cents)
-        
+
         # Get all applied payments in one query
         applied_payments_by_user = {}
-        
+
         # This query gets all payments applied to orders for each user
         applied_payments_query = Payment.where(payable_type: "Order")
                                         .joins("INNER JOIN orders ON orders.id = payments.payable_id")
@@ -33,27 +33,27 @@ class Admin::AccountReceivablesController < Admin::AdminController
                                         .where.not(account_receivable_id: nil)
                                         .group("orders.user_id")
                                         .sum(:amount_cents)
-                                        
+
         applied_payments_query.each do |user_id, amount|
           applied_payments_by_user[user_id] = amount
         end
-        
+
         # Get all unapplied payments in one query
         unapplied_payments_by_user = Payment.unapplied
                                            .where(user_id: user_ids)
                                            .group(:user_id)
                                            .sum(:amount_cents)
-        
+
         @users.each do |user|
           total_receivables = receivables_by_user[user.id] || 0
           total_applied_payments = applied_payments_by_user[user.id] || 0
           total_unapplied_payments = unapplied_payments_by_user[user.id] || 0
           total_payments = total_applied_payments + total_unapplied_payments
-          
+
           # Calculate balance (receivables - payments)
           @user_balances[user.id] = (total_receivables - total_payments) / 100.0
         end
-        
+
         @datatable_options = "resource_name:'User';sort_0_desc;create_button:false;balance_sort_5;"
       end
     end
@@ -74,7 +74,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
-      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
+      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid
 
       # Check if customer has any account receivables or payments
       @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
@@ -155,11 +155,11 @@ class Admin::AccountReceivablesController < Admin::AdminController
     ActiveRecord::Base.transaction do
       # Update the user's initial balance field
       @user.update!(account_receivable_initial_balance: amount)
-      
+
       if amount > 0
         # Find existing initial balance account receivable or create a new one
         existing_initial_balance = AccountReceivable.find_by(user: @user, description: "Saldo inicial", order_id: nil)
-        
+
         if existing_initial_balance.present?
           # Update the existing account receivable
           if existing_initial_balance.update(
@@ -200,7 +200,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
       elsif amount < 0
         # Find existing initial balance payment or create a new one
         existing_initial_balance = Payment.find_by(user: @user, description: "Saldo inicial a favor")
-        
+
         if existing_initial_balance.present?
           # Update the existing payment
           if existing_initial_balance.update(

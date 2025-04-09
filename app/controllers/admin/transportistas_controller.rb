@@ -46,6 +46,11 @@ class Admin::TransportistasController < Admin::AdminController
 
   def show
     authorize! :read, @transportista
+    
+    respond_to do |format|
+      format.html
+      format.json { render json: @transportista }
+    end
   end
 
   def new

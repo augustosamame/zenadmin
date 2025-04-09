@@ -5,6 +5,7 @@ class Purchases::PurchaseOrder < ApplicationRecord
   belongs_to :region
   belongs_to :user
   belongs_to :vendor, class_name: "Purchases::Vendor"
+  belongs_to :transportista, optional: true
   has_many :purchase_order_lines, class_name: "Purchases::PurchaseOrderLine", dependent: :destroy
   has_one :purchase, class_name: "Purchases::Purchase"
 
@@ -32,7 +33,8 @@ class Purchases::PurchaseOrder < ApplicationRecord
         user_id: user_id,
         vendor_id: vendor_id,
         purchase_date: Date.current,
-        purchase_order: self
+        purchase_order: self,
+        transportista_id: transportista_id
       )
 
       purchase_order_lines.each do |po_line|

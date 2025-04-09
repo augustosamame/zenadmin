@@ -1,0 +1,5 @@
+class AddTransportistaToPurchases < ActiveRecord::Migration[8.0]
+  def change
+    add_reference :purchases_purchases, :transportista, null: true, foreign_key: true
+  end
+end

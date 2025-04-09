@@ -1,37 +1,74 @@
-<tr class="purchase-order-line">
-  <td class="px-6 py-4 whitespace-nowrap">
+<div class="flex items-center w-full mb-4 space-x-4 nested-fields purchase-order-line" data-new-record="<%= f.object.new_record? %>">
+  <!-- Product Field -->
+  <div class="flex items-center w-1/3">
     <%= f.collection_select :product_id, 
         Product.all, 
         :id, 
         :name, 
         { prompt: "Seleccionar Producto" }, 
         { 
-          class: "form-input block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", 
-          data: { 
+          class: "w-full form-input text-sm",
+          data: {
             controller: "select",
-            action: "change->purchase-order-form#updateLineTotal",
             select_placeholder_value: "Seleccionar Producto",
             select_dropdown_parent: "body"
-          },
-          style: "z-index: 1000;"
+          }
         } 
     %>
-  </td>
-  <td class="px-6 py-4 whitespace-nowrap">
-    <%= f.number_field :quantity, min: 1, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "change->purchase-order-form#updateLineTotal" } %>
-  </td>
-  <td class="px-6 py-4 whitespace-nowrap">
-    <%= f.text_field :unit_price, class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "change->purchase-order-form#updateLineTotal" } %>
-  </td>
-  <td class="px-6 py-4 whitespace-nowrap line-total">
-    <%= humanized_money_with_symbol(f.object.total_price) if f.object.persisted? %>
-  </td>
-  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-    <% if f.object.persisted? %>
-      <%= f.hidden_field :_destroy %>
-      <%= link_to "Eliminar", "#", class: "text-red-600 hover:text-red-900", data: { action: "click->purchase-order-form#removeLine" } %>
-    <% else %>
-      <%= link_to "Eliminar", "#", class: "text-red-600 hover:text-red-900", data: { action: "click->purchase-order-form#removeLine" } %>
-    <% end %>
-  </td>
-</tr>
+  </div>
+
+  <!-- Quantity Fields Container -->
+  <div class="flex items-center w-2/3 space-x-4">
+    <!-- Quantity Field -->
+    <div class="flex items-center justify-end w-1/4">
+      <%= f.label :quantity, "Cantidad", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
+      <%= f.number_field :quantity, 
+                        min: 1, 
+                        value: f.object.quantity || 1, 
+                        class: "form-input w-24 text-sm no-spinner", 
+                        data: { action: "change->purchase-order-form#updateLineTotal" } %>
+    </div>
+
+    <!-- Unit Price Field -->
+    <div class="flex items-center justify-end w-1/4">
+      <%= f.label :unit_price, "Precio", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
+      <%= f.text_field :unit_price, 
+                      value: f.object.unit_price || 0.00, 
+                      class: "form-input w-28 text-sm", 
+                      data: { action: "change->purchase-order-form#updateLineTotal" } %>
+    </div>
+
+    <!-- Total Field -->
+    <div class="flex items-center justify-end w-1/4">
+      <%= f.label :total, "Total", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>
+      <div class="form-input w-28 text-sm line-total">
+        <% if f.object.persisted? && f.object.quantity && f.object.unit_price %>
+          <%= humanized_money_with_symbol(f.object.quantity * f.object.unit_price) %>
+        <% else %>
+          S/. 0.00
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex items-center justify-end w-1/4 space-x-2">
+      <!-- Remove Product Button -->
+      <button type="button" class="p-1 text-red-500 hover:text-red-700" data-action="click->purchase-order-form#remove">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
+        </svg>
+      </button>
+
+      <!-- Add Product Button -->
+      <button type="button" class="p-1 text-green-500 hover:text-green-700" data-action="click->purchase-order-form#add">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+      </button>
+
+      <% if f.object.persisted? %>
+        <%= f.hidden_field :_destroy %>
+      <% end %>
+    </div>
+  </div>
+</div>

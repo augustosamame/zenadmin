@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_204132) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -887,8 +887,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_204132) do
     t.integer "status", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "transportista_id"
     t.index ["purchase_order_number"], name: "index_purchases_purchase_orders_on_purchase_order_number", unique: true
     t.index ["region_id"], name: "index_purchases_purchase_orders_on_region_id"
+    t.index ["transportista_id"], name: "index_purchases_purchase_orders_on_transportista_id"
     t.index ["user_id"], name: "index_purchases_purchase_orders_on_user_id"
     t.index ["vendor_id"], name: "index_purchases_purchase_orders_on_vendor_id"
   end
@@ -903,9 +905,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_204132) do
     t.bigint "user_id", null: false
     t.bigint "purchase_order_id"
     t.text "notes"
+    t.bigint "transportista_id"
     t.index ["purchase_number"], name: "index_purchases_purchases_on_purchase_number", unique: true
     t.index ["purchase_order_id"], name: "index_purchases_purchases_on_purchase_order_id"
     t.index ["region_id"], name: "index_purchases_purchases_on_region_id"
+    t.index ["transportista_id"], name: "index_purchases_purchases_on_transportista_id"
     t.index ["user_id"], name: "index_purchases_purchases_on_user_id"
     t.index ["vendor_id"], name: "index_purchases_purchases_on_vendor_id"
   end
@@ -1310,10 +1314,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_204132) do
   add_foreign_key "purchases_purchase_order_lines", "purchases_purchase_orders", column: "purchase_order_id"
   add_foreign_key "purchases_purchase_orders", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchase_orders", "regions"
+  add_foreign_key "purchases_purchase_orders", "transportistas"
   add_foreign_key "purchases_purchase_orders", "users"
   add_foreign_key "purchases_purchases", "purchases_purchase_orders", column: "purchase_order_id"
   add_foreign_key "purchases_purchases", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchases", "regions"
+  add_foreign_key "purchases_purchases", "transportistas"
   add_foreign_key "purchases_purchases", "users"
   add_foreign_key "purchases_vendors", "regions"
   add_foreign_key "requisition_lines", "products"
