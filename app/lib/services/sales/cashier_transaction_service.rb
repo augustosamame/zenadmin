@@ -56,7 +56,7 @@ module Services
           if last_closed_shift
             last_closed_shift.cashier_transactions.includes(:payment_method).group_by(&:payment_method).each do |payment_method, transactions|
               next if $global_settings[:only_pull_cash_value_from_previous_cashier_shift] && payment_method&.name != "cash"
-              total_amount_cents = transactions.sum(&:amount_cents)
+              total_amount_cents = last_closed_shift.total_balance.cents
               CashierTransaction.create!(
                 cashier_shift: @cashier_shift,
                 amount_cents: total_amount_cents,
