@@ -18,7 +18,7 @@ class Admin::ProductsController < Admin::AdminController
         if @products.size > 1000
           @datatable_options = "server_side:true;state_save:true;resource_name:'Product';sort_0_asc;#{current_user.any_admin? ? '' : 'create_button:false;'}"
         else
-          @datatable_options = "resource_name:'Product';sort_0_asc;state_save:true;#{current_user.any_admin? ? '' : 'create_button:false;'}"
+          @datatable_options = "resource_name:'Product';sort_0_asc;state_save:true;#{current_user.any_admin? || current_user.has_role?('purchases') ? '' : 'create_button:false;'}"
         end
       end
 
@@ -319,9 +319,9 @@ class Admin::ProductsController < Admin::AdminController
     # Check if price lists feature is enabled
     unless $global_settings[:feature_flag_price_lists]
       # Return regular prices if price lists are not enabled
-      product_ids = params[:product_ids].split(',').map(&:to_i)
+      product_ids = params[:product_ids].split(",").map(&:to_i)
       products = Product.where(id: product_ids)
-      
+
       result = products.map do |product|
         {
           id: product.id,
@@ -330,7 +330,7 @@ class Admin::ProductsController < Admin::AdminController
           price_list_id: nil
         }
       end
-      
+
       render json: result
       return
     end
@@ -341,7 +341,7 @@ class Admin::ProductsController < Admin::AdminController
       return
     end
 
-    product_ids = params[:product_ids].split(',').map(&:to_i)
+    product_ids = params[:product_ids].split(",").map(&:to_i)
     products = Product.where(id: product_ids)
 
     result = products.map do |product|
@@ -363,7 +363,7 @@ class Admin::ProductsController < Admin::AdminController
       return
     end
 
-    product_ids = params[:product_ids].split(',').map(&:to_i)
+    product_ids = params[:product_ids].split(",").map(&:to_i)
     products = Product.where(id: product_ids)
 
     result = products.map do |product|
@@ -390,7 +390,7 @@ class Admin::ProductsController < Admin::AdminController
     def product_params
       params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, :inafecto, tag_ids: [], product_category_ids: [],
       media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
-      price_list_items_attributes: [:id, :price_list_id, :price])
+      price_list_items_attributes: [ :id, :price_list_id, :price ])
     end
 
     def preprocess_media_attributes(params)
@@ -409,38 +409,38 @@ class Admin::ProductsController < Admin::AdminController
     def product_to_json(product, applicable_discounts, customer = nil)
       # Calculate original price (before any discounts)
       original_price = product.price_cents / 100.0
-      
+
       # Apply price list pricing if customer is present and has a price list
       if customer.present? && $global_settings[:feature_flag_price_lists]
         customer_price = product.price_for_customer(customer)
         original_price = customer_price.to_f
       end
-      
+
       # Calculate discounted price (after any discounts)
       discounted_price = original_price
-      
+
       # Apply global discounts if any
       product_discounts = applicable_discounts.values.select do |discount|
         discount.matching_product_ids.include?(product.id)
       end
-      
+
       if product_discounts.any?
         # Process discounts with percentage or fixed amount
         percentage_discounts = product_discounts.select { |discount| discount.discount_percentage.present? }
         fixed_amount_discounts = product_discounts.select { |discount| discount.discount_fixed_amount.present? }
-        
+
         # Apply percentage discount if any
         if percentage_discounts.any?
           max_percentage_discount = percentage_discounts.max_by(&:discount_percentage)
           discounted_price = original_price * (1 - max_percentage_discount.discount_percentage / 100.0)
         end
-        
+
         # Apply fixed amount discount if any
         if fixed_amount_discounts.any?
           max_fixed_discount = fixed_amount_discounts.max_by(&:discount_fixed_amount)
           discounted_price = original_price - max_fixed_discount.discount_fixed_amount
           # Ensure price doesn't go below zero
-          discounted_price = [discounted_price, 0].max
+          discounted_price = [ discounted_price, 0 ].max
         end
       end
 
