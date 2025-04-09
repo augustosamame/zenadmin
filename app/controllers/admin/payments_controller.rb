@@ -49,7 +49,7 @@ class Admin::PaymentsController < Admin::AdminController
     generic_customer = User.find_by(email: "generic_customer@devtechperu.com")
     @customer_users = User.with_role("customer") - [ generic_customer ]
     if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active
+      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
     else
       @elligible_payment_methods = PaymentMethod.active.where(access: "all")
     end
@@ -97,7 +97,7 @@ class Admin::PaymentsController < Admin::AdminController
     @open_cashier_shifts = CashierShift.includes(:cashier).where(status: :open).order("cashiers.name")
 
     if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active
+      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
     else
       @elligible_payment_methods = PaymentMethod.active.where(access: "all")
     end
