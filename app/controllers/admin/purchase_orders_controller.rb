@@ -8,7 +8,7 @@ class Admin::PurchaseOrdersController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @purchase_orders = Purchases::PurchaseOrder.includes(:vendor, :user)
+        @purchase_orders = Purchases::PurchaseOrder.includes(:vendor, :user, :purchase)
                                                   .order(created_at: :desc)
                                                   .limit(10)
         @datatable_options = "server_side:true;resource_name:'PurchaseOrder';sort_0_desc;hide_0;create_button:true;"
@@ -30,6 +30,8 @@ class Admin::PurchaseOrdersController < Admin::AdminController
     @purchase_order.user_id = current_user.id
     # Only set region_id if @current_region exists
     @purchase_order.region_id = @current_region.id if @current_region.present?
+    # Set default status to pending
+    @purchase_order.status = :pending unless purchase_order_params[:status].present?
 
     respond_to do |format|
       if @purchase_order.save
@@ -65,21 +67,25 @@ class Admin::PurchaseOrdersController < Admin::AdminController
       if @purchase_order.purchase.present?
         format.html { redirect_to admin_purchase_order_path(@purchase_order), alert: "Purchase already exists for this order." }
       else
-        purchase = @purchase_order.create_purchase(current_user.id)
+        purchase = @purchase_order.create_purchase
 
         if purchase.persisted?
-          # Update inventory
-          Services::Inventory::PurchaseItemService.new(purchase).update_inventory
-
-          # Update purchase order status
-          @purchase_order.update(status: "completed")
-
           format.html { redirect_to admin_purchase_path(purchase), notice: "Purchase was successfully created from order." }
         else
           format.html { redirect_to admin_purchase_order_path(@purchase_order), alert: "Failed to create purchase from order." }
         end
       end
     end
+  end
+
+  def get_product_details
+    product = Product.find(params[:product_id])
+    
+    render json: {
+      id: product.id,
+      name: product.name,
+      price: product.price.to_f
+    }
   end
 
   private
@@ -112,7 +118,7 @@ class Admin::PurchaseOrdersController < Admin::AdminController
     # Apply search if provided
     if search_value.present?
       purchase_orders = purchase_orders.where(
-        "purchases_purchase_orders.purchase_order_number ILIKE :search OR
+        "purchases_purchase_orders.custom_id ILIKE :search OR
          purchases_vendors.name ILIKE :search",
         search: "%#{search_value}%"
       )
@@ -125,7 +131,7 @@ class Admin::PurchaseOrdersController < Admin::AdminController
 
       case order_column
       when 1
-        purchase_orders = purchase_orders.order(purchase_order_number: direction)
+        purchase_orders = purchase_orders.order(custom_id: direction)
       when 2
         purchase_orders = purchase_orders.order(order_date: direction)
       when 3
@@ -151,11 +157,11 @@ class Admin::PurchaseOrdersController < Admin::AdminController
       data: purchase_orders.map do |purchase_order|
         [
           purchase_order.id,
-          purchase_order.purchase_order_number,
+          purchase_order.custom_id,
           friendly_date(current_user, purchase_order.order_date),
           purchase_order.vendor.name,
           purchase_order.user.name,
-          purchase_order.status.humanize,
+          purchase_order.translated_status,
           render_to_string(
             partial: "admin/purchase_orders/actions",
             formats: [ :html ],

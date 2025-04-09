@@ -17,6 +17,46 @@ export default class extends Controller {
     if (transportistaSelect) {
       transportistaSelect.addEventListener('change', this.updateTransportistaInfo.bind(this))
     }
+
+    // Add event listener for product selection
+    this.element.addEventListener('change', this.handleProductSelection.bind(this))
+  }
+
+  handleProductSelection(event) {
+    // Check if the changed element is a product select
+    if (event.target.matches('select[name*="product_id"]')) {
+      const productId = event.target.value
+      if (!productId) return
+
+      const line = event.target.closest('.purchase-order-line')
+      const priceField = line.querySelector('input[name*="unit_price"]')
+      const quantityField = line.querySelector('input[name*="quantity"]')
+
+      // Set quantity to 1 by default
+      if (quantityField && (!quantityField.value || quantityField.value === '0')) {
+        quantityField.value = 1
+      }
+
+      // Fetch product price
+      fetch(`/admin/purchase_orders/get_product_details?product_id=${productId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`)
+          }
+          return response.json()
+        })
+        .then(data => {
+          console.log("Product details received:", data)
+          if (priceField) {
+            priceField.value = data.price
+            // Update the line total
+            this.updateLineTotal({ target: priceField })
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching product data:', error)
+        })
+    }
   }
 
   initializeProductSelects() {

@@ -43,6 +43,13 @@ class WarehouseInventory < ApplicationRecord
       end
     end
 
+    purchase_lines = Purchases::PurchaseLine.joins(:purchase)
+      .where(product: warehouse_inventory.product, warehouse: warehouse)
+    purchase_lines = purchase_lines.where("purchases_purchases.created_at <= ?", max_datetime) if max_datetime
+    purchase_lines.each do |purchase_line|
+      initial_stock += purchase_line.quantity
+    end
+
     product_order_items = OrderItem.joins(:order)
       .where(product: warehouse_inventory.product, order: { location_id: warehouse.location_id })
     product_order_items = product_order_items.where("order_items.created_at <= ?", max_datetime) if max_datetime

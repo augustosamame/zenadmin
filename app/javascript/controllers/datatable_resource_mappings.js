@@ -165,5 +165,10 @@ export const resourceMappings = {
     buttonText: "Crear Proveedor",
     buttonUrl: "/admin/vendors/new",
     ajaxUrl: "/admin/vendors.json"
+  },
+  PurchaseInvoice: {
+    buttonText: "Crear Comprobante de Compra",
+    buttonUrl: "/admin/purchase_invoices/new",
+    ajaxUrl: "/admin/purchase_invoices.json"
   }
 }

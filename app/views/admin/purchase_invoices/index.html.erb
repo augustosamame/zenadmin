@@ -1,0 +1,53 @@
+<%= render "shared/admin/nav", { header_title: "Comprobantes de Compra" } do %>
+  <%= link_to 'Nuevo Comprobante', new_admin_purchase_invoice_path, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left">ID</th>
+          <th class="px-4 py-2 text-left">Compra</th>
+          <th class="px-4 py-2 text-left">Proveedor</th>
+          <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Tipo</th>
+          <th class="px-4 py-2 text-left">Número</th>
+          <th class="px-4 py-2 text-left">Monto</th>
+          <th class="px-4 py-2 text-left">Estado de Pago</th>
+          <th class="px-4 py-2 text-left">Fecha Planificada de Pago</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @purchase_invoices.each do |invoice| %>
+          <tr>
+            <td class="px-4 py-2"><%= invoice.id %></td>
+            <td class="px-4 py-2"><%= invoice.purchase&.custom_id || "-" %></td>
+            <td class="px-4 py-2"><%= invoice.vendor&.name || "-" %></td>
+            <td class="px-4 py-2"><%= invoice.purchase_invoice_date&.strftime("%d/%m/%Y") || "-" %></td>
+            <td class="px-4 py-2"><%= invoice.translated_purchase_invoice_type %></td>
+            <td class="px-4 py-2"><%= invoice.custom_id %></td>
+            <td class="px-4 py-2"><%= humanized_money_with_symbol(invoice.amount) %></td>
+            <td class="px-4 py-2">
+              <% case invoice.payment_status %>
+              <% when "pending" %>
+                <span class="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">Pendiente</span>
+              <% when "partially_paid" %>
+                <span class="px-2 py-1 text-xs font-semibold text-blue-800 bg-blue-100 rounded-full">Pago Parcial</span>
+              <% when "paid" %>
+                <span class="px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">Pagado</span>
+              <% when "void" %>
+                <span class="px-2 py-1 text-xs font-semibold text-red-800 bg-red-100 rounded-full">Anulado</span>
+              <% end %>
+            </td>
+            <td class="px-4 py-2"><%= invoice.planned_payment_date&.strftime("%d/%m/%Y") || "-" %></td>
+            <td class="px-4 py-2">
+              <%= render 'actions', purchase_invoice: invoice %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

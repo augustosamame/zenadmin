@@ -6,14 +6,14 @@ module Services
       end
 
       def update_inventory
-        # Determine the warehouse to update
-        # For purchases, we'll use the warehouse associated with the vendor's region
-        warehouse = @purchase.region.warehouses.first
-        
-        return unless warehouse.present?
-
         ActiveRecord::Base.transaction do
           @purchase.purchase_lines.each do |purchase_line|
+            # Skip if no warehouse is specified
+            next unless purchase_line.warehouse.present?
+            
+            # Use the warehouse specified in the purchase line
+            warehouse = purchase_line.warehouse
+            
             product_to_update = warehouse.warehouse_inventories.find_by(product_id: purchase_line.product_id)
             
             if product_to_update.present?

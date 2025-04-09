@@ -8,14 +8,16 @@ class Purchases::Purchase < ApplicationRecord
   belongs_to :purchase_order, class_name: "Purchases::PurchaseOrder", optional: true
   belongs_to :transportista, optional: true
   has_many :purchase_lines, class_name: "Purchases::PurchaseLine", dependent: :destroy
+  has_many :purchase_invoices, class_name: "PurchaseInvoice", dependent: :destroy
 
   accepts_nested_attributes_for :purchase_lines, allow_destroy: true
+  accepts_nested_attributes_for :purchase_invoices, allow_destroy: true
   
   validates :purchase_date, presence: true
   validates :vendor_id, presence: true
   
   def self.custom_id_column
-    "purchase_number"
+    "custom_id"
   end
   
   def total_amount

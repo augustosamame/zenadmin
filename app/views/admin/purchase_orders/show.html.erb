@@ -1,4 +1,4 @@
-<%= render "shared/admin/nav", { header_title: "Orden de Compra" } do %>
+<%= render "shared/admin/nav", { header_title: "Orden de Compra #{@purchase_order.custom_id}" } do %>
   <div class="flex space-x-2">
     <%= link_to edit_admin_purchase_order_path(@purchase_order), class: "btn btn-secondary" do %>
       <%= render "shared/icons/edit" %> Editar
@@ -12,15 +12,15 @@
   </div>
 <% end %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="container px-4 py-8 mx-auto">
+  <div class="p-6 bg-white rounded-lg shadow">
+    <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Información de la Orden</h3>
-        <div class="border rounded-md p-4">
+        <h3 class="mb-2 text-lg font-medium text-gray-900">Información de la Orden</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Número de Orden:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.purchase_order_number %></span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.custom_id %></span>
           </div>
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Fecha de Orden:</span>
@@ -28,7 +28,7 @@
           </div>
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Estado:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.status.humanize %></span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.translated_status %></span>
           </div>
           <% if @purchase_order.notes.present? %>
             <div>
@@ -40,58 +40,84 @@
       </div>
       
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Información del Proveedor</h3>
-        <div class="border rounded-md p-4">
+        <h3 class="mb-2 text-lg font-medium text-gray-900">Información del Proveedor</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Nombre:</span>
             <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.name %></span>
           </div>
-          <div>
-            <span class="block text-sm font-medium text-gray-700">Región:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.region.name %></span>
+          <% if @purchase_order.vendor.contact_name.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Contacto:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.contact_name %></span>
           </div>
+          <% end %>
+          <% if @purchase_order.vendor.tax_id.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">RUC/DNI:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.tax_id %></span>
+          </div>
+          <% end %>
+          <% if @purchase_order.vendor.email.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Email:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.email %></span>
+          </div>
+          <% end %>
+          <% if @purchase_order.vendor.phone.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Teléfono:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.phone %></span>
+          </div>
+          <% end %>
+          <% if @purchase_order.vendor.address.present? %>
+          <div>
+            <span class="block text-sm font-medium text-gray-700">Dirección:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.vendor.address %></span>
+          </div>
+          <% end %>
         </div>
       </div>
     </div>
     
-    <h3 class="text-lg font-medium text-gray-900 mb-4">Productos</h3>
+    <h3 class="mb-4 text-lg font-medium text-gray-900">Productos</h3>
     
     <div class="overflow-x-auto mb-6">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio Unitario</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <% @purchase_order.purchase_order_lines.each do |line| %>
+          <% @purchase_order.purchase_order_lines.includes(:product).each do |line| %>
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= line.product.name %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= line.quantity %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= humanized_money_with_symbol(line.unit_price) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= humanized_money_with_symbol(line.total_price) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= line.product.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= line.quantity %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(line.unit_price) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(line.total_price) %></td>
             </tr>
           <% end %>
         </tbody>
         <tfoot class="bg-gray-50">
           <tr>
-            <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">Total:</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= humanized_money_with_symbol(@purchase_order.total_amount) %></td>
+            <td colspan="3" class="px-6 py-4 text-sm font-medium text-right text-gray-900 whitespace-nowrap">Total:</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(@purchase_order.total_amount) %></td>
           </tr>
         </tfoot>
       </table>
     </div>
     
     <% if @purchase_order.purchase.present? %>
-      <div class="mt-6 border-t pt-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Compra Relacionada</h3>
-        <div class="border rounded-md p-4">
+      <div class="pt-6 mt-6 border-t">
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Compra Relacionada</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Número de Compra:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.purchase.purchase_number %></span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.purchase.custom_id %></span>
           </div>
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Fecha de Compra:</span>
@@ -100,6 +126,30 @@
           <div>
             <%= link_to "Ver Compra", admin_purchase_path(@purchase_order.purchase), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
           </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if @purchase_order.transportista.present? %>
+      <div class="pt-6 mt-6 border-t">
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Información del Transportista</h3>
+        <div class="p-4 rounded-md border">
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Nombre:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.transportista.display_name %></span>
+          </div>
+          <% if @purchase_order.transportista.vehicle_plate.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Placa:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.transportista.vehicle_plate %></span>
+          </div>
+          <% end %>
+          <% if @purchase_order.transportista.license_number.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Licencia:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase_order.transportista.license_number %></span>
+          </div>
+          <% end %>
         </div>
       </div>
     <% end %>

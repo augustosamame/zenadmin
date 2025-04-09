@@ -1,6 +1,9 @@
-<%= form_with(model: [:admin, purchase], url: purchase.new_record? ? admin_purchases_path : admin_purchase_path(purchase), data: { controller: "purchase-form", purchase_form_target: "form" }, scope: :purchase) do |form| %>
+<%= form_with(model: [:admin, purchase], url: purchase.new_record? ? admin_purchases_path : admin_purchase_path(purchase), data: { purchase_form_target: "form" }, scope: :purchase) do |form| %>
+  <!-- Hidden field for purchase_order_id -->
+  <%= form.hidden_field :purchase_order_id %>
+  
   <% if purchase.errors.any? %>
-    <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+    <div class="px-4 py-3 mb-4 text-red-700 bg-red-100 rounded border border-red-400">
       <h2><%= pluralize(purchase.errors.count, "error") %> prohibited this purchase from being saved:</h2>
       <ul>
         <% purchase.errors.full_messages.each do |message| %>
@@ -10,7 +13,7 @@
     </div>
   <% end %>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
     <div>
       <%= form.label :vendor_id, "Proveedor", class: "block text-sm font-medium text-gray-700" %>
       <%= form.collection_select :vendor_id, 
@@ -36,7 +39,7 @@
     </div>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+  <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
     <div>
       <%= form.label :notes, "Notas", class: "block text-sm font-medium text-gray-700" %>
       <%= form.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
@@ -75,7 +78,7 @@
     </div>
   </div>
 
-  <h3 class="text-lg font-medium text-gray-900 mb-4">Productos</h3>
+  <h3 class="mb-4 text-lg font-medium text-gray-900">Productos</h3>
 
   <div class="p-2 mt-8 mb-8 bg-white rounded-lg border border-gray-200 shadow-md">
     <div id="purchase-form-lines" data-purchase-form-target="lines">
@@ -97,6 +100,36 @@
     <template data-purchase-form-target="template">
       <%= form.fields_for :purchase_lines, Purchases::PurchaseLine.new, child_index: 'NEW_RECORD' do |line_form| %>
         <%= render 'purchase_line_fields', f: line_form %>
+      <% end %>
+    </template>
+  </div>
+
+  <h3 class="mb-4 text-lg font-medium text-gray-900">Comprobantes de Pago</h3>
+
+  <div class="p-2 mt-8 mb-8 bg-white rounded-lg border border-gray-200 shadow-md">
+    <div id="purchase-form-invoices" data-purchase-form-target="invoices">
+      <% if purchase.purchase_invoices.empty? %>
+        <% purchase.purchase_invoices.build %>
+      <% end %>
+      
+      <%= form.fields_for :purchase_invoices do |invoice_form| %>
+        <%= render 'purchase_invoice_fields', f: invoice_form %>
+      <% end %>
+    </div>
+
+    <!-- Add Invoice Button -->
+    <div class="flex justify-end mt-4">
+      <button type="button" class="flex items-center px-3 py-2 text-sm font-medium text-white bg-green-600 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" data-action="click->purchase-form#addInvoice">
+        <svg xmlns="http://www.w3.org/2000/svg" class="mr-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        Agregar Comprobante
+      </button>
+    </div>
+
+    <template data-purchase-form-target="invoiceTemplate">
+      <%= form.fields_for :purchase_invoices, PurchaseInvoice.new, child_index: 'NEW_INVOICE_RECORD' do |invoice_form| %>
+        <%= render 'purchase_invoice_fields', f: invoice_form %>
       <% end %>
     </template>
   </div>

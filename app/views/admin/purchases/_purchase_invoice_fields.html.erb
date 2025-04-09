@@ -1,0 +1,61 @@
+<div class="relative p-4 mb-4 bg-gray-50 rounded-md border border-gray-200 purchase-invoice-fields">
+  <% if f.object.persisted? %>
+    <%= f.hidden_field :id %>
+  <% end %>
+  
+  <div class="absolute top-2 right-2">
+    <button type="button" class="text-red-500 hover:text-red-700" data-action="click->purchase-form#removeInvoice">
+      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+      </svg>
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-3">
+    <div>
+      <%= f.label :purchase_invoice_date, "Fecha de Comprobante de Compra", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :purchase_invoice_date, value: f.object.purchase_invoice_date || Date.current, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+    
+    <div>
+      <%= f.label :purchase_invoice_type, "Tipo de Comprobante", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.select :purchase_invoice_type, 
+          PurchaseInvoice.purchase_invoice_types.keys.map { |type| [type.humanize, type] },
+          { selected: f.object.purchase_invoice_type || "factura" },
+          { 
+            class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500",
+            data: {
+              controller: "select",
+              select_placeholder_value: "Seleccionar Tipo",
+              select_dropdown_parent: "body"
+            }
+          } 
+      %>
+    </div>
+    
+    <div>
+      <%= f.label :custom_id, "Número de Comprobante", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.text_field :custom_id, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 gap-4 md:grid-cols-2">
+    <div>
+      <%= f.label :amount, "Monto", class: "block text-sm font-medium text-gray-700" %>
+      <div class="relative mt-1 rounded-md shadow-sm">
+        <div class="flex absolute inset-y-0 left-0 items-center pl-3 pointer-events-none">
+          <span class="text-gray-500 sm:text-sm">S/</span>
+        </div>
+        <%= f.text_field :amount, value: f.object.amount || f.object.amount_cents&.to_f&./(100) || 0, class: "pl-8 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", data: { action: "input->purchase-form#updateInvoiceAmount" } %>
+      </div>
+    </div>
+    
+    <div>
+      <%= f.label :planned_payment_date, "Fecha Planificada de Pago", class: "block text-sm font-medium text-gray-700" %>
+      <%= f.date_field :planned_payment_date, value: f.object.planned_payment_date || Date.current, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+    </div>
+  </div>
+  
+  <%= f.hidden_field :currency, value: "PEN" %>
+  <%= f.hidden_field :_destroy, class: "destroy-flag" %>
+</div>

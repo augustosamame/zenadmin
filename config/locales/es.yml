@@ -59,6 +59,22 @@ es:
         display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
+      purchase_invoice:
+        purchase_invoice_type_list:
+          factura: Factura
+          boleta: Boleta
+        payment_status_list:
+          pending: Pendiente
+          partially_paid: Parcialmente pagado
+          paid: Pagado
+          void: Anulado
+      purchases/purchase_order:
+        status_list:
+          draft: Borrador
+          submitted: Por Procesar
+          partially_received: Parcialmente Recibido
+          received: Recibido
+          cancelled: Cancelado
       guia_series:
         guia_type_list:
           guia_remision: Guía de Remisión

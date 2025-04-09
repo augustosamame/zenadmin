@@ -6,15 +6,15 @@
   </div>
 <% end %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+<div class="container px-4 py-8 mx-auto">
+  <div class="p-6 bg-white rounded-lg shadow">
+    <div class="grid grid-cols-1 gap-6 mb-6 md:grid-cols-2">
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Información de la Compra</h3>
-        <div class="border rounded-md p-4">
+        <h3 class="mb-2 text-lg font-medium text-gray-900">Información de la Compra</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Número de Compra:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.purchase_number %></span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.custom_id %></span>
           </div>
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Fecha de Compra:</span>
@@ -30,12 +30,42 @@
       </div>
       
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-2">Información del Proveedor</h3>
-        <div class="border rounded-md p-4">
+        <h3 class="mb-2 text-lg font-medium text-gray-900">Información del Proveedor</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Nombre:</span>
             <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.name %></span>
           </div>
+          <% if @purchase.vendor.contact_name.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Contacto:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.contact_name %></span>
+          </div>
+          <% end %>
+          <% if @purchase.vendor.tax_id.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">RUC/DNI:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.tax_id %></span>
+          </div>
+          <% end %>
+          <% if @purchase.vendor.email.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Email:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.email %></span>
+          </div>
+          <% end %>
+          <% if @purchase.vendor.phone.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Teléfono:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.phone %></span>
+          </div>
+          <% end %>
+          <% if @purchase.vendor.address.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Dirección:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.vendor.address %></span>
+          </div>
+          <% end %>
           <div>
             <span class="block text-sm font-medium text-gray-700">Región:</span>
             <span class="block mt-1 text-sm text-gray-900"><%= @purchase.region.name %></span>
@@ -44,44 +74,46 @@
       </div>
     </div>
     
-    <h3 class="text-lg font-medium text-gray-900 mb-4">Productos</h3>
+    <h3 class="mb-4 text-lg font-medium text-gray-900">Productos</h3>
     
     <div class="overflow-x-auto mb-6">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Producto</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Cantidad</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Precio Unitario</th>
-            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Producto</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Almacén</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Cantidad</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Precio Unitario</th>
+            <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Total</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
-          <% @purchase.purchase_lines.each do |line| %>
+          <% @purchase.purchase_lines.includes(:product, :warehouse).each do |line| %>
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= line.product.name %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= line.quantity %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= humanized_money_with_symbol(line.unit_price) %></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900"><%= humanized_money_with_symbol(line.total_price) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= line.product.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= line.warehouse&.name || "No especificado" %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= line.quantity %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(line.unit_price) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(line.total_price) %></td>
             </tr>
           <% end %>
         </tbody>
         <tfoot class="bg-gray-50">
           <tr>
-            <td colspan="3" class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 text-right">Total:</td>
-            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= humanized_money_with_symbol(@purchase.total_amount) %></td>
+            <td colspan="4" class="px-6 py-4 text-sm font-medium text-right text-gray-900 whitespace-nowrap">Total:</td>
+            <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(@purchase.total_amount) %></td>
           </tr>
         </tfoot>
       </table>
     </div>
     
     <% if @purchase.purchase_order.present? %>
-      <div class="mt-6 border-t pt-6">
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Orden de Compra Relacionada</h3>
-        <div class="border rounded-md p-4">
+      <div class="pt-6 mt-6 border-t">
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Orden de Compra Relacionada</h3>
+        <div class="p-4 rounded-md border">
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Número de Orden:</span>
-            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.purchase_order.purchase_order_number %></span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.purchase_order.custom_id %></span>
           </div>
           <div class="mb-4">
             <span class="block text-sm font-medium text-gray-700">Fecha de Orden:</span>
@@ -90,6 +122,79 @@
           <div>
             <%= link_to "Ver Orden de Compra", admin_purchase_order_path(@purchase.purchase_order), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500" %>
           </div>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if @purchase.transportista.present? %>
+      <div class="pt-6 mt-6 border-t">
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Información del Transportista</h3>
+        <div class="p-4 rounded-md border">
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Nombre:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.transportista.display_name %></span>
+          </div>
+          <% if @purchase.transportista.vehicle_plate.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Placa:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.transportista.vehicle_plate %></span>
+          </div>
+          <% end %>
+          <% if @purchase.transportista.license_number.present? %>
+          <div class="mb-4">
+            <span class="block text-sm font-medium text-gray-700">Licencia:</span>
+            <span class="block mt-1 text-sm text-gray-900"><%= @purchase.transportista.license_number %></span>
+          </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+    
+    <% if @purchase.purchase_invoices.any? %>
+      <div class="pt-6 mt-6 border-t">
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Comprobantes de Pago</h3>
+        <div class="overflow-x-auto mb-6">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Número</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha de Pago Planificada</th>
+                <th scope="col" class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Estado de Pago</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @purchase.purchase_invoices.each do |invoice| %>
+                <tr>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= friendly_date(current_user, invoice.purchase_invoice_date) %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= invoice.purchase_invoice_type.humanize %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= invoice.custom_id %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= humanized_money_with_symbol(invoice.amount) %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap"><%= friendly_date(current_user, invoice.planned_payment_date) %></td>
+                  <td class="px-6 py-4 text-sm text-gray-900 whitespace-nowrap">
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                      <%= invoice.payment_status == 'paid' ? 'bg-green-100 text-green-800' : 
+                          invoice.payment_status == 'partially_paid' ? 'bg-yellow-100 text-yellow-800' : 
+                          invoice.payment_status == 'void' ? 'bg-gray-100 text-gray-800' : 
+                          'bg-red-100 text-red-800' %>">
+                      <%= invoice.payment_status.humanize %>
+                    </span>
+                  </td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot class="bg-gray-50">
+              <tr>
+                <td colspan="3" class="px-6 py-4 text-sm font-medium text-right text-gray-900 whitespace-nowrap">Total:</td>
+                <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap">
+                  <%= humanized_money_with_symbol(Money.new(@purchase.purchase_invoices.sum(:amount_cents), "PEN")) %>
+                </td>
+                <td colspan="2"></td>
+              </tr>
+            </tfoot>
+          </table>
         </div>
       </div>
     <% end %>

@@ -13,7 +13,8 @@ class CustomNumbering < ApplicationRecord
     stock_transfer: 8,
     requisition: 9,
     planned_stock_transfer: 10,
-    purchases_purchase_order: 11
+    purchases_purchase_order: 11,
+    purchases_purchase: 12
   }, prefix: :numbering
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status
@@ -36,6 +37,9 @@ class CustomNumbering < ApplicationRecord
 
   # Convert the model name to the record type taking into account namespaced models
   def self.record_type_for_model(model_name)
+    # Special case for Purchases::Purchase to maintain compatibility with existing records
+    return :purchase if model_name == "Purchases::Purchase"
+    
     model_name.underscore.gsub("/", "_").to_sym
   end
 

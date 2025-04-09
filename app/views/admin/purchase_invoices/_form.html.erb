@@ -1,0 +1,91 @@
+<%= form_with(model: [:admin, purchase_invoice], local: true, class: "space-y-6") do |form| %>
+  <% if purchase_invoice.errors.any? %>
+    <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-6">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd"/>
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            <%= pluralize(purchase_invoice.errors.count, "error") %> impidieron guardar este comprobante:
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc pl-5 space-y-1">
+              <% purchase_invoice.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="col-span-1">
+      <div class="mb-4">
+        <%= form.label :purchase_id, "Compra", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.collection_select :purchase_id, Purchases::Purchase.order(created_at: :desc), :id, :id, 
+            { prompt: "Seleccionar compra..." }, 
+            { class: "form-select block w-full", data: { controller: "select" } } %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :vendor_id, "Proveedor", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.collection_select :vendor_id, Purchases::Vendor.order(:name), :id, :name, 
+            { prompt: "Seleccionar proveedor..." }, 
+            { class: "form-select block w-full", data: { controller: "select" } } %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :purchase_invoice_date, "Fecha del Comprobante", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.date_field :purchase_invoice_date, class: "form-input block w-full" %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :purchase_invoice_type, "Tipo de Comprobante", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :purchase_invoice_type, PurchaseInvoice.purchase_invoice_types.keys.map { |k| [k.humanize, k] },
+            { prompt: "Seleccionar tipo..." }, 
+            { class: "form-select block w-full" } %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :custom_id, "Número de Comprobante", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :custom_id, class: "form-input block w-full" %>
+      </div>
+    </div>
+
+    <div class="col-span-1">
+      <div class="mb-4">
+        <%= form.label :amount, "Monto", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.text_field :amount, class: "form-input block w-full" %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :currency, "Moneda", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :currency, [["PEN", "PEN"], ["USD", "USD"], ["EUR", "EUR"]], 
+            { selected: purchase_invoice.currency || "PEN" }, 
+            { class: "form-select block w-full" } %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :payment_status, "Estado de Pago", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.select :payment_status, PurchaseInvoice.payment_statuses.keys.map { |k| [k.humanize, k] },
+            { prompt: "Seleccionar estado..." }, 
+            { class: "form-select block w-full" } %>
+      </div>
+
+      <div class="mb-4">
+        <%= form.label :planned_payment_date, "Fecha de Pago Planificada", class: "block text-sm font-medium text-gray-700 mb-1" %>
+        <%= form.date_field :planned_payment_date, class: "form-input block w-full" %>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-3 mt-6">
+    <%= link_to "Cancelar", admin_purchase_invoices_path, class: "btn btn-secondary" %>
+    <%= form.submit "Guardar", class: "btn btn-primary" %>
+  </div>
+<% end %>

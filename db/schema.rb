@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_09_031300) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -853,6 +853,24 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
     t.index ["status"], name: "index_products_on_status"
   end
 
+  create_table "purchase_invoices", force: :cascade do |t|
+    t.bigint "purchase_id", null: false
+    t.bigint "vendor_id", null: false
+    t.date "purchase_invoice_date", null: false
+    t.integer "amount_cents", null: false
+    t.string "currency", default: "PEN", null: false
+    t.integer "purchase_invoice_type", default: 0, null: false
+    t.integer "payment_status", default: 0, null: false
+    t.date "planned_payment_date", null: false
+    t.string "custom_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["payment_status"], name: "index_purchase_invoices_on_payment_status"
+    t.index ["purchase_id"], name: "index_purchase_invoices_on_purchase_id"
+    t.index ["purchase_invoice_type"], name: "index_purchase_invoices_on_purchase_invoice_type"
+    t.index ["vendor_id"], name: "index_purchase_invoices_on_vendor_id"
+  end
+
   create_table "purchases_purchase_lines", force: :cascade do |t|
     t.bigint "purchase_id"
     t.bigint "product_id"
@@ -861,8 +879,10 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
     t.datetime "updated_at", null: false
     t.integer "unit_price_cents", default: 0, null: false
     t.string "unit_price_currency", default: "PEN", null: false
+    t.bigint "warehouse_id"
     t.index ["product_id"], name: "index_purchases_purchase_lines_on_product_id"
     t.index ["purchase_id"], name: "index_purchases_purchase_lines_on_purchase_id"
+    t.index ["warehouse_id"], name: "index_purchases_purchase_lines_on_warehouse_id"
   end
 
   create_table "purchases_purchase_order_lines", force: :cascade do |t|
@@ -878,7 +898,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
   end
 
   create_table "purchases_purchase_orders", force: :cascade do |t|
-    t.string "purchase_order_number"
     t.bigint "region_id", null: false
     t.bigint "user_id", null: false
     t.bigint "vendor_id", null: false
@@ -888,7 +907,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.bigint "transportista_id"
-    t.index ["purchase_order_number"], name: "index_purchases_purchase_orders_on_purchase_order_number", unique: true
+    t.string "custom_id"
+    t.index ["custom_id"], name: "index_purchases_purchase_orders_on_custom_id", unique: true
     t.index ["region_id"], name: "index_purchases_purchase_orders_on_region_id"
     t.index ["transportista_id"], name: "index_purchases_purchase_orders_on_transportista_id"
     t.index ["user_id"], name: "index_purchases_purchase_orders_on_user_id"
@@ -898,7 +918,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
   create_table "purchases_purchases", force: :cascade do |t|
     t.bigint "vendor_id", null: false
     t.bigint "region_id", null: false
-    t.string "purchase_number", null: false
     t.datetime "purchase_date"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
@@ -906,7 +925,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
     t.bigint "purchase_order_id"
     t.text "notes"
     t.bigint "transportista_id"
-    t.index ["purchase_number"], name: "index_purchases_purchases_on_purchase_number", unique: true
+    t.string "custom_id"
+    t.index ["custom_id"], name: "index_purchases_purchases_on_custom_id", unique: true
     t.index ["purchase_order_id"], name: "index_purchases_purchases_on_purchase_order_id"
     t.index ["region_id"], name: "index_purchases_purchases_on_region_id"
     t.index ["transportista_id"], name: "index_purchases_purchases_on_transportista_id"
@@ -1308,8 +1328,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_08_232527) do
   add_foreign_key "product_min_max_stocks", "products"
   add_foreign_key "product_min_max_stocks", "warehouses"
   add_foreign_key "product_pack_items", "product_packs"
+  add_foreign_key "purchase_invoices", "purchases_purchases", column: "purchase_id"
+  add_foreign_key "purchase_invoices", "purchases_vendors", column: "vendor_id"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
+  add_foreign_key "purchases_purchase_lines", "warehouses"
   add_foreign_key "purchases_purchase_order_lines", "products"
   add_foreign_key "purchases_purchase_order_lines", "purchases_purchase_orders", column: "purchase_order_id"
   add_foreign_key "purchases_purchase_orders", "purchases_vendors", column: "vendor_id"

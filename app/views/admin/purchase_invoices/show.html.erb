@@ -1,0 +1,104 @@
+<%= render "shared/admin/nav", { header_title: "Detalle de Comprobante de Compra" } do %>
+  <div class="flex space-x-2">
+    <%= link_to "Editar", edit_admin_purchase_invoice_path(@purchase_invoice), class: "btn btn-primary" %>
+    <%= link_to "Volver", admin_purchase_invoices_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Información del Comprobante</h3>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">ID</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.id %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Compra Relacionada</p>
+          <p class="text-base text-gray-900">
+            <% if @purchase_invoice.purchase %>
+              <%= link_to "Compra ##{@purchase_invoice.purchase.id}", admin_purchase_path(@purchase_invoice.purchase), class: "text-blue-600 hover:text-blue-800" %>
+            <% else %>
+              N/A
+            <% end %>
+          </p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Proveedor</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.vendor&.name || 'N/A' %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Fecha del Comprobante</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.purchase_invoice_date&.strftime('%d/%m/%Y') %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Tipo de Comprobante</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.purchase_invoice_type&.humanize %></p>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Detalles de Pago</h3>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Número de Comprobante</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.custom_id || 'No especificado' %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Monto</p>
+          <p class="text-base text-gray-900"><%= humanized_money_with_symbol @purchase_invoice.amount %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Moneda</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.currency %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Estado de Pago</p>
+          <p class="text-base">
+            <% status_class = case @purchase_invoice.payment_status
+               when 'pending' then 'bg-yellow-100 text-yellow-800'
+               when 'partially_paid' then 'bg-blue-100 text-blue-800'
+               when 'paid' then 'bg-green-100 text-green-800'
+               when 'void' then 'bg-red-100 text-red-800'
+               else 'bg-gray-100 text-gray-800'
+               end
+            %>
+            <span class="px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <%= status_class %>">
+              <%= @purchase_invoice.payment_status&.humanize %>
+            </span>
+          </p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Fecha de Pago Planificada</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.planned_payment_date&.strftime('%d/%m/%Y') || 'No especificada' %></p>
+        </div>
+      </div>
+    </div>
+    
+    <div class="mt-8 border-t pt-6">
+      <h3 class="text-lg font-medium text-gray-900 mb-4">Información Adicional</h3>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Fecha de Creación</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.created_at.strftime('%d/%m/%Y %H:%M') %></p>
+        </div>
+        
+        <div class="mb-4">
+          <p class="text-sm font-medium text-gray-500">Última Actualización</p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.updated_at.strftime('%d/%m/%Y %H:%M') %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

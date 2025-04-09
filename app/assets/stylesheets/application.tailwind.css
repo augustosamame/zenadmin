@@ -3,6 +3,7 @@
 @import 'tailwindcss/utilities';
 
 @import 'apexcharts/dist/apexcharts.css';
+@import 'tom-select/dist/css/tom-select.default.css';
 
 /* Your custom styles here */
 @import './custom/custom.css';

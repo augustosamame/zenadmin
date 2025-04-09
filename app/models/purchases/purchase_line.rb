@@ -1,6 +1,7 @@
 class Purchases::PurchaseLine < ApplicationRecord
   belongs_to :purchase, class_name: "Purchases::Purchase"
   belongs_to :product
+  belongs_to :warehouse, optional: true
 
   validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :unit_price, presence: true, numericality: { greater_than_or_equal_to: 0 }

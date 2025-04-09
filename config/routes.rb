@@ -240,9 +240,19 @@ Rails.application.routes.draw do
       member do
         post :create_purchase
       end
+      collection do
+        get :get_product_details
+      end
     end
 
-    resources :purchases
+    resources :purchases do
+      collection do
+        get :get_purchase_order_details
+        get :get_product_details
+      end
+    end
+
+    resources :purchase_invoices
 
     resources :vendors
     

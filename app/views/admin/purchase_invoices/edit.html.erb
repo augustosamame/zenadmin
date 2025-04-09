@@ -1,0 +1,12 @@
+<%= render "shared/admin/nav", { header_title: "Editar Comprobante de Compra" } do %>
+  <div class="flex space-x-2">
+    <%= link_to "Ver Detalle", admin_purchase_invoice_path(@purchase_invoice), class: "btn btn-secondary" %>
+    <%= link_to "Volver", admin_purchase_invoices_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow p-6">
+    <%= render 'form', purchase_invoice: @purchase_invoice %>
+  </div>
+</div>

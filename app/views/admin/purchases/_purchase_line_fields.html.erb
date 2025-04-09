@@ -1,6 +1,6 @@
 <div class="flex items-center w-full mb-4 space-x-4 nested-fields purchase-line" data-new-record="<%= f.object.new_record? %>">
   <!-- Product Field -->
-  <div class="flex items-center w-1/3">
+  <div class="flex items-center w-1/4">
     <%= f.collection_select :product_id, 
         Product.all, 
         :id, 
@@ -18,8 +18,26 @@
     %>
   </div>
 
+  <!-- Warehouse Field -->
+  <div class="flex items-center w-1/4">
+    <%= f.collection_select :warehouse_id, 
+        Warehouse.all, 
+        :id, 
+        :name, 
+        { prompt: "Seleccionar Almacén" }, 
+        { 
+          class: "w-full form-input text-sm",
+          data: {
+            controller: "select",
+            select_placeholder_value: "Seleccionar Almacén",
+            select_dropdown_parent: "body"
+          }
+        } 
+    %>
+  </div>
+
   <!-- Quantity Fields Container -->
-  <div class="flex items-center w-2/3 space-x-4">
+  <div class="flex items-center w-2/4 space-x-4">
     <!-- Quantity Field -->
     <div class="flex items-center justify-end w-1/4">
       <%= f.label :quantity, "Cantidad", class: "form-label mr-1 text-right text-sm whitespace-nowrap" %>

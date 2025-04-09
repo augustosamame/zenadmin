@@ -50,6 +50,8 @@ Rails.application.config.after_initialize do
           CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: "PRO", length: 4, next_number: 1, status: :active)
         when "purchase"
           CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: "COM", length: 5, next_number: 1, status: :active)
+        when "purchases_purchase"
+          CustomNumbering.find_or_create_by!(record_type: :purchases_purchase, prefix: "COM", length: 5, next_number: 1, status: :active)
         when "product"
           CustomNumbering.find_or_create_by!(record_type: :product, prefix: "PRO", length: 4, next_number: 1, status: :active)
         when "order"
