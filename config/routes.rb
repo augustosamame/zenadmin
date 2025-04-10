@@ -86,7 +86,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :products_stock, only: [:index]
+    resources :products_stock, only: [ :index ]
 
     post "face_recognition", to: "face_recognition#recognize"
 
@@ -255,7 +255,7 @@ Rails.application.routes.draw do
     resources :purchase_invoices
 
     resources :vendors
-    
+
     resources :orders_per_product, only: [ :index ]
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
@@ -304,7 +304,7 @@ Rails.application.routes.draw do
     get "project", to: "page#project"
     get "projects", to: "page#projects"
 
-    get 'nota_de_venta/:id', to: 'nota_de_venta#show', as: 'nota_de_venta'
+    get "nota_de_venta/:id", to: "nota_de_venta#show", as: "nota_de_venta"
 
     get "edit_temp_password", to: "users#edit_temp_password", as: :edit_temp_password
     patch "update_temp_password", to: "users#update_temp_password", as: :update_temp_password
