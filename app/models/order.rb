@@ -159,7 +159,7 @@ class Order < ApplicationRecord
     end
   end
 
-  def determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift)
+  def determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift, current_user)
     if self.order_date > current_cashier_shift.opened_at
       current_cashier_shift
     else

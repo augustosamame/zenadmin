@@ -179,7 +179,7 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def edit_payments
-    # authorize! :manage, Payment
+    authorize! :view, Payment
     @order = Order.includes(payments: :payment_method).find(params[:id])
   end
 
@@ -187,7 +187,7 @@ class Admin::OrdersController < Admin::AdminController
     @order = Order.find(params[:id])
 
     begin
-      Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes], @current_cashier, @current_cashier_shift)
+      Services::Sales::OrderPaymentEditService.update_payments(@order, order_params[:payments_attributes], @current_cashier, @current_cashier_shift, current_user)
       @order.reevaluate_payment_status
 
       respond_to do |format|

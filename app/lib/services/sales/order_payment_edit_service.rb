@@ -1,7 +1,7 @@
 module Services
   module Sales
     class OrderPaymentEditService
-      def self.update_payments(order, payments_attributes, current_cashier, current_cashier_shift)
+      def self.update_payments(order, payments_attributes, current_cashier, current_cashier_shift, current_user)
         ActiveRecord::Base.transaction do
           payments_attributes.each do |_, payment_attrs|
             if payment_attrs[:id].present?
@@ -49,7 +49,7 @@ module Services
                 amount_cents: amount_cents,
                 user_id: order.user_id,
                 currency: order.currency || "PEN",
-                cashier_shift: order.determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift)
+                cashier_shift: order.determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift, current_user)
               )
 
               # Handle bank cashier transaction for new payments
