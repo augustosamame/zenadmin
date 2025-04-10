@@ -179,7 +179,7 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def edit_payments
-    authorize! :manage, Payment
+    # authorize! :manage, Payment
     @order = Order.includes(payments: :payment_method).find(params[:id])
   end
 

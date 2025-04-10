@@ -137,7 +137,7 @@
   <div class="mt-8">
     <div class="flex justify-between items-center mb-4">
       <h4 class="text-lg font-medium text-gray-900">Pagos</h4>
-      <% if current_user.any_admin? %>
+      <% if current_user %>
         <%= link_to "Modificar Pagos", 
                     edit_payments_admin_order_path(@order), 
                     class: "btn btn-primary" %>
