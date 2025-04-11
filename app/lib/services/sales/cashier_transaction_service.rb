@@ -51,7 +51,7 @@ module Services
 
       def open_shift(opened_by_user)
         ActiveRecord::Base.transaction do
-          last_closed_shift = @cashier_shift.cashier.cashier_shifts.where(status: :closed).order(id: :desc).first
+          last_closed_shift = @cashier_shift.cashier.cashier_shifts.where(status: :closed).order(closed_at: :desc).first
 
           if last_closed_shift
             last_closed_shift.cashier_transactions.includes(:payment_method).group_by(&:payment_method).each do |payment_method, transactions|
