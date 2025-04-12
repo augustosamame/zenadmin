@@ -174,5 +174,26 @@ export default class extends Controller {
     this.close(event);
 
     console.log(`Object with ID ${objectId} selected.`);
+    
+    // Select the first item in the order list after a short delay
+    setTimeout(() => {
+      const orderItemsElement = document.querySelector('[data-controller="pos--order-items"]');
+      const orderItemsController = orderItemsElement ? this.application.getControllerForElementAndIdentifier(orderItemsElement, 'pos--order-items') : null;
+      
+      if (orderItemsController) {
+        // Select the first item in the list if available
+        const firstItem = orderItemsElement.querySelector('[data-action="click->pos--order-items#selectItem"]');
+        if (firstItem) {
+          orderItemsController.selectItem(firstItem);
+        }
+        
+        // Re-enable keyboard listener
+        const keypadElement = document.querySelector('[data-controller="pos--keypad"]');
+        const keypadController = keypadElement ? this.application.getControllerForElementAndIdentifier(keypadElement, 'pos--keypad') : null;
+        if (keypadController) {
+          keypadController.enableKeyboardListener();
+        }
+      }
+    }, 200); // Delay to ensure DOM is fully updated
   }
 }
