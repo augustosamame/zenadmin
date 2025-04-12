@@ -51,11 +51,15 @@ module Services
       # Handles updating inventory when moving to 'complete'
       def update_destination_warehouse_inventory
         stock_transfer.stock_transfer_lines.each do |line|
-          warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
-          warehouse_inventory.stock ||= 0
-          quantity_to_add = line.received_quantity || line.quantity
-          warehouse_inventory.stock += quantity_to_add
-          warehouse_inventory.save!
+          # Skip adding to destination if this is a transfer to a customer
+          unless stock_transfer.customer_user_id.present?
+            warehouse_inventory = WarehouseInventory.find_or_initialize_by(warehouse_id: stock_transfer.destination_warehouse_id, product_id: line.product_id)
+            warehouse_inventory.stock ||= 0
+            quantity_to_add = line.received_quantity || line.quantity
+            warehouse_inventory.stock += quantity_to_add
+            warehouse_inventory.save!
+          end
+          
           if line.received_quantity != line.quantity
             Services::Notifications::CreateNotificationService.new(stock_transfer, custom_strategy: "PartialStockTransfer").create
           end

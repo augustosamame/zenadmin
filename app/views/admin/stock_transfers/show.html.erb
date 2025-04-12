@@ -41,12 +41,22 @@
           </p>
         </div>
       <% else %>
-        <!-- Destination Warehouse -->
+        <!-- Destination (Warehouse or Customer) -->
         <div>
-          <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Almacén de Destino</label>
-          <p class="text-slate-900 dark:text-slate-100">
-            <%= @stock_transfer.destination_warehouse&.name %>
-          </p>
+          <% if @stock_transfer.customer_user_id.present? %>
+            <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Cliente de Destino</label>
+            <p class="text-slate-900 dark:text-slate-100 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              <%= @stock_transfer.customer_user&.name %>
+            </p>
+          <% else %>
+            <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Almacén de Destino</label>
+            <p class="text-slate-900 dark:text-slate-100">
+              <%= @stock_transfer.destination_warehouse&.name %>
+            </p>
+          <% end %>
         </div>
       <% end %>
     </div>

@@ -1,4 +1,4 @@
-<%= simple_form_for([:admin, @stock_transfer], html: { data: { controller: "stock-transfer-form", action: "submit->stock-transfer-form#submitForm", "stock-transfer-form-target" => "form" } }) do |form| %>
+<%= simple_form_for([:admin, @stock_transfer], html: { data: { controller: "stock-transfer-form customer-table-modal", action: "submit->stock-transfer-form#submitForm", "stock-transfer-form-target" => "form" } }) do |form| %>
   <!-- Error Messages -->
   <%= render 'shared/form_errors', model: @stock_transfer %>
 
@@ -38,16 +38,57 @@
 
         <% else %>
 
-          <!-- Destination Warehouse -->
-          <div>
-          <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
-          <% if @stock_transfer.persisted? %>
-            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input", disabled: true %>
-            <%= form.hidden_field :destination_warehouse_id %>
-          <% else %>
-            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
+          <!-- Customer Transfer Checkbox (only when enabled in settings) -->
+          <% if @customer_transfer_enabled %>
+            <div class="flex items-center mb-6">
+              <% if @stock_transfer.persisted? %>
+                <% if @stock_transfer.customer_user_id.present? %>
+                  <%= form.check_box :to_customer, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
+                  <%= form.hidden_field :to_customer, value: "1" %>
+                <% else %>
+                  <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
+                  <%= form.hidden_field :to_customer, value: "0" %>
+                <% end %>
+              <% else %>
+                <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleDestinationType" } } %>
+              <% end %>
+              <%= form.label :to_customer, "Transferencia a cliente", class: "form-label mb-0" %>
+            </div>
           <% end %>
-        </div>
+
+          <!-- Destination Warehouse (hidden when customer transfer is selected) -->
+          <div data-stock-transfer-form-target="warehouseDestination" class="<%= @stock_transfer.customer_user_id.present? ? 'hidden' : '' %>">
+            <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
+            <% if @stock_transfer.persisted? %>
+              <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input", disabled: true %>
+              <%= form.hidden_field :destination_warehouse_id %>
+            <% else %>
+              <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
+            <% end %>
+          </div>
+
+          <!-- Customer Selection (shown only when customer transfer is selected) -->
+          <div data-stock-transfer-form-target="customerDestination" class="<%= @stock_transfer.customer_user_id.present? ? '' : 'hidden' %>">
+            <label class="form-label">Cliente de Destino</label>
+            <div class="relative">
+              <% if @stock_transfer.persisted? && @stock_transfer.customer_user_id.present? %>
+                <div class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
+                  <%= @stock_transfer.customer_user&.name %>
+                </div>
+                <%= form.hidden_field :customer_user_id %>
+              <% else %>
+                <button type="button" id="customer-select-button" 
+                        class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+                        data-action="click->customer-table-modal#open">
+                  <span data-stock-transfer-form-target="selectedCustomerName">Seleccionar Cliente</span>
+                  <svg class="w-5 h-5 ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                </button>
+                <%= form.hidden_field :customer_user_id, data: { "stock-transfer-form-target" => "customerUserId" } %>
+              <% end %>
+            </div>
+          </div>
 
       <% end %>
     </div>
@@ -127,3 +168,6 @@
     </div>
   
 <% end %>
+
+<!-- Customer Table Modal -->
+<%= render 'shared/admin/customer_table_modal' %>

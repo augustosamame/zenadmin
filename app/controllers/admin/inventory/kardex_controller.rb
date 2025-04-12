@@ -43,7 +43,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
     # Fetch stock transfers and orders related to the product
     stock_transfers = product.stock_transfer_lines
                             .joins(:stock_transfer)
-                            .includes(stock_transfer: [ :origin_warehouse, :destination_warehouse ])
+                            .includes(stock_transfer: [ :origin_warehouse, :destination_warehouse, :customer_user ])
                             .where("(stock_transfers.origin_warehouse_id = ? AND stock_transfers.stage IN (?)) OR (stock_transfers.destination_warehouse_id = ? AND stock_transfers.stage = ?)",
                                   selected_warehouse.id, [ "complete", "in_transit" ],
                                   selected_warehouse.id, "complete")
@@ -126,11 +126,21 @@ class Admin::Inventory::KardexController < Admin::AdminController
       else
         movement_hash[:custom_id] = movement.stock_transfer.custom_id
         if movement.stock_transfer.origin_warehouse_id == selected_warehouse.id
-          movement_hash[:origin_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
-          movement_hash[:destination_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+          if movement.stock_transfer.customer_user_id.present?
+            movement_hash[:origin_warehouse_name] = "Cliente: #{movement.stock_transfer.customer_user.name}"
+            movement_hash[:destination_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+          else
+            movement_hash[:origin_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+            movement_hash[:destination_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+          end
         else
-          movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
-          movement_hash[:destination_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+          if movement.stock_transfer.customer_user_id.present?
+            movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+            movement_hash[:destination_warehouse_name] = "Cliente: #{movement.stock_transfer.customer_user.name}"
+          else
+            movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
+            movement_hash[:destination_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+          end
         end
       end
 

@@ -112,16 +112,16 @@ class CashierShift < ApplicationRecord
     # Use delete_all instead of destroy to avoid media association issues
     inflow_ids = self.cash_inflows.where("description LIKE ?", "Saldo de caja anterior -%").pluck(:id)
     if inflow_ids.any?
-      CashierTransaction.where(transactable_type: 'CashInflow', transactable_id: inflow_ids).delete_all
+      CashierTransaction.where(transactable_type: "CashInflow", transactable_id: inflow_ids).delete_all
       CashInflow.where(id: inflow_ids).delete_all
     end
-    
+
     # Get the last shift for this cashier, regardless of status
-    last_shift = self.cashier.cashier_shifts.where("id < ?", self.id).order(id: :desc).first
+    last_shift = self.cashier.cashier_shifts.where("id < ?", self.id).order(closed_at: :desc).first
     if last_shift
       # Use the total_balance method which excludes credit transactions
       total_amount_cents = last_shift.total_balance.cents
-      
+
       # Skip creating if the amount is zero or negative
       if total_amount_cents > 0
         CashierTransaction.create!(

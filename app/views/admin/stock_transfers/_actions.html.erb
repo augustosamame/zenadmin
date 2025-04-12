@@ -9,7 +9,7 @@
       <% default_object_options_array.each do |option| %>
         <li>
           <% if option[:event_name] == 'edit' %>
-            <% if current_user.any_admin? %>
+            <% if current_user.any_admin? || stock_transfer.pending? %>
               <%= link_to edit_admin_stock_transfer_path(stock_transfer), class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
                 <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
                 <span><%= option[:label] %></span>

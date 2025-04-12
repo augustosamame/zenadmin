@@ -79,9 +79,9 @@ class Admin::OrdersController < Admin::AdminController
         if order_params[:sellers_attributes].present?
           Services::Sales::OrderCommissionService.new(@order).calculate_and_save_commissions(order_params[:sellers_attributes])
         end
-        if @order.fast_stock_transfer_flag
-          Services::Inventory::OrderItemService.new(@order).update_inventory
-        end
+
+        Services::Inventory::OrderItemService.new(@order).update_inventory_or_create_pending_transfer
+
         GenerateEinvoice.perform_async(@order.id) if ENV["RAILS_ENV"] == "production"
 
         session.delete(:draft_order)

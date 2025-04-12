@@ -47,7 +47,6 @@ class Order < ApplicationRecord
   after_create_commit :refresh_dashboard_metrics
   after_commit :evaluate_payment_status, on: [ :create ]
   after_commit :reevaluate_payment_status, on: [ :update ]
-  after_create_commit :create_planned_stock_transfer, if: -> { !fast_stock_transfer_flag }
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -428,9 +427,5 @@ class Order < ApplicationRecord
 
     def main_payment_method
       self.payments.where(status: :paid).order(amount_cents: :desc).first&.payment_method&.description
-    end
-
-    def create_planned_stock_transfer
-      Services::Inventory::PlannedStockTransferService.create_from_order(self)
     end
 end

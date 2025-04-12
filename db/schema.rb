@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_09_201657) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_12_144800) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1061,7 +1061,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_201657) do
     t.bigint "planned_stock_transfer_id"
     t.datetime "date_guia"
     t.bigint "transportista_id"
+    t.bigint "customer_user_id"
     t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
+    t.index ["customer_user_id"], name: "index_stock_transfers_on_customer_user_id"
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
     t.index ["origin_warehouse_id"], name: "index_stock_transfers_on_origin_warehouse_id"
     t.index ["periodic_inventory_id"], name: "index_stock_transfers_on_periodic_inventory_id"
@@ -1361,6 +1363,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_09_201657) do
   add_foreign_key "stock_transfers", "planned_stock_transfers"
   add_foreign_key "stock_transfers", "transportistas"
   add_foreign_key "stock_transfers", "users"
+  add_foreign_key "stock_transfers", "users", column: "customer_user_id"
   add_foreign_key "stock_transfers", "warehouses", column: "destination_warehouse_id"
   add_foreign_key "stock_transfers", "warehouses", column: "origin_warehouse_id"
   add_foreign_key "suppliers", "regions"

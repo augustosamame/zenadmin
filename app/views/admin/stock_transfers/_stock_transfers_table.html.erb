@@ -24,7 +24,15 @@
             <td class="px-4 py-2"><%= stock_transfer.custom_id %></td>
             <td class="px-4 py-2"><%= stock_transfer.user&.name %></td>
             <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name || "Inventario Inicial" %></td>
-            <td class="px-4 py-2"><%= stock_transfer.destination_warehouse&.name %></td>
+            <td class="px-4 py-2">
+              <% if stock_transfer.customer_user_id.present? %>
+                <span class="inline-flex items-center">
+                  Cliente: <%= stock_transfer.customer_user&.name %>
+                </span>
+              <% else %>
+                <%= stock_transfer.destination_warehouse&.name %>
+              <% end %>
+            </td>
             <td class="px-4 py-2"><%= stock_transfer.total_products %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, stock_transfer.transfer_date) %></td>
             <td class="px-4 py-2"><%= stock_transfer.translated_status %></td>

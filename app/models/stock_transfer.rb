@@ -10,9 +10,10 @@ class StockTransfer < ApplicationRecord
   belongs_to :periodic_inventory, class_name: "PeriodicInventory", optional: true
   belongs_to :planned_stock_transfer, optional: true
   belongs_to :transportista, optional: true
+  belongs_to :customer_user, class_name: "User", optional: true
   has_many :guias, dependent: :nullify
 
-  attr_accessor :current_user_for_destroy, :cached_lines, :create_guia
+  attr_accessor :current_user_for_destroy, :cached_lines, :create_guia, :to_customer
 
   validates :transportista_id, presence: true, if: -> { create_guia == "1" || create_guia == true }
 
@@ -48,7 +49,8 @@ class StockTransfer < ApplicationRecord
   translate_enum :adjustment_type
 
   validates :origin_warehouse_id, presence: true, if: :is_adjustment?
-  validates :destination_warehouse_id, presence: true, unless: :is_adjustment?
+  validates :destination_warehouse_id, presence: true, unless: -> { is_adjustment? || to_customer == "1" }
+  validates :customer_user_id, presence: true, if: -> { to_customer == "1" }
   validates :stage, presence: true
 
   aasm column: "stage" do
@@ -57,8 +59,8 @@ class StockTransfer < ApplicationRecord
     state :complete
 
     event :start_transfer do
-      transitions from: :pending, to: :in_transit, guard: :in_transit_step_enabled?, after: :process_in_transit
-      transitions from: :pending, to: :complete, unless: :in_transit_step_enabled?, after: :process_complete
+      transitions from: :pending, to: :in_transit, guard: :should_use_in_transit_step?, after: :process_in_transit
+      transitions from: :pending, to: :complete, unless: :should_use_in_transit_step?, after: :process_complete
     end
 
     event :finish_transfer do
@@ -183,5 +185,9 @@ class StockTransfer < ApplicationRecord
 
   def in_transit_step_enabled?
     $global_settings[:stock_transfers_have_in_transit_step]
+  end
+
+  def should_use_in_transit_step?
+    in_transit_step_enabled? && !customer_user_id.present?
   end
 end
