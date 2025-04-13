@@ -3,7 +3,7 @@ class Admin::AccountPayablesController < Admin::AdminController
 
   def vendors_index
     authorize! :read, Purchases::Vendor
-    
+
     respond_to do |format|
       format.html do
         @vendors = Purchases::Vendor.all
@@ -33,12 +33,34 @@ class Admin::AccountPayablesController < Admin::AdminController
         end
 
         # Get all unapplied payments in one query
-        unapplied_payments_by_vendor = PurchasePayment.unapplied
-                                                     .where(payable_type: "Purchases::Purchase")
-                                                     .joins("INNER JOIN purchases_purchases ON purchases_purchases.id = purchase_payments.payable_id")
-                                                     .where(purchases_purchases: { vendor_id: vendor_ids })
-                                                     .group("purchases_purchases.vendor_id")
-                                                     .sum(:amount_cents)
+        purchase_related_payments = PurchasePayment.unapplied
+                                                  .where(payable_type: "Purchases::Purchase")
+                                                  .joins("INNER JOIN purchases_purchases ON purchases_purchases.id = purchase_payments.payable_id")
+                                                  .where(purchases_purchases: { vendor_id: vendor_ids })
+                                                  .group("purchases_purchases.vendor_id")
+                                                  .sum(:amount_cents)
+
+        # Get all direct vendor payments
+        direct_vendor_payments = PurchasePayment.unapplied
+                                               .where(vendor_id: vendor_ids)
+                                               .group(:vendor_id)
+                                               .sum(:amount_cents)
+
+        # Merge the two payment types
+        unapplied_payments_by_vendor = {}
+
+        # Add purchase-related payments
+        purchase_related_payments.each do |vendor_id, amount|
+          unapplied_payments_by_vendor[vendor_id] = amount
+        end
+
+        # Add direct vendor payments, summing with existing amounts if needed
+        direct_vendor_payments.each do |vendor_id, amount|
+          # Handle both simple vendor_id and composite [id, payment_method_id] keys
+          actual_vendor_id = vendor_id.is_a?(Array) ? vendor_id.last : vendor_id
+          unapplied_payments_by_vendor[actual_vendor_id] = (unapplied_payments_by_vendor[actual_vendor_id] || 0) + amount
+        end
+
 
         @vendors.each do |vendor|
           total_payables = payables_by_vendor[vendor.id] || 0
@@ -60,44 +82,44 @@ class Admin::AccountPayablesController < Admin::AdminController
     if params[:vendor_id].present?
       @vendor = Purchases::Vendor.find(params[:vendor_id])
       @purchase_invoices = PurchaseInvoice.where(vendor_id: params[:vendor_id])
-      
+
       # Get unapplied payments from both direct vendor payments and purchase-related payments
       vendor_payments = PurchasePayment.includes(:payment_method)
                                       .unapplied
                                       .where(payable_type: "Purchases::Vendor", payable_id: params[:vendor_id])
                                       .order(payment_date: :desc)
-      
+
       purchase_payments = PurchasePayment.includes(:payment_method)
                                         .unapplied
                                         .where(payable_type: "Purchases::Purchase")
                                         .where(payable_id: Purchases::Purchase.where(vendor_id: params[:vendor_id]).pluck(:id))
                                         .order(payment_date: :desc)
-      
+
       # Get payments with direct vendor_id association
       direct_vendor_payments = PurchasePayment.includes(:payment_method)
                                             .unapplied
                                             .where(vendor_id: params[:vendor_id])
                                             .order(payment_date: :desc)
-      
+
       @unapplied_payments = vendor_payments.or(purchase_payments).or(direct_vendor_payments)
-      
+
       @applied_payments = PurchaseInvoicePayment.joins(:purchase_invoice)
                                                .where(purchase_invoices: { vendor_id: params[:vendor_id] })
                                                .includes(:purchase_payment)
-      
+
       # Calculate total purchases by summing purchase_lines
       @purchases = Purchases::Purchase.where(vendor_id: params[:vendor_id]).includes(:purchase_lines)
       @total_purchases = @purchases.sum { |purchase| purchase.total_amount.to_f }
-      
+
       @total_credit_purchases = @purchase_invoices.sum(:amount_cents) / 100.0
-      
+
       # When using a grouped query, we need to handle the sum differently
       total_applied_payments = @applied_payments.sum(:amount_cents)
       total_applied_payments = total_applied_payments.is_a?(Hash) ? total_applied_payments.values.sum : total_applied_payments
-      
+
       total_unapplied_payments = @unapplied_payments.sum(:amount_cents)
       total_unapplied_payments = total_unapplied_payments.is_a?(Hash) ? total_unapplied_payments.values.sum : total_unapplied_payments
-      
+
       @total_paid = (total_applied_payments / 100.0) + (total_unapplied_payments / 100.0)
       @total_unapplied_payments = total_unapplied_payments / 100.0
       @total_pending_previous_period = @vendor.account_payable_initial_balance.to_f
@@ -105,7 +127,7 @@ class Admin::AccountPayablesController < Admin::AdminController
 
       # Check if vendor has any purchase invoices or payments
       @has_transactions = @purchase_invoices.any? || @unapplied_payments.any? || @applied_payments.any?
-      
+
       # Set datatable options
       @datatable_options = "resource_name:'PurchaseInvoice';sort_0_desc;create_button:false;"
     else
@@ -119,45 +141,48 @@ class Admin::AccountPayablesController < Admin::AdminController
 
   def payments_calendar
     authorize! :read, PurchaseInvoice
-    
+
     @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.today.beginning_of_month
     @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.today.end_of_month
-    
+
     # Get all purchase invoices with due dates in the specified range
     @purchase_invoices = PurchaseInvoice.includes(:vendor)
                                        .where("planned_payment_date BETWEEN ? AND ?", @start_date, @end_date)
                                        .where.not(payment_status: :paid)
                                        .order(:planned_payment_date)
-    
+
     # Group purchase invoices by due date
     @grouped_invoices = @purchase_invoices.group_by { |invoice| invoice.planned_payment_date&.to_date }
-    
+
     # Calculate total amount due for each day
     @daily_totals = {}
     @grouped_invoices.each do |date, invoices|
       @daily_totals[date] = invoices.sum { |invoice| invoice.amount_cents - invoice.purchase_invoice_payments.sum(:amount_cents) } / 100.0
     end
-    
+
     # Calculate overall total
     @total_due = @purchase_invoices.sum { |invoice| invoice.amount_cents - invoice.purchase_invoice_payments.sum(:amount_cents) } / 100.0
   end
 
   def create_initial_balance
     authorize! :manage, PurchaseInvoice
-    
+
     @vendor = Purchases::Vendor.find(params[:vendor_id])
-    
+
     # Convert amount to cents
     amount = params[:amount].to_f
-    
+
     success = false
     message = ""
-    
+
     ActiveRecord::Base.transaction do
       if amount > 0
+        # Update the vendor's initial balance field
+        @vendor.update!(account_payable_initial_balance: amount)
+
         # Find existing initial balance or create a new one
         existing_initial_balance = PurchaseInvoice.find_by(vendor: @vendor, description: "Saldo inicial")
-        
+
         if existing_initial_balance.present?
           # Update the existing purchase invoice
           if existing_initial_balance.update(
@@ -184,7 +209,6 @@ class Admin::AccountPayablesController < Admin::AdminController
             description: "Saldo inicial",
             planned_payment_date: params[:due_date].present? ? Time.zone.parse(params[:due_date]).change(hour: 12) : nil
           )
-
           if purchase_invoice.save
             success = true
             message = "Saldo inicial por pagar creado exitosamente"
@@ -196,9 +220,12 @@ class Admin::AccountPayablesController < Admin::AdminController
           end
         end
       elsif amount < 0
+        # Update the vendor's initial balance field
+        @vendor.update!(account_payable_initial_balance: amount)
+
         # Find existing initial balance payment or create a new one
-        existing_initial_balance = PurchasePayment.find_by(description: "Saldo inicial a favor", 
-                                                          payable_type: "Purchases::Vendor", 
+        existing_initial_balance = PurchasePayment.find_by(description: "Saldo inicial a favor",
+                                                          payable_type: "Purchases::Vendor",
                                                           payable_id: @vendor.id)
 
         if existing_initial_balance.present?

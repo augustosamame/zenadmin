@@ -12,8 +12,10 @@ class Ability
       can :manage, StockTransfer
       can :manage, InTransitStock
       can :manage, StockTransferLine
-      can :manage, StockTransferPartialReceipt
-      can :manage, StockTransferLineItem
+      can :manage, Transportista
+      can :manage, Purchases::Vendor
+      can :manage, PurchaseInvoice
+      can :manage, PurchasePayment
     elsif user.has_role?("supervisor")
       can :manage, :all
     elsif user.has_role?("store_manager")

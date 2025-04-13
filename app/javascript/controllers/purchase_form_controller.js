@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["lines", "template", "form", "invoices", "invoiceTemplate"]
+  static targets = ["lines", "template", "form", "invoices", "invoiceTemplate", "invoiceCustomId", "customIdError"]
 
   connect() {
     console.log("Purchase Form controller connected")
@@ -12,6 +12,9 @@ export default class extends Controller {
       transportistaSelect.addEventListener('change', this.updateTransportistaInfo.bind(this))
     }
 
+    // Store a flag to indicate if we're working with a purchase order
+    this.isPurchaseOrderBased = false
+    
     // Add event listener for product selection
     this.element.addEventListener('change', this.handleProductSelection.bind(this))
   }
@@ -23,8 +26,12 @@ export default class extends Controller {
       console.log("No purchase order selected, clearing form")
       // Clear form if no purchase order is selected
       this.clearForm()
+      this.isPurchaseOrderBased = false
       return
     }
+    
+    // Set flag to indicate we're working with a purchase order
+    this.isPurchaseOrderBased = true
     
     console.log("Fetching purchase order details for ID:", purchaseOrderId)
     // Fetch purchase order details
@@ -206,40 +213,54 @@ export default class extends Controller {
   }
 
   handleProductSelection(event) {
-    // Check if the changed element is a product select
-    if (event.target.matches('select[name*="product_id"]')) {
-      const productId = event.target.value
-      if (!productId) return
-
-      const line = event.target.closest('.purchase-line')
-      const priceField = line.querySelector('input[name*="unit_price"]')
-      const quantityField = line.querySelector('input[name*="quantity"]')
-
-      // Set quantity to 1 by default
-      if (quantityField && (!quantityField.value || quantityField.value === '0')) {
-        quantityField.value = 1
-      }
-
-      // Fetch product price
-      fetch(`/admin/purchases/get_product_details?product_id=${productId}`)
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`HTTP error! Status: ${response.status}`)
-          }
-          return response.json()
-        })
-        .then(data => {
-          console.log("Product details received:", data)
-          if (priceField) {
-            priceField.value = data.price
-            // Update the line total
-            this.updateLineTotal({ target: priceField })
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching product data:', error)
-        })
+    if (!event.target.matches('select[name*="product_id"]')) {
+      return
     }
+    
+    const productId = event.target.value
+    if (!productId) {
+      return
+    }
+    
+    const line = event.target.closest(".purchase-line")
+    const quantityField = line.querySelector("input[name*='quantity']")
+    const priceField = line.querySelector("input[name*='unit_price']")
+    
+    // Set quantity to 1 by default
+    if (quantityField && (!quantityField.value || quantityField.value === '0')) {
+      quantityField.value = 1
+    }
+
+    // If we're working with a purchase order, don't fetch product prices
+    if (this.isPurchaseOrderBased) {
+      console.log("Working with purchase order - skipping product price fetch")
+      // If the price field is empty, we still need to update the line total
+      if (priceField && !priceField.value) {
+        priceField.value = 0
+      }
+      this.updateLineTotal({ target: priceField })
+      return
+    }
+
+    // Only fetch product price if we're not working with a purchase order
+    fetch(`/admin/purchases/get_product_details?product_id=${productId}`)
+      .then(response => {
+        if (!response.ok) {
+          throw new Error(`HTTP error! Status: ${response.status}`)
+        }
+        return response.json()
+      })
+      .then(data => {
+        console.log("Product details received:", data)
+        if (priceField) {
+          priceField.value = data.price
+          // Update the line total
+          this.updateLineTotal({ target: priceField })
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching product data:', error)
+      })
   }
 
   add(event) {
@@ -324,10 +345,17 @@ export default class extends Controller {
         quantityInput.value = lineData.quantity
       }
       
-      // Set unit price
+      // Set unit price - use purchase_order_line_price if available, otherwise fallback to unit_price
       const priceInput = newLine.querySelector('input[name*="unit_price"]')
       if (priceInput) {
-        priceInput.value = lineData.unit_price
+        // Prioritize the purchase order price if available
+        if (lineData.purchase_order_line_price !== undefined) {
+          console.log("Using purchase order line price:", lineData.purchase_order_line_price)
+          priceInput.value = lineData.purchase_order_line_price
+        } else if (lineData.unit_price !== undefined) {
+          console.log("Using unit price from data:", lineData.unit_price)
+          priceInput.value = lineData.unit_price
+        }
       }
       
       // Update the line total
@@ -471,5 +499,35 @@ export default class extends Controller {
     if (cleanValue !== value) {
       amountField.value = cleanValue
     }
+  }
+  
+  validateInvoiceCustomId(event) {
+    const customIdField = event.target
+    const customId = customIdField.value.trim()
+    
+    if (!customId) {
+      return // Skip validation for empty values
+    }
+    
+    // Find the error message element for this specific field
+    const errorElement = customIdField.closest('.purchase-invoice-fields').querySelector('[data-purchase-form-target="customIdError"]')
+    
+    // Check if the custom ID already exists
+    fetch(`/admin/purchases/check_invoice_custom_id?custom_id=${encodeURIComponent(customId)}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.exists) {
+          // Show error message
+          errorElement.classList.remove('hidden')
+          customIdField.classList.add('border-red-500')
+        } else {
+          // Hide error message
+          errorElement.classList.add('hidden')
+          customIdField.classList.remove('border-red-500')
+        }
+      })
+      .catch(error => {
+        console.error('Error checking custom ID:', error)
+      })
   }
 }

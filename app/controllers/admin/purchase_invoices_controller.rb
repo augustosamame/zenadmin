@@ -139,7 +139,7 @@ class Admin::PurchaseInvoicesController < Admin::AdminController
           invoice.purchase&.custom_id || "-",
           invoice.vendor&.name || "-",
           invoice.purchase_invoice_date&.strftime("%d/%m/%Y") || "-",
-          invoice.translated_purchase_invoice_type,
+          invoice.description == "Saldo inicial" ? "Saldo inicial" : invoice.translated_purchase_invoice_type,
           invoice.custom_id,
           humanized_money_with_symbol(invoice.amount),
           payment_status_badge(invoice.payment_status),

@@ -10,6 +10,13 @@ class CashierTransaction < ApplicationRecord
 
   monetize :amount_cents, with_model_currency: :currency
 
+  # Fix for incorrect namespace reference
+  def transactable_type=(class_name)
+    # Convert "Purchases::PurchaseInvoice" to "PurchaseInvoice" if needed
+    normalized_class_name = class_name == "Purchases::PurchaseInvoice" ? "PurchaseInvoice" : class_name
+    super(normalized_class_name)
+  end
+
   def amount_for_balance
     case transactable_type
     when "CashInflow"

@@ -29,17 +29,18 @@ class PurchasePayment < ApplicationRecord
   monetize :amount_cents, with_model_currency: :currency
 
   validates :payment_method_id, :user_id, :amount_cents, :payment_date, presence: true
+  validates :cashier_shift_id, presence: true
 
   before_validation :set_payment_date
 
   after_create :create_cashier_transaction, if: -> { cashier_shift.present? }
 
   scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
-  scope :unapplied, -> { 
+  scope :unapplied, -> {
     left_joins(:purchase_invoice_payments)
       .group(:id)
-      .having('COALESCE(SUM(purchase_invoice_payments.amount_cents), 0) < purchase_payments.amount_cents')
-      .where(status: [:paid, :partially_paid])
+      .having("COALESCE(SUM(purchase_invoice_payments.amount_cents), 0) < purchase_payments.amount_cents")
+      .where(status: [ :paid, :partially_paid ])
   }
 
   pg_search_scope :search_by_all_fields,
@@ -70,10 +71,22 @@ class PurchasePayment < ApplicationRecord
       payable_name = case payable_type&.underscore
       when "purchases/purchase"
         "Compra #{payable&.custom_id}"
+      when "purchase_invoice", "purchases/purchase_invoice"
+        if payable.vendor.present?
+          "Proveedor #{payable&.custom_id} #{payable.vendor.name}"
+        else
+          "Proveedor #{payable&.custom_id}"
+        end
       when nil
         "Saldo inicial"
       else
         "#{payable_type.underscore.humanize} #{payable&.custom_id}"
+      end
+    elsif purchase_invoice.present?
+      if purchase_invoice.vendor.present?
+        payable_name = "Proveedor #{purchase_invoice.custom_id || purchase_invoice.id} (#{purchase_invoice.vendor.name})"
+      else
+        payable_name = "Proveedor #{purchase_invoice.custom_id || purchase_invoice.id}"
       end
     elsif vendor.present?
       payable_name = "Proveedor #{vendor.name}"

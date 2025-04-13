@@ -11,14 +11,14 @@ class Admin::PurchasePaymentsController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        # Load payments with basic associations first
+        # Load payments with appropriate associations
         @purchase_payments = if @current_location && current_user.any_admin_or_supervisor?
-          PurchasePayment.includes(:user, :payment_method, cashier_shift: :cashier)
+          PurchasePayment.includes(:payable, cashier_shift: :cashier)
                 .where(region_id: @current_location.region_id)
                 .order(id: :desc)
                 .limit(10)
         else
-          PurchasePayment.includes(:user, :payment_method, cashier_shift: :cashier)
+          PurchasePayment.includes(:payable, cashier_shift: :cashier)
                 .order(id: :desc)
                 .limit(10)
         end
@@ -103,12 +103,9 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     
     # The cashier_shift will be set in create based on the selected cashier
     
-    if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
-    else
-      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
-    end
-
+    
+    @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
+    
     # Pre-select vendor if vendor_id is provided
     if params[:vendor_id].present?
       @vendor = Purchases::Vendor.find(params[:vendor_id])
@@ -159,11 +156,7 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     
     # The cashier_shift will be set in update based on the selected cashier
     
-    if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
-    else
-      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
-    end
+    @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
     
     # Preselect the vendor if it exists
     @vendor_id = @purchase_payment.purchase&.vendor_id
@@ -203,11 +196,7 @@ class Admin::PurchasePaymentsController < Admin::AdminController
       @purchase_payment.vendor_id = @vendor_id
     end
     
-    if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
-    else
-      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
-    end
+    @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
     
     # Preselect the vendor if it exists
     @vendor_id = @purchase_payment.purchase&.vendor_id
@@ -230,6 +219,33 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     # Extract cashier_id from params before creating the PurchasePayment
     cashier_id = params[:purchase_payment].delete(:cashier_id) if params[:purchase_payment][:cashier_id].present?
     
+    # Validate cashier selection
+    if cashier_id.blank?
+      @purchase_payment = PurchasePayment.new(purchase_payment_params)
+      @purchase_payment.errors.add(:base, "Debe seleccionar una caja para continuar")
+      
+      # Set up variables for the form
+      @cashiers = Cashier.where(status: :active).order(:name)
+      @cashiers_with_open_shifts = Cashier.active_with_open_shift.order(:name)
+      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
+      @vendors = Purchases::Vendor.all
+      
+      # Handle purchase invoice if present
+      if params[:purchase_invoice_id].present?
+        @purchase_invoice = PurchaseInvoice.find(params[:purchase_invoice_id])
+      elsif params[:purchase_payment][:payable_type] == "PurchaseInvoice" && params[:purchase_payment][:payable_id].present?
+        @purchase_invoice = PurchaseInvoice.find_by(id: params[:purchase_payment][:payable_id])
+      end
+      
+      # Handle vendor_id from the form
+      if params[:vendor_id].present?
+        @vendor_id = params[:vendor_id]
+        @purchases = Purchases::Purchase.where(vendor_id: @vendor_id)
+      end
+      
+      return render :new, status: :unprocessable_entity
+    end
+    
     @purchase_payment = PurchasePayment.new(purchase_payment_params)
     @purchase_payment.status = "paid"
     @purchase_payment.user = current_user
@@ -246,11 +262,7 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     @cashiers_with_open_shifts = Cashier.active_with_open_shift.order(:name)
     
     # Get payment methods for dropdown
-    if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
-    else
-      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
-    end
+    @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
     
     # Load vendors for dropdown
     @vendors = Purchases::Vendor.all
@@ -386,7 +398,7 @@ class Admin::PurchasePaymentsController < Admin::AdminController
   end
 
   def datatable_json
-    purchase_payments = PurchasePayment.includes(:user, :payment_method, :purchase_invoice, cashier_shift: :cashier)
+    purchase_payments = PurchasePayment.includes(:payable, cashier_shift: :cashier)
                                       .joins(:payment_method)
 
     # Location filter

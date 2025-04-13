@@ -208,7 +208,13 @@
                 <%= friendly_transactable_type(transaction) %>
               </span>
             </td>
-            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.transactable&.description %></td>
+            <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+              <% begin %>
+                <%= transaction.transactable&.description %>
+              <% rescue NameError %>
+                <%= transaction.transactable_type == "PurchaseInvoice" ? "Factura de compra" : "Descripción no disponible" %>
+              <% end %>
+            </td>
             <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400"><%= transaction.payment_method&.description %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= transaction.processor_transacion_id %></td>
             <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap dark:text-gray-400"><%= format_currency(transaction.amount) %></td>

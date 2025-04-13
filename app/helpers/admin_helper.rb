@@ -293,4 +293,21 @@ module AdminHelper
     guia = stock_transfer.guias.last
     link_to("#{guia.custom_id}", guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline")
   end
+  
+  def payment_status_badge(record)
+    status_class = case record.payment_status
+                   when 'paid'
+                     'bg-green-100 text-green-800'
+                   when 'partially_paid'
+                     'bg-yellow-100 text-yellow-800'
+                   when 'void'
+                     'bg-gray-100 text-gray-800'
+                   else
+                     'bg-red-100 text-red-800'
+                   end
+    
+    content_tag :span, class: "px-2 inline-flex text-xs leading-5 font-semibold rounded-full #{status_class}" do
+      record.respond_to?(:translated_payment_status) ? record.translated_payment_status : record.payment_status.humanize
+    end
+  end
 end

@@ -2,7 +2,7 @@
   <%= link_to "Volver a Pagos", admin_purchase_payments_path, class: "btn btn-secondary" %>
 <% end %>
 
-<div class="px-4 mx-auto mt-8 md:px-10">
+<div class="px-4 mx-auto mt-8 md:px-10" data-controller="purchase-payment-form">
   <% if @purchase_invoice.present? %>
     <div class="p-4 mb-6 text-green-700 bg-green-100 rounded-md border border-green-200">
       <p class="mb-2">
@@ -28,7 +28,7 @@
   <%= simple_form_for([:admin, @purchase_payment]) do |form| %>
     <%= render 'shared/form_errors', model: @purchase_payment %>
     
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3" data-purchase-payment-form-target="form">
       <!-- Payment Method Selection -->
       <div>
         <%= form.association :payment_method,
@@ -52,8 +52,13 @@
           <%= select_tag "purchase_payment[cashier_id]",
               options_from_collection_for_select(@cashiers_with_open_shifts, :id, :name),
               include_blank: "Seleccionar Caja",
-              class: "form-select w-full" %>
+              required: true,
+              class: "form-select w-full",
+              data: { purchase_payment_form_target: "cashierSelect" } %>
           <div class="mt-1 text-xs text-gray-500">Solo se muestran cajeros con turnos abiertos</div>
+          <div data-purchase-payment-form-target="cashierError" class="mt-1 text-sm text-red-600 hidden">
+            Debe seleccionar una caja para continuar
+          </div>
         </div>
       </div>
 
@@ -66,7 +71,8 @@
               step: 0.01,
               class: "form-input",
               min: 0,
-              value: @purchase_invoice.present? ? ((@purchase_invoice.amount_cents - @purchase_invoice.purchase_invoice_payments.sum(:amount_cents)) / 100.0) : nil
+              value: @purchase_invoice.present? ? ((@purchase_invoice.amount_cents - @purchase_invoice.purchase_invoice_payments.sum(:amount_cents)) / 100.0) : nil,
+              readonly: @purchase_invoice.present?
             },
             label_html: { class: "form-label" } %>
       </div>

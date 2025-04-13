@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_13_173836) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -868,7 +868,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_173836) do
   end
 
   create_table "purchase_invoices", force: :cascade do |t|
-    t.bigint "purchase_id", null: false
+    t.bigint "purchase_id"
     t.bigint "vendor_id", null: false
     t.date "purchase_invoice_date", null: false
     t.integer "amount_cents", null: false
@@ -879,6 +879,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_173836) do
     t.string "custom_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "description"
     t.index ["payment_status"], name: "index_purchase_invoices_on_payment_status"
     t.index ["purchase_id"], name: "index_purchase_invoices_on_purchase_id"
     t.index ["purchase_invoice_type"], name: "index_purchase_invoices_on_purchase_invoice_type"

@@ -35,18 +35,44 @@ class Admin::PurchasesController < Admin::AdminController
     @purchase.region_id = @current_region.id if @current_region.present?
 
     respond_to do |format|
-      if @purchase.save
-        # Update inventory
-        Services::Inventory::PurchaseItemService.new(@purchase).update_inventory
+      begin
+        if @purchase.save
+          # Update inventory
+          begin
+            Services::Inventory::PurchaseItemService.new(@purchase).update_inventory
+          rescue => e
+            Rails.logger.error("Error updating inventory: #{e.message}")
+            Rails.logger.error(e.backtrace.join("\n"))
+            # Continue with the save even if inventory update fails
+          end
 
-        format.html { redirect_to admin_purchase_path(@purchase), notice: "Purchase was successfully created." }
-        format.json { render :show, status: :created, location: @purchase }
-      else
+          format.html { redirect_to admin_purchase_path(@purchase), notice: "Purchase was successfully created." }
+          format.json { render :show, status: :created, location: @purchase }
+        else
+          Rails.logger.error("Purchase save errors: #{@purchase.errors.full_messages}")
+          @purchase.purchase_invoices.each do |invoice|
+            Rails.logger.error("Invoice errors: #{invoice.errors.full_messages}") if invoice.errors.any?
+          end
+          @purchase.purchase_lines.each do |line|
+            Rails.logger.error("Line errors: #{line.errors.full_messages}") if line.errors.any?
+          end
+          
+          @purchase_orders = Purchases::PurchaseOrder.where(status: [ :draft, :approved, :pending ])
+                                                   .includes(:vendor)
+                                                   .order(created_at: :desc)
+          format.html { render :new, status: :unprocessable_entity }
+          format.json { render json: @purchase.errors, status: :unprocessable_entity }
+        end
+      rescue => e
+        Rails.logger.error("Exception in purchase create: #{e.message}")
+        Rails.logger.error(e.backtrace.join("\n"))
+        
+        flash.now[:alert] = "Error creating purchase: #{e.message}"
         @purchase_orders = Purchases::PurchaseOrder.where(status: [ :draft, :approved, :pending ])
-                                                  .includes(:vendor)
-                                                  .order(created_at: :desc)
-        format.html { render :new }
-        format.json { render json: @purchase.errors, status: :unprocessable_entity }
+                                                 .includes(:vendor)
+                                                 .order(created_at: :desc)
+        format.html { render :new, status: :unprocessable_entity }
+        format.json { render json: { error: e.message }, status: :unprocessable_entity }
       end
     end
   end
@@ -106,6 +132,11 @@ class Admin::PurchasesController < Admin::AdminController
       name: product.name,
       price: product.price.to_f
     }
+  end
+
+  def check_invoice_custom_id
+    exists = PurchaseInvoice.exists?(custom_id: params[:custom_id])
+    render json: { exists: exists }
   end
 
   private

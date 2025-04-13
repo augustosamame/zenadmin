@@ -5,11 +5,11 @@
   </div>
 <% end %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow p-6">
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="container px-4 py-8 mx-auto">
+  <div class="p-6 bg-white rounded-lg shadow">
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Información del Comprobante</h3>
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Información del Comprobante</h3>
         
         <div class="mb-4">
           <p class="text-sm font-medium text-gray-500">ID</p>
@@ -39,12 +39,12 @@
         
         <div class="mb-4">
           <p class="text-sm font-medium text-gray-500">Tipo de Comprobante</p>
-          <p class="text-base text-gray-900"><%= @purchase_invoice.purchase_invoice_type&.humanize %></p>
+          <p class="text-base text-gray-900"><%= @purchase_invoice.description == "Saldo inicial" ? "Saldo inicial" : @purchase_invoice.translated_purchase_invoice_type %></p>
         </div>
       </div>
       
       <div>
-        <h3 class="text-lg font-medium text-gray-900 mb-4">Detalles de Pago</h3>
+        <h3 class="mb-4 text-lg font-medium text-gray-900">Detalles de Pago</h3>
         
         <div class="mb-4">
           <p class="text-sm font-medium text-gray-500">Número de Comprobante</p>
@@ -64,17 +64,7 @@
         <div class="mb-4">
           <p class="text-sm font-medium text-gray-500">Estado de Pago</p>
           <p class="text-base">
-            <% status_class = case @purchase_invoice.payment_status
-               when 'pending' then 'bg-yellow-100 text-yellow-800'
-               when 'partially_paid' then 'bg-blue-100 text-blue-800'
-               when 'paid' then 'bg-green-100 text-green-800'
-               when 'void' then 'bg-red-100 text-red-800'
-               else 'bg-gray-100 text-gray-800'
-               end
-            %>
-            <span class="px-2 py-1 inline-flex text-sm leading-5 font-semibold rounded-full <%= status_class %>">
-              <%= @purchase_invoice.payment_status&.humanize %>
-            </span>
+            <%= payment_status_badge(@purchase_invoice) %>
           </p>
         </div>
         
@@ -85,10 +75,10 @@
       </div>
     </div>
     
-    <div class="mt-8 border-t pt-6">
-      <h3 class="text-lg font-medium text-gray-900 mb-4">Información Adicional</h3>
+    <div class="pt-6 mt-8 border-t">
+      <h3 class="mb-4 text-lg font-medium text-gray-900">Información Adicional</h3>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div class="mb-4">
           <p class="text-sm font-medium text-gray-500">Fecha de Creación</p>
           <p class="text-base text-gray-900"><%= @purchase_invoice.created_at.strftime('%d/%m/%Y %H:%M') %></p>

@@ -62,9 +62,9 @@ class Admin::CashierShiftsController < Admin::AdminController
       return
     end
 
-    # Paginate transactions with proper eager loading for payment methods and transactables
+    # Load transactions without eager loading problematic associations
     @transactions = @cashier_shift.cashier_transactions
-                                  .includes(:payment_method, transactable: [ :payable, :vendor ])
+                                  .includes(:payment_method)
                                   .order(created_at: :desc)
                                   .page(params[:page])
                                   .per(50)

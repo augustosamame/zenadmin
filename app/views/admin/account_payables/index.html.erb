@@ -117,7 +117,7 @@
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
   <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
     <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
-      <h3 class="mb-2 text-lg font-bold">Facturas Pendientes</h3>
+      <h3 class="mb-2 text-lg font-bold">Comprobantes Pendientes De Pago</h3>
       <thead>
         <tr>
           <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
@@ -156,7 +156,7 @@
             %>
             <tr class="<%= 'bg-red-50 dark:bg-red-950' if is_overdue %>">
               <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= invoice.purchase_invoice_date.strftime("%d/%m/%Y") %></td>
-              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= invoice.translated_purchase_invoice_type %></td>
+              <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= invoice.description == "Saldo inicial" ? "Saldo inicial" : invoice.translated_purchase_invoice_type %></td>
               <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= invoice.custom_id %></td>
               <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">S/ <%= number_with_precision(invoice.amount, precision: 2) %></td>
               <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap">S/ <%= number_with_precision(total_paid / 100.0, precision: 2) %></td>

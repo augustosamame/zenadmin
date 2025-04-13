@@ -249,6 +249,7 @@ Rails.application.routes.draw do
       collection do
         get :get_purchase_order_details
         get :get_product_details
+        get :check_invoice_custom_id
       end
     end
 

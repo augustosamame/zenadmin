@@ -35,7 +35,16 @@
     
     <div>
       <%= f.label :custom_id, "Número de Comprobante", class: "block text-sm font-medium text-gray-700" %>
-      <%= f.text_field :custom_id, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500" %>
+      <%= f.text_field :custom_id, 
+          class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500", 
+          data: { 
+            purchase_form_target: "invoiceCustomId",
+            action: "blur->purchase-form#validateInvoiceCustomId"
+          } 
+      %>
+      <div data-purchase-form-target="customIdError" class="mt-1 text-sm text-red-600 hidden">
+        Este número de comprobante ya está en uso.
+      </div>
     </div>
   </div>
 

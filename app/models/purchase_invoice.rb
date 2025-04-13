@@ -2,7 +2,7 @@ class PurchaseInvoice < ApplicationRecord
   audited_if_enabled
   include TranslateEnum
 
-  belongs_to :purchase, class_name: "Purchases::Purchase"
+  belongs_to :purchase, class_name: "Purchases::Purchase", optional: true
   belongs_to :vendor, class_name: "Purchases::Vendor", optional: true
   has_many :purchase_invoice_payments, dependent: :destroy
 

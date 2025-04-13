@@ -26,7 +26,7 @@
             <td class="px-4 py-2"><%= invoice.purchase&.custom_id || "-" %></td>
             <td class="px-4 py-2"><%= invoice.vendor&.name || "-" %></td>
             <td class="px-4 py-2"><%= invoice.purchase_invoice_date&.strftime("%d/%m/%Y") || "-" %></td>
-            <td class="px-4 py-2"><%= invoice.translated_purchase_invoice_type %></td>
+            <td class="px-4 py-2"><%= invoice.description == "Saldo inicial" ? "Saldo inicial" : invoice.translated_purchase_invoice_type %></td>
             <td class="px-4 py-2"><%= invoice.custom_id %></td>
             <td class="px-4 py-2"><%= humanized_money_with_symbol(invoice.amount) %></td>
             <td class="px-4 py-2">
