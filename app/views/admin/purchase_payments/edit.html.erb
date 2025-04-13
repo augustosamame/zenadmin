@@ -1,0 +1,238 @@
+<%= render "shared/admin/nav", { header_title: "Editar Pago a Proveedor" } do %>
+  <%= link_to "Volver a Pagos", admin_purchase_payments_path, class: "btn btn-secondary" %>
+<% end %>
+
+<div class="px-4 mx-auto mt-8 md:px-10">
+  <% if @purchase_payment.purchase_invoice.present? %>
+    <div class="p-4 mb-6 text-green-700 bg-green-100 rounded-md border border-green-200">
+      <p class="mb-2">
+        <strong>Nota:</strong> Este pago está asociado a la siguiente factura:
+      </p>
+      <ul class="ml-4 list-disc">
+        <li><strong>ID:</strong> #<%= @purchase_payment.purchase_invoice.id %></li>
+        <li><strong>Proveedor:</strong> <%= @purchase_payment.purchase_invoice.vendor.name %></li>
+        <li><strong>Fecha de factura:</strong> <%= l(@purchase_payment.purchase_invoice.purchase_invoice_date, format: :short) if @purchase_payment.purchase_invoice.purchase_invoice_date.present? %></li>
+        <li><strong>Monto total:</strong> <%= humanized_money_with_symbol @purchase_payment.purchase_invoice.amount %></li>
+        <li><strong>Saldo pendiente:</strong> <%= humanized_money_with_symbol(@purchase_payment.purchase_invoice.amount - (@purchase_payment.purchase_invoice.purchase_invoice_payments.sum(:amount_cents) / 100.0)) %></li>
+        <% if @purchase_payment.purchase_invoice.custom_id.present? %>
+          <li><strong>Número de factura:</strong> <%= @purchase_payment.purchase_invoice.custom_id %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%= simple_form_for([:admin, @purchase_payment]) do |form| %>
+    <%= render 'shared/form_errors', model: @purchase_payment %>
+    
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-3">
+      <!-- Payment Method Selection -->
+      <div>
+        <%= form.association :payment_method,
+            collection: @elligible_payment_methods.map { |pm| [pm.description, pm.id] },
+            label: "Método de Pago",
+            prompt: "Seleccione método de pago",
+            input_html: { 
+              class: "form-input",
+              data: { 
+                controller: "select",
+                select_placeholder_value: "Seleccione método de pago"
+              }
+            },
+            label_html: { class: "form-label" } %>
+      </div>
+      
+      <!-- Cashier Selection -->
+      <div class="mt-0">
+        <%= form.label :cashier_id, "Caja", class: "form-label" %>
+        <div class="relative">
+          <%= select_tag "purchase_payment[cashier_id]",
+              options_from_collection_for_select(@cashiers_with_open_shifts, :id, :name, @purchase_payment.cashier_shift&.cashier_id),
+              include_blank: "Seleccionar Caja",
+              class: "form-select w-full" %>
+          <div class="mt-1 text-xs text-gray-500">Solo se muestran cajeros con turnos abiertos</div>
+        </div>
+      </div>
+
+      <!-- Amount Field -->
+      <div>
+        <%= form.input :amount,
+            label: "Monto en S/",
+            as: :decimal,
+            input_html: { 
+              step: 0.01,
+              class: "form-input",
+              min: 0
+            },
+            label_html: { class: "form-label" } %>
+      </div>
+    </div>
+
+    <!-- Payment Date and Transaction ID -->
+    <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+      <div>
+        <%= form.label :payment_date, "Fecha de Pago", class: "form-label" %>
+        <div class="relative">
+          <%= form.text_field :payment_date,
+              value: @purchase_payment.payment_date&.strftime('%Y-%m-%dT%H:%M'),
+              class: "form-input w-full",
+              type: "datetime-local" %>
+        </div>
+      </div>
+      
+      <div>
+        <%= form.input :processor_transacion_id,
+          label: "ID de Transacción",
+          input_html: { 
+            class: "form-input w-full"
+          },
+          label_html: { class: "form-label" } %>
+      </div>
+    </div>
+
+    <!-- Vendor and Purchase Selection -->
+    <div class="grid grid-cols-1 gap-6 mt-6 md:grid-cols-2">
+      <% if @purchase_payment.purchase.present? %>
+        <div>
+          <label class="form-label">Proveedor</label>
+          <p class="mt-1 text-sm text-gray-900"><%= @purchase_payment.purchase.vendor.name %></p>
+        </div>
+        
+        <div>
+          <label class="form-label">Compra</label>
+          <p class="mt-1 text-sm text-gray-900"><%= @purchase_payment.purchase.custom_id %></p>
+          <%= form.hidden_field :payable_id, value: @purchase_payment.purchase.id %>
+          <%= form.hidden_field :payable_type, value: "Purchases::Purchase" %>
+        </div>
+      <% elsif @vendor_id.present? %>
+        <div>
+          <label class="form-label">Proveedor</label>
+          <p class="mt-1 text-sm text-gray-900"><%= Purchases::Vendor.find(@vendor_id).name %></p>
+          <%= form.hidden_field :vendor_id, value: @vendor_id %>
+        </div>
+        
+        <div>
+          <%= form.label :payable_id, "Compra", class: "form-label" %>
+          <%= form.collection_select :payable_id,
+              @purchases || [],
+              :id,
+              :custom_id,
+              { prompt: "Seleccione compra" },
+              { 
+                class: "form-input",
+                data: { 
+                  controller: "select",
+                  select_placeholder_value: "Seleccione compra"
+                }
+              } %>
+          <%= form.hidden_field :payable_type, value: "Purchases::Purchase" %>
+        </div>
+      <% else %>
+        <div>
+          <label for="vendor_id" class="form-label">Proveedor</label>
+          <%= select_tag :vendor_id, 
+                        options_from_collection_for_select(@vendors, :id, :name), 
+                        { 
+                          prompt: "Seleccionar proveedor", 
+                          class: "form-input",
+                          data: {
+                            controller: "select",
+                            select_placeholder_value: "Seleccione proveedor"
+                          },
+                          onchange: "fetchPurchasesForVendor(this.value); return false;"
+                        } %>
+          
+          <script>
+            function fetchPurchasesForVendor(vendorId) {
+              if (!vendorId) return;
+              
+              console.log("Custom function: fetchPurchasesForVendor with ID:", vendorId);
+              
+              // Show the purchase select dropdown
+              const purchaseSelect = document.getElementById('purchase-select');
+              if (purchaseSelect) {
+                purchaseSelect.classList.remove('hidden');
+              }
+              
+              // Fetch purchases for the selected vendor
+              fetch(`/admin/purchase_payments/fetch_purchases?vendor_id=${vendorId}`, {
+                headers: {
+                  "Accept": "application/json",
+                  "X-Requested-With": "XMLHttpRequest"
+                }
+              })
+              .then(response => response.json())
+              .then(data => {
+                console.log("Data received:", data);
+                
+                // Get the select element
+                const selectElement = document.getElementById('purchase_payment_payable_id');
+                if (!selectElement) return;
+                
+                // Clear existing options
+                selectElement.innerHTML = '';
+                
+                // Add the prompt option
+                const promptOption = document.createElement('option');
+                promptOption.value = "";
+                promptOption.text = "Seleccione compra";
+                selectElement.appendChild(promptOption);
+                
+                // Add the purchase options
+                data.purchases.forEach(purchase => {
+                  const displayText = purchase.custom_id || `Compra #${purchase.id}`;
+                  const option = document.createElement('option');
+                  option.value = purchase.id;
+                  option.text = displayText;
+                  selectElement.appendChild(option);
+                });
+              })
+              .catch(error => console.error("Error fetching purchases:", error));
+              
+              return false;
+            }
+          </script>
+        </div>
+        
+        <div id="purchase-select" class="<%= @purchases&.any? ? '' : 'hidden' %>">
+          <%= form.label :payable_id, "Compra", class: "form-label" %>
+          <select id="purchase_payment_payable_id" name="purchase_payment[payable_id]" class="form-input">
+            <option value="">Seleccione compra</option>
+            <% (@purchases || []).each do |purchase| %>
+              <option value="<%= purchase.id %>"><%= purchase.custom_id || "Compra ##{purchase.id}" %></option>
+            <% end %>
+          </select>
+          <%= form.hidden_field :payable_type, value: "Purchases::Purchase" %>
+        </div>
+      <% end %>
+    </div>
+
+    <!-- Comments -->
+    <div class="mt-6">
+      <%= form.input :comment,
+        label: "Comentarios",
+        as: :text,
+        input_html: { 
+          class: "form-input w-full",
+          rows: 3
+        },
+        label_html: { class: "form-label" } %>
+    </div>
+
+    <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+      <%= form.button :submit, "Actualizar Pago", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", 
+          admin_purchase_payments_path, 
+          class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+    </div>
+  <% end %>
+</div>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // If there's a vendor selected, fetch purchases for it
+    const vendorSelect = document.querySelector('#vendor_id');
+    if (vendorSelect && vendorSelect.value) {
+      fetchPurchasesForVendor(vendorSelect.value);
+    }
+  });
+</script>

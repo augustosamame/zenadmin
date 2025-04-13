@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_12_225100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -855,6 +855,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
     t.index ["status"], name: "index_products_on_status"
   end
 
+  create_table "purchase_invoice_payments", force: :cascade do |t|
+    t.bigint "purchase_invoice_id", null: false
+    t.bigint "purchase_payment_id", null: false
+    t.integer "amount_cents", default: 0, null: false
+    t.string "currency"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["purchase_invoice_id"], name: "index_purchase_invoice_payments_on_purchase_invoice_id"
+    t.index ["purchase_payment_id"], name: "index_purchase_invoice_payments_on_purchase_payment_id"
+  end
+
   create_table "purchase_invoices", force: :cascade do |t|
     t.bigint "purchase_id", null: false
     t.bigint "vendor_id", null: false
@@ -871,6 +882,37 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
     t.index ["purchase_id"], name: "index_purchase_invoices_on_purchase_id"
     t.index ["purchase_invoice_type"], name: "index_purchase_invoices_on_purchase_invoice_type"
     t.index ["vendor_id"], name: "index_purchase_invoices_on_vendor_id"
+  end
+
+  create_table "purchase_payments", force: :cascade do |t|
+    t.bigint "payment_method_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "region_id", null: false
+    t.string "payable_type"
+    t.bigint "payable_id"
+    t.bigint "cashier_shift_id"
+    t.bigint "original_payment_id"
+    t.bigint "purchase_invoice_id"
+    t.bigint "vendor_id"
+    t.string "custom_id"
+    t.integer "amount_cents", default: 0, null: false
+    t.string "currency"
+    t.datetime "payment_date"
+    t.text "comment"
+    t.integer "status", default: 0
+    t.string "processor_transacion_id"
+    t.datetime "due_date"
+    t.string "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["cashier_shift_id"], name: "index_purchase_payments_on_cashier_shift_id"
+    t.index ["original_payment_id"], name: "index_purchase_payments_on_original_payment_id"
+    t.index ["payable_type", "payable_id"], name: "index_purchase_payments_on_payable"
+    t.index ["payment_method_id"], name: "index_purchase_payments_on_payment_method_id"
+    t.index ["purchase_invoice_id"], name: "index_purchase_payments_on_purchase_invoice_id"
+    t.index ["region_id"], name: "index_purchase_payments_on_region_id"
+    t.index ["user_id"], name: "index_purchase_payments_on_user_id"
+    t.index ["vendor_id"], name: "index_purchase_payments_on_vendor_id"
   end
 
   create_table "purchases_purchase_lines", force: :cascade do |t|
@@ -948,6 +990,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
     t.string "address"
     t.string "tax_id"
     t.text "notes"
+    t.decimal "account_payable_initial_balance", precision: 10, scale: 2, default: "0.0"
     t.index ["custom_id"], name: "index_purchases_vendors_on_custom_id", unique: true
     t.index ["region_id"], name: "index_purchases_vendors_on_region_id"
   end
@@ -1334,8 +1377,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
   add_foreign_key "product_min_max_stocks", "products"
   add_foreign_key "product_min_max_stocks", "warehouses"
   add_foreign_key "product_pack_items", "product_packs"
+  add_foreign_key "purchase_invoice_payments", "purchase_invoices"
+  add_foreign_key "purchase_invoice_payments", "purchase_payments"
   add_foreign_key "purchase_invoices", "purchases_purchases", column: "purchase_id"
   add_foreign_key "purchase_invoices", "purchases_vendors", column: "vendor_id"
+  add_foreign_key "purchase_payments", "cashier_shifts"
+  add_foreign_key "purchase_payments", "payment_methods"
+  add_foreign_key "purchase_payments", "purchase_invoices"
+  add_foreign_key "purchase_payments", "purchase_payments", column: "original_payment_id"
+  add_foreign_key "purchase_payments", "purchases_vendors", column: "vendor_id"
+  add_foreign_key "purchase_payments", "regions"
+  add_foreign_key "purchase_payments", "users"
   add_foreign_key "purchases_purchase_lines", "products"
   add_foreign_key "purchases_purchase_lines", "purchases_purchases", column: "purchase_id"
   add_foreign_key "purchases_purchase_lines", "warehouses"

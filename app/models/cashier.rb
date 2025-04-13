@@ -10,6 +10,11 @@ class Cashier < ApplicationRecord
 
   enum :cashier_type, { standard: 0, bank: 1 }
 
+  # Scope for active cashiers with at least one open shift
+  scope :active_with_open_shift, -> {
+    active.joins(:cashier_shifts).where(cashier_shifts: { status: :open }).distinct
+  }
+
   def old_current_shift(current_user)
     open_shift = cashier_shifts.find_or_initialize_by(status: :open)
     if open_shift.new_record?

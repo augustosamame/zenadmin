@@ -14,7 +14,8 @@ class CustomNumbering < ApplicationRecord
     requisition: 9,
     planned_stock_transfer: 10,
     purchases_purchase_order: 11,
-    purchases_purchase: 12
+    purchases_purchase: 12,
+    purchase_payment: 13
   }, prefix: :numbering
   enum :status, { active: 0, inactive: 1 }
   translate_enum :status

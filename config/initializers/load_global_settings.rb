@@ -70,6 +70,8 @@ Rails.application.config.after_initialize do
           CustomNumbering.find_or_create_by!(record_type: :planned_stock_transfer, prefix: "PLA", length: 5, next_number: 1, status: :active)
         when "purchase_order"
           CustomNumbering.find_or_create_by!(record_type: :purchases_purchase_order, prefix: "POO", length: 6, next_number: 1, status: :active)
+        when "purchase_payment"
+          CustomNumbering.find_or_create_by!(record_type: :purchase_payment, prefix: "PPR", length: 6, next_number: 1, status: :active)
         else
           raise "CustomNumbering for #{record_type} not found"
         end

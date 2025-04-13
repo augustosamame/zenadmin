@@ -55,6 +55,8 @@ module AdminHelper
       "bg-red-100 text-red-800"
     when "Payment"
       "bg-blue-100 text-blue-800"
+    when "PurchasePayment"
+      "bg-orange-100 text-orange-800"
     else
       "bg-gray-100 text-gray-800"
     end
@@ -64,6 +66,8 @@ module AdminHelper
     case transaction.transactable_type
     when "Payment"
       "Pago por Venta"
+    when "PurchasePayment"
+      "Pago por Compra"
     when "CashInflow"
       "Entrada de Caja"
     when "CashOutflow"

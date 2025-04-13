@@ -8,7 +8,7 @@ class Admin::PurchaseInvoicesController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
-        @purchase_invoices = PurchaseInvoice.includes(:vendor).order(created_at: :desc).limit(10)
+        @purchase_invoices = PurchaseInvoice.includes(:vendor, :purchase).order(created_at: :desc).limit(10)
         @datatable_options = "server_side:true;resource_name:'PurchaseInvoice';sort_0_desc;hide_0;create_button:true;"
       end
 

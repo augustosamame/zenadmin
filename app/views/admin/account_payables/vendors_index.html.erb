@@ -1,0 +1,46 @@
+<div class="container mx-auto px-4 py-8">
+  <h1 class="text-2xl font-bold mb-6">Cuentas por Pagar por Proveedor</h1>
+
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b">
+      <h2 class="text-lg font-semibold">Proveedores con Saldos Pendientes</h2>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">RUC</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Teléfono</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dirección</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Saldo</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @vendors.each do |vendor| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= vendor.name %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.ruc %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.phone %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.email %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= vendor.address %></td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <% balance = @vendor_balances[vendor.id] || 0 %>
+                <span class="<%= balance > 0 ? 'text-red-600 font-semibold' : 'text-green-600 font-semibold' %>">
+                  <%= number_to_currency(balance.abs, unit: "S/ ") %>
+                  <%= balance < 0 ? "(a favor)" : "" %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= link_to "Ver Detalle", admin_account_payables_path(vendor_id: vendor.id), class: "text-indigo-600 hover:text-indigo-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

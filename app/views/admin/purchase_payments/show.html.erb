@@ -1,0 +1,182 @@
+<%= render "shared/admin/nav", { header_title: "Detalle de Pago a Proveedor" } do %>
+  <%= link_to "Volver a Pagos", admin_purchase_payments_path, class: "btn btn-secondary" %>
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-6">
+      <h2 class="text-xl font-semibold mb-6">Información del Pago</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-sm font-medium text-gray-500">Código</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.custom_id %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Fecha</p>
+          <p class="mt-1 text-lg"><%= friendly_date(current_user, @purchase_payment.payment_date) %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Método de Pago</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.payment_method&.description %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Monto</p>
+          <p class="mt-1 text-lg font-semibold"><%= format_currency(@purchase_payment.amount) %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Estado</p>
+          <p class="mt-1">
+            <span class="px-2 py-1 text-sm font-semibold rounded-full 
+              <%= @purchase_payment.status == 'paid' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
+              <%= @purchase_payment.translated_status %>
+            </span>
+          </p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">ID de Transacción</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.processor_transacion_id || "-" %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Usuario</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.user&.name %></p>
+        </div>
+        
+        <div>
+          <p class="text-sm font-medium text-gray-500">Ubicación</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.location&.name || "-" %></p>
+        </div>
+      </div>
+      
+      <% if @purchase_payment.comment.present? %>
+        <div class="mt-6">
+          <p class="text-sm font-medium text-gray-500">Comentario</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.comment %></p>
+        </div>
+      <% end %>
+      
+      <% if @purchase_payment.payable.present? %>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">Información de <%= @purchase_payment.payable_type == "Purchases::Purchase" ? "Compra" : "Proveedor" %></h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <% if @purchase_payment.payable_type == "Purchases::Purchase" %>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Código de Compra</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.custom_id %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">Proveedor</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.vendor&.name %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">Fecha de Compra</p>
+                <p class="mt-1 text-lg"><%= friendly_date(current_user, @purchase_payment.payable.created_at) %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">Total de Compra</p>
+                <p class="mt-1 text-lg font-semibold"><%= format_currency(@purchase_payment.payable.total_price) %></p>
+              </div>
+            <% elsif @purchase_payment.payable_type == "Purchases::Vendor" %>
+              <div>
+                <p class="text-sm font-medium text-gray-500">Nombre del Proveedor</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.name %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">RUC</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.ruc %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">Email</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.email || "-" %></p>
+              </div>
+              
+              <div>
+                <p class="text-sm font-medium text-gray-500">Teléfono</p>
+                <p class="mt-1 text-lg"><%= @purchase_payment.payable.phone || "-" %></p>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      <% end %>
+      
+      <% if @purchase_payment.purchase_invoice.present? %>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">Factura Asociada</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Número de Factura</p>
+              <p class="mt-1 text-lg"><%= @purchase_payment.purchase_invoice.custom_id %></p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Tipo</p>
+              <p class="mt-1 text-lg"><%= @purchase_payment.purchase_invoice.translated_purchase_invoice_type %></p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Fecha</p>
+              <p class="mt-1 text-lg"><%= @purchase_payment.purchase_invoice.purchase_invoice_date.strftime("%d/%m/%Y") %></p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Monto</p>
+              <p class="mt-1 text-lg font-semibold"><%= format_currency(@purchase_payment.purchase_invoice.amount) %></p>
+            </div>
+            
+            <div>
+              <p class="text-sm font-medium text-gray-500">Estado</p>
+              <p class="mt-1">
+                <span class="px-2 py-1 text-sm font-semibold rounded-full 
+                  <%= @purchase_payment.purchase_invoice.payment_status == 'paid' ? 'bg-green-100 text-green-800' : 
+                      @purchase_payment.purchase_invoice.payment_status == 'partially_paid' ? 'bg-yellow-100 text-yellow-800' : 
+                      'bg-gray-100 text-gray-800' %>">
+                  <%= @purchase_payment.purchase_invoice.translated_payment_status %>
+                </span>
+              </p>
+            </div>
+          </div>
+        </div>
+      <% end %>
+      
+      <% if @purchase_payment.purchase_invoice_payments.any? %>
+        <div class="mt-8">
+          <h3 class="text-lg font-semibold mb-4">Aplicaciones del Pago</h3>
+          
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Aplicado</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <% @purchase_payment.purchase_invoice_payments.each do |payment_application| %>
+                <tr>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.purchase_invoice.custom_id %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.purchase_invoice.translated_purchase_invoice_type %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= format_currency(payment_application.amount) %></td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.created_at.strftime("%d/%m/%Y") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

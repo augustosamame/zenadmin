@@ -59,6 +59,12 @@ es:
         display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
+      purchase_payment:
+        status_list:
+          pending: Pendiente
+          paid: Pagado
+          partially_paid: Parcialmente pagado
+          cancelled: Cancelado
       purchase_invoice:
         purchase_invoice_type_list:
           factura: Factura

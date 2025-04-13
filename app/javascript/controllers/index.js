@@ -222,3 +222,9 @@ application.register("purchase-order-form", PurchaseOrderFormController)
 
 import PurchaseFormController from "./purchase_form_controller"
 application.register("purchase-form", PurchaseFormController)
+
+import PurchasePaymentFormController from "./purchase_payment_form_controller"
+application.register("purchase-payment-form", PurchasePaymentFormController)
+
+import SimpleFormController from "./simple_form_controller"
+application.register("simple-form", SimpleFormController)

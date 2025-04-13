@@ -1,0 +1,113 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold">Calendario de Vencimientos</h1>
+    <div class="flex space-x-2">
+      <%= link_to "Volver a Cuentas por Pagar", vendors_index_admin_account_payables_path, class: "btn btn-secondary" %>
+    </div>
+  </div>
+
+  <!-- Date Range Selector -->
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <%= form_with url: payments_calendar_admin_account_payables_path, method: :get, class: "flex flex-wrap items-end gap-4" do |f| %>
+      <div>
+        <%= f.label :start_date, "Fecha Inicial", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :start_date, value: @start_date, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+      </div>
+      
+      <div>
+        <%= f.label :end_date, "Fecha Final", class: "block text-sm font-medium text-gray-700" %>
+        <%= f.date_field :end_date, value: @end_date, class: "mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md" %>
+      </div>
+      
+      <div>
+        <%= f.submit "Filtrar", class: "btn btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Summary Card -->
+  <div class="bg-white rounded-lg shadow p-4 mb-6">
+    <h2 class="text-lg font-semibold mb-2">Resumen</h2>
+    <p class="text-xl font-bold">Total por Pagar en el Período: S/ <%= number_with_precision(@total_due, precision: 2) %></p>
+  </div>
+
+  <!-- Calendar View -->
+  <div class="bg-white rounded-lg shadow overflow-hidden">
+    <div class="p-4 border-b">
+      <h2 class="text-lg font-semibold">Vencimientos por Día</h2>
+    </div>
+
+    <div class="overflow-x-auto">
+      <% if @grouped_invoices.any? %>
+        <% (@start_date..@end_date).each do |date| %>
+          <% invoices = @grouped_invoices[date] || [] %>
+          <% next if invoices.empty? %>
+          
+          <div class="border-b border-gray-200">
+            <div class="p-4 bg-gray-50 flex justify-between items-center">
+              <h3 class="text-md font-semibold">
+                <%= date.strftime("%A, %d de %B de %Y") %>
+              </h3>
+              <span class="text-lg font-bold">
+                S/ <%= number_with_precision(@daily_totals[date], precision: 2) %>
+              </span>
+            </div>
+            
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Proveedor</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Número</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Total</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Pendiente</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <% invoices.each do |invoice| %>
+                  <% 
+                    total_paid = invoice.purchase_invoice_payments.sum(:amount_cents) / 100.0
+                    pending_amount = invoice.amount - total_paid
+                    is_overdue = invoice.planned_payment_date.present? && invoice.planned_payment_date < Date.today && invoice.payment_status != "paid"
+                    status_class = if invoice.payment_status == "paid"
+                                    "bg-green-100 text-green-800"
+                                  elsif is_overdue
+                                    "bg-red-100 text-red-800"
+                                  elsif invoice.payment_status == "partially_paid"
+                                    "bg-yellow-100 text-yellow-800"
+                                  else
+                                    "bg-gray-100 text-gray-800"
+                                  end
+                  %>
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= invoice.vendor.name %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= invoice.translated_purchase_invoice_type %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= invoice.custom_id %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">S/ <%= number_with_precision(invoice.amount, precision: 2) %></td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">S/ <%= number_with_precision(pending_amount, precision: 2) %></td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_class %>">
+                        <%= is_overdue ? "Vencido" : invoice.translated_payment_status %>
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                      <% if invoice.payment_status != "paid" %>
+                        <%= link_to "Registrar Pago", new_admin_purchase_payment_path(purchase_invoice_id: invoice.id), class: "text-indigo-600 hover:text-indigo-900" %>
+                      <% end %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% end %>
+      <% else %>
+        <div class="p-6 text-center text-gray-500">
+          No hay facturas pendientes de pago en el período seleccionado.
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -256,6 +256,20 @@ Rails.application.routes.draw do
 
     resources :vendors
 
+    resources :purchase_payments, only: [ :index, :show, :new, :create ] do
+      collection do
+        get :fetch_purchases
+      end
+    end
+    
+    resources :account_payables, only: [ :index, :show ] do
+      collection do
+        get :vendors_index
+        get :payments_calendar
+        post :create_initial_balance
+      end
+    end
+
     resources :orders_per_product, only: [ :index ]
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"

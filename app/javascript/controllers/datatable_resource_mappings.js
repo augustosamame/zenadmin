@@ -170,5 +170,15 @@ export const resourceMappings = {
     buttonText: "Crear Comprobante de Compra",
     buttonUrl: "/admin/purchase_invoices/new",
     ajaxUrl: "/admin/purchase_invoices.json"
+  },
+  PurchasePayment: {
+    buttonText: "Crear Pago a Proveedor",
+    buttonUrl: "/admin/purchase_payments/new",
+    ajaxUrl: "/admin/purchase_payments.json"
+  },
+  AccountPayable: {
+    buttonText: "Crear Cuenta por Pagar",
+    buttonUrl: "/admin/account_payables/new",
+    ajaxUrl: "/admin/account_payables.json"
   }
 }
