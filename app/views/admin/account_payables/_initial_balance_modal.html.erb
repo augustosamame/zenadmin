@@ -1,0 +1,33 @@
+<div data-initial-balance-modal-target="container" class="fixed inset-0 z-50 hidden overflow-y-auto" role="dialog">
+  <div class="relative w-full h-screen">
+    <div data-initial-balance-modal-target="content" class="hidden h-auto max-w-2xl p-8 m-4 mx-auto bg-white rounded-lg shadow-xl dark:bg-slate-700">
+      <h2 class="text-lg font-semibold text-center dark:text-slate-100">
+        Crear Saldo Inicial para <%= vendor.name %>
+      </h2>
+      
+      <%= form_with url: create_initial_balance_admin_account_payables_path(vendor_id: vendor.id), method: :post, class: "mt-4", data: { controller: "initial-balance-form", remote: true } do |form| %>
+        <div class="mb-4">
+          <%= form.label :amount, "Monto", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200" %>
+          <div class="flex items-center">
+            <span class="mr-2 text-gray-700 dark:text-slate-200">S/</span>
+            <%= form.number_field :amount, step: "0.01", class: "w-full p-2 border rounded-md dark:bg-slate-600 dark:text-white", required: true, data: { action: "input->initial-balance-form#toggleDueDate" } %>
+          </div>
+          <p class="mt-1 text-sm text-gray-500 dark:text-slate-400">
+            Monto positivo: se debe dinero al proveedor<br>
+            Monto negativo: el proveedor tiene crédito con nosotros
+          </p>
+        </div>
+        
+        <div class="mb-4 hidden" data-initial-balance-form-target="dueDateField">
+          <%= form.label :due_date, "Fecha de Vencimiento", class: "block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200" %>
+          <%= form.date_field :due_date, class: "w-full p-2 border rounded-md dark:bg-slate-600 dark:text-white", required: true, min: Date.current.to_s %>
+        </div>
+        
+        <div class="flex justify-end mt-4 space-x-4">
+          <button type="button" class="btn btn-secondary" data-action="click->initial-balance-modal#close">Cancellar</button>
+          <%= form.submit "Guardar", class: "btn btn-primary" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

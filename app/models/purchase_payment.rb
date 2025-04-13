@@ -35,7 +35,12 @@ class PurchasePayment < ApplicationRecord
   after_create :create_cashier_transaction, if: -> { cashier_shift.present? }
 
   scope :for_location, ->(location) { joins(cashier_shift: :cashier).where(cashiers: { location_id: location.id }) }
-  scope :unapplied, -> { where(purchase_invoice_id: nil, status: :paid) }
+  scope :unapplied, -> { 
+    left_joins(:purchase_invoice_payments)
+      .group(:id)
+      .having('COALESCE(SUM(purchase_invoice_payments.amount_cents), 0) < purchase_payments.amount_cents')
+      .where(status: [:paid, :partially_paid])
+  }
 
   pg_search_scope :search_by_all_fields,
     against: [ :custom_id, :amount_cents, :processor_transacion_id ],

@@ -4,6 +4,7 @@ class PurchaseInvoice < ApplicationRecord
 
   belongs_to :purchase, class_name: "Purchases::Purchase"
   belongs_to :vendor, class_name: "Purchases::Vendor", optional: true
+  has_many :purchase_invoice_payments, dependent: :destroy
 
   enum :purchase_invoice_type, {
     factura: 0,

@@ -34,7 +34,6 @@ class Admin::AccountPayablesController < Admin::AdminController
 
         # Get all unapplied payments in one query
         unapplied_payments_by_vendor = PurchasePayment.unapplied
-                                                     .joins(:payable)
                                                      .where(payable_type: "Purchases::Purchase")
                                                      .joins("INNER JOIN purchases_purchases ON purchases_purchases.id = purchase_payments.payable_id")
                                                      .where(purchases_purchases: { vendor_id: vendor_ids })
@@ -61,26 +60,54 @@ class Admin::AccountPayablesController < Admin::AdminController
     if params[:vendor_id].present?
       @vendor = Purchases::Vendor.find(params[:vendor_id])
       @purchase_invoices = PurchaseInvoice.where(vendor_id: params[:vendor_id])
-      @unapplied_payments = PurchasePayment.unapplied
-                                          .joins(:payable)
-                                          .where(payable_type: "Purchases::Purchase")
-                                          .joins("INNER JOIN purchases_purchases ON purchases_purchases.id = purchase_payments.payable_id")
-                                          .where(purchases_purchases: { vendor_id: params[:vendor_id] })
-                                          .order(id: :desc)
+      
+      # Get unapplied payments from both direct vendor payments and purchase-related payments
+      vendor_payments = PurchasePayment.includes(:payment_method)
+                                      .unapplied
+                                      .where(payable_type: "Purchases::Vendor", payable_id: params[:vendor_id])
+                                      .order(payment_date: :desc)
+      
+      purchase_payments = PurchasePayment.includes(:payment_method)
+                                        .unapplied
+                                        .where(payable_type: "Purchases::Purchase")
+                                        .where(payable_id: Purchases::Purchase.where(vendor_id: params[:vendor_id]).pluck(:id))
+                                        .order(payment_date: :desc)
+      
+      # Get payments with direct vendor_id association
+      direct_vendor_payments = PurchasePayment.includes(:payment_method)
+                                            .unapplied
+                                            .where(vendor_id: params[:vendor_id])
+                                            .order(payment_date: :desc)
+      
+      @unapplied_payments = vendor_payments.or(purchase_payments).or(direct_vendor_payments)
       
       @applied_payments = PurchaseInvoicePayment.joins(:purchase_invoice)
                                                .where(purchase_invoices: { vendor_id: params[:vendor_id] })
                                                .includes(:purchase_payment)
       
-      @total_purchases = Purchases::Purchase.where(vendor_id: params[:vendor_id]).sum(:total_price_cents) / 100.0
+      # Calculate total purchases by summing purchase_lines
+      @purchases = Purchases::Purchase.where(vendor_id: params[:vendor_id]).includes(:purchase_lines)
+      @total_purchases = @purchases.sum { |purchase| purchase.total_amount.to_f }
+      
       @total_credit_purchases = @purchase_invoices.sum(:amount_cents) / 100.0
-      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
-      @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
+      
+      # When using a grouped query, we need to handle the sum differently
+      total_applied_payments = @applied_payments.sum(:amount_cents)
+      total_applied_payments = total_applied_payments.is_a?(Hash) ? total_applied_payments.values.sum : total_applied_payments
+      
+      total_unapplied_payments = @unapplied_payments.sum(:amount_cents)
+      total_unapplied_payments = total_unapplied_payments.is_a?(Hash) ? total_unapplied_payments.values.sum : total_unapplied_payments
+      
+      @total_paid = (total_applied_payments / 100.0) + (total_unapplied_payments / 100.0)
+      @total_unapplied_payments = total_unapplied_payments / 100.0
       @total_pending_previous_period = @vendor.account_payable_initial_balance.to_f
       @total_pending = @purchase_invoices.sum(:amount_cents) / 100.0 - @total_paid
 
       # Check if vendor has any purchase invoices or payments
       @has_transactions = @purchase_invoices.any? || @unapplied_payments.any? || @applied_payments.any?
+      
+      # Set datatable options
+      @datatable_options = "resource_name:'PurchaseInvoice';sort_0_desc;create_button:false;"
     else
       raise "Vendor ID is required"
     end

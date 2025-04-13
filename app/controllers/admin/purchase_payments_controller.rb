@@ -11,15 +11,63 @@ class Admin::PurchasePaymentsController < Admin::AdminController
   def index
     respond_to do |format|
       format.html do
+        # Load payments with basic associations first
         @purchase_payments = if @current_location && current_user.any_admin_or_supervisor?
-          PurchasePayment.includes(cashier_shift: :cashier, payable: :vendor)
+          PurchasePayment.includes(:user, :payment_method, cashier_shift: :cashier)
                 .where(region_id: @current_location.region_id)
                 .order(id: :desc)
                 .limit(10)
         else
-          PurchasePayment.includes(cashier_shift: :cashier, payable: :vendor)
+          PurchasePayment.includes(:user, :payment_method, cashier_shift: :cashier)
                 .order(id: :desc)
                 .limit(10)
+        end
+
+        # Manually load payables to avoid namespace issues
+        payable_ids_by_type = {}
+        @purchase_payments.each do |payment|
+          # Normalize the payable type
+          if payment.payable_type == "Purchases::PurchaseInvoice"
+            payment.payable_type = "PurchaseInvoice"
+          end
+          
+          # Group payable IDs by type for efficient loading
+          payable_ids_by_type[payment.payable_type] ||= []
+          payable_ids_by_type[payment.payable_type] << payment.payable_id if payment.payable_id.present?
+        end
+        
+        # Load payables by type
+        payables_by_type_and_id = {}
+        payable_ids_by_type.each do |type, ids|
+          next if ids.empty?
+          
+          # Handle different payable types
+          klass = case type
+                  when "Purchases::Purchase"
+                    Purchases::Purchase
+                  when "Purchases::Vendor"
+                    Purchases::Vendor
+                  when "PurchaseInvoice"
+                    PurchaseInvoice
+                  else
+                    next
+                  end
+          
+          # Load records and index them by ID
+          records = klass.where(id: ids.uniq).includes(:vendor) rescue klass.where(id: ids.uniq)
+          records.each do |record|
+            payables_by_type_and_id[type] ||= {}
+            payables_by_type_and_id[type][record.id] = record
+          end
+        end
+        
+        # Assign payables to payments
+        @purchase_payments.each do |payment|
+          next unless payment.payable_id.present? && payment.payable_type.present?
+          next unless payables_by_type_and_id[payment.payable_type]&.key?(payment.payable_id)
+          
+          # Use instance variable to store the payable
+          payment.instance_variable_set(:@payable, payables_by_type_and_id[payment.payable_type][payment.payable_id])
         end
 
         @datatable_options = "server_side:true;resource_name:'PurchasePayment';create_button:true;sort_1_desc;"
@@ -185,23 +233,38 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     @purchase_payment = PurchasePayment.new(purchase_payment_params)
     @purchase_payment.status = "paid"
     @purchase_payment.user = current_user
+    @purchase_payment.region = @current_location.region if @current_location.present?
+    
+    # Handle payable type correctly - ensure we're using the correct namespace
+    if @purchase_payment.payable_type == "PurchaseInvoice"
+      # PurchaseInvoice is in the root namespace
+      @purchase_payment.payable_type = "PurchaseInvoice"
+    end
 
     # Get cashiers for dropdown (in case of validation errors)
     @cashiers = Cashier.where(status: :active).order(:name)
     @cashiers_with_open_shifts = Cashier.active_with_open_shift.order(:name)
+    
+    # Get payment methods for dropdown
+    if current_user.any_admin?
+      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
+    else
+      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
+    end
+    
+    # Load vendors for dropdown
     @vendors = Purchases::Vendor.all
+    
+    # If we have a payable_id and payable_type for a purchase invoice, load the purchase invoice
+    if @purchase_payment.payable_type == "PurchaseInvoice" && @purchase_payment.payable_id.present?
+      @purchase_invoice = PurchaseInvoice.find_by(id: @purchase_payment.payable_id)
+      @vendor = @purchase_invoice&.vendor
+    end
     
     # Set the cashier_shift based on the extracted cashier_id
     if cashier_id.present?
       cashier = Cashier.find(cashier_id)
       @purchase_payment.cashier_shift = find_cashier_shift(cashier)
-    end
-    
-    # Set payment method options for dropdown
-    if current_user.any_admin?
-      @elligible_payment_methods = PaymentMethod.active.where(payment_method_type: "standard")
-    else
-      @elligible_payment_methods = PaymentMethod.active.where(access: "all")
     end
     
     # Handle vendor_id from the form
@@ -212,17 +275,23 @@ class Admin::PurchasePaymentsController < Admin::AdminController
     end
     
     # Handle purchase invoice if present
+    purchase_invoice_id = nil
     if params[:purchase_payment][:purchase_invoice_id].present?
-      @purchase_invoice = PurchaseInvoice.find(params[:purchase_payment][:purchase_invoice_id])
+      purchase_invoice_id = params[:purchase_payment][:purchase_invoice_id]
+      @purchase_invoice = PurchaseInvoice.find(purchase_invoice_id)
+    elsif params[:purchase_invoice_id].present?
+      purchase_invoice_id = params[:purchase_invoice_id]
+      @purchase_invoice = PurchaseInvoice.find(purchase_invoice_id)
     elsif session[:purchase_invoice_id].present?
-      @purchase_invoice = PurchaseInvoice.find(session[:purchase_invoice_id])
+      purchase_invoice_id = session[:purchase_invoice_id]
+      @purchase_invoice = PurchaseInvoice.find(purchase_invoice_id)
     end
 
     ActiveRecord::Base.transaction do
       if @purchase_payment.save
         # Handle purchase invoice payment if applicable
-        if params[:purchase_invoice_id].present?
-          purchase_invoice = PurchaseInvoice.find(params[:purchase_invoice_id])
+        if purchase_invoice_id.present?
+          purchase_invoice = PurchaseInvoice.find(purchase_invoice_id)
           
           # Calculate remaining balance
           remaining_balance = purchase_invoice.amount_cents - purchase_invoice.purchase_invoice_payments.sum(:amount_cents)
@@ -317,7 +386,7 @@ class Admin::PurchasePaymentsController < Admin::AdminController
   end
 
   def datatable_json
-    purchase_payments = PurchasePayment.includes(:user, :payment_method, cashier_shift: :cashier)
+    purchase_payments = PurchasePayment.includes(:user, :payment_method, :purchase_invoice, cashier_shift: :cashier)
                                       .joins(:payment_method)
 
     # Location filter
@@ -374,12 +443,17 @@ class Admin::PurchasePaymentsController < Admin::AdminController
       data: paginated_payments.map do |payment|
         row = []
 
+        # Fix any incorrect payable_type values
+        payment.payable_type = "PurchaseInvoice" if payment.payable_type == "Purchases::PurchaseInvoice"
+
         vendor_name = if payment.vendor.present?
                         payment.vendor.name
                       elsif payment.payable_type == "Purchases::Purchase"
                         payment.payable&.vendor&.name
                       elsif payment.payable_type == "Purchases::Vendor"
                         payment.payable&.name
+                      elsif payment.payable_type == "PurchaseInvoice"
+                        payment.payable&.vendor&.name
                       else
                         ""
                       end

@@ -27,6 +27,8 @@
                 <%= payment.payable&.vendor&.name %>
               <% elsif payment.payable_type == "Purchases::Vendor" %>
                 <%= payment.payable&.name %>
+              <% elsif payment.payable_type == "PurchaseInvoice" %>
+                <%= payment.payable&.vendor&.name %>
               <% end %>
             </td>
             <td class="px-4 py-2"><%= payment.cashier_shift&.cashier&.name %></td>

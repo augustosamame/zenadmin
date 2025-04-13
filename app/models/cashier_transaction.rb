@@ -14,7 +14,7 @@ class CashierTransaction < ApplicationRecord
     case transactable_type
     when "CashInflow"
       amount_cents
-    when "CashOutflow"
+    when "CashOutflow", "PurchasePayment"
       -amount_cents
     else
       amount_cents # For payments and other types, assume positive

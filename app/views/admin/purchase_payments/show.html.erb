@@ -2,12 +2,12 @@
   <%= link_to "Volver a Pagos", admin_purchase_payments_path, class: "btn btn-secondary" %>
 <% end %>
 
-<div class="container mx-auto px-4 py-8">
-  <div class="bg-white rounded-lg shadow overflow-hidden">
+<div class="container px-4 py-8 mx-auto">
+  <div class="overflow-hidden bg-white rounded-lg shadow">
     <div class="p-6">
-      <h2 class="text-xl font-semibold mb-6">Información del Pago</h2>
+      <h2 class="mb-6 text-xl font-semibold">Información del Pago</h2>
       
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
         <div>
           <p class="text-sm font-medium text-gray-500">Código</p>
           <p class="mt-1 text-lg"><%= @purchase_payment.custom_id %></p>
@@ -49,8 +49,8 @@
         </div>
         
         <div>
-          <p class="text-sm font-medium text-gray-500">Ubicación</p>
-          <p class="mt-1 text-lg"><%= @purchase_payment.location&.name || "-" %></p>
+          <p class="text-sm font-medium text-gray-500">Caja</p>
+          <p class="mt-1 text-lg"><%= @purchase_payment.cashier&.name || "-" %></p>
         </div>
       </div>
       
@@ -63,9 +63,9 @@
       
       <% if @purchase_payment.payable.present? %>
         <div class="mt-8">
-          <h3 class="text-lg font-semibold mb-4">Información de <%= @purchase_payment.payable_type == "Purchases::Purchase" ? "Compra" : "Proveedor" %></h3>
+          <h3 class="mb-4 text-lg font-semibold">Información de <%= @purchase_payment.payable_type == "Purchases::Purchase" ? "Compra" : "Proveedor" %></h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <% if @purchase_payment.payable_type == "Purchases::Purchase" %>
               <div>
                 <p class="text-sm font-medium text-gray-500">Código de Compra</p>
@@ -84,7 +84,7 @@
               
               <div>
                 <p class="text-sm font-medium text-gray-500">Total de Compra</p>
-                <p class="mt-1 text-lg font-semibold"><%= format_currency(@purchase_payment.payable.total_price) %></p>
+                <p class="mt-1 text-lg font-semibold"><%= format_currency(@purchase_payment.payable.total_amount) %></p>
               </div>
             <% elsif @purchase_payment.payable_type == "Purchases::Vendor" %>
               <div>
@@ -113,9 +113,9 @@
       
       <% if @purchase_payment.purchase_invoice.present? %>
         <div class="mt-8">
-          <h3 class="text-lg font-semibold mb-4">Factura Asociada</h3>
+          <h3 class="mb-4 text-lg font-semibold">Factura Asociada</h3>
           
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
             <div>
               <p class="text-sm font-medium text-gray-500">Número de Factura</p>
               <p class="mt-1 text-lg"><%= @purchase_payment.purchase_invoice.custom_id %></p>
@@ -153,24 +153,24 @@
       
       <% if @purchase_payment.purchase_invoice_payments.any? %>
         <div class="mt-8">
-          <h3 class="text-lg font-semibold mb-4">Aplicaciones del Pago</h3>
+          <h3 class="mb-4 text-lg font-semibold">Aplicaciones del Pago</h3>
           
           <table class="min-w-full divide-y divide-gray-200">
             <thead class="bg-gray-50">
               <tr>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Factura</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Monto Aplicado</th>
-                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Fecha</th>
+                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Factura</th>
+                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Tipo</th>
+                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Monto Aplicado</th>
+                <th class="px-6 py-3 text-xs font-medium tracking-wider text-left text-gray-500 uppercase">Fecha</th>
               </tr>
             </thead>
             <tbody class="bg-white divide-y divide-gray-200">
               <% @purchase_payment.purchase_invoice_payments.each do |payment_application| %>
                 <tr>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.purchase_invoice.custom_id %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.purchase_invoice.translated_purchase_invoice_type %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= format_currency(payment_application.amount) %></td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= payment_application.created_at.strftime("%d/%m/%Y") %></td>
+                  <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment_application.purchase_invoice.custom_id %></td>
+                  <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment_application.purchase_invoice.translated_purchase_invoice_type %></td>
+                  <td class="px-6 py-4 text-sm font-medium text-gray-900 whitespace-nowrap"><%= format_currency(payment_application.amount) %></td>
+                  <td class="px-6 py-4 text-sm text-gray-500 whitespace-nowrap"><%= payment_application.created_at.strftime("%d/%m/%Y") %></td>
                 </tr>
               <% end %>
             </tbody>

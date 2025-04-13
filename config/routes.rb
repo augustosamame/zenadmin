@@ -270,6 +270,13 @@ Rails.application.routes.draw do
       end
     end
 
+    resources :account_payable_payments do
+      collection do
+        get :success
+        get :error
+      end
+    end
+
     resources :orders_per_product, only: [ :index ]
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"

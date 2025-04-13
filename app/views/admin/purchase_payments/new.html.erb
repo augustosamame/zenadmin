@@ -13,7 +13,11 @@
         <li><strong>Proveedor:</strong> <%= @purchase_invoice.vendor.name %></li>
         <li><strong>Fecha de factura:</strong> <%= l(@purchase_invoice.purchase_invoice_date, format: :short) if @purchase_invoice.purchase_invoice_date.present? %></li>
         <li><strong>Monto total:</strong> <%= humanized_money_with_symbol @purchase_invoice.amount %></li>
-        <li><strong>Saldo pendiente:</strong> <%= humanized_money_with_symbol(@purchase_invoice.amount - (@purchase_invoice.purchase_invoice_payments.sum(:amount_cents) / 100.0)) %></li>
+        <li><strong>Saldo pendiente:</strong> <%= 
+          total_paid_cents = @purchase_invoice.purchase_invoice_payments.sum(:amount_cents)
+          pending_amount_cents = @purchase_invoice.amount_cents - total_paid_cents
+          humanized_money_with_symbol(pending_amount_cents / 100.0)
+        %></li>
         <% if @purchase_invoice.custom_id.present? %>
           <li><strong>Número de factura:</strong> <%= @purchase_invoice.custom_id %></li>
         <% end %>
@@ -62,7 +66,7 @@
               step: 0.01,
               class: "form-input",
               min: 0,
-              value: @purchase_invoice.present? ? (@purchase_invoice.amount - (@purchase_invoice.purchase_invoice_payments.sum(:amount_cents) / 100.0)) : nil
+              value: @purchase_invoice.present? ? ((@purchase_invoice.amount_cents - @purchase_invoice.purchase_invoice_payments.sum(:amount_cents)) / 100.0) : nil
             },
             label_html: { class: "form-label" } %>
       </div>
@@ -109,7 +113,7 @@
           <label class="form-label">Proveedor</label>
           <p class="mt-1 text-sm text-gray-900"><%= @purchase_invoice.vendor.name %></p>
           <%= form.hidden_field :payable_id, value: @purchase_invoice.id %>
-          <%= form.hidden_field :payable_type, value: "Purchases::PurchaseInvoice" %>
+          <%= form.hidden_field :payable_type, value: "PurchaseInvoice" %>
         </div>
       <% elsif @vendor_id.present? %>
         <div>

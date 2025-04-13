@@ -62,9 +62,9 @@ class Admin::CashierShiftsController < Admin::AdminController
       return
     end
 
-    # Paginate transactions with proper eager loading for payment methods
+    # Paginate transactions with proper eager loading for payment methods and transactables
     @transactions = @cashier_shift.cashier_transactions
-                                  .includes(:payment_method, :transactable)
+                                  .includes(:payment_method, transactable: [ :payable, :vendor ])
                                   .order(created_at: :desc)
                                   .page(params[:page])
                                   .per(50)
@@ -223,10 +223,18 @@ class Admin::CashierShiftsController < Admin::AdminController
   end
 
   def calculate_payment_method_balances(cashier_shift)
+    # Get all transactions except inflows and outflows
     all_transactions = cashier_shift.cashier_transactions
                                    .where.not(transactable_type: [ "CashInflow", "CashOutflow" ])
                                    .to_a
-    transactions_by_method = all_transactions.group_by(&:payment_method)
+
+    # Separate purchase payments from other transactions
+    purchase_payment_transactions = all_transactions.select { |t| t.transactable_type == "PurchasePayment" }
+    sales_transactions = all_transactions.reject { |t| t.transactable_type == "PurchasePayment" }
+
+    # Group transactions by payment method
+    sales_by_method = sales_transactions.group_by(&:payment_method)
+    purchase_payments_by_method = purchase_payment_transactions.group_by(&:payment_method)
 
     # Get cash inflows and outflows separately
     cash_inflows = cashier_shift.cashier_transactions
@@ -245,7 +253,8 @@ class Admin::CashierShiftsController < Admin::AdminController
       amount: Money.new(cashier_shift.cash_from_previous_shift_cents, "PEN")
     }
 
-    transactions_by_method.each do |payment_method, transactions|
+    # Add sales transactions by payment method
+    sales_by_method.each do |payment_method, transactions|
       next if payment_method&.name == "credit"
       # Use amount_for_balance to correctly account for transaction types
       total_cents = transactions.sum(&:amount_for_balance)
@@ -254,6 +263,20 @@ class Admin::CashierShiftsController < Admin::AdminController
       # Add regular balance
       balances << {
         description: "Ventas #{payment_method&.description || 'sin método de pago'}",
+        amount: total
+      }
+    end
+
+    # Add purchase payment transactions by payment method
+    purchase_payments_by_method.each do |payment_method, transactions|
+      next if payment_method&.name == "credit"
+      # Use amount_for_balance to correctly account for transaction types
+      total_cents = transactions.sum(&:amount_for_balance)
+      total = Money.new(total_cents, "PEN")
+
+      # Add purchase payments balance
+      balances << {
+        description: "Pagos por Compras #{payment_method&.description || 'sin método de pago'}",
         amount: total
       }
     end
@@ -269,7 +292,7 @@ class Admin::CashierShiftsController < Admin::AdminController
 
     # Add cash outflows as a separate entry
     if cash_outflows.any?
-      outflow_total_cents = cash_outflows.sum(&:amount_for_balance).abs
+      outflow_total_cents = cash_outflows.sum(&:amount_for_balance)
       balances << {
         description: "Salidas de Caja",
         amount: Money.new(outflow_total_cents, "PEN")
