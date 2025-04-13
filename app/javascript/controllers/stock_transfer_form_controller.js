@@ -2,7 +2,18 @@
 import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
-  static targets = ["line", "lines", "form", "guiaFields", "warehouseDestination", "customerDestination", "customerUserId"]
+  static targets = [
+    "form",
+    "lines",
+    "warehouseDestination",
+    "customerDestination",
+    "warehouseOrigin",
+    "vendorOrigin",
+    "selectedCustomerName",
+    "customerUserId",
+    "vendorId",
+    "guiaFields"
+  ]
 
   connect() {
     console.log("Stock transfer form controller connected")
@@ -16,6 +27,15 @@ export default class extends Controller {
 
     // Listen for customer selection events
     this.element.addEventListener('customer-selected', this.handleCustomerSelected.bind(this))
+    
+    // Initialize TomSelect for vendor dropdown if it exists
+    this.initializeVendorSelect()
+  }
+
+  initializeVendorSelect() {
+    // The vendor dropdown already has the select controller applied via data attributes
+    // so we don't need to do anything here, as the select controller will initialize TomSelect
+    console.log("Vendor select should be initialized by the select controller")
   }
 
   toggleGuiaFields(event) {
@@ -29,28 +49,41 @@ export default class extends Controller {
   }
 
   toggleDestinationType(event) {
-    if (this.hasWarehouseDestinationTarget && this.hasCustomerDestinationTarget) {
-      if (event.target.checked) {
-        // Show customer selection, hide warehouse selection
-        this.warehouseDestinationTarget.classList.add('hidden')
-        this.customerDestinationTarget.classList.remove('hidden')
-      } else {
-        // Show warehouse selection, hide customer selection
-        this.warehouseDestinationTarget.classList.remove('hidden')
-        this.customerDestinationTarget.classList.add('hidden')
-        // Clear customer selection
-        if (this.hasCustomerUserIdTarget) {
-          this.customerUserIdTarget.value = ''
-        }
-        // Reset customer button text
-        const customerButton = document.getElementById('customer-select-button')
-        if (customerButton) {
-          customerButton.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 mr-2 text-slate-600 dark:text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-            Seleccionar Cliente
-          `
+    const isCustomerTransfer = event.target.checked
+    
+    if (isCustomerTransfer) {
+      this.warehouseDestinationTarget.classList.add("hidden")
+      this.customerDestinationTarget.classList.remove("hidden")
+    } else {
+      this.warehouseDestinationTarget.classList.remove("hidden")
+      this.customerDestinationTarget.classList.add("hidden")
+    }
+  }
+
+  toggleOriginType(event) {
+    const isVendorTransfer = event.target.checked
+    
+    if (isVendorTransfer) {
+      this.warehouseOriginTarget.classList.add("hidden")
+      this.vendorOriginTarget.classList.remove("hidden")
+      
+      // Clear the origin warehouse selection when switching to vendor
+      const originWarehouseSelect = this.warehouseOriginTarget.querySelector('select')
+      if (originWarehouseSelect) {
+        originWarehouseSelect.value = ""
+      }
+    } else {
+      this.warehouseOriginTarget.classList.remove("hidden")
+      this.vendorOriginTarget.classList.add("hidden")
+      
+      // Clear the vendor selection when switching to warehouse
+      if (this.hasVendorIdTarget) {
+        // If it's a TomSelect, we need to clear it differently
+        const vendorSelect = this.vendorIdTarget
+        if (vendorSelect.tomSelect) {
+          vendorSelect.tomSelect.clear()
+        } else {
+          vendorSelect.value = ""
         }
       }
     }

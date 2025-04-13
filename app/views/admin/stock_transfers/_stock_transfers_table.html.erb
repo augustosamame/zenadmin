@@ -23,7 +23,15 @@
           <tr>
             <td class="px-4 py-2"><%= stock_transfer.custom_id %></td>
             <td class="px-4 py-2"><%= stock_transfer.user&.name %></td>
-            <td class="px-4 py-2"><%= stock_transfer.origin_warehouse&.name || "Inventario Inicial" %></td>
+            <td class="px-4 py-2">
+              <% if stock_transfer.vendor_id.present? %>
+                <span class="inline-flex items-center">
+                  Proveedor: <%= stock_transfer.vendor&.name %>
+                </span>
+              <% else %>
+                <%= stock_transfer.origin_warehouse&.name || "Inventario Inicial" %>
+              <% end %>
+            </td>
             <td class="px-4 py-2">
               <% if stock_transfer.customer_user_id.present? %>
                 <span class="inline-flex items-center">

@@ -10,6 +10,7 @@ module Services
       # Handles updating inventory when moving to 'in_transit'
       def update_origin_warehouse_inventory
         return if stock_transfer.origin_warehouse_id.nil? # Skip if no origin warehouse
+        return if stock_transfer.vendor_id.present? # Skip for vendor transfers - no origin warehouse inventory to update
 
         stock_transfer.stock_transfer_lines.each do |line|
           # Find or initialize the warehouse inventory record

@@ -25,16 +25,24 @@ class WarehouseInventory < ApplicationRecord
     initial_stock = 0
     warehouse = warehouse_inventory.warehouse
 
+    # Handle incoming stock transfers to this warehouse (including vendor transfers)
     incoming_stock_transfer_lines = StockTransferLine.joins(:stock_transfer)
-      .where(product: warehouse_inventory.product, stock_transfer: { destination_warehouse: warehouse, is_adjustment: false, stage: [ "complete" ] })
-    incoming_stock_transfer_lines = incoming_stock_transfer_lines.where("stock_transfer.transfer_date <= ?", max_datetime) if max_datetime
+      .where(product: warehouse_inventory.product)
+      .where("(stock_transfers.destination_warehouse_id = ? AND stock_transfers.is_adjustment = ? AND stock_transfers.stage = ?) OR 
+              (stock_transfers.destination_warehouse_id = ? AND stock_transfers.vendor_id IS NOT NULL AND stock_transfers.stage = ?)",
+             warehouse.id, false, "complete", warehouse.id, "complete")
+    incoming_stock_transfer_lines = incoming_stock_transfer_lines.where("stock_transfers.transfer_date <= ?", max_datetime) if max_datetime
     incoming_stock_transfer_lines.each do |stock_transfer_line|
       initial_stock += stock_transfer_line.quantity
     end
 
+    # Handle outgoing stock transfers from this warehouse (including customer transfers)
     outgoing_stock_transfer_lines = StockTransferLine.joins(:stock_transfer)
-      .where(product: warehouse_inventory.product, stock_transfer: { origin_warehouse: warehouse, stage: [ "in_transit", "complete" ] })
-    outgoing_stock_transfer_lines = outgoing_stock_transfer_lines.where("stock_transfer.transfer_date <= ?", max_datetime) if max_datetime
+      .where(product: warehouse_inventory.product)
+      .where("(stock_transfers.origin_warehouse_id = ? AND stock_transfers.stage IN (?)) OR 
+              (stock_transfers.origin_warehouse_id = ? AND stock_transfers.customer_user_id IS NOT NULL AND stock_transfers.stage = ?)",
+             warehouse.id, ["in_transit", "complete"], warehouse.id, "complete")
+    outgoing_stock_transfer_lines = outgoing_stock_transfer_lines.where("stock_transfers.transfer_date <= ?", max_datetime) if max_datetime
     outgoing_stock_transfer_lines.each do |stock_transfer_line|
       if stock_transfer_line.stock_transfer.is_adjustment?
         initial_stock += stock_transfer_line.quantity
@@ -43,6 +51,7 @@ class WarehouseInventory < ApplicationRecord
       end
     end
 
+    # Handle purchases to this warehouse
     purchase_lines = Purchases::PurchaseLine.joins(:purchase)
       .where(product: warehouse_inventory.product, warehouse: warehouse)
     purchase_lines = purchase_lines.where("purchases_purchases.created_at <= ?", max_datetime) if max_datetime
@@ -50,6 +59,7 @@ class WarehouseInventory < ApplicationRecord
       initial_stock += purchase_line.quantity
     end
 
+    # Handle sales from this warehouse
     product_order_items = OrderItem.joins(:order)
       .where(product: warehouse_inventory.product, order: { location_id: warehouse.location_id })
     product_order_items = product_order_items.where("order_items.created_at <= ?", max_datetime) if max_datetime

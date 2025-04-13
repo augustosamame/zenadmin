@@ -42,12 +42,12 @@ class Admin::Inventory::KardexController < Admin::AdminController
   def get_kardex_movements(product, selected_warehouse)
     # Fetch stock transfers and orders related to the product
     stock_transfers = product.stock_transfer_lines
-                            .joins(:stock_transfer)
-                            .includes(stock_transfer: [ :origin_warehouse, :destination_warehouse, :customer_user ])
-                            .where("(stock_transfers.origin_warehouse_id = ? AND stock_transfers.stage IN (?)) OR (stock_transfers.destination_warehouse_id = ? AND stock_transfers.stage = ?)",
-                                  selected_warehouse.id, [ "complete", "in_transit" ],
-                                  selected_warehouse.id, "complete")
-                            .order(:created_at)
+                          .joins(:stock_transfer)
+                          .includes(stock_transfer: [:origin_warehouse, :destination_warehouse, :customer_user, :vendor])
+                          .where("(stock_transfers.origin_warehouse_id = ? AND stock_transfers.stage IN (?)) OR (stock_transfers.destination_warehouse_id = ? AND stock_transfers.stage = ?)",
+                                selected_warehouse.id, ["complete", "in_transit"],
+                                selected_warehouse.id, "complete")
+                          .order(:created_at)
 
     orders = OrderItem
       .joins(order: { location: :warehouses }) # Join order_items to orders, then to locations, then to warehouses
@@ -57,15 +57,11 @@ class Admin::Inventory::KardexController < Admin::AdminController
       .includes(:order) # Eager load orders to prevent N+1 queries
       .order("order_items.created_at") # Order the results by order_items' creation date
 
-    # Fetch purchase lines for the product and selected warehouse
-    purchase_lines = Purchases::PurchaseLine
-      .joins(:purchase)
-      .where(product_id: product.id, warehouse_id: selected_warehouse.id)
-      .includes(:purchase) # Eager load purchases to prevent N+1 queries
-      .order(:created_at)
-
+    # Only fetch purchase lines that don't have an associated stock transfer
+    # We're not including purchase_lines anymore since they're represented by vendor stock transfers
+    
     # Combine and sort movements by creation date
-    movements = (stock_transfers + orders + purchase_lines).sort_by(&:created_at)
+    movements = (stock_transfers + orders).sort_by(&:created_at)
 
     # Initialize current stock
     current_stock = 0
@@ -77,12 +73,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
         qty_in = 0
         current_stock -= qty_out
         movement_type = "Venta"
-      elsif movement.is_a?(Purchases::PurchaseLine)
-        qty_in = movement.quantity
-        qty_out = 0
-        current_stock += qty_in
-        movement_type = "Compra"
-      else
+      elsif movement.is_a?(StockTransferLine)
         difference = false
         if movement.stock_transfer.is_adjustment?
           qty_in = movement.received_quantity || movement.quantity
@@ -90,18 +81,25 @@ class Admin::Inventory::KardexController < Admin::AdminController
           current_stock += qty_in
           movement_type = "Adjustment"
         else
-          if movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
+          if movement.stock_transfer.vendor_id.present? && movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
+            # This is a vendor transfer to this warehouse - treat as a purchase
+            qty_in = movement.received_quantity || movement.quantity
+            qty_out = 0
+            current_stock += qty_in
+            movement_type = "Compra"
+          elsif movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
             qty_in = movement.received_quantity || movement.quantity
             qty_out = 0
             current_stock += qty_in
             difference = true if movement.received_quantity != movement.quantity
+            movement_type = "Transferencia de Stock"
           else
             qty_in = 0
             qty_out = movement.quantity
             current_stock -= qty_out
             difference = true if movement.received_quantity != movement.quantity
+            movement_type = "Transferencia de Stock"
           end
-          movement_type = "Transferencia de Stock"
         end
       end
 
@@ -119,14 +117,16 @@ class Admin::Inventory::KardexController < Admin::AdminController
         movement_hash[:custom_id] = movement.order.custom_id
         movement_hash[:customer_name] = movement.order.customer.name
         movement_hash[:origin_warehouse_name] = movement.order.location.warehouses.first.name
-      elsif movement.is_a?(Purchases::PurchaseLine)
-        movement_hash[:custom_id] = movement.purchase.custom_id
-        movement_hash[:vendor_name] = movement.purchase.vendor&.name
-        movement_hash[:warehouse_name] = movement.warehouse&.name
-      else
+      elsif movement.is_a?(StockTransferLine)
         movement_hash[:custom_id] = movement.stock_transfer.custom_id
-        if movement.stock_transfer.origin_warehouse_id == selected_warehouse.id
+        
+        if movement.stock_transfer.vendor_id.present? && movement.stock_transfer.destination_warehouse_id == selected_warehouse.id
+          # For vendor transfers (purchases), use purchase-like display
+          movement_hash[:origin_warehouse_name] = "Proveedor: #{movement.stock_transfer.vendor.name}"
+          movement_hash[:destination_warehouse_name] = movement.stock_transfer.destination_warehouse&.name
+        elsif movement.stock_transfer.origin_warehouse_id == selected_warehouse.id
           if movement.stock_transfer.customer_user_id.present?
+            # For transfers to customers, origin is the customer and destination is the warehouse
             movement_hash[:origin_warehouse_name] = "Cliente: #{movement.stock_transfer.customer_user.name}"
             movement_hash[:destination_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
           else
@@ -135,6 +135,7 @@ class Admin::Inventory::KardexController < Admin::AdminController
           end
         else
           if movement.stock_transfer.customer_user_id.present?
+            # For transfers to customers viewed from destination, origin is the warehouse and destination is the customer
             movement_hash[:origin_warehouse_name] = movement.stock_transfer.origin_warehouse&.name
             movement_hash[:destination_warehouse_name] = "Cliente: #{movement.stock_transfer.customer_user.name}"
           else

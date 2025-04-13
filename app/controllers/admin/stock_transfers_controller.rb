@@ -84,6 +84,8 @@ class Admin::StockTransfersController < Admin::AdminController
     @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
     @destination_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : (Warehouse.all - @origin_warehouses)
     @customer_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers]
+    @vendor_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers] == true && current_user.has_any_role?("admin", "super_admin", "purchases", "warehouse_manager")
+    @vendors = Purchases::Vendor.all
     set_form_variables
   end
 
@@ -92,6 +94,9 @@ class Admin::StockTransfersController < Admin::AdminController
     @stock_transfer.user_id = current_user.id
     if @stock_transfer.save
       @stock_transfer.finish_transfer! if @stock_transfer.origin_warehouse_id.nil? # inventario inicial
+      
+      # Start transfer automatically for vendor transfers
+      @stock_transfer.start_transfer! if @stock_transfer.vendor_id.present?
 
       # Create guia if requested and allowed by settings
       if !@stock_transfer.is_adjustment &&
@@ -118,6 +123,8 @@ class Admin::StockTransfersController < Admin::AdminController
     @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
     @destination_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : (Warehouse.all - @origin_warehouses)
     @customer_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers]
+    @vendor_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers] == true && current_user.has_any_role?("admin", "super_admin", "purchases", "warehouse_manager")
+    @vendors = Purchases::Vendor.all
     set_form_variables
   end
 
@@ -232,6 +239,6 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def stock_transfer_params
-    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, :create_guia, :transportista_id, :to_customer, :customer_user_id, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
+    params.require(:stock_transfer).permit(:origin_warehouse_id, :destination_warehouse_id, :guia, :transfer_date, :comments, :is_adjustment, :adjustment_type, :create_guia, :transportista_id, :to_customer, :customer_user_id, :from_vendor, :vendor_id, stock_transfer_lines_attributes: [ :id, :product_id, :quantity, :received_quantity, :_destroy ])
   end
 end

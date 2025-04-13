@@ -4,58 +4,90 @@
 
   <!-- Header Section -->
   <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
-    <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
-
-      <!-- Transfer Date -->
-      <div>
-        <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
-        <%= form.datetime_local_field :transfer_date, class: "form-input" %>
+    <% if @vendor_transfer_enabled && @customer_transfer_enabled %>
+      <!-- New layout with checkboxes on first row -->
+      <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+        <!-- Transfer Date -->
+        <div>
+          <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
+          <%= form.datetime_local_field :transfer_date, class: "form-input" %>
+        </div>
+        
+        <!-- Vendor Transfer Checkbox -->
+        <div class="flex items-center">
+          <% if @stock_transfer.persisted? %>
+            <% if @stock_transfer.vendor_id.present? %>
+              <%= form.check_box :from_vendor, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
+              <%= form.hidden_field :from_vendor, value: "1" %>
+            <% else %>
+              <%= form.check_box :from_vendor, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
+              <%= form.hidden_field :from_vendor, value: "0" %>
+            <% end %>
+          <% else %>
+            <%= form.check_box :from_vendor, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleOriginType" } } %>
+          <% end %>
+          <%= form.label :from_vendor, "Transferencia desde proveedor", class: "form-label mb-0" %>
+        </div>
+        
+        <!-- Customer Transfer Checkbox -->
+        <div class="flex items-center">
+          <% if @stock_transfer.persisted? %>
+            <% if @stock_transfer.customer_user_id.present? %>
+              <%= form.check_box :to_customer, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
+              <%= form.hidden_field :to_customer, value: "1" %>
+            <% else %>
+              <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
+              <%= form.hidden_field :to_customer, value: "0" %>
+            <% end %>
+          <% else %>
+            <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleDestinationType" } } %>
+          <% end %>
+          <%= form.label :to_customer, "Transferencia a cliente", class: "form-label mb-0" %>
+        </div>
       </div>
       
-      <!-- Origin Warehouse -->
-      <div>
-        <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "form-label" %>
-        <% if @stock_transfer.persisted? %>
-          <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input", disabled: true %>
-          <%= form.hidden_field :origin_warehouse_id %>
-        <% else %>
-          <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
-        <% end %>
-      </div>
+      <!-- Second row for origin/destination -->
+      <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-2 sm:gap-x-8 sm:gap-y-10">
+        <!-- Origin section (Warehouse or Vendor) -->
+        <div>
+          <!-- Origin Warehouse (hidden when vendor transfer is selected) -->
+          <div data-stock-transfer-form-target="warehouseOrigin" class="<%= @stock_transfer.vendor_id.present? ? 'hidden' : '' %>">
+            <%= form.label :origin_warehouse_id, "Almacén de Origen", class: "form-label" %>
+            <% if @stock_transfer.persisted? %>
+              <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input", disabled: true %>
+              <%= form.hidden_field :origin_warehouse_id %>
+            <% else %>
+              <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
+            <% end %>
+          </div>
 
-      <% if @is_adjustment %>
-
-        <!-- Adjustment Type -->
-        <div id="adjustment-type-field">
-          <%= form.label :adjustment_type, "Tipo de Ajuste", class: "form-label" %>
-          <% if @stock_transfer.persisted? %>
-            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input", disabled: true %>
-            <%= form.hidden_field :adjustment_type %>
-          <% else %>
-            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
-          <% end %>
-        </div>
-
-        <% else %>
-
-          <!-- Customer Transfer Checkbox (only when enabled in settings) -->
-          <% if @customer_transfer_enabled %>
-            <div class="flex items-center mb-6">
-              <% if @stock_transfer.persisted? %>
-                <% if @stock_transfer.customer_user_id.present? %>
-                  <%= form.check_box :to_customer, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
-                  <%= form.hidden_field :to_customer, value: "1" %>
-                <% else %>
-                  <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
-                  <%= form.hidden_field :to_customer, value: "0" %>
-                <% end %>
+          <!-- Vendor Selection (shown only when vendor transfer is selected) -->
+          <div data-stock-transfer-form-target="vendorOrigin" class="<%= @stock_transfer.vendor_id.present? ? '' : 'hidden' %>">
+            <%= form.label :vendor_id, "Proveedor de Origen", class: "form-label" %>
+            <div class="relative">
+              <% if @stock_transfer.persisted? && @stock_transfer.vendor_id.present? %>
+                <div class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
+                  <%= @stock_transfer.vendor&.name %>
+                </div>
+                <%= form.hidden_field :vendor_id %>
               <% else %>
-                <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleDestinationType" } } %>
+                <%= form.collection_select :vendor_id, @vendors, :id, :name, 
+                    { include_blank: "Seleccionar Proveedor" }, 
+                    { class: "form-input", 
+                      data: { 
+                        controller: "select", 
+                        "stock-transfer-form-target" => "vendorId",
+                        "select-placeholder-value" => "Seleccionar Proveedor"
+                      } 
+                    } 
+                %>
               <% end %>
-              <%= form.label :to_customer, "Transferencia a cliente", class: "form-label mb-0" %>
             </div>
-          <% end %>
-
+          </div>
+        </div>
+        
+        <!-- Destination section (Warehouse or Customer) -->
+        <div>
           <!-- Destination Warehouse (hidden when customer transfer is selected) -->
           <div data-stock-transfer-form-target="warehouseDestination" class="<%= @stock_transfer.customer_user_id.present? ? 'hidden' : '' %>">
             <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
@@ -72,16 +104,16 @@
             <label class="form-label">Cliente de Destino</label>
             <div class="relative">
               <% if @stock_transfer.persisted? && @stock_transfer.customer_user_id.present? %>
-                <div class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
+                <div class="flex items-center justify-center w-full px-4 py-2 text-center bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
                   <%= @stock_transfer.customer_user&.name %>
                 </div>
                 <%= form.hidden_field :customer_user_id %>
               <% else %>
                 <button type="button" id="customer-select-button" 
-                        class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+                        class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
                         data-action="click->customer-table-modal#open">
-                  <span data-stock-transfer-form-target="selectedCustomerName">Seleccionar Cliente</span>
-                  <svg class="w-5 h-5 ml-auto" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <span class="flex-grow text-center" data-stock-transfer-form-target="selectedCustomerName">Seleccionar Cliente</span>
+                  <svg class="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
                     <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
                   </svg>
                 </button>
@@ -89,9 +121,141 @@
               <% end %>
             </div>
           </div>
+        </div>
+      </div>
+    <% else %>
+      <!-- Original layout with 3 elements in first row -->
+      <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+
+        <!-- Transfer Date -->
+        <div>
+          <%= form.label :transfer_date, "Fecha de Traslado", class: "form-label" %>
+          <%= form.datetime_local_field :transfer_date, class: "form-input" %>
+        </div>
+        
+        <!-- Origin Warehouse -->
+        <div>
+          <%= form.label :origin_warehouse_id, @almacen_de_origen_label, class: "form-label" %>
+          <% if @stock_transfer.persisted? %>
+            <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input", disabled: true %>
+            <%= form.hidden_field :origin_warehouse_id %>
+          <% else %>
+            <%= form.collection_select :origin_warehouse_id, @origin_warehouses, :id, :name, { include_blank: @current_warehouse.is_main ? 'Ninguno (Inventario Inicial)' : nil }, class: "form-input" %>
+          <% end %>
+        </div>
+
+      <% if @is_adjustment %>
+
+        <!-- Adjustment Type -->
+        <div id="adjustment-type-field">
+          <%= form.label :adjustment_type, "Tipo de Ajuste", class: "form-label" %>
+          <% if @stock_transfer.persisted? %>
+            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input", disabled: true %>
+            <%= form.hidden_field :adjustment_type %>
+          <% else %>
+            <%= form.select :adjustment_type, StockTransfer.adjustment_types.keys.map { |status| [status.titleize, status] }, {}, class: "form-input" %>
+          <% end %>
+        </div>
+
+      <% else %>
+
+        <!-- Vendor Transfer Checkbox -->
+        <% if @vendor_transfer_enabled %>
+          <div class="flex items-center mb-6">
+            <% if @stock_transfer.persisted? %>
+              <% if @stock_transfer.vendor_id.present? %>
+                <%= form.check_box :from_vendor, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
+                <%= form.hidden_field :from_vendor, value: "1" %>
+              <% else %>
+                <%= form.check_box :from_vendor, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
+                <%= form.hidden_field :from_vendor, value: "0" %>
+              <% end %>
+            <% else %>
+              <%= form.check_box :from_vendor, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleOriginType" } } %>
+            <% end %>
+            <%= form.label :from_vendor, "Transferencia desde proveedor", class: "form-label mb-0" %>
+          </div>
+        <% end %>
+
+        <!-- Customer Transfer Checkbox (only when enabled in settings) -->
+        <% if @customer_transfer_enabled %>
+          <div class="flex items-center mb-6">
+            <% if @stock_transfer.persisted? %>
+              <% if @stock_transfer.customer_user_id.present? %>
+                <%= form.check_box :to_customer, { checked: true, class: "form-checkbox mr-2", disabled: true } %>
+                <%= form.hidden_field :to_customer, value: "1" %>
+              <% else %>
+                <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", disabled: true } %>
+                <%= form.hidden_field :to_customer, value: "0" %>
+              <% end %>
+            <% else %>
+              <%= form.check_box :to_customer, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleDestinationType" } } %>
+            <% end %>
+            <%= form.label :to_customer, "Transferencia a cliente", class: "form-label mb-0" %>
+          </div>
+        <% end %>
+
+        <!-- Vendor Selection (shown only when vendor transfer is selected) -->
+        <div data-stock-transfer-form-target="vendorOrigin" class="<%= @stock_transfer.vendor_id.present? ? '' : 'hidden' %>">
+          <%= form.label :vendor_id, "Proveedor de Origen", class: "form-label" %>
+          <div class="relative">
+            <% if @stock_transfer.persisted? && @stock_transfer.vendor_id.present? %>
+              <div class="flex items-center w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
+                <%= @stock_transfer.vendor&.name %>
+              </div>
+              <%= form.hidden_field :vendor_id %>
+            <% else %>
+              <%= form.collection_select :vendor_id, @vendors, :id, :name, 
+                  { include_blank: "Seleccionar Proveedor" }, 
+                  { class: "form-input", 
+                    data: { 
+                      controller: "select", 
+                      "stock-transfer-form-target" => "vendorId",
+                      "select-placeholder-value" => "Seleccionar Proveedor"
+                    } 
+                  } 
+              %>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Destination Warehouse (hidden when customer transfer is selected) -->
+        <div data-stock-transfer-form-target="warehouseDestination" class="<%= @stock_transfer.customer_user_id.present? ? 'hidden' : '' %>">
+          <%= form.label :destination_warehouse_id, "Almacén de Destino", class: "form-label" %>
+          <% if @stock_transfer.persisted? %>
+            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input", disabled: true %>
+            <%= form.hidden_field :destination_warehouse_id %>
+          <% else %>
+            <%= form.collection_select :destination_warehouse_id, @destination_warehouses, :id, :name, {}, class: "form-input" %>
+          <% end %>
+        </div>
+
+        <!-- Customer Selection (shown only when customer transfer is selected) -->
+        <div data-stock-transfer-form-target="customerDestination" class="<%= @stock_transfer.customer_user_id.present? ? '' : 'hidden' %>">
+          <label class="form-label">Cliente de Destino</label>
+          <div class="relative">
+            <% if @stock_transfer.persisted? && @stock_transfer.customer_user_id.present? %>
+              <div class="flex items-center justify-center w-full px-4 py-2 text-center bg-white border rounded-md shadow-sm border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200">
+                <%= @stock_transfer.customer_user&.name %>
+              </div>
+              <%= form.hidden_field :customer_user_id %>
+            <% else %>
+              <button type="button" id="customer-select-button" 
+                      class="flex items-center justify-between w-full px-4 py-2 text-left bg-white border rounded-md shadow-sm border-slate-300 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-primary-500 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200"
+                      data-action="click->customer-table-modal#open">
+                <span class="flex-grow text-center" data-stock-transfer-form-target="selectedCustomerName">Seleccionar Cliente</span>
+                <svg class="w-5 h-5 ml-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+              </button>
+              <%= form.hidden_field :customer_user_id, data: { "stock-transfer-form-target" => "customerUserId" } %>
+            <% end %>
+          </div>
+        </div>
 
       <% end %>
     </div>
+    <% end %>
 
       <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
         <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>

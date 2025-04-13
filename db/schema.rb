@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_12_144800) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_12_185400) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -1062,6 +1062,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_144800) do
     t.datetime "date_guia"
     t.bigint "transportista_id"
     t.bigint "customer_user_id"
+    t.bigint "vendor_id"
     t.index ["custom_id"], name: "index_stock_transfers_on_custom_id", unique: true
     t.index ["customer_user_id"], name: "index_stock_transfers_on_customer_user_id"
     t.index ["destination_warehouse_id"], name: "index_stock_transfers_on_destination_warehouse_id"
@@ -1073,6 +1074,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_144800) do
     t.index ["transfer_date"], name: "index_stock_transfers_on_transfer_date"
     t.index ["transportista_id"], name: "index_stock_transfers_on_transportista_id"
     t.index ["user_id"], name: "index_stock_transfers_on_user_id"
+    t.index ["vendor_id"], name: "index_stock_transfers_on_vendor_id"
   end
 
   create_table "suppliers", force: :cascade do |t|
@@ -1361,6 +1363,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_12_144800) do
   add_foreign_key "stock_transfer_lines", "stock_transfers"
   add_foreign_key "stock_transfers", "periodic_inventories"
   add_foreign_key "stock_transfers", "planned_stock_transfers"
+  add_foreign_key "stock_transfers", "purchases_vendors", column: "vendor_id"
   add_foreign_key "stock_transfers", "transportistas"
   add_foreign_key "stock_transfers", "users"
   add_foreign_key "stock_transfers", "users", column: "customer_user_id"

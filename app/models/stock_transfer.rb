@@ -11,9 +11,10 @@ class StockTransfer < ApplicationRecord
   belongs_to :planned_stock_transfer, optional: true
   belongs_to :transportista, optional: true
   belongs_to :customer_user, class_name: "User", optional: true
+  belongs_to :vendor, class_name: "Purchases::Vendor", optional: true
   has_many :guias, dependent: :nullify
 
-  attr_accessor :current_user_for_destroy, :cached_lines, :create_guia, :to_customer
+  attr_accessor :current_user_for_destroy, :cached_lines, :create_guia, :to_customer, :from_vendor
 
   validates :transportista_id, presence: true, if: -> { create_guia == "1" || create_guia == true }
 
@@ -51,6 +52,7 @@ class StockTransfer < ApplicationRecord
   validates :origin_warehouse_id, presence: true, if: :is_adjustment?
   validates :destination_warehouse_id, presence: true, unless: -> { is_adjustment? || to_customer == "1" }
   validates :customer_user_id, presence: true, if: -> { to_customer == "1" }
+  validates :vendor_id, presence: true, if: -> { from_vendor == "1" }
   validates :stage, presence: true
 
   aasm column: "stage" do

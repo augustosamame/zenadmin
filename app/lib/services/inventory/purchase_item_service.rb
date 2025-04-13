@@ -7,6 +7,51 @@ module Services
 
       def update_inventory
         ActiveRecord::Base.transaction do
+          # Group purchase lines by warehouse
+          warehouse_groups = @purchase.purchase_lines.group_by(&:warehouse_id)
+          
+          # Create a stock transfer for each warehouse
+          warehouse_groups.each do |warehouse_id, purchase_lines|
+            next if warehouse_id.nil?
+            
+            # Create a new stock transfer from vendor to warehouse
+            stock_transfer = StockTransfer.new(
+              user_id: @purchase.user_id,
+              origin_warehouse_id: nil, # No origin warehouse for vendor transfers
+              destination_warehouse_id: warehouse_id,
+              vendor_id: @purchase.vendor_id,
+              from_vendor: "1", # Flag to indicate this is a vendor transfer
+              transfer_date: Time.zone.now,
+              comments: "Creado automáticamente desde la compra #{@purchase.custom_id}"
+            )
+            
+            # Add lines for each product in the purchase for this warehouse
+            purchase_lines.each do |purchase_line|
+              next if purchase_line.product.nil? || purchase_line.quantity <= 0
+              
+              stock_transfer.stock_transfer_lines.build(
+                product_id: purchase_line.product_id,
+                quantity: purchase_line.quantity
+              )
+            end
+            
+            # Save the stock transfer (it will be in pending stage by default)
+            unless stock_transfer.save
+              Rails.logger.error "Failed to create StockTransfer from Purchase #{@purchase.id}: #{stock_transfer.errors.full_messages.join(", ")}"
+              raise ActiveRecord::Rollback
+            end
+            
+            # Automatically start the transfer for vendor transfers
+            stock_transfer.start_transfer! if stock_transfer.vendor_id.present?
+          end
+        end
+      end
+      
+      private
+      
+      # This method is no longer used but kept for reference
+      def update_inventory_directly
+        ActiveRecord::Base.transaction do
           @purchase.purchase_lines.each do |purchase_line|
             # Skip if no warehouse is specified
             next unless purchase_line.warehouse.present?
@@ -33,8 +78,6 @@ module Services
           end
         end
       end
-      
-      private
       
       def fulfill_preorders(product_id, warehouse_id)
         # Find any preorders for this product

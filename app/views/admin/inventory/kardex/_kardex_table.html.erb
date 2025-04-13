@@ -27,6 +27,21 @@
                   'Compra'
                 when "Adjustment"
                   'Ajuste de Inventario'
+                when "StockTransferLine"
+                  stock_transfer = movement.stock_transfer_line.stock_transfer
+                  if stock_transfer.origin_warehouse_id == selected_warehouse.id
+                    if stock_transfer.customer_user_id.present?
+                      'Transferencia a Cliente'
+                    else
+                      'Transferencia de Stock'
+                    end
+                  elsif stock_transfer.destination_warehouse_id == selected_warehouse.id
+                    if stock_transfer.vendor_id.present?
+                      'Compra'
+                    else
+                      'Transferencia de Stock'
+                    end
+                  end
                 else
                   'Transferencia de Stock'
                 end %>
@@ -36,7 +51,36 @@
             <% if movement[:type] == "OrderItem" || movement[:type] == "Venta" %>
               <%= movement[:origin_warehouse_name] %>
             <% elsif movement[:type] == "Purchases::PurchaseLine" || movement[:type] == "Compra" %>
-              <%= movement[:vendor_name] %>
+              <% if movement.is_a?(StockTransferLine) && movement.stock_transfer_line.stock_transfer.vendor_id.present? %>
+                <span class="flex items-center">
+                  Proveedor: <%= movement.stock_transfer_line.stock_transfer.vendor&.name %>
+                </span>
+              <% else %>
+                <%= movement[:origin_warehouse_name] %>
+              <% end %>
+            <% elsif movement[:type] == "StockTransferLine" %>
+              <% if movement.is_a?(StockTransferLine) %>
+                <% stock_transfer = movement.stock_transfer_line.stock_transfer %>
+                <% if stock_transfer.origin_warehouse_id == selected_warehouse.id %>
+                  <% if stock_transfer.customer_user_id.present? %>
+                    <span class="flex items-center">
+                      Cliente: <%= stock_transfer.customer_user&.name %>
+                    </span>
+                  <% else %>
+                    <%= stock_transfer.destination_warehouse&.name %>
+                  <% end %>
+                <% elsif stock_transfer.destination_warehouse_id == selected_warehouse.id %>
+                  <% if stock_transfer.vendor_id.present? %>
+                    <span class="flex items-center">
+                      Proveedor: <%= stock_transfer.vendor&.name %>
+                    </span>
+                  <% else %>
+                    <%= stock_transfer.origin_warehouse&.name %>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <%= movement[:origin_warehouse_name] %>
+              <% end %>
             <% else %>
               <%= movement[:qty_out] > 0 ? movement[:destination_warehouse_name] : movement[:origin_warehouse_name] %>
             <% end %>
@@ -45,7 +89,30 @@
             <% if movement[:type] == "OrderItem" || movement[:type] == "Venta" %>
               <%= movement[:customer_name] %>
             <% elsif movement[:type] == "Purchases::PurchaseLine" || movement[:type] == "Compra" %>
-              <%= movement[:warehouse_name] %>
+              <% if movement.is_a?(StockTransferLine) && movement.stock_transfer_line.stock_transfer.vendor_id.present? %>
+                <%= movement.stock_transfer_line.stock_transfer.destination_warehouse&.name %>
+              <% else %>
+                <%= movement[:destination_warehouse_name] %>
+              <% end %>
+            <% elsif movement[:type] == "StockTransferLine" %>
+              <% if movement.is_a?(StockTransferLine) %>
+                <% stock_transfer = movement.stock_transfer_line.stock_transfer %>
+                <% if stock_transfer.origin_warehouse_id == selected_warehouse.id %>
+                  <% if stock_transfer.customer_user_id.present? %>
+                    <%= stock_transfer.origin_warehouse&.name %>
+                  <% else %>
+                    <%= stock_transfer.origin_warehouse&.name %>
+                  <% end %>
+                <% elsif stock_transfer.destination_warehouse_id == selected_warehouse.id %>
+                  <% if stock_transfer.vendor_id.present? %>
+                    <%= stock_transfer.destination_warehouse&.name %>
+                  <% else %>
+                    <%= stock_transfer.destination_warehouse&.name %>
+                  <% end %>
+                <% end %>
+              <% else %>
+                <%= movement[:destination_warehouse_name] %>
+              <% end %>
             <% else %>
               <%= movement[:qty_out] > 0 ? movement[:origin_warehouse_name] : movement[:destination_warehouse_name] %>
             <% end %>
@@ -54,8 +121,8 @@
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:qty_out] %></td>
           <td class="px-6 py-4 whitespace-nowrap"><%= movement[:final_stock] %></td>
           <% if movement[:difference] %>
-            <td class="px-6 py-4 whitespace-nowrap text-red-600 font-medium">
-              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+            <td class="px-6 py-4 font-medium text-red-600 whitespace-nowrap">
+              <span class="inline-flex items-center px-2.5 py-0.5 text-xs font-medium text-red-800 bg-red-100 rounded-full">
                 Diferencia
               </span>
             </td>
