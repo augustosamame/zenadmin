@@ -5,6 +5,7 @@ export default class extends Controller {
   static targets = [
     "form",
     "lines",
+    "template",
     "warehouseDestination",
     "customerDestination",
     "warehouseOrigin",
@@ -106,23 +107,24 @@ export default class extends Controller {
   addProduct(event) {
     event.preventDefault()
 
-    // Clone a template for a new line
-    const newLine = this.lineTarget.cloneNode(true)
-
-    // Clean up Tom Select-specific elements and attributes in the cloned template
-    newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove());  // Remove Tom Select wrappers
-    newLine.querySelectorAll("input, select").forEach(input => {
-      input.value = ""
-      input.classList.remove("tomselected", "ts-hidden-accessible")
-      input.removeAttribute("id")
-      input.style.display = ''; // Ensure the original select is visible
-    })
-
-    // Append new line to the container using the target reference
+    if (!this.hasTemplateTarget || !this.hasLinesTarget) {
+      console.error('Template or lines target not found')
+      return
+    }
+    
+    // Get the template content
+    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
+    const newLine = document.createRange().createContextualFragment(content).firstElementChild
+    
+    // Add the new line to the form
     this.linesTarget.appendChild(newLine)
-
-    // Initialize Tom Select only for the new row's select element
-    // this.initializeTomSelect(newLine.querySelector('select[data-controller="select"]'))
+    
+    // Initialize select for the new line
+    const selects = newLine.querySelectorAll('[data-controller="select"]')
+    selects.forEach(select => {
+      const application = this.application
+      application.getControllerForElementAndIdentifier(select, 'select')
+    })
   }
 
   removeProduct(event) {

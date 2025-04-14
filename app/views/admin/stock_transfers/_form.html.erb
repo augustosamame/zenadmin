@@ -323,6 +323,13 @@
           </button>
         </div>
       </div>
+      
+      <!-- Template for new product lines -->
+      <template data-stock-transfer-form-target="template">
+        <%= form.fields_for :stock_transfer_lines, StockTransferLine.new, child_index: 'NEW_RECORD' do |line_form| %>
+          <%= render 'stock_transfer_line_fields', f: line_form %>
+        <% end %>
+      </template>
     </div>
 
     <!-- Form Actions -->
