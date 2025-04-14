@@ -9,6 +9,7 @@
           <th class="px-4 py-2 text-left">Destino</th>
           <th class="px-4 py-2 text-left">Total Productos</th>
           <th class="px-4 py-2 text-left">Fecha</th>
+          <th class="px-4 py-2 text-left">Transportista</th>
           <th class="px-4 py-2 text-left">Estado</th>
           <th class="px-4 py-2 text-left">Etapa</th>
           <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
@@ -43,6 +44,7 @@
             </td>
             <td class="px-4 py-2"><%= stock_transfer.total_products %></td>
             <td class="px-4 py-2"><%= friendly_date(current_user, stock_transfer.transfer_date) %></td>
+            <td class="px-4 py-2"><%= stock_transfer.transportista&.display_name %></td>
             <td class="px-4 py-2"><%= stock_transfer.translated_status %></td>
             <td class="px-4 py-2"><%= translated_stage(stock_transfer.stage) %></td>
             <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
