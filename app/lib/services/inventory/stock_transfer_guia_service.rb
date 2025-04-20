@@ -89,7 +89,6 @@ module Services
           "destinatario_direccion": sale ? destination_client.address : guia_series.invoicer.address,
           "issuer_ruc": guia_series.invoicer.ruc,
           "issuer_razon_social": guia_series.invoicer.razon_social,
-          "transport_mode": "01", # 01 is the code for Public transport
           "efact_client_token": guia_series.invoicer.einvoice_api_key,
           "envio_fecha_inicio_traslado": @stock_transfer.date_guia&.strftime("%d-%m-%Y") || Time.current.strftime("%d-%m-%Y"),
           "envio_descripcion_traslado": observaciones,
@@ -201,14 +200,12 @@ module Services
           "correlativo": guia_series.next_invoice_number.split("-").last,
           "order_custom_id": @order.custom_id,
           "document_type": "09", # 09 is the code for Guia de Remision
-          "destinatario_tipo_doc": @order.customer.wants_factura? ? "6" : "1",
-          "destinatario_ruc": @order.customer.wants_factura? ? @order.customer.factura_ruc : @order.customer.doc_id,
-          "destinatario_razon_social": @order.customer.wants_factura? ? @order.customer.factura_razon_social : @order.user.name,
-          "destinatario_direccion": @order.user.address,
+          "destinatario_tipo_doc": @order.customer.customer.wants_factura? ? "6" : "1",
+          "destinatario_ruc": @order.customer.customer.wants_factura? ? @order.customer.customer.factura_ruc : @order.customer.customer.doc_id,
+          "destinatario_razon_social": @order.customer.customer.wants_factura? ? @order.customer.customer.factura_razon_social : @order.customer.name,
+          "destinatario_direccion": @order.customer.customer.wants_factura? ? @order.customer.customer.factura_direccion : @order.customer.customer.dni_address,
           "issuer_ruc": guia_series.invoicer.ruc,
           "issuer_razon_social": guia_series.invoicer.razon_social,
-          "transfer_reason": "01", # 01 is the code for Sale
-          "transport_mode": "01", # 01 is the code for Public transport
           "efact_client_token": guia_series.invoicer.einvoice_api_key,
           "envio_fecha_inicio_traslado": Time.current.strftime("%d-%m-%Y"),
           "envio_descripcion_traslado": observaciones,
@@ -241,7 +238,7 @@ module Services
         Rails.logger.info("Guia Response text: #{response.parsed_response["response_text"]}")
 
         guia = Guia.new(
-          order: @order,
+          order_id: @order.id,
           custom_id: "#{guia_data[:serie]}-#{guia_data[:correlativo]}",
           guia_series: guia_series,
           amount: @order.total_products,
@@ -264,6 +261,7 @@ module Services
         end
 
         guia.save
+
         guia
       end
 

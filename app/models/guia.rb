@@ -3,6 +3,7 @@ class Guia < ApplicationRecord
   self.table_name = "guias"
 
   belongs_to :stock_transfer, optional: true
+  belongs_to :order, optional: true
   belongs_to :guia_series
   has_one :invoicer, through: :guia_series
 

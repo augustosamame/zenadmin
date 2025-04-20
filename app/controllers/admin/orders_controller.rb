@@ -98,6 +98,7 @@ class Admin::OrdersController < Admin::AdminController
 
   def show
     @order = Order.includes(payments: :payment_method, commissions: :user).find(params[:id])
+    @guia = Guia.where(order_id: @order.id)&.last
     @transportistas = Transportista.all
   end
 
@@ -233,6 +234,26 @@ class Admin::OrdersController < Admin::AdminController
     else
       flash.now[:error] = "Error al actualizar las comisiones."
       render :edit_commissions, status: :unprocessable_entity
+    end
+  end
+
+  def generate_guia
+    if params[:source_type] == 'order'
+      order = Order.find(params[:source_id])
+      transportista_id = params[:transportista]
+      if transportista_id.present?
+        order.update(transportista_id: transportista_id)
+      end
+      # Existing logic for generating guia for order
+      service = Services::Inventory::StockTransferGuiaService.new('venta', order.id)
+      guia = service.create_guia(params.permit!)
+      respond_to do |format|
+        format.html { redirect_to admin_order_path(order), notice: 'Guía generada.' }
+        format.json { render json: { status: guia.sunat_status, guia_id: guia.id } }
+      end
+    else
+      # Existing logic for other source_types
+      # ...
     end
   end
 

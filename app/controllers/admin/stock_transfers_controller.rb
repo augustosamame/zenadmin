@@ -256,6 +256,10 @@ class Admin::StockTransfersController < Admin::AdminController
         guia = service.create_guia(guia_params)
       when "order"
         order = Order.find(source_id)
+        transportista_id = params[:transportista]
+        if transportista_id.present?
+          order.update(transportista_id: transportista_id)
+        end
         service = Services::Inventory::StockTransferGuiaService.new("venta", order.id)
         guia = service.create_guia(guia_params)
       else

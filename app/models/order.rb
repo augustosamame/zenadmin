@@ -201,6 +201,10 @@ class Order < ApplicationRecord
     self.invoices&.sunat_success&.issued&.last
   end
 
+  def total_products
+    order_items.sum(:quantity)
+  end
+
   def evaluate_payment_status
     Services::Sales::OrderCreditService.new(self).evaluate_payment_status(operation: :create)
   end

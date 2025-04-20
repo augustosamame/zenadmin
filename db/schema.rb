@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_20_021451) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -377,7 +377,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
     t.string "guia_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.bigint "order_id"
     t.index ["guia_series_id"], name: "index_guias_on_guia_series_id"
+    t.index ["order_id"], name: "index_guias_on_order_id"
     t.index ["stock_transfer_id"], name: "index_guias_on_stock_transfer_id"
   end
 
@@ -593,6 +595,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
     t.boolean "is_credit_sale", default: false
     t.integer "price_list_id"
     t.boolean "nota_de_venta", default: false
+    t.bigint "transportista_id"
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
@@ -606,6 +609,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
     t.index ["region_id"], name: "index_orders_on_region_id"
     t.index ["request_id"], name: "index_orders_on_request_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
+    t.index ["transportista_id"], name: "index_orders_on_transportista_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -1328,6 +1332,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
   add_foreign_key "guia_series_mappings", "guia_series"
   add_foreign_key "guia_series_mappings", "locations"
   add_foreign_key "guias", "guia_series"
+  add_foreign_key "guias", "orders"
   add_foreign_key "guias", "stock_transfers"
   add_foreign_key "in_transit_stocks", "products"
   add_foreign_key "in_transit_stocks", "stock_transfers"
@@ -1350,6 +1355,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_13_194200) do
   add_foreign_key "order_sellers", "users"
   add_foreign_key "orders", "locations"
   add_foreign_key "orders", "regions"
+  add_foreign_key "orders", "transportistas"
   add_foreign_key "orders", "users"
   add_foreign_key "orders", "users", column: "seller_id"
   add_foreign_key "payments", "cashier_shifts"
