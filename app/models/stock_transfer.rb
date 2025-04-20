@@ -72,7 +72,7 @@ class StockTransfer < ApplicationRecord
 
   accepts_nested_attributes_for :stock_transfer_lines, allow_destroy: true
 
-  validate :different_warehouses
+  validate :different_warehouses, unless: -> { to_customer == "1" || from_vendor == "1" }
 
   def different_warehouses
     if origin_warehouse && origin_warehouse == destination_warehouse

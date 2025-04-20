@@ -11,7 +11,14 @@ class Admin::StockTransfersController < Admin::AdminController
     respond_to do |format|
       format.html do
         if current_user.any_admin_or_supervisor?
-          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user, :customer_user, :vendor, :transportista).where(is_adjustment: false).order(id: :desc)
+          @stock_transfers = StockTransfer.includes(
+            :user,
+            :customer_user,
+            :vendor,
+            :transportista,
+            origin_warehouse: [ :location ],
+            destination_warehouse: [ :location ]
+          ).where(is_adjustment: false).order(id: :desc)
           @default_object_options_array = [
             { event_name: "show", label: "Ver", icon: "eye" },
             { event_name: "edit", label: "Editar", icon: "pencil" },
@@ -19,16 +26,26 @@ class Admin::StockTransfersController < Admin::AdminController
             { event_name: "print", label: "Imprimir PDF", icon: "printer" }
           ]
         else
-          @stock_transfers = StockTransfer.includes(:origin_warehouse, :destination_warehouse, :user, :customer_user, :vendor, :transportista)
-                                .where(origin_warehouse: { id: @current_warehouse.id })
-                                .or(StockTransfer.where(destination_warehouse: { id: @current_warehouse.id }))
-                                .where(is_adjustment: false)
-                                .order(id: :desc)
+          @stock_transfers = StockTransfer.includes(
+            :user,
+            :customer_user,
+            :vendor,
+            :transportista,
+            origin_warehouse: [ :location ],
+            destination_warehouse: [ :location ]
+          )
+          .where(origin_warehouse: { id: @current_warehouse.id })
+          .or(StockTransfer.where(destination_warehouse: { id: @current_warehouse.id }))
+          .where(is_adjustment: false)
+          .order(id: :desc)
           @default_object_options_array = [
             { event_name: "edit", label: "Editar", icon: "pencil" },
             { event_name: "show", label: "Ver", icon: "eye" }
           ]
         end
+
+        # Load transportistas for the guia modal
+        @transportistas = Transportista.where(status: :active)
 
         if @stock_transfers.size > 2000
           @datatable_options = "server_side:true;resource_name:'StockTransfer'; sort_0_desc;"
@@ -70,6 +87,7 @@ class Admin::StockTransfersController < Admin::AdminController
   end
 
   def show
+    @transportistas = Transportista.all
     respond_to do |format|
       format.html
       format.pdf do
@@ -224,6 +242,48 @@ class Admin::StockTransfersController < Admin::AdminController
     end
   end
 
+  def generate_guia
+    source_type = params[:source_type]
+    source_id = params[:source_id]
+    guia_params = params.permit(:origin_address, :destination_address, :transportista, :envio_peso_bruto_total, :envio_num_bultos, :comments)
+
+    begin
+      case source_type
+      when "stock_transfer"
+        stock_transfer = StockTransfer.find(source_id)
+        type_of_guia = stock_transfer.customer_user_id.present? ? "stock_transfer_venta" : "stock_transfer"
+        service = Services::Inventory::StockTransferGuiaService.new(type_of_guia, stock_transfer.id)
+        guia = service.create_guia(guia_params)
+      when "order"
+        order = Order.find(source_id)
+        service = Services::Inventory::StockTransferGuiaService.new("venta", order.id)
+        guia = service.create_guia(guia_params)
+      else
+        respond_to do |format|
+          format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: "Tipo de origen inválido" }
+          format.json { render json: { success: false, error: "Tipo de origen inválido" } }
+        end
+        return
+      end
+      if guia.persisted? && guia.sunat_status == "sunat_success"
+        respond_to do |format|
+          format.html { redirect_back fallback_location: admin_stock_transfers_path, notice: "Guía generada correctamente." }
+          format.json { render json: { success: true, guia_id: guia.id } }
+        end
+      else
+        respond_to do |format|
+          format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: "Guía no generada correctamente: #{guia.errors.full_messages.join(", ")}" }
+          format.json { render json: { success: false, error: guia.errors.full_messages.join(", ") } }
+        end
+      end
+    rescue => e
+      respond_to do |format|
+        format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: e.message }
+        format.json { render json: { success: false, error: e.message } }
+      end
+    end
+  end
+
   private
 
   def set_stock_transfer
@@ -257,7 +317,15 @@ class Admin::StockTransfersController < Admin::AdminController
     end
 
     # Include necessary associations for display
-    stock_transfers = stock_transfers.includes(:origin_warehouse, :destination_warehouse, :user, :customer_user, :transportista, :vendor)
+    stock_transfers = stock_transfers.includes(
+      :user,
+      :customer_user,
+      :vendor,
+      :transportista,
+      :guias,
+      origin_warehouse: [ :location ],
+      destination_warehouse: [ :location ]
+    )
 
     # Get total count before pagination for recordsTotal
     total_count = is_adjustment ?
@@ -340,7 +408,17 @@ class Admin::StockTransfersController < Admin::AdminController
 
         # Add guia column if enabled
         if $global_settings[:show_sunat_guia_for_stock_transfers]
-          row << (stock_transfer.guia.present? ? stock_transfer.guia : "")
+          if stock_transfer.guias.last.present?
+            guia_link = "<a href=\"#{stock_transfer.guias.last.guia_url}\" target=\"_blank\" class=\"text-blue-600 hover:text-blue-800\">#{stock_transfer.guias.last.custom_id}</a>"
+            row << guia_link
+          elsif stock_transfer.origin_warehouse_id.present? && stock_transfer.vendor_id.blank?
+            # Generate Guía button for the datatable - we'll use a link that opens the modal from the show page
+            guia_button = "<a href=\"#{Rails.application.routes.url_helpers.admin_stock_transfer_path(stock_transfer)}#guia\" class=\"btn btn-lg btn-primary\">Generar</a>"
+            row << guia_button
+          else
+            # No button or link to show
+            row << ""
+          end
         end
 
         # Add delivery action column
@@ -416,6 +494,13 @@ class Admin::StockTransfersController < Admin::AdminController
       @almacen_de_origen_label = "Almacén de Origen"
     end
     @transportistas = Transportista.where(status: :active)
+
+    # Set warehouse variables to prevent nil errors on form re-render
+    @origin_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : Warehouse.where(id: @current_warehouse&.id)
+    @destination_warehouses = current_user.any_admin_or_supervisor? ? Warehouse.all : (Warehouse.all - @origin_warehouses)
+    @customer_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers]
+    @vendor_transfer_enabled = $global_settings[:pos_can_create_orders_without_stock_transfers] == true && current_user.has_any_role?("admin", "super_admin", "purchases", "warehouse_manager")
+    @vendors = Purchases::Vendor.all
   end
 
   def stock_transfer_params

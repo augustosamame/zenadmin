@@ -176,10 +176,6 @@ module AdminHelper
         modal_content = []
 
         modal_content << button_tag("Error", type: "button", class: "text-red-600 underline cursor-pointer", data: { action: "click->invoice-error-modal#open" })
-        modal_content << button_tag("Reenviar", type: "button", class: "btn btn-sm btn-primary", data: {
-          action: "click->invoice-error-modal#resendInvoice",
-          invoice_error_modal_order_id_value: order.id
-        })
         modal_content << content_tag(:div, class: "hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full", data: { invoice_error_modal_target: "modal" }) do
           inner_modal = []
           inner_modal << content_tag(:h3, "Error al emitir el Comprobante", class: "text-lg font-bold mb-4")
@@ -288,10 +284,31 @@ module AdminHelper
 
   def stock_transfer_guia_link(stock_transfer)
     return unless $global_settings[:show_sunat_guia_for_stock_transfers]
-    return unless stock_transfer.guias.last.present?
-
     guia = stock_transfer.guias.last
-    link_to("#{guia.custom_id}", guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline")
+    return unless guia.present?
+
+    if guia.sunat_status == "sunat_error"
+      button_id = "guia-error-btn-#{guia.id}"
+      modal_id = "guia-error-modal-#{guia.id}"
+      modal_html = content_tag(:div, id: modal_id, class: "fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50") do
+        content_tag(:div, class: "bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative") do
+          close_btn = content_tag(:button, "×", type: "button", class: "absolute top-2 right-2 text-gray-400 hover:text-gray-700", onclick: "document.getElementById('#{modal_id}').classList.add('hidden')")
+          title = content_tag(:h2, "Error al generar Guía de Remisión", class: "text-xl font-bold mb-4 text-red-600")
+          detail = content_tag(:div, class: "mb-4") do
+            content_tag(:label, "Detalle del error:", class: "block mb-1 font-semibold") +
+            content_tag(:textarea, guia.guia_sunat_response["response_text"] || "Error desconocido", class: "form-control w-full bg-gray-100 p-3 rounded text-sm text-red-700", readonly: true, rows: 6, style: "resize:vertical;")
+          end
+          actions = content_tag(:div, class: "flex justify-end space-x-2") do
+            content_tag(:button, "Cerrar", type: "button", class: "btn btn-secondary", onclick: "document.getElementById('#{modal_id}').classList.add('hidden')")
+          end
+          close_btn + title + detail + actions
+        end
+      end
+      button_html = content_tag(:button, "Error", type: "button", class: "text-red-600 hover:text-red-800 underline guia-error-link", onclick: "document.getElementById('#{modal_id}').classList.remove('hidden')")
+      button_html + modal_html.html_safe
+    else
+      link_to("#{guia.custom_id}", guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline")
+    end
   end
   
   def payment_status_badge(record)

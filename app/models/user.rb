@@ -51,6 +51,10 @@ class User < ApplicationRecord
     "#{first_name} #{last_name}"
   end
 
+  def address
+    self.customer&.wants_factura? ? self&.customer&.factura_direccion : self&.customer&.dni_address
+  end
+
   def set_user_email
     if self.customer.present? && login_type == "email"
       if self.customer.doc_id.present?

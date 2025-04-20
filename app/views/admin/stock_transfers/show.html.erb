@@ -11,9 +11,40 @@
   </div>
 
   <!-- Main Content -->
-  <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+  <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+      <div data-controller="guia-modal">
+        <% if @stock_transfer.origin_warehouse_id.present? && @stock_transfer.vendor_id.blank? %>
+          <div class="flex justify-end mb-4">
+            <button type="button" class="btn btn-primary" data-action="click->guia-modal#open" data-source-type="stock_transfer" data-source-id="<%= @stock_transfer.id %>">
+              Generar Guía de Remisión
+            </button>
+          </div>
+        <% end %>
+        <%= render "shared/admin/guia_modal", 
+          transportistas: @transportistas, 
+          guia_origin_address: @stock_transfer.origin_warehouse&.location&.address,
+          guia_destination_address: @stock_transfer.customer_user_id.blank? ? @stock_transfer.destination_warehouse&.location&.address : User.find(@stock_transfer.customer_user_id)&.address,
+          guia_comments: @stock_transfer.comments,
+          guia_transportista_id: @stock_transfer.transportista_id
+        %>
+        
+        <script>
+          // Check if URL has #guia hash and open the modal if it does
+          document.addEventListener('turbo:load', function() {
+            if (window.location.hash === '#guia') {
+              setTimeout(function() {
+                const button = document.querySelector('[data-action="click->guia-modal#open"]');
+                if (button) button.click();
+              }, 300);
+            }
+          });
+        </script>
+      </div>
+    <% end %>
+
     <!-- Header Section -->
-    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
+    <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-10">
       <!-- Transfer Date -->
       <div>
         <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Fecha de Traslado</label>
@@ -30,7 +61,7 @@
         <p class="text-slate-900 dark:text-slate-100">
           <% if @stock_transfer.vendor_id.present? %>
             <span class="flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
               </svg>
               Proveedor: <%= @stock_transfer.vendor&.name %>
@@ -54,8 +85,8 @@
         <div>
           <% if @stock_transfer.customer_user_id.present? %>
             <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Cliente de Destino</label>
-            <p class="text-slate-900 dark:text-slate-100 flex items-center">
-              <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 mr-1 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <p class="flex items-center text-slate-900 dark:text-slate-100">
+              <svg xmlns="http://www.w3.org/2000/svg" class="mr-1 w-4 h-4 text-primary-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
               </svg>
               <%= @stock_transfer.customer_user&.name %>
@@ -71,7 +102,7 @@
     </div>
 
     <!-- Additional Info -->
-    <div class="grid items-center grid-cols-1 gap-6 mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
+    <div class="grid grid-cols-1 gap-6 items-center mb-5 sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
       <% if $global_settings[:show_sunat_guia_for_stock_transfers] && @stock_transfer.guias.last.present? %>
         <div>
           <label class="block mb-1 text-sm font-medium text-slate-700 dark:text-slate-300">Guía de Remisión</label>
@@ -99,7 +130,7 @@
     <% end %>
 
     <!-- Products Section -->
-    <div class="p-6 mb-8 bg-white border border-gray-200 rounded-lg shadow-md dark:bg-slate-800 dark:border-slate-700">
+    <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
       <h2 class="mb-4 text-lg font-medium text-slate-900 dark:text-slate-100">Productos</h2>
       
       <div class="overflow-x-auto">

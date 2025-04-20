@@ -49,7 +49,33 @@
             <td class="px-4 py-2"><%= translated_stage(stock_transfer.stage) %></td>
             <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
               <td class="px-4 py-2">
-                <%= stock_transfer_guia_link(stock_transfer) || stock_transfer.guia %>
+                <% if stock_transfer_guia_link(stock_transfer).present? %>
+                  <span class="inline-flex items-center space-x-2">
+                    <%= stock_transfer_guia_link(stock_transfer) %>
+                    <% guia = stock_transfer.guias.last %>
+                    <% if guia&.sunat_status == "sunat_error" %>
+                      <%= button_to "Reintentar", admin_generate_guia_path,
+                        method: :post,
+                        params: { source_type: "stock_transfer", source_id: stock_transfer.id },
+                        class: "btn btn-sm btn-primary ml-2",
+                        form_class: "inline",
+                        data: { turbo: false } %>
+                    <% end %>
+                  </span>
+                <% elsif stock_transfer.origin_warehouse_id.present? && stock_transfer.vendor_id.blank? %>
+                  <div data-controller="guia-modal">
+                    <button type="button" class="btn btn-lg btn-primary" data-action="click->guia-modal#open" data-source-type="stock_transfer" data-source-id="<%= stock_transfer.id %>">
+                      Generar
+                    </button>
+                    <%= render "shared/admin/guia_modal", 
+                      transportistas: @transportistas, 
+                      guia_origin_address: stock_transfer.origin_warehouse&.location&.address,
+                      guia_destination_address: stock_transfer.customer_user_id.blank? ? stock_transfer.destination_warehouse&.location&.address : User.find(stock_transfer.customer_user_id)&.address,
+                      guia_comments: stock_transfer.comments,
+                      guia_transportista_id: stock_transfer.transportista_id
+                    %>
+                  </div>
+                <% end %>
               </td>
             <% end %>
             <td>
@@ -67,5 +93,22 @@
         <% end %>
       </tbody>
     </table>
+  </div>
+</div>
+
+<!-- Guia Error Modal (only one per page) -->
+<div data-controller="guia-error-modal" data-guia-error-modal-target="container" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black bg-opacity-50">
+  <div data-guia-error-modal-target="content" class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+    <button type="button" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" data-action="click->guia-error-modal#close">
+      &times;
+    </button>
+    <h2 class="text-xl font-bold mb-4 text-red-600">Error al generar Guía de Remisión</h2>
+    <div class="mb-4">
+      <label class="block mb-1 font-semibold">Detalle del error:</label>
+      <pre data-guia-error-modal-target="responseText" class="bg-gray-100 p-3 rounded text-sm text-red-700 overflow-x-auto"></pre>
+    </div>
+    <div class="flex justify-end space-x-2">
+      <button type="button" class="btn btn-secondary" data-action="click->guia-error-modal#close">Cerrar</button>
+    </div>
   </div>
 </div>

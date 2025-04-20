@@ -98,6 +98,7 @@ class Admin::OrdersController < Admin::AdminController
 
   def show
     @order = Order.includes(payments: :payment_method, commissions: :user).find(params[:id])
+    @transportistas = Transportista.all
   end
 
   def pos

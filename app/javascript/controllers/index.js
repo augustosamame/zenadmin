@@ -228,3 +228,6 @@ application.register("purchase-payment-form", PurchasePaymentFormController)
 
 import SimpleFormController from "./simple_form_controller"
 application.register("simple-form", SimpleFormController)
+
+import GuiaModalController from "./guia_modal_controller"
+application.register("guia-modal", GuiaModalController)

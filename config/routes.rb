@@ -192,6 +192,7 @@ Rails.application.routes.draw do
         patch :adjustment_stock_transfer_admin_confirm
       end
     end
+    post 'generate_guia', to: 'stock_transfers#generate_guia'
     resources :planned_stock_transfers do
       member do
         post :create_stock_transfer

@@ -259,22 +259,7 @@
 
       <div class="grid grid-cols-1 gap-6 items-center sm:grid-cols-2 sm:gap-x-16 sm:gap-y-10">
         <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
-          <div class="flex items-center mb-6">
-            <%= form.check_box :create_guia, { checked: false, class: "form-checkbox mr-2", data: { action: "change->stock-transfer-form#toggleGuiaFields" } } %>
-            <%= form.label :create_guia, "Generar Guía de Remisión", class: "form-label mb-0" %>
-          </div>
-          
-          <div data-stock-transfer-form-target="guiaFields" class="hidden w-full">
-            <div class="mb-4">
-              <%= form.label :guia, "Número de Guía (opcional)", class: "form-label" %>
-              <%= form.text_field :guia, class: "form-input" %>
-            </div>
-            
-            <div class="mb-4">
-              <%= form.label :transportista_id, "Transportista", class: "form-label required" %>
-              <%= form.collection_select :transportista_id, @transportistas, :id, :display_name, { include_blank: "Seleccionar transportista" }, class: "form-input w-full", required: true %>
-            </div>
-          </div>
+          <!-- Guia generation UI is now handled via modal in show view. Checkbox and inline fields removed. -->
         <% end %>
       </div>
 

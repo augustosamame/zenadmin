@@ -89,6 +89,22 @@
     </div>
   </div>
 
+  <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+    <div data-controller="guia-modal">
+      <div class="flex justify-end mb-4">
+        <button type="button" class="btn btn-primary" data-action="click->guia-modal#open" data-source-type="order" data-source-id="<%= @order.id %>">
+          Generar Guía de Remisión
+        </button>
+      </div>
+      <%= render "shared/admin/guia_modal", 
+        transportistas: @transportistas,
+        guia_origin_address: @order.location&.address,
+        guia_destination_address: @order.customer&.address,
+        guia_comments: @order.seller_note
+      %>
+    </div>
+  <% end %>
+
   <!-- Order Items -->
   <div class="mt-8">
     <h4 class="mb-4 text-lg font-medium text-gray-900">Artículos de la Venta</h4>
