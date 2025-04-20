@@ -59,6 +59,19 @@ es:
         display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
+      guia:
+        sunat_status_list:
+          sunat_pending: Pendiente
+          sunat_success: Emitido
+          sunat_error: Error
+          application_error: Error de Aplicación
+        status_list:
+          pending: Pendiente
+          issued: Activo
+          voided: Anulado
+        guia_type_list:
+          guia_remision: Guía de Remisión
+          guia_transportista: Guía de Remisión Transportista
       purchase_payment:
         status_list:
           pending: Pendiente

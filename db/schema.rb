@@ -479,6 +479,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_20_021451) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_main", default: false
+    t.string "ubigeo"
     t.index ["region_id"], name: "index_locations_on_region_id"
   end
 

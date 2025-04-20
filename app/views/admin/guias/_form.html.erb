@@ -1,0 +1,28 @@
+<%= simple_form_for([:admin, guia]) do |f| %>
+  <div class="row">
+    <div class="col-md-4">
+      <%= f.input :guia_type, collection: Guia.guia_types.keys.map { |k| [k.humanize, k] }, prompt: "Seleccione tipo de guía" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.input :status, collection: Guia.statuses.keys.map { |k| [k.humanize, k] }, prompt: "Seleccione estado" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.input :sunat_status, collection: Guia.sunat_statuses.keys.map { |k| [k.humanize, k] }, prompt: "Estado SUNAT" %>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4">
+      <%= f.input :guia_series_id, collection: guia_series.map { |s| [s.name, s.id] }, prompt: "Seleccione serie" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.input :stock_transfer_id, collection: stock_transfers.map { |st| [st.custom_id, st.id] }, prompt: "Seleccione transferencia de stock" %>
+    </div>
+    <div class="col-md-4">
+      <%= f.input :order_id, collection: orders.map { |o| [o.custom_id, o.id] }, prompt: "Seleccione orden" %>
+    </div>
+  </div>
+  <div class="mt-3">
+    <%= f.button :submit, class: "btn btn-primary" %>
+    <%= link_to "Cancelar", admin_guias_path, class: "btn btn-secondary ml-2" %>
+  </div>
+<% end %>

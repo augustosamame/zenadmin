@@ -52,7 +52,9 @@ module Services
         # Extract modal params or fallback to defaults
 
         partida_direccion = guia_params[:origin_address] || @stock_transfer&.origin_warehouse&.location&.address
+        partida_ubigeo = guia_params[:origin_ubigeo] || @stock_transfer&.origin_warehouse&.location&.ubigeo
         llegada_direccion = guia_params[:destination_address] || @stock_transfer&.destination_warehouse&.location&.address
+        llegada_ubigeo = guia_params[:destination_ubigeo] || @stock_transfer&.destination_warehouse&.location&.ubigeo
         envio_peso_bruto_total = guia_params[:envio_peso_bruto_total] || 10
         envio_num_bultos = guia_params[:envio_num_bultos] || 1
         observaciones = guia_params[:comments] || @stock_transfer.comments || "Transferencia de stock #{@stock_transfer.custom_id}"
@@ -96,9 +98,9 @@ module Services
           "envio_unidad_medida_peso": "KGM",
           "envio_num_bultos": envio_num_bultos,
           "envio_modalidad_traslado": "02",
-          "partida_ubigeo": "030109",
+          "partida_ubigeo": partida_ubigeo,
           "partida_direccion": partida_direccion,
-          "llegada_ubigeo": "030109",
+          "llegada_ubigeo": llegada_ubigeo,
           "llegada_direccion": llegada_direccion,
           "observaciones": observaciones,
           "move_lines": guia_lines,
@@ -174,7 +176,9 @@ module Services
 
         # Extract modal params or fallback to defaults
         partida_direccion = guia_params[:origin_address] || @order.location&.address
+        partida_ubigeo = guia_params[:origin_ubigeo] || @order.location&.ubigeo
         llegada_direccion = guia_params[:destination_address] || @order.user&.address
+        llegada_ubigeo = guia_params[:destination_ubigeo] || @order.user&.ubigeo
         envio_peso_bruto_total = guia_params[:envio_peso_bruto_total] || 10
         envio_num_bultos = guia_params[:envio_num_bultos] || 1
         observaciones = guia_params[:comments] || @order.seller_note || "Venta #{@order.custom_id}"
@@ -213,9 +217,9 @@ module Services
           "envio_unidad_medida_peso": "KGM",
           "envio_num_bultos": envio_num_bultos,
           "envio_modalidad_traslado": "02",
-          "partida_ubigeo": "030109",
+          "partida_ubigeo": partida_ubigeo,
           "partida_direccion": partida_direccion,
-          "llegada_ubigeo": "030109",
+          "llegada_ubigeo": llegada_ubigeo,
           "llegada_direccion": llegada_direccion,
           "observaciones": observaciones,
           "move_lines": guia_lines,

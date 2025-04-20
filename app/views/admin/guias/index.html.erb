@@ -1,0 +1,7 @@
+<%= render "shared/admin/nav", { header_title: "Guías de Remisión" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <%= render partial: "table", locals: { datatable_options: @datatable_options, default_object_options_array: @default_object_options_array } %>
+</div>

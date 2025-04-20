@@ -312,6 +312,8 @@ Rails.application.routes.draw do
     end
     get "reports/stock_transfers_with_differences", to: "stock_transfers_with_differences#index"
 
+    resources :guias
+
     get "integrations", to: "page#integrations"
     get "team", to: "page#team"
     get "billing", to: "page#billing"

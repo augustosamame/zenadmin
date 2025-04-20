@@ -1,0 +1,51 @@
+<%# Redesigned show view for Guia, styled similar to order show %>
+<%= render "shared/admin/nav", { header_title: "Guía de Remisión ##{@guia.custom_id}" } %>
+
+<div class="p-4 mt-8 mb-6">
+  <div class="p-4 mb-6 bg-white rounded border-l-4 border-blue-400 shadow well dark:bg-slate-700">
+    <h3 class="mb-2 text-lg font-semibold dark:text-white">Guía de Remisión</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-2">
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Fecha</div>
+        <div class="font-medium"><%= @guia.created_at.strftime("%Y-%m-%d %H:%M") %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">ID</div>
+        <div class="font-medium"><%= @guia.custom_id %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Tipo</div>
+        <div class="font-medium"><%= @guia.guia_type %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Estado</div>
+        <div class="font-medium"><%= @guia.status %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Estado SUNAT</div>
+        <div class="font-medium"><%= @guia.sunat_status %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Stock Transfer</div>
+        <div class="font-medium"><%= @guia.stock_transfer&.custom_id %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">Orden</div>
+        <div class="font-medium"><%= @guia.order&.custom_id %></div>
+      </div>
+      <div>
+        <div class="mb-2 text-sm text-gray-500">URL</div>
+        <div class="font-medium">
+          <% if @guia.guia_url.present? %>
+            <%= link_to "Ver Guía", @guia.guia_url, target: "_blank", class: "text-blue-600 hover:underline" %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    <div class="mt-6">
+      <div class="mb-2 text-sm text-gray-500">Respuesta SUNAT</div>
+      <textarea class="p-3 w-full text-sm text-gray-700 bg-gray-100 rounded form-control" readonly rows="6" style="resize:vertical;"><%= @guia.guia_sunat_response && @guia.guia_sunat_response["response_text"] || "Sin respuesta" %></textarea>
+    </div>
+  </div>
+  <%= link_to "Volver", admin_guias_path, class: "btn btn-secondary mt-3" %>
+</div>

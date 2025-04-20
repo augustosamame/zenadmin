@@ -1,0 +1,9 @@
+<%= render "shared/admin/nav", { header_title: "Nueva Guía de Remisión" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="card mt-3">
+  <div class="card-body">
+    <%= render partial: "form", locals: { guia: @guia, guia_series: @guia_series, stock_transfers: @stock_transfers, orders: @orders } %>
+  </div>
+</div>

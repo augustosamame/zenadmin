@@ -245,7 +245,7 @@ class Admin::StockTransfersController < Admin::AdminController
   def generate_guia
     source_type = params[:source_type]
     source_id = params[:source_id]
-    guia_params = params.permit(:origin_address, :destination_address, :transportista, :envio_peso_bruto_total, :envio_num_bultos, :comments)
+    guia_params = params.permit(:origin_address, :origin_ubigeo, :destination_address, :destination_ubigeo, :transportista, :envio_peso_bruto_total, :envio_num_bultos, :comments)
 
     begin
       case source_type
@@ -262,6 +262,24 @@ class Admin::StockTransfersController < Admin::AdminController
         end
         service = Services::Inventory::StockTransferGuiaService.new("venta", order.id)
         guia = service.create_guia(guia_params)
+      when "guia" # sent from retry button in guia table
+        found_guia = Guia.find(source_id)
+        if found_guia.order_id.present?
+          order = Order.find(found_guia.order_id)
+          service = Services::Inventory::StockTransferGuiaService.new("venta", order.id)
+          guia = service.create_guia(guia_params)
+        elsif found_guia.stock_transfer_id.present?
+          stock_transfer = StockTransfer.find(found_guia.stock_transfer_id)
+          type_of_guia = stock_transfer.customer_user_id.present? ? "stock_transfer_venta" : "stock_transfer"
+          service = Services::Inventory::StockTransferGuiaService.new(type_of_guia, stock_transfer.id)
+          guia = service.create_guia(guia_params)
+        else
+          respond_to do |format|
+            format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: "Guía inválida" }
+            format.json { render json: { success: false, error: "Guía inválida" } }
+          end
+          return
+        end
       else
         respond_to do |format|
           format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: "Tipo de origen inválido" }

@@ -180,5 +180,10 @@ export const resourceMappings = {
     buttonText: "Crear Cuenta por Pagar",
     buttonUrl: "/admin/account_payables/new",
     ajaxUrl: "/admin/account_payables.json"
+  },
+  Guia: {
+    buttonText: "Crear Guía de Remisión",
+    buttonUrl: "/admin/guias/new",
+    ajaxUrl: "/admin/guias.json"
   }
 }

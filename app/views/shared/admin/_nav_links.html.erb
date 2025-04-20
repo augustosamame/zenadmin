@@ -182,6 +182,11 @@
     <li>
       <%= nav_link_to "Stocks En Tránsito", admin_in_transit_stocks_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+    <li>
+      <%= nav_link_to "Guías de Remisión (SUNAT)", admin_guias_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
     <li>
       <%= nav_link_to "Pedidos", admin_requisitions_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
