@@ -13,28 +13,33 @@
   <!-- Main Content -->
   <div class="p-6 mb-8 bg-white rounded-lg border border-gray-200 shadow-md dark:bg-slate-800 dark:border-slate-700">
     <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
-      <div data-controller="guia-modal">
+      <div>
         <% if @stock_transfer.origin_warehouse_id.present? && @stock_transfer.vendor_id.blank? %>
           <div class="flex justify-end mb-4">
-            <button type="button" class="btn btn-primary" data-action="click->guia-modal#open" data-source-type="stock_transfer" data-source-id="<%= @stock_transfer.id %>">
+            <button type="button" class="btn btn-primary" 
+              onclick="
+                document.getElementById('guia-modal').classList.remove('hidden'); 
+                document.body.classList.add('overflow-hidden'); 
+                document.getElementById('guia_source_type').value = 'stock_transfer'; 
+                document.getElementById('guia_source_id').value = '<%= @stock_transfer.id %>';
+                document.getElementById('origin_address').value = '<%= j(@stock_transfer.origin_warehouse&.location&.address.to_s) %>';
+                document.getElementById('destination_address').value = '<%= j(@stock_transfer.customer_user_id.blank? ? @stock_transfer.destination_warehouse&.location&.address.to_s : User.find(@stock_transfer.customer_user_id)&.address.to_s) %>';
+                document.getElementById('comments').value = '<%= j(@stock_transfer.comments.to_s) %>';
+                <% if @stock_transfer.transportista_id.present? %>
+                  document.getElementById('transportista_id').value = '<%= @stock_transfer.transportista_id %>';
+                <% end %>
+              ">
               Generar Guía de Remisión
             </button>
           </div>
         <% end %>
-        <%= render "shared/admin/guia_modal", 
-          transportistas: @transportistas, 
-          guia_origin_address: @stock_transfer.origin_warehouse&.location&.address,
-          guia_destination_address: @stock_transfer.customer_user_id.blank? ? @stock_transfer.destination_warehouse&.location&.address : User.find(@stock_transfer.customer_user_id)&.address,
-          guia_comments: @stock_transfer.comments,
-          guia_transportista_id: @stock_transfer.transportista_id
-        %>
         
         <script>
           // Check if URL has #guia hash and open the modal if it does
           document.addEventListener('turbo:load', function() {
             if (window.location.hash === '#guia') {
               setTimeout(function() {
-                const button = document.querySelector('[data-action="click->guia-modal#open"]');
+                const button = document.querySelector('button.btn.btn-primary');
                 if (button) button.click();
               }, 300);
             }
@@ -175,3 +180,9 @@
     </div>
   </div>
 </div>
+
+<%= render "shared/admin/guia_modal", 
+  transportistas: @transportistas, 
+  guia_origin_address: '',
+  guia_destination_address: ''
+%>
