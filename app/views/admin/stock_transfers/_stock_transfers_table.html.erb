@@ -63,17 +63,22 @@
                     <% end %>
                   </span>
                 <% elsif stock_transfer.origin_warehouse_id.present? && stock_transfer.vendor_id.blank? %>
-                  <div data-controller="guia-modal">
-                    <button type="button" class="btn btn-lg btn-primary" data-action="click->guia-modal#open" data-source-type="stock_transfer" data-source-id="<%= stock_transfer.id %>">
+                  <div>
+                    <button type="button" class="btn btn-lg btn-primary" 
+                      onclick="
+                        document.getElementById('guia-modal').classList.remove('hidden'); 
+                        document.body.classList.add('overflow-hidden'); 
+                        document.getElementById('guia_source_type').value = 'stock_transfer'; 
+                        document.getElementById('guia_source_id').value = '<%= stock_transfer.id %>';
+                        document.getElementById('origin_address').value = '<%= j(stock_transfer.origin_warehouse&.location&.address.to_s) %>';
+                        document.getElementById('destination_address').value = '<%= j(stock_transfer.customer_user_id.blank? ? stock_transfer.destination_warehouse&.location&.address.to_s : User.find(stock_transfer.customer_user_id)&.address.to_s) %>';
+                        document.getElementById('comments').value = '<%= j(stock_transfer.comments.to_s) %>';
+                        <% if stock_transfer.transportista_id.present? %>
+                          document.getElementById('transportista_id').value = '<%= stock_transfer.transportista_id %>';
+                        <% end %>
+                      ">
                       Generar
                     </button>
-                    <%= render "shared/admin/guia_modal", 
-                      transportistas: @transportistas, 
-                      guia_origin_address: stock_transfer.origin_warehouse&.location&.address,
-                      guia_destination_address: stock_transfer.customer_user_id.blank? ? stock_transfer.destination_warehouse&.location&.address : User.find(stock_transfer.customer_user_id)&.address,
-                      guia_comments: stock_transfer.comments,
-                      guia_transportista_id: stock_transfer.transportista_id
-                    %>
                   </div>
                 <% end %>
               </td>

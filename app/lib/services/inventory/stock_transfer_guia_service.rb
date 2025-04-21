@@ -151,11 +151,16 @@ module Services
       def create_guia_from_order(guia_params = {})
         # Get the order's location to determine the guia series
         location = @order.location
-        guia_series = GuiaSeriesMapping.find_by!(location: location, guia_type: "guia_remision").guia_series
-
-        if guia_series.blank?
-          raise "No active guia series found for guia_remision order location"
+        guia_series_mapping = GuiaSeriesMapping.joins(:guia_series)
+                                              .where(location: location)
+                                              .where(guia_series: { guia_type: :guia_remision })
+                                              .first
+        
+        if guia_series_mapping.blank?
+          raise "No active guia series mapping found for guia_remision order location"
         end
+        
+        guia_series = guia_series_mapping.guia_series
 
         # Prepare line items
         guia_lines = []
@@ -270,11 +275,16 @@ module Services
       def create_guia_de_transporte_from_order(guia_params = {})
         # Get the order's location to determine the guia series
         location = @order.location
-        guia_series = GuiaSeriesMapping.find_by!(location: location, guia_type: "guia_transporte").guia_series
-
-        if guia_series.blank?
-          raise "No active guia series found for guia_transporte order location"
+        guia_series_mapping = GuiaSeriesMapping.joins(:guia_series)
+                                              .where(location: location)
+                                              .where(guia_series: { guia_type: :guia_transporte })
+                                              .first
+        
+        if guia_series_mapping.blank?
+          raise "No active guia series mapping found for guia_transporte order location"
         end
+        
+        guia_series = guia_series_mapping.guia_series
 
         # Extract modal params or fallback to defaults
         partida_direccion = guia_params[:origin_address] || @order.location&.address
@@ -380,13 +390,15 @@ module Services
       end
 
       def determine_guia_series_for_stock_transfer
-        found_guia_series = GuiaSeriesMapping.find_by!(location: @stock_transfer.origin_warehouse, guia_type: "guia_remision").guia_series
-
+        found_guia_series = GuiaSeriesMapping.joins(:guia_series)
+                                              .where(location: @stock_transfer.origin_warehouse, guia_series: { guia_type: :guia_remision })
+                                              .first
+        
         if found_guia_series.blank?
-          raise "No active guia series found for guia_remision stock transfer origin warehouse location"
+          raise "No active guia series mapping found for guia_remision stock transfer origin warehouse location"
         end
-
-        found_guia_series
+        
+        found_guia_series.guia_series
       end
 
       private

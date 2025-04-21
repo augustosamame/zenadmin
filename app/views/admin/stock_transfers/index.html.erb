@@ -3,3 +3,9 @@
 <% end %>
 
 <%= render "admin/stock_transfers/stock_transfers_table" %>
+
+<%= render "shared/admin/guia_modal", 
+  transportistas: @transportistas, 
+  guia_origin_address: '',
+  guia_destination_address: ''
+%>
