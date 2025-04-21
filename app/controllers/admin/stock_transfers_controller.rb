@@ -280,6 +280,11 @@ class Admin::StockTransfersController < Admin::AdminController
           end
           return
         end
+      when "guia_transporte"
+        guia = Guia.find(source_id)
+        order = Order.find(found_guia.order_id)
+        service = Services::Inventory::StockTransferGuiaService.new("servicio_transporte", order.id)
+        guia = service.create_guia(guia_params)
       else
         respond_to do |format|
           format.html { redirect_back fallback_location: admin_stock_transfers_path, alert: "Tipo de origen inválido" }

@@ -97,9 +97,15 @@ class Admin::OrdersController < Admin::AdminController
   end
 
   def show
-    @order = Order.includes(payments: :payment_method, commissions: :user).find(params[:id])
-    @guia = Guia.where(order_id: @order.id)&.last
+    @order = Order.includes(payments: :payment_method, commissions: :user, order_items: :product).find(params[:id])
+    @guia = Guia.where(order_id: @order.id, guia_type: "guia_remision").last
+    @guia_transportista = Guia.where(order_id: @order.id, guia_type: "guia_transportista").last
     @transportistas = Transportista.all
+
+    # Detect presence of "Servicio de Transporte" product
+    servicio_transporte_items = @order.order_items.select { |item| item.product&.name == "Servicio de Transporte" }
+    @has_servicio_transporte = servicio_transporte_items.any?
+    @only_servicio_transporte = @has_servicio_transporte && @order.order_items.all? { |item| item.product&.name == "Servicio de Transporte" }
   end
 
   def pos

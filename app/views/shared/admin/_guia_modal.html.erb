@@ -1,6 +1,6 @@
-<div data-guia-modal-target="container" class="hidden overflow-y-auto fixed inset-0 z-50" role="dialog">
+<div id="guia-modal" class="hidden overflow-y-auto fixed inset-0 z-50" role="dialog">
   <div class="relative w-full h-screen">
-    <div data-guia-modal-target="content" class="hidden p-8 m-4 mx-auto max-w-2xl h-auto bg-white rounded-lg shadow-xl dark:bg-slate-700">
+    <div class="p-8 m-4 mx-auto max-w-2xl h-auto bg-white rounded-lg shadow-xl dark:bg-slate-700">
       <h2 class="text-lg font-semibold text-center dark:text-slate-100">
         Generar Guía de Remisión
       </h2>
@@ -9,26 +9,26 @@
         <div class="flex flex-row gap-4 mb-4">
           <div class="flex-1">
             <label for="origin_address" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Punto de Partida</label>
-            <input type="text" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="origin_address" name="origin_address" data-guia-modal-target="originAddress" value="<%= defined?(guia_origin_address) ? guia_origin_address : '' %>">
+            <input type="text" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="origin_address" name="origin_address" value="<%= defined?(guia_origin_address) ? guia_origin_address : '' %>">
           </div>
           <div style="flex-basis: 20%; max-width: 120px;">
             <label for="origin_ubigeo" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Ubigeo</label>
-            <input type="text" maxlength="6" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="origin_ubigeo" name="origin_ubigeo" data-guia-modal-target="originUbigeo" value="<%= defined?(guia_origin_ubigeo) ? guia_origin_ubigeo : '' %>">
+            <input type="text" maxlength="6" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="origin_ubigeo" name="origin_ubigeo" value="<%= defined?(guia_origin_ubigeo) ? guia_origin_ubigeo : '' %>">
           </div>
         </div>
         <div class="flex flex-row gap-4 mb-4">
           <div class="flex-1">
             <label for="destination_address" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Punto de Llegada</label>
-            <input type="text" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="destination_address" name="destination_address" data-guia-modal-target="destinationAddress" value="<%= defined?(guia_destination_address) ? guia_destination_address : '' %>">
+            <input type="text" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="destination_address" name="destination_address" value="<%= defined?(guia_destination_address) ? guia_destination_address : '' %>">
           </div>
           <div style="flex-basis: 20%; max-width: 120px;">
             <label for="destination_ubigeo" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Ubigeo</label>
-            <input type="text" maxlength="6" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="destination_ubigeo" name="destination_ubigeo" data-guia-modal-target="destinationUbigeo" value="<%= defined?(guia_destination_ubigeo) ? guia_destination_ubigeo : '' %>">
+            <input type="text" maxlength="6" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="destination_ubigeo" name="destination_ubigeo" value="<%= defined?(guia_destination_ubigeo) ? guia_destination_ubigeo : '' %>">
           </div>
         </div>
         <div class="mb-4">
           <label for="transportista_id" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Transportista</label>
-          <select class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="transportista_id" name="transportista" data-guia-modal-target="transportista">
+          <select class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="transportista_id" name="transportista">
             <% @transportistas.each do |t| %>
               <option value="<%= t.id %>" <%= defined?(guia_transportista_id) && t.id == guia_transportista_id ? 'selected' : '' %>><%= t.display_name %></option>
             <% end %>
@@ -36,20 +36,20 @@
         </div>
         <div class="mb-4">
           <label for="envio_peso_bruto_total" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Peso bruto total (kg)</label>
-          <input type="number" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="envio_peso_bruto_total" name="envio_peso_bruto_total" min="0" step="0.01" data-guia-modal-target="peso">
+          <input type="number" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="envio_peso_bruto_total" name="envio_peso_bruto_total" min="0" step="0.01">
         </div>
         <div class="mb-4">
           <label for="envio_num_bultos" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Número de bultos</label>
-          <input type="number" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="envio_num_bultos" name="envio_num_bultos" min="1" step="1" data-guia-modal-target="bultos">
+          <input type="number" class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="envio_num_bultos" name="envio_num_bultos" min="1" step="1">
         </div>
         <div class="mb-4">
           <label for="comments" class="block mb-2 text-sm font-medium text-gray-700 dark:text-slate-200">Comentarios</label>
-          <textarea class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="comments" name="comments" data-guia-modal-target="comments"><%= defined?(guia_comments) ? guia_comments : '' %></textarea>
+          <textarea class="p-2 w-full rounded-md border dark:bg-slate-600 dark:text-white" id="comments" name="comments"><%= defined?(guia_comments) ? guia_comments : '' %></textarea>
         </div>
-        <input type="hidden" name="source_type" id="guia_source_type" value="">
-        <input type="hidden" name="source_id" id="guia_source_id" value="">
+        <input type="hidden" name="source_type" id="guia_source_type" value="order">
+        <input type="hidden" name="source_id" id="guia_source_id" value="<%= @order.id %>">
         <div class="flex justify-end mt-4 space-x-4">
-          <button type="button" class="btn btn-secondary" data-action="click->guia-modal#close">Cancelar</button>
+          <button type="button" class="btn btn-secondary" onclick="document.getElementById('guia-modal').classList.add('hidden'); document.body.classList.remove('overflow-hidden');">Cancelar</button>
           <button type="submit" class="btn btn-primary">Generar Guía</button>
         </div>
       </form>

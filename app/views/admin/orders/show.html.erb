@@ -205,32 +205,32 @@
     </div>
   <% end %>
 
-  <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+  <% if @has_servicio_transporte %>
     <div class="p-4 mt-8 mb-6">
-      <div class="p-4 mb-6 bg-white rounded border-l-4 border-blue-400 shadow well dark:bg-slate-700">
-        <h3 class="mb-2 text-lg font-semibold dark:text-white">Guía de Remisión</h3>
-        <% if @guia.present? %>
-          <% if @guia.sunat_status == "sunat_success" %>
+      <div class="p-4 mb-6 bg-white rounded border-l-4 border-yellow-400 shadow well dark:bg-slate-700">
+        <h3 class="mb-2 text-lg font-semibold dark:text-white">Guía de Transportista</h3>
+        <% if @guia_transportista.present? %>
+          <% if @guia_transportista.sunat_status == "sunat_success" %>
             <div class="flex items-center space-x-2">
-              <%= link_to @guia.custom_id, @guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline" %>
+              <%= link_to @guia_transportista.custom_id, @guia_transportista.guia_url, target: "_blank", class: "text-yellow-600 hover:text-yellow-800 underline" %>
               <span class="font-medium text-green-600">Enviada correctamente a SUNAT</span>
             </div>
-          <% elsif @guia.sunat_status == "sunat_error" %>
+          <% elsif @guia_transportista.sunat_status == "sunat_error" %>
             <div class="flex items-center space-x-2">
-              <button type="button" class="text-red-600 underline hover:text-red-800 guia-error-link" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.remove('hidden')">Error</button>
+              <button type="button" class="text-red-600 underline hover:text-red-800 guia-error-link" onclick="document.getElementById('guia-transportista-error-modal-order-<%= @guia_transportista.id %>').classList.remove('hidden')">Error</button>
               <span class="font-medium text-red-600">Error al generar Guía</span>
-              <%= button_to 'Reintentar', admin_generate_guia_path, method: :post, params: { source_type: 'order', source_id: @order.id }, class: 'btn btn-primary btn-xs', data: { turbo: false } %>
+              <%= button_to 'Reintentar', admin_generate_guia_path, method: :post, params: { source_type: 'guia_transporte', source_id: @order.id }, class: 'btn btn-primary btn-xs', data: { turbo: false } %>
             </div>
-            <div id="guia-error-modal-order-<%= @guia.id %>" class="flex hidden fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
+            <div id="guia-transportista-error-modal-order-<%= @guia_transportista.id %>" class="flex hidden fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
               <div class="relative p-6 w-full max-w-lg bg-white rounded-lg shadow-lg">
-                <button type="button" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.add('hidden')">×</button>
-                <h2 class="mb-4 text-xl font-bold text-red-600">Error al generar Guía de Remisión</h2>
+                <button type="button" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onclick="document.getElementById('guia-transportista-error-modal-order-<%= @guia_transportista.id %>').classList.add('hidden')">×</button>
+                <h2 class="mb-4 text-xl font-bold text-red-600">Error al generar Guía de Transportista</h2>
                 <div class="mb-4">
                   <label class="block mb-1 font-semibold">Detalle del error:</label>
-                  <textarea class="p-3 w-full text-sm text-red-700 bg-gray-100 rounded form-control" readonly rows="6" style="resize:vertical;"><%= @guia.guia_sunat_response && @guia.guia_sunat_response["response_text"] || "Error desconocido" %></textarea>
+                  <textarea class="p-3 w-full text-sm text-red-700 bg-gray-100 rounded form-control" readonly rows="6" style="resize:vertical;"><%= @guia_transportista.guia_sunat_response && @guia_transportista.guia_sunat_response["response_text"] || "Error desconocido" %></textarea>
                 </div>
                 <div class="flex justify-end space-x-2">
-                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.add('hidden')">Cerrar</button>
+                  <button type="button" class="btn btn-secondary" onclick="document.getElementById('guia-transportista-error-modal-order-<%= @guia_transportista.id %>').classList.add('hidden')">Cerrar</button>
                 </div>
               </div>
             </div>
@@ -238,9 +238,53 @@
             <span class="text-gray-700 dark:text-slate-200">Guía en proceso...</span>
           <% end %>
         <% else %>
-          <div data-controller="guia-modal">
+          <div class="flex justify-end mb-4">
+            <button type="button" class="btn btn-primary" onclick="document.getElementById('guia-transportista-modal').classList.remove('hidden'); document.body.classList.add('overflow-hidden');">
+              Generar Guía de Transportista
+            </button>
+          </div>
+          <%= render "shared/admin/guia_transportista_modal", order: @order, transportistas: @transportistas %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+    <% unless @only_servicio_transporte %>
+      <div class="p-4 mt-8 mb-6">
+        <div class="p-4 mb-6 bg-white rounded border-l-4 border-blue-400 shadow well dark:bg-slate-700">
+          <h3 class="mb-2 text-lg font-semibold dark:text-white">Guía de Remisión</h3>
+          <% if @guia.present? %>
+            <% if @guia.sunat_status == "sunat_success" %>
+              <div class="flex items-center space-x-2">
+                <%= link_to @guia.custom_id, @guia.guia_url, target: "_blank", class: "text-blue-600 hover:text-blue-800 underline" %>
+                <span class="font-medium text-green-600">Enviada correctamente a SUNAT</span>
+              </div>
+            <% elsif @guia.sunat_status == "sunat_error" %>
+              <div class="flex items-center space-x-2">
+                <button type="button" class="text-red-600 underline hover:text-red-800 guia-error-link" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.remove('hidden')">Error</button>
+                <span class="font-medium text-red-600">Error al generar Guía</span>
+                <%= button_to 'Reintentar', admin_generate_guia_path, method: :post, params: { source_type: 'order', source_id: @order.id }, class: 'btn btn-primary btn-xs', data: { turbo: false } %>
+              </div>
+              <div id="guia-error-modal-order-<%= @guia.id %>" class="flex hidden fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
+                <div class="relative p-6 w-full max-w-lg bg-white rounded-lg shadow-lg">
+                  <button type="button" class="absolute top-2 right-2 text-gray-400 hover:text-gray-700" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.add('hidden')">×</button>
+                  <h2 class="mb-4 text-xl font-bold text-red-600">Error al generar Guía de Remisión</h2>
+                  <div class="mb-4">
+                    <label class="block mb-1 font-semibold">Detalle del error:</label>
+                    <textarea class="p-3 w-full text-sm text-red-700 bg-gray-100 rounded form-control" readonly rows="6" style="resize:vertical;"><%= @guia.guia_sunat_response && @guia.guia_sunat_response["response_text"] || "Error desconocido" %></textarea>
+                  </div>
+                  <div class="flex justify-end space-x-2">
+                    <button type="button" class="btn btn-secondary" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.add('hidden')">Cerrar</button>
+                  </div>
+                </div>
+              </div>
+            <% else %>
+              <span class="text-gray-700 dark:text-slate-200">Guía en proceso...</span>
+            <% end %>
+          <% else %>
             <div class="flex justify-end mb-4">
-              <button type="button" class="btn btn-primary" data-action="click->guia-modal#open" data-source-type="order" data-source-id="<%= @order.id %>">
+              <button type="button" class="btn btn-primary" onclick="document.getElementById('guia-modal').classList.remove('hidden'); document.body.classList.add('overflow-hidden');">
                 Generar Guía de Remisión
               </button>
             </div>
@@ -250,10 +294,18 @@
               guia_destination_address: @order.customer&.address,
               guia_comments: @order.seller_note
             %>
-          </div>
+          <% end %>
         </div>
-      <% end %>
-    </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render "shared/admin/guia_transportista_modal", order: @order, transportistas: @transportistas do %>
+    <%= form_with url: admin_generate_guia_path, method: :post, local: true do |f| %>
+      <%= hidden_field_tag :source_type, 'guia_transporte' %>
+      <%= hidden_field_tag :source_id, @order.id %>
+      {{ ... }}
+    <% end %>
   <% end %>
 
 </div>
