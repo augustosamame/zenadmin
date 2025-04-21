@@ -61,9 +61,61 @@ class Admin::OrdersController < Admin::AdminController
         @order.location_id = @current_location.id
       end
 
+      # Handle Servicio de Transporte order creation
+      if @order.servicio_transporte?
+        # Find the "Servicio de Transporte" product
+        transporte_product = Product.find_by(name: "Servicio de Transporte")
+
+        if transporte_product.present?
+          # Set the user_id from the separate parameter
+          customer_id = params[:user_id]
+          customer = Customer.find_by(id: customer_id)
+          @order.user_id = customer&.user_id if customer.present?
+
+          # Set the total price based on the amount parameter
+          amount = params[:amount].to_f
+          @order.total_price_cents = (amount * 100).to_i
+          @order.total_price = amount
+          @order.total_original_price_cents = @order.total_price_cents
+          @order.total_original_price = amount
+          @order.total_discount_cents = 0
+          @order.total_discount = 0
+          @order.shipping_price_cents = 0
+          @order.shipping_price = 0
+          @order.currency = "PEN"
+
+          # Create the order item for the transport service
+          @order.order_items.build(
+            product: transporte_product,
+            quantity: 1,
+            price_cents: @order.total_price_cents,
+            discounted_price_cents: @order.total_price_cents,
+            currency: "PEN"
+          )
+
+          # Create payment with Efectivo payment method
+          efectivo_payment_method = PaymentMethod.find_by(name: "cash")
+          if efectivo_payment_method.present?
+            cashier_id = params[:cashier_id]
+            cashier = Cashier.find_by(id: cashier_id)
+            cashier_shift = cashier&.current_shift(current_user)
+
+            @order.payments.build(
+              payment_method: efectivo_payment_method,
+              amount_cents: @order.total_price_cents,
+              user_id: @order.user_id,
+              currency: "PEN",
+              payment_date: @order.order_date,
+              status: "paid",
+              cashier_shift: cashier_shift
+            )
+          end
+        end
+      end
+
       if @order.save!
         credit_payment_method = PaymentMethod.find_by(name: "credit")
-        if order_params[:payments_attributes]
+        if order_params[:payments_attributes] && !@order.servicio_transporte?
           order_params[:payments_attributes].each do |payment|
             @order.payments.create!(
               payment.merge(
@@ -85,15 +137,33 @@ class Admin::OrdersController < Admin::AdminController
         GenerateEinvoice.perform_async(@order.id) if ENV["RAILS_ENV"] == "production"
 
         session.delete(:draft_order)
-        render json: { status: "success", id: @order.id, message: "Order created successfully.", universal_invoice_link: @order.universal_invoice_link, order_data: @order.as_json(include: [ :user ]) }
+
+        if @order.servicio_transporte?
+          redirect_to orden_de_transporte_index_admin_orders_path, notice: "Orden de Servicio de Transporte creada exitosamente."
+        else
+          render json: { status: "success", id: @order.id, message: "Order created successfully.", universal_invoice_link: @order.universal_invoice_link, order_data: @order.as_json(include: [ :user ]) }
+        end
       else
         Rails.logger.info("Error creating order: #{@order.errors.full_messages}")
-        render json: { status: "error", errors: @order.errors.full_messages }
+        if @order.servicio_transporte?
+          @customer_users = User.joins(:customer).order(:first_name)
+          @open_cashiers = Cashier.active_with_open_shift
+          render :new_orden_de_transporte
+        else
+          render json: { status: "error", errors: @order.errors.full_messages }
+        end
       end
     end
   rescue ActiveRecord::Rollback => e
     Rails.logger.info("Error creating order in rollback: #{@order.errors.full_messages}")
-    render json: { status: "error", errors: e.message }
+    if @order.servicio_transporte?
+      @customer_users = User.joins(:customer).order(:first_name)
+      @open_cashiers = Cashier.active_with_open_shift
+      flash[:error] = e.message
+      render :new_orden_de_transporte
+    else
+      render json: { status: "error", errors: e.message }
+    end
   end
 
   def show
@@ -243,11 +313,42 @@ class Admin::OrdersController < Admin::AdminController
     end
   end
 
+  def orden_de_transporte_index
+    respond_to do |format|
+      format.html do
+        @orders = if @current_location
+          Order.includes([ :invoices, :external_invoices, :location ])
+              .where(location_id: @current_location.id, servicio_transporte: true)
+              .with_commission_status
+              .order(id: :desc)
+              .limit(10)
+        else
+          Order.includes([ :invoices, :location, :external_invoices ])
+              .where(servicio_transporte: true)
+              .with_commission_status
+              .order(id: :desc)
+              .limit(10)
+        end
+        @datatable_options = "server_side:false;create_button:false;resource_name:'Order';sort_0_desc;hide_0;"
+      end
+
+      format.json do
+        render json: datatable_json(servicio_transporte: true)
+      end
+    end
+  end
+
+  def new_orden_de_transporte
+    @order = Order.new
+    @customer_users = User.joins(:customer).order(:first_name)
+    @open_cashiers = Cashier.active_with_open_shift
+  end
+
   private
 
     def order_params
       params.require(:order).permit(
-        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, :nota_de_venta,
+        :region_id, :user_id, :origin, :order_recipient_id, :location_id, :total_price, :total_discount, :total_original_price, :shipping_price, :currency, :wants_factura, :stage, :payment_status, :cart_id, :shipping_address_id, :billing_address_id, :coupon_applied, :customer_note, :seller_note, :active_invoice_id, :invoice_id_required, :order_date, :request_id, :preorder_id, :fast_payment_flag, :fast_stock_transfer_flag, :is_credit_sale, :price_list_id, :nota_de_venta, :servicio_transporte,
         order_items_attributes: [ :id, :order_id, :product_id, :quantity, :price, :price_cents, :discounted_price, :discounted_price_cents, :currency, :is_loyalty_free, :birthday_discount, :birthday_image, :product_pack_id ],
         payments_attributes: [ :id, :user_id, :payment_method_id, :amount, :amount_cents, :currency, :payable_type, :processor_transacion_id, :due_date, :_destroy ],
         sellers_attributes: [ :id, :user_id, :percentage, :amount ],
@@ -264,7 +365,7 @@ class Admin::OrdersController < Admin::AdminController
       User.find_by!(email: "ecommerce@devtechperu.com").try(:id)
     end
 
-    def datatable_json
+    def datatable_json(servicio_transporte: false)
       orders = if @current_location
         Order.includes([ :user, :invoices, :external_invoices, :location ])
             .where(location_id: @current_location.id)
@@ -273,6 +374,8 @@ class Admin::OrdersController < Admin::AdminController
         Order.includes([ :user, :invoices, :location, :external_invoices ])
             .with_commission_status
       end
+
+      orders = orders.where(servicio_transporte: true) if servicio_transporte
 
       # Apply search filter
       if params[:search][:value].present?

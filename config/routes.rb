@@ -113,6 +113,8 @@ Rails.application.routes.draw do
       end
       collection do
         get "pos"
+        get "orden_de_transporte_index", as: :orden_de_transporte_index
+        get "new_orden_de_transporte", as: :new_orden_de_transporte
       end
 
       resources :external_invoices, only: [ :new, :create, :destroy ]

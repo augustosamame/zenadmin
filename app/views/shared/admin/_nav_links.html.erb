@@ -99,6 +99,11 @@
     <li>
       <%= nav_link_to "Turnos de Caja", admin_cashier_shifts_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:show_sunat_guia_for_stock_transfers] %>
+      <li>
+        <%= nav_link_to "Servicios de Transporte", orden_de_transporte_index_admin_orders_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+    <% end %>
     <li>
       <%= nav_link_to "Clientes", admin_customers_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>

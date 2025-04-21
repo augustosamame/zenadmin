@@ -47,6 +47,7 @@ class Order < ApplicationRecord
   after_create_commit :refresh_dashboard_metrics
   after_commit :evaluate_payment_status, on: [ :create ]
   after_commit :reevaluate_payment_status, on: [ :update ]
+  after_commit :update_servicio_transporte, on: [ :create, :update ]
 
   validates :user_id, :location_id, :region_id, presence: true
   validates :total_price_cents, presence: true
@@ -156,6 +157,10 @@ class Order < ApplicationRecord
     if nota_de_venta
       Rails.application.routes.url_helpers.admin_nota_de_venta_path(self, format: :pdf)
     end
+  end
+
+  def update_servicio_transporte
+    self.update_columns(servicio_transporte: self.order_items.any? { |item| item.product&.name == "Servicio de Transporte" })
   end
 
   def determine_cashier_shift_based_on_order_date(current_cashier, current_cashier_shift, current_user)

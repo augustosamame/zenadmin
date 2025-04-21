@@ -1,0 +1,94 @@
+<%= render "shared/admin/nav", { header_title: "Nueva Orden por Servicio de Transporte" } do %>
+  <%= link_to 'Volver a Órdenes de Transporte', orden_de_transporte_index_admin_orders_path, class: 'btn btn-secondary' %>
+<% end %>
+
+<div class="px-4 mx-auto mt-8 md:px-10">
+  <%= simple_form_for([:admin, @order], url: admin_orders_path) do |form| %>
+    <%= render 'shared/form_errors', model: @order %>
+    
+    <%= form.hidden_field :servicio_transporte, value: true %>
+    <%= form.hidden_field :origin, value: "pos" %>
+    
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+      <!-- Order Date -->
+      <div>
+        <%= form.label :order_date, "Fecha y Hora", class: "form-label" %>
+        <div class="relative">
+          <%= form.text_field :order_date,
+              value: Time.current.strftime('%Y-%m-%dT%H:%M'),
+              class: "form-input w-full",
+              type: "datetime-local" %>
+        </div>
+      </div>
+
+      <!-- Client Selection -->
+      <div>
+        <label for="user_id" class="form-label">Cliente</label>
+        <div class="relative">
+          <%= select_tag "user_id",
+              options_for_select(@customer_users.map { |u| [u.name, u.customer.id] }),
+              { 
+                prompt: "Seleccione cliente",
+                class: "form-input",
+                data: {
+                  controller: "select",
+                  select_placeholder_value: "Seleccione cliente"
+                }
+              } %>
+        </div>
+      </div>
+
+      <!-- Cashier Selection -->
+      <div>
+        <label for="cashier_id" class="form-label">Caja</label>
+        <div class="relative">
+          <%= select_tag "cashier_id",
+              options_from_collection_for_select(@open_cashiers, :id, :name),
+              { 
+                prompt: "Seleccione caja",
+                class: "form-input",
+                data: {
+                  controller: "select",
+                  select_placeholder_value: "Seleccione caja"
+                }
+              } %>
+        </div>
+      </div>
+
+      <!-- Amount Field -->
+      <div>
+        <label for="amount" class="form-label">Monto en S/</label>
+        <div class="relative">
+          <%= number_field_tag "amount",
+              nil,
+              class: "form-input w-full",
+              step: "0.01",
+              min: "0" %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Wants Factura Checkbox -->
+    <div class="mt-6">
+      <div class="flex items-center">
+        <%= form.check_box :wants_factura, class: "form-checkbox" %>
+        <%= form.label :wants_factura, "Requiere Factura", class: "ml-2 form-label" %>
+      </div>
+    </div>
+
+    <!-- Comments -->
+    <div class="mt-6">
+      <%= form.label :seller_note, "Comentarios", class: "form-label" %>
+      <%= form.text_area :seller_note,
+          class: "form-input w-full",
+          rows: 3 %>
+    </div>
+
+    <div class="flex items-center py-6 mt-10 space-x-4 border-t dark:border-slate-600">
+      <%= form.button :submit, "Crear Orden", class: "btn btn-primary" %>
+      <%= link_to "Cancelar", 
+          orden_de_transporte_index_admin_orders_path, 
+          class: "font-medium text-slate-600 hover:text-primary-600 text-sm px-2 py-2 dark:text-slate-400 dark:hover:text-primary-400" %>
+    </div>
+  <% end %>
+</div>

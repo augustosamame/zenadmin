@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_20_021451) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -597,6 +597,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_20_021451) do
     t.integer "price_list_id"
     t.boolean "nota_de_venta", default: false
     t.bigint "transportista_id"
+    t.boolean "servicio_transporte", default: false
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
@@ -610,6 +611,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_20_021451) do
     t.index ["region_id"], name: "index_orders_on_region_id"
     t.index ["request_id"], name: "index_orders_on_request_id"
     t.index ["seller_id"], name: "index_orders_on_seller_id"
+    t.index ["servicio_transporte"], name: "index_orders_on_servicio_transporte"
     t.index ["transportista_id"], name: "index_orders_on_transportista_id"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
