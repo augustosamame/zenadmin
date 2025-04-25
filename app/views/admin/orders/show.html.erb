@@ -5,6 +5,9 @@
 <div class="container px-4 py-8 mx-auto" 
   data-controller="order-show"
   data-order-show-order-id-value="<%= @order.custom_id %>"
+  data-order-show-order-status-value="<%= @order.status %>"
+  data-order-show-order-payment-status-value="<%= @order.payment_status %>"
+  data-order-show-order-stage-value="<%= @order.stage %>"
   data-order-show-invoice-url-value="<%= @order.universal_invoice_link %>"
   data-order-show-xml-url-value="<%= @order.universal_xml_link %>"
   data-order-show-customer-phone-value="<%= @order.customer&.phone %>">
@@ -219,7 +222,7 @@
             <div class="flex items-center space-x-2">
               <button type="button" class="text-red-600 underline hover:text-red-800 guia-error-link" onclick="document.getElementById('guia-transportista-error-modal-order-<%= @guia_transportista.id %>').classList.remove('hidden')">Error</button>
               <span class="font-medium text-red-600">Error al generar Guía</span>
-              <%= button_to 'Reintentar', admin_generate_guia_path, method: :post, params: { source_type: 'guia_transporte', source_id: @order.id }, class: 'btn btn-primary btn-xs', data: { turbo: false } %>
+              <button type="button" class="btn btn-primary btn-xs" onclick="document.getElementById('guia-transportista-modal').classList.remove('hidden'); document.body.classList.add('overflow-hidden');">Reintentar</button>
             </div>
             <div id="guia-transportista-error-modal-order-<%= @guia_transportista.id %>" class="flex hidden fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
               <div class="relative p-6 w-full max-w-lg bg-white rounded-lg shadow-lg">
@@ -264,7 +267,7 @@
               <div class="flex items-center space-x-2">
                 <button type="button" class="text-red-600 underline hover:text-red-800 guia-error-link" onclick="document.getElementById('guia-error-modal-order-<%= @guia.id %>').classList.remove('hidden')">Error</button>
                 <span class="font-medium text-red-600">Error al generar Guía</span>
-                <%= button_to 'Reintentar', admin_generate_guia_path, method: :post, params: { source_type: 'order', source_id: @order.id }, class: 'btn btn-primary btn-xs', data: { turbo: false } %>
+                <button type="button" class="btn btn-primary btn-xs" onclick="document.getElementById('guia-modal').classList.remove('hidden'); document.body.classList.add('overflow-hidden');">Reintentar</button>
               </div>
               <div id="guia-error-modal-order-<%= @guia.id %>" class="flex hidden fixed inset-0 z-50 justify-center items-center bg-black bg-opacity-50">
                 <div class="relative p-6 w-full max-w-lg bg-white rounded-lg shadow-lg">
@@ -288,13 +291,13 @@
                 Generar Guía de Remisión
               </button>
             </div>
-            <%= render "shared/admin/guia_modal",
-              transportistas: @transportistas,
-              guia_origin_address: @order.location&.address,
-              guia_destination_address: @order.customer&.address,
-              guia_comments: @order.seller_note
-            %>
           <% end %>
+          <%= render "shared/admin/guia_modal",
+            transportistas: @transportistas,
+            guia_origin_address: @order.location&.address,
+            guia_destination_address: @order.customer&.address,
+            guia_comments: @order.seller_note
+          %>
         </div>
       </div>
     <% end %>

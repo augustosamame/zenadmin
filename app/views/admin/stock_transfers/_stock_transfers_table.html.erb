@@ -54,12 +54,21 @@
                     <%= stock_transfer_guia_link(stock_transfer) %>
                     <% guia = stock_transfer.guias.last %>
                     <% if guia&.sunat_status == "sunat_error" %>
-                      <%= button_to "Reintentar", admin_generate_guia_path,
-                        method: :post,
-                        params: { source_type: "stock_transfer", source_id: stock_transfer.id },
-                        class: "btn btn-sm btn-primary ml-2",
-                        form_class: "inline",
-                        data: { turbo: false } %>
+                      <button type="button" class="btn btn-sm btn-primary ml-2" 
+                        onclick="
+                          document.getElementById('guia-modal').classList.remove('hidden'); 
+                          document.body.classList.add('overflow-hidden'); 
+                          document.getElementById('guia_source_type').value = 'stock_transfer'; 
+                          document.getElementById('guia_source_id').value = '<%= stock_transfer.id %>';
+                          document.getElementById('origin_address').value = '<%= j(stock_transfer.origin_warehouse&.location&.address.to_s) %>';
+                          document.getElementById('destination_address').value = '<%= j(stock_transfer.customer_user_id.blank? ? stock_transfer.destination_warehouse&.location&.address.to_s : User.find(stock_transfer.customer_user_id)&.address.to_s) %>';
+                          document.getElementById('comments').value = '<%= j(stock_transfer.comments.to_s) %>';
+                          <% if stock_transfer.transportista_id.present? %>
+                            document.getElementById('transportista_id').value = '<%= stock_transfer.transportista_id %>';
+                          <% end %>
+                        ">
+                        Reintentar
+                      </button>
                     <% end %>
                   </span>
                 <% elsif stock_transfer.origin_warehouse_id.present? && stock_transfer.vendor_id.blank? %>
