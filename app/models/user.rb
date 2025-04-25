@@ -48,7 +48,8 @@ class User < ApplicationRecord
   end
 
   def name
-    "#{first_name} #{last_name}"
+    possible_name = "#{first_name} #{last_name}".strip
+    possible_name.blank? ? self.customer&.factura_razon_social : possible_name
   end
 
   def address
