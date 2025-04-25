@@ -96,7 +96,7 @@ module Services
           "envio_peso_bruto_total": envio_peso_bruto_total,
           "envio_unidad_medida_peso": "KGM",
           "envio_num_bultos": envio_num_bultos,
-          "envio_modalidad_traslado": "02",
+          "envio_modalidad_traslado": transportista_fields[:transportista_type] == "privado" ? "02" : "01",
           "partida_ubigeo": partida_ubigeo,
           "partida_direccion": partida_direccion,
           "llegada_ubigeo": llegada_ubigeo,
@@ -104,11 +104,11 @@ module Services
           "observaciones": observaciones,
           "move_lines": guia_lines,
           # Additional fields required by Nubefact
-          "transportista_indicador_m1l": nil,
+          "transportista_indicador_m1l": transportista_fields[:m1l_indicator],
           "transportista_tipo_doc": transportista_fields[:tipo_doc],
           "transportista_num_doc": transportista_fields[:num_doc],
           "transportista_razon_social": transportista_fields[:razon_social],
-          "transportista_numero_mtc": nil,
+          "transportista_numero_mtc": transportista_fields[:numero_mtc],
           "transportista_chofer_tipo_doc": "1",
           "transportista_chofer_num_doc": transportista_fields[:chofer_num_doc],
           "transportista_chofer_num_licencia": transportista_fields[:chofer_num_licencia],
@@ -155,11 +155,11 @@ module Services
                                               .where(location: location)
                                               .where(guia_series: { guia_type: :guia_remision })
                                               .first
-        
+
         if guia_series_mapping.blank?
           raise "No active guia series mapping found for guia_remision order location"
         end
-        
+
         guia_series = guia_series_mapping.guia_series
 
         # Prepare line items
@@ -219,7 +219,7 @@ module Services
           "envio_peso_bruto_total": envio_peso_bruto_total,
           "envio_unidad_medida_peso": "KGM",
           "envio_num_bultos": envio_num_bultos,
-          "envio_modalidad_traslado": "02",
+          "envio_modalidad_traslado": transportista_fields[:transportista_type] == "privado" ? "02" : "01",
           "partida_ubigeo": partida_ubigeo,
           "partida_direccion": partida_direccion,
           "llegada_ubigeo": llegada_ubigeo,
@@ -227,11 +227,11 @@ module Services
           "observaciones": observaciones,
           "move_lines": guia_lines,
           # Additional fields required by Nubefact
-          "transportista_indicador_m1l": nil,
+          "transportista_indicador_m1l": transportista_fields[:m1l_indicator],
           "transportista_tipo_doc": transportista_fields[:tipo_doc],
           "transportista_num_doc": transportista_fields[:num_doc],
           "transportista_razon_social": transportista_fields[:razon_social],
-          "transportista_numero_mtc": nil,
+          "transportista_numero_mtc": transportista_fields[:numero_mtc],
           "transportista_chofer_tipo_doc": "1",
           "transportista_chofer_num_doc": transportista_fields[:chofer_num_doc],
           "transportista_chofer_num_licencia": transportista_fields[:chofer_num_licencia],
@@ -279,11 +279,11 @@ module Services
                                               .where(location: location)
                                               .where(guia_series: { guia_type: :guia_transporte })
                                               .first
-        
+
         if guia_series_mapping.blank?
           raise "No active guia series mapping found for guia_transporte order location"
         end
-        
+
         guia_series = guia_series_mapping.guia_series
 
         # Extract modal params or fallback to defaults
@@ -336,7 +336,7 @@ module Services
           "envio_peso_bruto_total": envio_peso_bruto_total,
           "envio_unidad_medida_peso": "KGM",
           "envio_num_bultos": envio_num_bultos,
-          "envio_modalidad_traslado": "02",
+          "envio_modalidad_traslado": transportista_fields[:transportista_type] == "privado" ? "02" : "01",
           "partida_ubigeo": partida_ubigeo,
           "partida_direccion": partida_direccion,
           "llegada_ubigeo": llegada_ubigeo,
@@ -344,11 +344,11 @@ module Services
           "observaciones": observaciones,
           "move_lines": guia_lines,
           # Additional fields required by Nubefact
-          "transportista_indicador_m1l": nil,
+          "transportista_indicador_m1l": transportista_fields[:m1l_indicator],
           "transportista_tipo_doc": transportista_fields[:tipo_doc],
           "transportista_num_doc": transportista_fields[:num_doc],
           "transportista_razon_social": transportista_fields[:razon_social],
-          "transportista_numero_mtc": nil,
+          "transportista_numero_mtc": transportista_fields[:numero_mtc],
           "transportista_chofer_tipo_doc": "1",
           "transportista_chofer_num_doc": transportista_fields[:chofer_num_doc],
           "transportista_chofer_num_licencia": transportista_fields[:chofer_num_licencia],
@@ -393,11 +393,11 @@ module Services
         found_guia_series = GuiaSeriesMapping.joins(:guia_series)
                                               .where(location: @stock_transfer.origin_warehouse, guia_series: { guia_type: :guia_remision })
                                               .first
-        
+
         if found_guia_series.blank?
           raise "No active guia series mapping found for guia_remision stock transfer origin warehouse location"
         end
-        
+
         found_guia_series.guia_series
       end
 
@@ -412,7 +412,10 @@ module Services
           chofer_num_licencia: nil,
           chofer_nombres: nil,
           chofer_apellidos: nil,
-          placa: nil
+          placa: nil,
+          transportista_type: nil,
+          m1l_indicator: nil,
+          numero_mtc: nil
         }
 
         if transportista&.ruc?
@@ -429,19 +432,15 @@ module Services
           fields[:razon_social] = guia_series.invoicer.razon_social
         end
 
-        if transportista&.dni?
-          fields[:chofer_num_doc] = transportista.dni_number
-          fields[:chofer_num_licencia] = transportista.license_number
-          fields[:chofer_nombres] = transportista.first_name
-          fields[:chofer_apellidos] = transportista.last_name
-        else
-          fields[:chofer_num_doc] = "09344556"
-          fields[:chofer_num_licencia] = "Q09344556"
-          fields[:chofer_nombres] = "NOMBRE"
-          fields[:chofer_apellidos] = "APELLIDO"
-        end
+        fields[:transportista_type] = transportista&.transportista_type
 
-        fields[:placa] = transportista&.vehicle_plate || "ABC123"
+        fields[:chofer_num_doc] = transportista.dni_number
+        fields[:chofer_num_licencia] = transportista.license_number
+        fields[:chofer_nombres] = transportista.first_name
+        fields[:chofer_apellidos] = transportista.last_name
+        fields[:placa] = transportista&.vehicle_plate
+        fields[:m1l_indicator] = transportista&.m1l_indicator
+        fields[:numero_mtc] = transportista&.numero_mtc
 
         fields
       end

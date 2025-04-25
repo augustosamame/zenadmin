@@ -3,7 +3,7 @@ import { Controller } from "@hotwired/stimulus"
 export default class extends Controller {
   connect() {
     console.log("Transportista form controller connected");
-    this.toggleFieldsOnLoad();
+    // this.toggleFieldsOnLoad();
   }
 
   toggleFieldsOnLoad() {
@@ -19,11 +19,11 @@ export default class extends Controller {
     const dniFields = document.querySelectorAll('.dni-field');
 
     if (docType === 'ruc') {
-      rucFields.forEach(field => field.style.display = '');
-      dniFields.forEach(field => field.style.display = 'none');
+      // rucFields.forEach(field => field.style.display = '');
+      // dniFields.forEach(field => field.style.display = 'none');
     } else if (docType === 'dni') {
-      rucFields.forEach(field => field.style.display = 'none');
-      dniFields.forEach(field => field.style.display = '');
+      // rucFields.forEach(field => field.style.display = 'none');
+      // dniFields.forEach(field => field.style.display = '');
     }
   }
 }

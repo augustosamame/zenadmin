@@ -119,7 +119,7 @@ Rails.application.configure do
   case ENV["CURRENT_ORGANIZATION"]
   when "jardindelzen"
     config.action_mailer.default_url_options = { host: "jardindelzen.devtechperu.com" }
-  when "sercams"
+  when "sercam"
     config.action_mailer.default_url_options = { host: "sercam.devtechperu.net" }
   when "constructor"
     config.action_mailer.default_url_options = { host: "constructor.devtechperu.net" }
