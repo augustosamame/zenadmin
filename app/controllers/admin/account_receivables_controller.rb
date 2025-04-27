@@ -48,8 +48,8 @@ class Admin::AccountReceivablesController < Admin::AdminController
           total_receivables = receivables_by_user[user.id] || 0
           total_applied_payments = applied_payments_by_user[user.id] || 0
           total_unapplied_payments = unapplied_payments_by_user[user.id] || 0
-          total_pending_previous_period = user&.account_receivable_initial_balance&.to_f || 0
-          total_payments = total_applied_payments + total_unapplied_payments - total_pending_previous_period
+          total_pending_previous_period = (user&.account_receivable_initial_balance&.to_f * 100) || 0
+          total_payments = total_applied_payments + total_unapplied_payments
 
           # Calculate balance (receivables - payments)
           @user_balances[user.id] = (total_receivables - total_payments - total_pending_previous_period) / 100.0
