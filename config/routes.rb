@@ -110,6 +110,7 @@ Rails.application.routes.draw do
         get :edit_payments
         patch :update_payments
         post :void
+        patch :toggle_wants_factura
       end
       collection do
         get "pos"

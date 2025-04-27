@@ -65,6 +65,17 @@
           <dt class="text-sm font-medium text-gray-500">Notas del Vendedor</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2"><%= @order.seller_note %></dd>
         </div>
+        <div class="px-4 py-5 bg-gray-50 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Desea Factura?</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2 flex items-center">
+            <input type="checkbox" disabled <%= @order.wants_factura? ? 'checked' : '' %> />
+            <% unless @order.last_issued_ok_invoice_urls.present? %>
+              <%= button_to (
+                @order.wants_factura? ? "Cambiar a Boleta" : "Cambiar a Factura"
+              ), toggle_wants_factura_admin_order_path(@order), method: :patch, class: "ml-4 btn btn-primary btn-sm" %>
+            <% end %>
+          </dd>
+        </div>
         <div class="px-4 py-5 bg-white sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
           <dt class="text-sm font-medium text-gray-500">Comprobante</dt>
           <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">

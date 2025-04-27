@@ -344,6 +344,17 @@ class Admin::OrdersController < Admin::AdminController
     @open_cashiers = Cashier.active_with_open_shift
   end
 
+  # PATCH /admin/orders/:id/toggle_wants_factura
+  def toggle_wants_factura
+    @order = Order.find(params[:id])
+    @order.wants_factura = !@order.wants_factura?
+    if @order.save
+      redirect_to admin_order_path(@order), notice: "El tipo de comprobante ha sido actualizado."
+    else
+      redirect_to admin_order_path(@order), alert: "No se pudo actualizar el tipo de comprobante."
+    end
+  end
+
   private
 
     def order_params
