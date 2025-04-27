@@ -1,0 +1,38 @@
+<%# app/views/admin/unit_of_measures/_form.html.erb %>
+<%= simple_form_for [:admin, @unit_of_measure] do |f| %>
+  <%= render 'shared/form_errors', model: @unit_of_measure %>
+  <div class="grid grid-cols-1 gap-4">
+    <!-- Name Field -->
+    <div>
+      <%= f.input :name, label: "Nombre", required: true, input_html: { class: "form-input" } %>
+    </div>
+    <!-- Abbreviation Field -->
+    <div>
+      <%= f.input :abbreviation, label: "Abreviatura", required: true, input_html: { class: "form-input" } %>
+    </div>
+    <!-- Reference Unit Field -->
+    <div>
+      <%= f.input :reference_unit_id, collection: UnitOfMeasure.where.not(id: @unit_of_measure.id).map { |u| [u.name, u.id] }, label: "Unidad de Referencia", include_blank: true, input_html: { class: "form-select" } %>
+    </div>
+    <!-- Multiplier Field -->
+    <div>
+      <%= f.input :multiplier, label: "Multiplicador", required: true, input_html: { step: 0.0001, class: "form-input" } %>
+    </div>
+    <!-- Status Field -->
+    <div>
+      <%= f.input :status, label: "Estado", collection: UnitOfMeasure.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+    </div>
+    <!-- Sunat Code Field -->
+    <div>
+      <%= f.input :sunat_code, label: "Código Sunat", required: true, input_html: { class: "form-input" } %>
+    </div>
+    <!-- Notes Field -->
+    <div>
+      <%= f.input :notes, label: "Notas", input_html: { class: "form-input" } %>
+    </div>
+  </div>
+  <div class="mt-4">
+    <%= f.button :submit, "Guardar", class: "btn btn-primary" %>
+    <%= link_to t('cancel', default: 'Cancelar'), admin_unit_of_measures_path, class: "btn btn-secondary" %>
+  </div>
+<% end %>

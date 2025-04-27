@@ -41,6 +41,11 @@
     <li>
       <%= nav_link_to "Métodos de Pago", admin_payment_methods_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:feature_flag_uom] %>
+      <li>
+        <%= nav_link_to "Unidades de Medida", admin_unit_of_measures_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+      </li>
+    <% end %>
     <li>
       <%= nav_link_to "Tiendas", admin_locations_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>

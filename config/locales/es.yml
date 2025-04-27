@@ -59,6 +59,10 @@ es:
         display_entries: "Mostrando %{entry_name} <b>%{first}&nbsp;-&nbsp;%{last}</b> de <b>%{total}</b> en total"
   activerecord:
     attributes:
+      unit_of_measure:
+        status_list:
+          active: Activo
+          inactive: Inactivo
       guia:
         sunat_status_list:
           sunat_pending: Pendiente

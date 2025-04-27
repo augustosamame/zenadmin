@@ -1,0 +1,17 @@
+<div data-controller="dropdown" class="relative">
+  <button data-action="click->dropdown#toggle click@window->dropdown#hide"
+          class="p-2 rounded-lg focus:ring-4 focus:ring-primary-50 dark:focus:ring-slate-600/50">
+    <%= icon "cog-6-tooth", classes: "w-6 h-6 stroke-current text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+  </button>
+  <ul data-dropdown-target="menu"
+      class="hidden absolute right-0 top-10 bg-white rounded-lg shadow-xl dark:bg-slate-700 dark:shadow-slate-900/50 dark:border-slate-500/60 w-[200px] z-50 py-2">
+    <% default_object_options_array.each do |option| %>
+      <li>
+        <%= link_to "#", data: { action: "click->dropdown#handleAction", test_id: "test", object_id: unit.id, event_name: option[:event_name], edit_url: edit_admin_unit_of_measure_path(unit), destroy_url: admin_unit_of_measure_path(unit) }, class: "px-4 py-[.4rem] group flex items-center justify-start space-x-3" do %>
+          <%= icon option[:icon], classes: "stroke-current w-5 h-5 text-slate-500 group-hover:text-primary-600 dark:group-hover:text-primary-400" %>
+          <span><%= option[:label] %></span>
+        <% end %>
+      </li>
+    <% end %>
+  </ul>
+</div>

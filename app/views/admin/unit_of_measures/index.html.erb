@@ -1,0 +1,42 @@
+<%# app/views/admin/unit_of_measures/index.html.erb %>
+<%= render "shared/admin/nav", { header_title: "Unidades de Medida" } do %>
+  <%= render "shared/admin/create_dropdown" %>
+<% end %>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <div class="container p-2 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+    <table id="datatable-element" class="min-w-full bg-white dark:bg-slate-800">
+      <thead>
+        <tr>
+          <th class="px-4 py-2 text-left" style="display: none;">Id</th>
+          <th class="px-4 py-2 text-left">Nombre</th>
+          <th class="px-4 py-2 text-left">Abreviatura</th>
+          <th class="px-4 py-2 text-left">Unidad de Referencia</th>
+          <th class="px-4 py-2 text-left">Multiplicador</th>
+          <th class="px-4 py-2 text-left">Estado</th>
+          <th class="px-4 py-2 text-left">Por Defecto</th>
+          <th class="px-4 py-2 text-left">Notas</th>
+          <th class="px-4 py-2 text-left">Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @unit_of_measures.each do |unit| %>
+          <tr>
+            <td class="px-4 py-2" style="display: none;"><%= unit.id %></td>
+            <td class="px-4 py-2"><%= unit.name %></td>
+            <td class="px-4 py-2"><%= unit.abbreviation %></td>
+            <td class="px-4 py-2"><%= unit.reference_unit&.name %></td>
+            <td class="px-4 py-2"><%= unit.multiplier %></td>
+            <td class="px-4 py-2"><%= unit.translated_status %></td>
+            <td class="px-4 py-2"><%= unit.default? ? 'Sí' : 'No' %></td>
+            <td class="px-4 py-2"><%= unit.notes %></td>
+            <td class="px-4 py-2">
+              <%= link_to 'Editar', edit_admin_unit_of_measure_path(unit), class: "btn btn-sm btn-primary" %>
+              <%= link_to 'Eliminar', admin_unit_of_measure_path(unit), method: :delete, data: { confirm: '¿Está seguro?' }, class: "btn btn-sm btn-danger" %>
+            </td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

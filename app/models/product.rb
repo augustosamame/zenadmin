@@ -8,6 +8,7 @@ class Product < ApplicationRecord
 
   belongs_to :brand
   belongs_to :sourceable, polymorphic: true, optional: true
+  belongs_to :unit_of_measure
   has_and_belongs_to_many :product_categories
   has_many :taggings, dependent: :destroy
   has_many :tags, through: :taggings
@@ -42,6 +43,7 @@ class Product < ApplicationRecord
   monetize :discounted_price_cents, with_model_currency: :currency
 
   before_validation :set_discounted_price
+  before_validation :assign_default_unit_of_measure, on: :create
 
   def set_discounted_price
     # we do this now as discounts are handled through time sensitive discount objects or price lists
@@ -68,7 +70,6 @@ class Product < ApplicationRecord
 
   scope :without_tests, -> { where(is_test_product: false) }
 
-  before_validation :set_permalink
   after_commit :create_warehouse_inventory_for_all_warehouses, on: :create
   after_commit :create_price_list_items_for_all_price_lists, on: :create, if: -> { $global_settings[:feature_flag_price_lists] }
 
@@ -132,6 +133,12 @@ class Product < ApplicationRecord
   end
 
   private
+
+  def assign_default_unit_of_measure
+    if self.unit_of_measure.nil?
+      self.unit_of_measure = UnitOfMeasure.find_by(name: "Unidad")
+    end
+  end
 
   def find_or_get_tag(tag_name_or_object)
     if tag_name_or_object.is_a?(Tag)

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_27_180000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -854,12 +854,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
     t.datetime "updated_at", null: false
     t.boolean "inafecto", default: false
     t.string "unit_of_measure", default: "NIU"
+    t.bigint "unit_of_measure_id", null: false
     t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
     t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"
     t.index ["product_order"], name: "index_products_on_product_order"
     t.index ["sourceable_type", "sourceable_id"], name: "index_products_on_sourceable"
     t.index ["status"], name: "index_products_on_status"
+    t.index ["unit_of_measure_id"], name: "index_products_on_unit_of_measure_id"
   end
 
   create_table "purchase_invoice_payments", force: :cascade do |t|
@@ -1185,6 +1187,21 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "unit_of_measures", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "abbreviation", null: false
+    t.string "sunat_code", null: false
+    t.bigint "reference_unit_id"
+    t.decimal "multiplier", precision: 10, scale: 4, default: "1.0", null: false
+    t.integer "status", default: 0, null: false
+    t.boolean "default", default: false, null: false
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_unit_of_measures_on_name", unique: true
+    t.index ["reference_unit_id"], name: "index_unit_of_measures_on_reference_unit_id"
+  end
+
   create_table "user_attendance_logs", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "location_id", null: false
@@ -1388,6 +1405,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
   add_foreign_key "product_min_max_stocks", "products"
   add_foreign_key "product_min_max_stocks", "warehouses"
   add_foreign_key "product_pack_items", "product_packs"
+  add_foreign_key "products", "unit_of_measures"
   add_foreign_key "purchase_invoice_payments", "purchase_invoices"
   add_foreign_key "purchase_invoice_payments", "purchase_payments"
   add_foreign_key "purchase_invoices", "purchases_purchases", column: "purchase_id"
@@ -1436,6 +1454,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
   add_foreign_key "taggings", "products"
   add_foreign_key "taggings", "tags"
   add_foreign_key "tags", "tags", column: "parent_tag_id"
+  add_foreign_key "unit_of_measures", "unit_of_measures", column: "reference_unit_id"
   add_foreign_key "user_attendance_logs", "locations"
   add_foreign_key "user_attendance_logs", "users"
   add_foreign_key "user_free_products", "loyalty_tiers"

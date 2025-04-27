@@ -125,6 +125,7 @@ Rails.application.routes.draw do
 
     resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
+    resources :unit_of_measures
     resources :price_lists
     resources :users do
       member do

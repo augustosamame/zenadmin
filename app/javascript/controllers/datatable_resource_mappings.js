@@ -185,5 +185,10 @@ export const resourceMappings = {
     buttonText: "Crear Guía de Remisión",
     buttonUrl: "/admin/guias/new",
     ajaxUrl: "/admin/guias.json"
+  },
+  UnitOfMeasure: {
+    buttonText: "Crear Unidad de Medida",
+    buttonUrl: "/admin/unit_of_measures/new",
+    ajaxUrl: "/admin/unit_of_measures.json"
   }
 }

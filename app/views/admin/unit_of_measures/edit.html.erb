@@ -1,0 +1,8 @@
+<%# app/views/admin/unit_of_measures/edit.html.erb %>
+<%= render "shared/admin/nav", { header_title: "Editar Unidad de Medida" } do %>
+<% end %>
+
+<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <h1 class="mb-4 text-xl font-semibold">Editar Unidad de Medida</h1>
+  <%= render 'form', unit_of_measure: @unit_of_measure %>
+</div>
