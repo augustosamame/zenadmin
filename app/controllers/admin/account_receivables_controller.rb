@@ -55,7 +55,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
           @user_balances[user.id] = (total_receivables - total_payments - total_pending_previous_period) / 100.0
         end
 
-        @datatable_options = "resource_name:'User';sort_0_desc;create_button:false;balance_sort_5;"
+        @datatable_options = "resource_name:'User';sort_4_desc;create_button:false;"
       end
     end
   end

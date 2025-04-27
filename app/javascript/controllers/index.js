@@ -10,6 +10,9 @@ application.register("attendance-form", AttendanceFormController)
 import AttendanceLogsController from "./attendance_logs_controller"
 application.register("attendance-logs", AttendanceLogsController)
 
+import BalanceFilterController from "./balance_filter_controller"
+application.register("balance-filter", BalanceFilterController)
+
 import BulkTagController from "./bulk_tag_controller"
 application.register("bulk-tag", BulkTagController)
 
