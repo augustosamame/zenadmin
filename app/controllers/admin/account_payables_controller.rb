@@ -123,7 +123,7 @@ class Admin::AccountPayablesController < Admin::AdminController
       @total_paid = (total_applied_payments / 100.0) + (total_unapplied_payments / 100.0)
       @total_unapplied_payments = total_unapplied_payments / 100.0
       @total_pending_previous_period = @vendor.account_payable_initial_balance.to_f
-      @total_pending = @purchase_invoices.sum(:amount_cents) / 100.0 - @total_paid - @total_pending_previous_period
+      @total_pending = @purchase_invoices.sum(:amount_cents) / 100.0 - @total_paid
 
       # Check if vendor has any purchase invoices or payments
       @has_transactions = @purchase_invoices.any? || @unapplied_payments.any? || @applied_payments.any?

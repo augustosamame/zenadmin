@@ -48,10 +48,11 @@ class Admin::AccountReceivablesController < Admin::AdminController
           total_receivables = receivables_by_user[user.id] || 0
           total_applied_payments = applied_payments_by_user[user.id] || 0
           total_unapplied_payments = unapplied_payments_by_user[user.id] || 0
-          total_payments = total_applied_payments + total_unapplied_payments
+          total_pending_previous_period = user&.account_receivable_initial_balance&.to_f || 0
+          total_payments = total_applied_payments + total_unapplied_payments - total_pending_previous_period
 
           # Calculate balance (receivables - payments)
-          @user_balances[user.id] = (total_receivables - total_payments) / 100.0
+          @user_balances[user.id] = (total_receivables - total_payments - total_pending_previous_period) / 100.0
         end
 
         @datatable_options = "resource_name:'User';sort_0_desc;create_button:false;balance_sort_5;"
@@ -63,18 +64,18 @@ class Admin::AccountReceivablesController < Admin::AdminController
     authorize! :read, AccountReceivable
     if params[:user_id].present?
       @user = User.find(params[:user_id])
-      @account_receivables = AccountReceivable.where(user_id: params[:user_id])
-      @unapplied_payments = Payment.unapplied.includes([ :cashier_shift ]).where(user_id: params[:user_id]).order(id: :desc)
+      @account_receivables = AccountReceivable.where(user_id: @user.id)
+      @unapplied_payments = Payment.unapplied.includes([ :cashier_shift ]).where(user_id: @user.id).order(id: :desc)
       @applied_payments = Payment.where(payable_type: "Order")
                                 .joins("INNER JOIN orders ON orders.id = payments.payable_id")
-                                .where(orders: { user_id: params[:user_id], is_credit_sale: true })
+                                .where(orders: { user_id: @user.id, is_credit_sale: true })
                                 .where.not(account_receivable_id: nil)
-      @total_sales = Order.where(user_id: params[:user_id]).sum(:total_price_cents) / 100.0
+      @total_sales = Order.where(user_id: @user.id).sum(:total_price_cents) / 100.0
       @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
-      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
-      @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
-      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid - @total_pending_previous_period
+      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0) + @total_pending_previous_period
+      @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
+      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
 
       # Check if customer has any account receivables or payments
       @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
