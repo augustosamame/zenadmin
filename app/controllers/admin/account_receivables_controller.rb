@@ -74,7 +74,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
-      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid
+      @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid - @total_pending_previous_period
 
       # Check if customer has any account receivables or payments
       @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
