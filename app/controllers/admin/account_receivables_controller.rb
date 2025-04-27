@@ -49,7 +49,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
           total_applied_payments = applied_payments_by_user[user.id] || 0
           total_unapplied_payments = unapplied_payments_by_user[user.id] || 0
           total_pending_previous_period = user&.account_receivable_initial_balance&.to_f || 0
-          total_payments = total_applied_payments + total_unapplied_payments - total_pending_previous_period
+          total_payments = total_applied_payments + total_unapplied_payments
 
           # Calculate balance (receivables - payments)
           @user_balances[user.id] = (total_receivables - total_payments - total_pending_previous_period) / 100.0
@@ -73,7 +73,7 @@ class Admin::AccountReceivablesController < Admin::AdminController
       @total_sales = Order.where(user_id: @user.id).sum(:total_price_cents) / 100.0
       @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
       @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
-      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0) + @total_pending_previous_period
+      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
       @total_pending = @account_receivables.sum(:amount_cents) / 100.0 - @total_paid + @total_pending_previous_period
 
