@@ -449,6 +449,17 @@ export default class extends Controller {
 
     const orderDateInput = document.getElementById('pos-order-date');
 
+    // Pull servicio_transporte data from order items container
+    const orderItemsContainer = document.querySelector('[data-controller="pos--order-items"]');
+    let servicioTransporteData = {};
+    if (orderItemsContainer && orderItemsContainer.dataset.servicioTransporte) {
+      try {
+        servicioTransporteData = JSON.parse(orderItemsContainer.dataset.servicioTransporte);
+      } catch (e) {
+        servicioTransporteData = {};
+      }
+    }
+
     const orderData = {
       order: {
         stage: 'confirmed',
@@ -468,7 +479,8 @@ export default class extends Controller {
         request_id: this.requestId,
         fast_stock_transfer_flag: this.hasAutomaticDeliveryTarget ? this.automaticDeliveryTarget.checked : true,
         order_date: orderDateInput?.value || null,
-        nota_de_venta: this.hasNotaDeVentaTarget ? this.notaDeVentaTarget.checked : false
+        nota_de_venta: this.hasNotaDeVentaTarget ? this.notaDeVentaTarget.checked : false,
+        servicio_transporte_hash: servicioTransporteData
       }
     };
 

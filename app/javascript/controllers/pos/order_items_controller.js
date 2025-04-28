@@ -208,6 +208,7 @@ export default class extends Controller {
     this.calculateTotal();
     this.evaluateGroupDiscount();
     this.saveDraft();
+    this.checkForTransportServiceProduct();
   }
 
   addNewItem(product) {
@@ -480,14 +481,14 @@ export default class extends Controller {
     console.log('removing item:', this.selectedItem);
     if (this.selectedItem.hasAttribute('data-combo-id')) {
       console.log('removing combo discount for:', this.selectedItem);
-      this.removeComboDiscount(this.selectedItem);;
+      this.removeComboDiscount(this.selectedItem);
     }
-
     this.selectedItem.remove();
-    this.deselectItem()
+    this.deselectItem();
     this.calculateTotal();
     this.evaluateGroupDiscount();
     this.saveDraft();
+    setTimeout(() => this.checkForTransportServiceProduct(), 0);
   }
 
   handleKeypadForPrice(digit) {
@@ -832,6 +833,7 @@ export default class extends Controller {
     this.itemsTarget.innerHTML = '';
     this.selectedItem = null;
     this.calculateTotal();
+    this.checkForTransportServiceProduct();
   }
 
   resetGroupDiscountFlags() {
@@ -1080,4 +1082,26 @@ export default class extends Controller {
     }
   }
   
+  checkForTransportServiceProduct() {
+    console.log('Checking for transport service product...');
+    // Check if any order item has the name 'Servicio de Transporte'
+    const items = this.itemsTarget.querySelectorAll('div.flex');
+    let found = false;
+    items.forEach(item => {
+      // Try to get product name from data attribute or inner text
+      const name = item.getAttribute('data-item-name') || item.querySelector('[data-item-name]')?.textContent || item.querySelector('.item-name')?.textContent;
+      if (name && name.trim() === 'Servicio de Transporte') {
+        found = true;
+      }
+    });
+    // Show/hide the button using utility classes (Tailwind/Stimulus)
+    const container = document.getElementById('transport-service-last-button-container');
+    if (container) {
+      if (found) {
+        container.classList.remove('hidden');
+      } else {
+        container.classList.add('hidden');
+      }
+    }
+  }
 }

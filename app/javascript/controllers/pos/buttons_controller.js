@@ -9,6 +9,14 @@ export default class extends Controller {
     this.element.addEventListener('clear-selected-user', this.handleClearSelectedUser.bind(this));
     this.element.addEventListener('clear-selected-sellers', this.handleClearSelectedSellers.bind(this));
 
+    // Listen for transport service product visibility event
+    this.element.addEventListener('transport-service-product-visibility', (event) => {
+      const visible = event.detail.visible;
+      const container = document.getElementById('transport-service-last-button-container');
+      if (container) {
+        container.style.display = visible ? '' : 'none';
+      }
+    });
 
     this.checkForDraftOrder();
   }
@@ -164,6 +172,4 @@ export default class extends Controller {
       console.warn('Loyalty info container not found');
     }
   }
-
-
 }

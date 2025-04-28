@@ -123,6 +123,24 @@ module Services
           "comments": @order.einvoice_comments
         }
 
+        if @order.servicio_transporte
+          transportista_id = @order.servicio_transporte_hash["transportista_id"]
+          transportista = Transportista.find(transportista_id) if transportista_id
+          invoice_data_hash["transporte_placa"] = transportista&.vehicle_plate
+          invoice_data_hash["detraccion_use_valor_referencial"] = @order.servicio_transporte_hash["detraccion_use_valor_referencial"]
+          invoice_data_hash["ubigeo_origen"] = @order.servicio_transporte_hash["ubigeo_origen"]
+          invoice_data_hash["ubigeo_destino"] = @order.servicio_transporte_hash["ubigeo_destino"]
+          invoice_data_hash["direccion_origen"] = @order.servicio_transporte_hash["direccion_origen"]
+          invoice_data_hash["direccion_destino"] = @order.servicio_transporte_hash["direccion_destino"]
+          invoice_data_hash["guia_remision"] = @order.servicio_transporte_hash["guia_remision"]
+          invoice_data_hash["guia_transportista"] = @order.servicio_transporte_hash["guia_transportista"]
+          invoice_data_hash["valor_referencial_carga_efectiva"] = @order.servicio_transporte_hash["valor_carga_efectiva"]
+          invoice_data_hash["valor_referencial_carga_util"] = @order.servicio_transporte_hash["valor_carga_util"]
+          invoice_data_hash["valor_referencial_transporte"] = @order.servicio_transporte_hash["valor_servicio"]
+          invoice_data_hash["detalle_viaje"] = @order.servicio_transporte_hash["descripcion"]
+          invoice_data_hash["reduce_detraccion_cuota"] = @order.servicio_transporte_hash["restar_detraccion"]
+        end
+
         response = Integrations::Nubefact.new.emitir_comprobante(invoice_data_hash.to_json)
         Rails.logger.info("Response: #{response.parsed_response}")
         Rails.logger.info("Response text: #{response.parsed_response["response_text"]}")

@@ -157,6 +157,9 @@ application.register("pos--loyalty-info", Pos__LoyaltyInfoController)
 import Pos__OrderItemsController from "./pos/order_items_controller"
 application.register("pos--order-items", Pos__OrderItemsController)
 
+import Pos__ServicioTransporteModalController from "./pos/servicio_transporte_modal_controller"
+application.register("pos--servicio-transporte-modal", Pos__ServicioTransporteModalController)
+
 import Pos__PaymentController from "./pos/payment_controller"
 application.register("pos--payment", Pos__PaymentController)
 

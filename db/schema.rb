@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_27_180000) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_28_001325) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -598,6 +598,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_27_180000) do
     t.boolean "nota_de_venta", default: false
     t.bigint "transportista_id"
     t.boolean "servicio_transporte", default: false
+    t.jsonb "servicio_transporte_hash", default: {}, null: false
     t.index ["active_invoice_id"], name: "index_orders_on_active_invoice_id", unique: true
     t.index ["cart_id"], name: "index_orders_on_cart_id"
     t.index ["custom_id"], name: "index_orders_on_custom_id", unique: true
