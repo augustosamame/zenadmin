@@ -70,12 +70,17 @@ class Admin::AccountReceivablesController < Admin::AdminController
                                 .joins("INNER JOIN orders ON orders.id = payments.payable_id")
                                 .where(orders: { user_id: @user.id, is_credit_sale: true })
                                 .where.not(account_receivable_id: nil)
-      @total_sales = Order.where(user_id: @user.id).sum(:total_price_cents) / 100.0
-      @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
       @total_pending_previous_period = @user.account_receivable_initial_balance.to_f
-      @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
+      @total_sales = Order.where(user_id: @user.id).sum(:total_price_cents) / 100.0
+      if @total_pending_previous_period > 0
+        @total_credit_sales = (@account_receivables.sum(:amount_cents) / 100.0) - @total_pending_previous_period
+        @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0)
+      else
+        @total_credit_sales = @account_receivables.sum(:amount_cents) / 100.0
+        @total_paid = (@applied_payments.sum(:amount_cents) / 100.0) + (@unapplied_payments.sum(:amount_cents) / 100.0) - @total_pending_previous_period
+      end
       @total_unapplied_payments = @unapplied_payments.sum(:amount_cents) / 100.0
-      @total_pending = @total_credit_sales - @total_paid - @total_pending_previous_period
+      @total_pending = @total_credit_sales - @total_paid
 
       # Check if customer has any account receivables or payments
       @has_transactions = @account_receivables.any? || @unapplied_payments.any? || @applied_payments.any?
