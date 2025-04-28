@@ -19,8 +19,13 @@
       </div>
     </div>
 
-    <div>
-      <%= form.input :price, label: "Precio", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
+    <div class="col-span-2">
+      <div class="grid grid-cols-2 gap-12">
+        <%= form.input :price, label: "Precio", as: :decimal, input_html: { step: 1, class: "form-input" }, label_html: { class: "form-label" } %>
+        <% if $global_settings[:feature_flag_uom] %>
+          <%= form.association :unit_of_measure, collection: UnitOfMeasure.active, prompt: "Unidad", label: "Unidad de Medida", input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
+        <% end %>
+      </div>
     </div>
 
     <% if $global_settings[:feature_flag_price_lists] %>

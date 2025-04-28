@@ -51,6 +51,6 @@ class Admin::UnitOfMeasuresController < Admin::AdminController
     end
 
     def unit_of_measure_params
-      params.require(:unit_of_measure).permit(:name, :abbreviation, :reference_unit_id, :multiplier, :status, :default, :notes)
+      params.require(:unit_of_measure).permit(:name, :abbreviation, :reference_unit_id, :multiplier, :status, :default, :notes, :sunat_code)
     end
 end

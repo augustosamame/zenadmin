@@ -388,7 +388,7 @@ class Admin::ProductsController < Admin::AdminController
     end
 
     def product_params
-      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, :inafecto, tag_ids: [], product_category_ids: [],
+      params.require(:product).permit(:custom_id, :file_data, :custom_id, :name, :description, :permalink, :price, :discounted_price, :brand_id, :is_test_product, :status, :inafecto, :unit_of_measure_id, tag_ids: [], product_category_ids: [],
       media_attributes: [ :id, :file, :file_data, :media_type, :_destroy ],
       price_list_items_attributes: [ :id, :price_list_id, :price ])
     end
