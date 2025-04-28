@@ -2,7 +2,7 @@ import { Controller } from "@hotwired/stimulus";
 
 export default class extends Controller {
   static targets = [
-    "container", "content", "descripcion", "transportista", "direccionOrigen", "ubigeoOrigen",
+    "container", "content", "descripcion", "direccionOrigen", "ubigeoOrigen",
     "direccionDestino", "ubigeoDestino", "valorServicio", "valorCargaEfectiva", "valorCargaUtil",
     "restarDetraccion", "guiaRemision", "guiaTransportista", "detraccionUseValorReferencial"
   ];
@@ -25,7 +25,6 @@ export default class extends Controller {
   save() {
     const data = {
       descripcion: this.descripcionTarget.value,
-      transportista_id: this.transportistaTarget.value,
       direccion_origen: this.direccionOrigenTarget.value,
       ubigeo_origen: this.ubigeoOrigenTarget.value,
       direccion_destino: this.direccionDestinoTarget.value,

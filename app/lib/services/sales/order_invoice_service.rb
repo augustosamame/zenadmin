@@ -124,9 +124,6 @@ module Services
         }
 
         if @order.servicio_transporte
-          transportista_id = @order.servicio_transporte_hash["transportista_id"]
-          transportista = Transportista.find(transportista_id) if transportista_id
-          invoice_data_hash["transporte_placa"] = transportista&.vehicle_plate
           invoice_data_hash["detraccion_use_valor_referencial"] = @order.servicio_transporte_hash["detraccion_use_valor_referencial"]
           invoice_data_hash["ubigeo_origen"] = @order.servicio_transporte_hash["ubigeo_origen"]
           invoice_data_hash["ubigeo_destino"] = @order.servicio_transporte_hash["ubigeo_destino"]
