@@ -44,7 +44,7 @@ module Services
             "description": product.description,
             "product_id": product.custom_id,
             "quantity": transfer_line.quantity,
-            "product_uom": product.unit_of_measure || "NIU",
+            "product_uom": product.unit_of_measure&.sunat_code || "NIU",
             "weight": product.weight || 1.0
           }
         end
@@ -173,7 +173,7 @@ module Services
             "description": product.description,
             "product_id": product.custom_id,
             "quantity": order_item.quantity,
-            "product_uom": product.unit_of_measure || "NIU",
+            "product_uom": product.unit_of_measure&.sunat_code || "NIU",
             "weight": product.weight || 1.0
           }
         end
