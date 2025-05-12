@@ -37,6 +37,7 @@ class Product < ApplicationRecord
   validates :name, presence: true
   validates :description, presence: true
   validates :permalink, presence: true
+  validates :permalink, uniqueness: true, on: :create
   validates :price_cents, presence: true
 
   monetize :price_cents, with_model_currency: :currency
@@ -44,6 +45,7 @@ class Product < ApplicationRecord
 
   before_validation :set_discounted_price
   before_validation :assign_default_unit_of_measure, on: :create
+  before_validation :set_permalink
 
   def set_discounted_price
     # we do this now as discounts are handled through time sensitive discount objects or price lists
@@ -74,8 +76,25 @@ class Product < ApplicationRecord
   after_commit :create_price_list_items_for_all_price_lists, on: :create, if: -> { $global_settings[:feature_flag_price_lists] }
 
   def set_permalink
-    self.permalink = name.parameterize if permalink.blank?
+    if permalink.blank?
+      base_permalink = name.parameterize
+      self.permalink = ensure_unique_permalink(base_permalink)
+    end
   end
+
+  private
+
+  def ensure_unique_permalink(base_permalink)
+    permalink = base_permalink
+    counter = 2
+    while Product.where(permalink: permalink).where.not(id: id).exists?
+      permalink = "#{base_permalink}-#{counter}"
+      counter += 1
+    end
+    permalink
+  end
+
+  public
 
   def create_warehouse_inventory_for_all_warehouses
     Warehouse.all.each do |warehouse|
