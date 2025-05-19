@@ -462,7 +462,7 @@ class Admin::ProductsController < Admin::AdminController
         id: pack.id,
         custom_id: "PACK-#{pack.id}",
         name: pack.name,
-        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || "https://devtech-edukaierp-dev.s3.amazonaws.com/public/default_product_image.jpg",
+        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || "https://v1-devtech-edukaierp-prod.s3.amazonaws.com/public/default_product_image.jpg",
         price: pack.price.to_f,
         stock: calculate_pack_stock(pack),
         type: "ProductPack",

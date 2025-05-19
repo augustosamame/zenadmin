@@ -141,7 +141,7 @@ export default class extends Controller {
       console.log('Fetching blob for existing file:', file);
 
       // Fetch the Blob data from S3 for each existing file
-      return fetch(`https://devtech-edukaierp-dev.s3.amazonaws.com/public/${file.id}`)
+      return fetch(`https://v1-devtech-edukaierp-prod.s3.amazonaws.com/public/${file.id}`)
         .then(response => response.blob())
         .then(blob => {
           console.log('Fetched blob:', blob);
