@@ -91,6 +91,7 @@ module Services
 
         # Use the calculated total tax amount
         total_tax_amount = running_tax_total
+        extra_comments = ENV["CURRENT_ORGANIZATION"] == "jardindelzen" ? "No se aceptan cambios ni devoluciones" : ""
 
         # Log the final values
         Rails.logger.info("Sum of Line Tax Amounts: #{running_tax_total.round(6)}")
@@ -120,7 +121,7 @@ module Services
           "email": @order.customer.email,
           "invoice_type": invoice_data.invoice_type,
           "efact_client_token": invoice_data.invoicer.einvoice_api_key,
-          "comments": @order.einvoice_comments
+          "comments": "#{@order.einvoice_comments} #{extra_comments}"
         }
 
         if @order.servicio_transporte
