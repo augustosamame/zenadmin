@@ -497,7 +497,7 @@ class Admin::DashboardsController < Admin::AdminController
 
     def calculate_percentage_change(new_value, old_value)
       return "0%" if old_value.zero?
-      percentage = ((new_value - old_value) / old_value) * 100
+      percentage = ((new_value.to_f - old_value.to_f) / old_value.to_f) * 100
       format_change("#{percentage.round(2)}%")
     end
 end
