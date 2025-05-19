@@ -1,0 +1,67 @@
+<%= render "shared/admin/nav", { header_title: "Editar Configuración" } do %>
+  <%= link_to "Volver", admin_settings_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" %>
+<% end %>
+
+<div class="container px-4 py-8 mx-auto">
+  <div class="mx-auto max-w-3xl">
+    <div class="p-6 bg-white rounded-lg shadow-sm">
+      <h2 class="mb-4 text-lg font-medium text-gray-900"><%= @setting.localized_name %></h2>
+      
+      <%= form_with(model: @setting, url: admin_setting_path(@setting), method: :patch) do |form| %>
+        <% if @setting.errors.any? %>
+          <div class="p-4 mb-6 bg-red-50 rounded">
+            <div class="font-medium text-red-800">
+              <%= pluralize(@setting.errors.count, "error") %> prohibited this setting from being saved:
+            </div>
+            <ul class="mt-3 text-sm list-disc list-inside text-red-800">
+              <% @setting.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <div class="mb-4">
+          <% case @setting.data_type %>
+          <% when "type_string" %>
+            <%= form.label :string_value, "Valor:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.text_field :string_value, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+          <% when "type_integer" %>
+            <%= form.label :integer_value, "Valor:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.number_field :integer_value, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+          <% when "type_float" %>
+            <%= form.label :float_value, "Valor:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.number_field :float_value, step: "0.01", class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+          <% when "type_datetime" %>
+            <%= form.label :datetime_value, "Valor:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.datetime_field :datetime_value, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+          <% when "type_boolean" %>
+            <div class="flex items-center">
+              <%= form.check_box :boolean_value, class: "h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" %>
+              <%= form.label :boolean_value, "Valor:", class: "ml-2 block text-sm text-gray-700" %>
+            </div>
+          <% when "type_hash" %>
+            <%= form.label :hash_value, "Valor:", class: "block text-sm font-medium text-gray-700 mb-1" %>
+            <%= form.text_area :hash_value, rows: 5, class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" %>
+          <% end %>
+        </div>
+
+        <div class="flex justify-end mt-6">
+          <%= form.submit "Guardar", class: "inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<style>
+  .toggle-checkbox:checked {
+    @apply: right-0 border-indigo-600;
+    right: 0;
+    border-color: #4f46e5;
+  }
+  .toggle-checkbox:checked + .toggle-label {
+    @apply: bg-indigo-600;
+    background-color: #4f46e5;
+  }
+</style>

@@ -1,0 +1,40 @@
+<%= render "shared/admin/nav", { header_title: "Configuración" } do %>
+  <!-- No create button needed as requested -->
+<% end %>
+
+<div class="container mx-auto px-4 py-8">
+  <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nombre Localizado</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Tipo de Dato</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Valor</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Estado</th>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Acciones</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900"><%= @setting.name %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= @setting.localized_name %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= @setting.data_type.gsub('type_', '') %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500"><%= @setting.get_value %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= @setting.active? ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' %>">
+                <%= @setting.status %>
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <%= link_to edit_admin_setting_path(@setting), class: "text-indigo-600 hover:text-indigo-900" do %>
+                <%= render "shared/icons/pencil" %>
+              <% end %>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
