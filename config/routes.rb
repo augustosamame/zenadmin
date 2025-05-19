@@ -123,6 +123,8 @@ Rails.application.routes.draw do
 
     resources :voided_orders, only: [ :index, :show ]
 
+    resources :settings, only: [ :index, :edit, :update ]
+
     resources :payments, only: [ :index, :show, :new, :create ]
     resources :payment_methods
     resources :price_lists
@@ -195,7 +197,7 @@ Rails.application.routes.draw do
         patch :adjustment_stock_transfer_admin_confirm
       end
     end
-    post 'generate_guia', to: 'stock_transfers#generate_guia'
+    post "generate_guia", to: "stock_transfers#generate_guia"
     resources :planned_stock_transfers do
       member do
         post :create_stock_transfer
@@ -266,7 +268,7 @@ Rails.application.routes.draw do
         get :fetch_purchases
       end
     end
-    
+
     resources :account_payables, only: [ :index, :show ] do
       collection do
         get :vendors_index

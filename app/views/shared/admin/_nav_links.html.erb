@@ -44,6 +44,9 @@
     <li>
       <%= nav_link_to "Tiendas", admin_locations_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <li>
+      <%= nav_link_to "Configuración", admin_settings_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
     <% if $global_settings[:feature_flag_price_lists] %>
     <li>
       <%= nav_link_to "Listas de Precios", admin_price_lists_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
