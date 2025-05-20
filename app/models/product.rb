@@ -117,7 +117,10 @@ class Product < ApplicationRecord
   end
 
   def smart_image(size)
-    self.media&.first&.smart_image(size)
+    image_media = self.media.find_by(media_type: "image")
+    default_media = self.media.find_by(media_type: "default_image")
+    
+    (image_media || default_media)&.smart_image(size)
   end
 
   def price_for_customer(customer)
