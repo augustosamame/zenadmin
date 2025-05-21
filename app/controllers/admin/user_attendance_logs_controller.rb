@@ -80,8 +80,8 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
       client = Aws::Rekognition::Client.new(
         region: "us-east-1",
         credentials: Aws::Credentials.new(
-          ENV["AWS_ACCESS_KEY_ID"],
-          ENV["AWS_SECRET_ACCESS_KEY"]
+          ENV["AWS_REKOGNITION_ACCESS_KEY_ID"],
+          ENV["AWS_REKOGNITION_SECRET_ACCESS_KEY"]
         )
       )
 
