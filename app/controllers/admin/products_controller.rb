@@ -69,19 +69,20 @@ class Admin::ProductsController < Admin::AdminController
     processed_params[:tag_ids] ||= []
     processed_params[:product_category_ids] ||= []
 
-    # TODO refactor
-    # Identify which media are to be kept
-    # media_ids_to_keep = processed_params[:media_attributes].map { |media| media[:id].to_i }.compact
-    # Find media records that should be deleted
-    # media_to_delete = @product.media.where.not(id: media_ids_to_keep)
+    # Handle deleted media IDs if present
+    if params[:product][:deleted_media_ids].present?
+      # Find and destroy the media records by ID
+      deleted_ids = params[:product][:deleted_media_ids].map(&:to_i).uniq
+      Rails.logger.info "Deleting media IDs: #{deleted_ids}"
+      
+      # Delete the media records
+      @product.media.where(id: deleted_ids).destroy_all
+    end
 
     # Explicitly handle the inafecto attribute
     @product.inafecto = processed_params[:inafecto]
 
     if @product.update(processed_params)
-      # Delete media that are no longer associated with the product
-      # media_to_delete.each(&:destroy)
-
       redirect_to admin_products_path, notice: "Product updated successfully."
     else
       render :edit
@@ -462,7 +463,7 @@ class Admin::ProductsController < Admin::AdminController
         id: pack.id,
         custom_id: "PACK-#{pack.id}",
         name: pack.name,
-        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || "https://v1-devtech-edukaierp-prod.s3.amazonaws.com/public/default_product_image.jpg",
+        image: pack.product_pack_items.first&.tags&.first&.products&.first&.smart_image(:small) || "https://#{ENV['S3_AWS_STORAGE_BUCKET_NAME']}.s3.amazonaws.com/public/default_product_image.jpg",
         price: pack.price.to_f,
         stock: calculate_pack_stock(pack),
         type: "ProductPack",

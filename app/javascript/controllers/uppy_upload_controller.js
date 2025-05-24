@@ -8,6 +8,9 @@ import Compressor from '@uppy/compressor';
 
 export default class extends Controller {
   static targets = ["fileInput", "previewContainer", "hiddenInput"];
+  static values = {
+    deletedFiles: { type: Array, default: [] }
+  };
 
   connect() {
     console.log("Uppy initialized in Stimulus controller");
@@ -114,13 +117,30 @@ export default class extends Controller {
 
     });
 
-    this.uppy.on('file-removed', () => {
-      console.log('File removed:', this.uppy.getFiles());
+    this.uppy.on('file-removed', (file) => {
+      console.log('File removed:', file);
+      
+      // If this is an existing file (has an ID from the server), track it for deletion
+      if (file.meta && file.meta.key && file.meta.existingFile) {
+        const fileId = file.meta.fileId;
+        if (fileId) {
+          console.log('Adding file ID to deleted files:', fileId);
+          const currentDeleted = this.deletedFilesValue || [];
+          this.deletedFilesValue = [...currentDeleted, fileId];
+          
+          // Add a hidden input to track deleted files
+          const deletedInput = document.createElement('input');
+          deletedInput.type = 'hidden';
+          deletedInput.name = 'product[deleted_media_ids][]';
+          deletedInput.value = fileId;
+          this.element.appendChild(deletedInput);
+        }
+      }
+      
       // set a timeout to re-add the remove buttons
       setTimeout(() => {
         this.addRemoveButtons();
       }, 100);
-      
     });
   }
 
@@ -141,7 +161,10 @@ export default class extends Controller {
       console.log('Fetching blob for existing file:', file);
 
       // Fetch the Blob data from S3 for each existing file
-      return fetch(`https://v1-devtech-edukaierp-prod.s3.amazonaws.com/public/${file.id}`)
+      const bucketName = this.element.dataset.s3Bucket || '';
+      // Use the storage prefix from the file data (cache, public, private)
+      const storagePrefix = file.storage || 'cache';
+      return fetch(`https://${bucketName}.s3.amazonaws.com/${storagePrefix}/${file.id}`)
         .then(response => response.blob())
         .then(blob => {
           console.log('Fetched blob:', blob);
@@ -153,6 +176,8 @@ export default class extends Controller {
             data: blob,
             meta: {
               key: file.id,
+              fileId: file.metadata.media_id, // Store the actual media record ID
+              existingFile: true // Flag to identify existing files
             }
           });
         })

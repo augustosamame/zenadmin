@@ -12,7 +12,7 @@
     </div>
     
     <!-- Media Upload Section -->
-    <div class="col-span-2" data-controller="uppy-upload" data-existing-files="<%= @product.media.map { |media| media.file }.to_json %>">
+    <div class="col-span-2" data-controller="uppy-upload" data-existing-files="<%= @product.media.map { |media| media.file.as_json.merge(metadata: media.file.metadata.as_json.merge(media_id: media.id)) }.to_json %>" data-s3-bucket="<%= ENV['S3_AWS_STORAGE_BUCKET_NAME'] %>">
       <h3 class="mb-4 text-lg font-semibold">Añadir Media</h3>
       <div data-uppy-upload-target="previewContainer">
         <!-- Uppy Dashboard will be rendered here -->
