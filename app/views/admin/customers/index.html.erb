@@ -24,6 +24,7 @@
         </tr>
       </thead>
       <tbody>
+        <% # Initial data will be loaded via AJAX after page load %>
         <% @users.each do |user| %>
           <tr>
             <td class="px-4 py-2"><%= user.id %></td>
@@ -49,7 +50,6 @@
             <td class="px-4 py-2"><%= user.translated_status %></td>
             <td class="px-4 py-2">
               <%= render partial: "admin/customers/actions", locals: { user: user, default_object_options_array: @default_object_options_array } %>
-              
             </td>
           </tr>
         <% end %>
