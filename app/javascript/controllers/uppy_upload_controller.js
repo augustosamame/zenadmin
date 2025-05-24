@@ -164,7 +164,17 @@ export default class extends Controller {
       const bucketName = this.element.dataset.s3Bucket || '';
       // Use the storage prefix from the file data (cache, public, private)
       const storagePrefix = file.storage || 'cache';
-      return fetch(`https://${bucketName}.s3.amazonaws.com/${storagePrefix}/${file.id}`)
+      
+      // Handle file IDs that already contain a full path
+      const fileId = file.id;
+      
+      // If the file ID already includes the storage prefix, don't add it again
+      const url = fileId.startsWith(storagePrefix + '/') ?
+        `https://${bucketName}.s3.amazonaws.com/${fileId}` :
+        `https://${bucketName}.s3.amazonaws.com/${storagePrefix}/${fileId}`;
+      
+      console.log('Fetching file from URL:', url);
+      return fetch(url)
         .then(response => response.blob())
         .then(blob => {
           console.log('Fetched blob:', blob);
