@@ -162,16 +162,32 @@ export default class extends Controller {
 
       // Fetch the Blob data from S3 for each existing file
       const bucketName = this.element.dataset.s3Bucket || '';
-      // Use the storage prefix from the file data (cache, public, private)
-      const storagePrefix = file.storage || 'cache';
+      
+      // Map storage values to actual S3 folder prefixes
+      // In production, files with storage='store' are actually in the 'public' folder
+      const storageMap = {
+        'cache': 'cache',
+        'store': 'public',
+        'store_public': 'public',
+        'store_private': 'private'
+      };
+      
+      // Get the actual storage prefix to use
+      const storagePrefix = storageMap[file.storage] || 'public';
       
       // Handle file IDs that already contain a full path
       const fileId = file.id;
       
-      // If the file ID already includes the storage prefix, don't add it again
+      // Determine if we need to use the regional S3 URL format
+      const isProduction = window.location.hostname.includes('prod');
+      const s3Domain = isProduction ? 
+        `${bucketName}.s3.us-east-1.amazonaws.com` : 
+        `${bucketName}.s3.amazonaws.com`;
+      
+      // Construct the URL
       const url = fileId.startsWith(storagePrefix + '/') ?
-        `https://${bucketName}.s3.amazonaws.com/${fileId}` :
-        `https://${bucketName}.s3.amazonaws.com/${storagePrefix}/${fileId}`;
+        `https://${s3Domain}/${fileId}` :
+        `https://${s3Domain}/${storagePrefix}/${fileId}`;
       
       console.log('Fetching file from URL:', url);
       return fetch(url)
