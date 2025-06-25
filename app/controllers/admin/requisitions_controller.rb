@@ -251,6 +251,17 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def requisition_params
+    # First, preprocess the params to mark empty records for destruction
+    if params[:requisition][:requisition_lines_attributes].present?
+      params[:requisition][:requisition_lines_attributes].each do |key, line_params|
+        # If there's only an ID and no other meaningful attributes, mark it for destruction
+        if line_params[:id].present? &&
+           (line_params[:product_id].blank? || line_params.keys.size <= 1)
+          params[:requisition][:requisition_lines_attributes][key][:_destroy] = "1"
+        end
+      end
+    end
+
     filtered_params = params.require(:requisition).permit(
       :location_id,
       :warehouse_id,
@@ -271,9 +282,13 @@ class Admin::RequisitionsController < Admin::AdminController
       ]
     )
 
-    # Filter out invalid requisition lines
+    # Filter out invalid requisition lines, but keep ones marked for destruction
     if filtered_params[:requisition_lines_attributes].present?
       filtered_params[:requisition_lines_attributes].reject! do |_, line_params|
+        # Don't reject if it's marked for destruction
+        next false if line_params[:_destroy].present? && line_params[:_destroy] == "1"
+
+        # Otherwise, apply the regular validation
         line_params[:product_id].blank? ||
         line_params[:manual_quantity].blank? ||
         line_params[:manual_quantity].to_i <= 0
