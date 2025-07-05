@@ -162,7 +162,19 @@ class Admin::RequisitionsController < Admin::AdminController
             end
           when "plan"
             Rails.logger.info "Attempting to plan requisition"
-            if @requisition.req_submitted? && @requisition.may_plan?
+            if @requisition.req_submitted?
+              # Check if all requisition lines have planned quantities
+              missing_planned_quantities = @requisition.requisition_lines.any? { |line| line.planned_quantity.blank? || line.planned_quantity.to_i <= 0 }
+              
+              if missing_planned_quantities
+                # Set error message for missing planned quantities
+                flash.now[:alert] = "Debe indicar cantidad planificada para cada producto pedido"
+                set_locations_and_warehouses
+                render :edit, status: :unprocessable_entity
+                return
+              end
+              
+              # If we get here, all lines have planned quantities
               Rails.logger.info "About to plan! requisition ##{@requisition.id}"
               @requisition.plan!
               Rails.logger.info "Planned requisition ##{@requisition.id}"

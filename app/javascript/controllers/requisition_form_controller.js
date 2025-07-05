@@ -40,28 +40,51 @@ export default class extends Controller {
   }
 
   add(event) {
+    console.log('Add button clicked!')
     event.preventDefault()
-    const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
-    const newLine = document.createRange().createContextualFragment(content).firstElementChild
-
-    newLine.querySelectorAll(".ts-wrapper").forEach(wrapper => wrapper.remove())
-    newLine.querySelectorAll("input, select").forEach(input => {
-      if (input.name.includes("quantity")) {
-        input.value = "0"
-      } else {
-        input.value = ""
+    
+    if (!this.hasTemplateTarget || !this.hasLinesTarget) {
+      console.error('Template or lines target not found')
+      return
+    }
+    
+    try {
+      // Generate a unique timestamp for the new record
+      const timestamp = new Date().getTime()
+      
+      // Get the template content and replace NEW_RECORD with the timestamp
+      const content = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, timestamp)
+      
+      // Insert the new line HTML directly into the lines container
+      this.linesTarget.insertAdjacentHTML('beforeend', content)
+      
+      // Get the newly added line (it will be the last child)
+      const newLine = this.linesTarget.lastElementChild
+      
+      console.log('New line added:', newLine)
+      
+      // Initialize select elements in the new line
+      const selects = newLine.querySelectorAll('select[data-controller="select"]')
+      if (selects.length > 0) {
+        selects.forEach(select => {
+          // Initialize the select with TomSelect
+          if (this.application) {
+            this.application.getControllerForElementAndIdentifier(select, 'select')
+          }
+          
+          // Add event listener for stock updates
+          select.addEventListener('change', (e) => this.updateStockInfo(e))
+        })
       }
-      input.classList.remove("tomselected", "ts-hidden-accessible")
-      input.removeAttribute("id")
-      input.style.display = ''
-    })
-
-    this.linesTarget.appendChild(newLine)
-
-    // Initialize event listeners for the new line
-    const newSelect = newLine.querySelector('select[data-controller="select"]')
-    if (newSelect) {
-      newSelect.addEventListener('change', (event) => this.updateStockInfo(event))
+      
+      // Set default values for quantity fields
+      const quantityInputs = newLine.querySelectorAll('input[name*="quantity"]')
+      quantityInputs.forEach(input => {
+        input.value = "0"
+      })
+      
+    } catch (error) {
+      console.error('Error adding new line:', error)
     }
   }
 
