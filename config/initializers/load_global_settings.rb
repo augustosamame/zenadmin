@@ -41,39 +41,71 @@ Rails.application.config.after_initialize do
   def check_custom_numberings
     return unless ActiveRecord::Base.connection.table_exists?("custom_numberings")
 
-    CustomNumbering.record_types.keys.each do |record_type|
+    # Load settings first to ensure $global_settings is populated
+    load_global_settings if $global_settings.empty?
+    
+    # Get all record types
+    all_record_types = CustomNumbering.record_types.keys
+    
+    # Identify purchase-related record types
+    purchase_related_types = all_record_types.select do |record_type|
+      record_type.start_with?("purchases_") || 
+      record_type == "purchase" || 
+      record_type == "purchase_payment"
+    end
+    
+    # Filter out purchase-related record types if the feature flag is disabled
+    record_types_to_check = if $global_settings[:feature_flag_purchases] == false
+      all_record_types - purchase_related_types
+    else
+      all_record_types
+    end
+
+    # Define default configurations for each record type
+    default_configs = {
+      "purchases_vendor" => { prefix: "VEP", length: 4 },
+      "supplier" => { prefix: "PRO", length: 4 },
+      "purchase" => { prefix: "COM", length: 5 },
+      "purchases_purchase" => { prefix: "COM", length: 5 },
+      "product" => { prefix: "PRO", length: 4 },
+      "order" => { prefix: "VEN", length: 6 },
+      "cash_inflow" => { prefix: "CIN", length: 5 },
+      "cash_outflow" => { prefix: "COU", length: 5 },
+      "payment" => { prefix: "PAG", length: 6 },
+      "stock_transfer" => { prefix: "INT", length: 5 },
+      "requisition" => { prefix: "PED", length: 5 },
+      "planned_stock_transfer" => { prefix: "PLA", length: 5 },
+      "purchases_purchase_order" => { prefix: "POO", length: 6 },
+      "purchase_payment" => { prefix: "PPR", length: 6 }
+    }
+    
+    record_types_to_check.each do |record_type|
       unless CustomNumbering.exists?(record_type: record_type)
-        case record_type
-        when "purchases_vendor"
-          CustomNumbering.find_or_create_by!(record_type: :purchases_vendor, prefix: "VEP", length: 4, next_number: 1, status: :active)
-        when "supplier"
-          CustomNumbering.find_or_create_by!(record_type: :supplier, prefix: "PRO", length: 4, next_number: 1, status: :active)
-        when "purchase"
-          CustomNumbering.find_or_create_by!(record_type: :purchase, prefix: "COM", length: 5, next_number: 1, status: :active)
-        when "purchases_purchase"
-          CustomNumbering.find_or_create_by!(record_type: :purchases_purchase, prefix: "COM", length: 5, next_number: 1, status: :active)
-        when "product"
-          CustomNumbering.find_or_create_by!(record_type: :product, prefix: "PRO", length: 4, next_number: 1, status: :active)
-        when "order"
-          CustomNumbering.find_or_create_by!(record_type: :order, prefix: "VEN", length: 6, next_number: 1, status: :active)
-        when "cash_inflow"
-          CustomNumbering.find_or_create_by!(record_type: :cash_inflow, prefix: "CIN", length: 5, next_number: 1, status: :active)
-        when "cash_outflow"
-          CustomNumbering.find_or_create_by!(record_type: :cash_outflow, prefix: "COU", length: 5, next_number: 1, status: :active)
-        when "payment"
-          CustomNumbering.find_or_create_by!(record_type: :payment, prefix: "PAG", length: 6, next_number: 1, status: :active)
-        when "stock_transfer"
-          CustomNumbering.find_or_create_by!(record_type: :stock_transfer, prefix: "INT", length: 5, next_number: 1, status: :active)
-        when "requisition"
-          CustomNumbering.find_or_create_by!(record_type: :requisition, prefix: "PED", length: 5, next_number: 1, status: :active)
-        when "planned_stock_transfer"
-          CustomNumbering.find_or_create_by!(record_type: :planned_stock_transfer, prefix: "PLA", length: 5, next_number: 1, status: :active)
-        when "purchase_order"
-          CustomNumbering.find_or_create_by!(record_type: :purchases_purchase_order, prefix: "POO", length: 6, next_number: 1, status: :active)
-        when "purchase_payment"
-          CustomNumbering.find_or_create_by!(record_type: :purchase_payment, prefix: "PPR", length: 6, next_number: 1, status: :active)
-        else
-          raise "CustomNumbering for #{record_type} not found"
+        # Get default config or use a generic one
+        config = default_configs[record_type] || { prefix: record_type[0, 3].upcase, length: 5 }
+        
+        begin
+          # Create the CustomNumbering record with the appropriate configuration
+          CustomNumbering.create!(
+            record_type: record_type,
+            prefix: config[:prefix],
+            length: config[:length],
+            next_number: 1,
+            status: :active
+          )
+        rescue => e
+          # Log the error but don't raise it during initialization
+          # This prevents the app from crashing during startup
+          Rails.logger.error("Error creating CustomNumbering for #{record_type}: #{e.message}")
+          
+          # Only raise for non-purchase related record types if feature flag is enabled
+          is_purchase_related = record_type.start_with?("purchases_") || 
+                              record_type == "purchase" || 
+                              record_type == "purchase_payment"
+                              
+          if !is_purchase_related || $global_settings[:feature_flag_purchases]
+            raise e
+          end
         end
       end
     end

@@ -243,7 +243,7 @@ class Order < ApplicationRecord
   def self.consolidated_sales(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)
     # First get the regular sales data
     base_query = Order.select([
-      "orders.id",
+      "DISTINCT ON (orders.id) orders.id",
       "orders.custom_id",
       "orders.order_date",
       "orders.total_price_cents",
@@ -302,20 +302,22 @@ class Order < ApplicationRecord
     if order_column.present? && order_direction.present?
       order_sql = case order_column
       when "1" # custom_id
-                    "orders.custom_id"
+                  "orders.custom_id"
       when "2" # datetime
-                    "orders.order_date"
+                  "orders.order_date"
       when "4" # total
-                    "orders.total_price_cents"
+                  "orders.total_price_cents"
       else
-                    "orders.custom_id"
+                  "orders.custom_id"
       end
 
       direction = order_direction.upcase
-      return base_query.order(Arel.sql("#{order_sql} #{direction}"))
+      # When using DISTINCT ON, the first ORDER BY expression must match the DISTINCT ON expression
+      return base_query.order(Arel.sql("orders.id, #{order_sql} #{direction}"))
     end
 
-    base_query.order(Arel.sql("orders.custom_id DESC"))
+    # Default ordering - must include orders.id first for DISTINCT ON
+    base_query.order(Arel.sql("orders.id, orders.custom_id DESC"))
   end
 
   def self.consolidated_sales_by_payment_method(location: nil, date_range: nil, order_column: nil, order_direction: nil, search_term: nil)

@@ -110,5 +110,5 @@ group :development do
   gem 'capistrano-bundler', '~> 2.0'
   gem 'ed25519', '~> 1.2'
   gem 'bcrypt_pbkdf', '~> 1.0'
-  gem 'log_bench', '~> 0.1.4'
+  # gem 'log_bench', '~> 0.1.4'
 end

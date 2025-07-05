@@ -59,7 +59,7 @@ supplier_2 = Supplier.create!(name: "Main Factory", sourceable: factory_1, regio
 warehouse_user_1 = User.create!(email: 'almacen_principal@jardindelzen.com', phone: "986976311", login: "almacen_principal@jardindelzen.com", require_password_change: false, password: "12345678", first_name: "Almacén", last_name: "Principal", internal: true)
 warehouse_user_1.add_role('warehouse_manager')
 
-location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@jardindelzen.com", address: 'Jr. Combate de Angamos 172, Santiago de Surco 15023', phone: '900000000')
+location_0 = Location.find_or_create_by!(name: 'Oficina Principal', region: region_default, email: "oficina@jardindelzen.com", address: 'Jr. Combate de Angamos 172, Santiago de Surco 15023', phone: '900000000', is_main: true)
 
 warehouse_0 = Warehouse.find_by!(name: "Almacén Oficina Principal").update(is_main: true)
 

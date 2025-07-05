@@ -306,6 +306,9 @@ Rails.application.routes.draw do
     resources :consolidated_sales, only: [ :index ]
     get "reports/consolidated_sales", to: "consolidated_sales#index"
 
+    resources :sales_per_seller, only: [ :index ]
+    get "reports/sales_per_seller", to: "sales_per_seller#index"
+
     resources :grouped_sales, only: [ :index ]
     get "reports/grouped_sales", to: "grouped_sales#index"
 

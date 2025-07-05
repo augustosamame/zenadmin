@@ -29,11 +29,21 @@ class CustomNumbering < ApplicationRecord
   after_initialize :set_defaults, if: :new_record?
 
   def self.for_record_type(record_type, category_prefix = nil)
-    if record_type == :product && category_prefix.present?
-      find_or_create_by(record_type: record_type, prefix: category_prefix)
-    else
-      find_or_create_by(record_type: record_type)
+    # Ensure record_type is valid
+    unless record_types.key?(record_type.to_s)
+      Rails.logger.warn("Invalid record_type: #{record_type} for CustomNumbering")
+      # Return a default CustomNumbering with a generic prefix to avoid errors
+      return new(record_type: record_types.keys.first, prefix: record_type.to_s[0, 3].upcase, next_number: 1, length: 5)
     end
+    
+    # Create with explicit prefix to avoid validation errors
+    prefix = if record_type == :product && category_prefix.present?
+               category_prefix
+             else
+               record_type.to_s[0, 3].upcase
+             end
+    
+    find_or_create_by!(record_type: record_type, prefix: prefix)
   end
 
   # Convert the model name to the record type taking into account namespaced models
@@ -47,6 +57,14 @@ class CustomNumbering < ApplicationRecord
   private
 
   def set_defaults
-    self.prefix ||= "#{record_type[0, 3].upcase}"
+    # Make sure record_type is a string before trying to use it
+    if record_type.present?
+      # Convert symbol to string if needed
+      rt = record_type.is_a?(Symbol) ? record_type.to_s : record_type
+      self.prefix ||= rt[0, 3].upcase
+    else
+      # Fallback prefix if record_type is not set yet
+      self.prefix ||= "UNK"
+    end
   end
 end

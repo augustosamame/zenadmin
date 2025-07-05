@@ -132,6 +132,11 @@ export const resourceMappings = {
     buttonUrl: "/admin/consolidated_sales/new", // or null if you don't want a create button
     ajaxUrl: "/admin/consolidated_sales.json"
   },
+  SalesPerSeller: {
+    buttonText: "Exportar", // or null if you don't want a create button
+    buttonUrl: "/admin/sales_per_seller/new", // or null if you don't want a create button
+    ajaxUrl: "/admin/sales_per_seller.json"
+  },
   OrdersPerProduct: {
     ajaxUrl: "/admin/orders_per_product.json"
   },
