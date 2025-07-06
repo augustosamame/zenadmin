@@ -309,6 +309,9 @@ Rails.application.routes.draw do
     resources :sales_per_seller, only: [ :index ]
     get "reports/sales_per_seller", to: "sales_per_seller#index"
 
+    resources :flat_commission_products_report, only: [ :index ]
+    get "reports/flat_commission_products_report", to: "flat_commission_products_report#index"
+
     resources :grouped_sales, only: [ :index ]
     get "reports/grouped_sales", to: "grouped_sales#index"
 

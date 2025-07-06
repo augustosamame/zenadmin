@@ -268,6 +268,11 @@
     <li>
       <%= nav_link_to "Ventas por Vendedor", admin_reports_sales_per_seller_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>
+    <% if $global_settings[:feature_flag_sellers_products_can_have_flat_commissions] %>
+    <li>
+      <%= nav_link_to "Productos con Comisión Plana", admin_reports_flat_commission_products_report_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
+    </li>
+    <% end %>
     <li>
       <%= nav_link_to "Totalizado de Ventas por Tienda", admin_reports_grouped_sales_path, class: "block px-4 py-2 text-gray-700 hover:bg-gray-100" %>
     </li>

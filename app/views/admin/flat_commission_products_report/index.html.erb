@@ -1,0 +1,100 @@
+<%= render "shared/admin/nav", { header_title: "Reporte de Productos con Comisión Plana" } do %>
+  <%= render "shared/admin/location_dropdown" %>
+<% end %>
+
+<div class="container p-6 mx-auto mt-6 bg-white border rounded-lg shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
+  <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
+    <%= simple_form_for :filter, url: admin_reports_flat_commission_products_report_path, method: :get, html: { class: 'contents' } do |f| %>
+      <div class="md:col-span-1">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Desde</p>
+        <%= f.input :from_date, 
+            as: :date, 
+            html5: true,
+            label: false, 
+            input_html: { 
+              class: 'form-input block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600 dark:text-gray-300',
+              value: @from_date
+            } %>
+      </div>
+
+      <div class="md:col-span-1">
+        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Hasta</p>
+        <%= f.input :to_date, 
+            as: :date, 
+            html5: true,
+            label: false, 
+            input_html: { 
+              class: 'form-input block w-full text-sm border-gray-300 rounded-md shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600 dark:text-gray-300',
+              value: @to_date
+            } %>
+      </div>
+
+      <div class="md:col-span-1">
+        <div class="flex flex-col gap-4 h-full justify-center">
+          <div class="flex items-center">
+            <%= f.input :consolidated_by_seller,
+                as: :boolean,
+                label: "Consolidar por vendedor",
+                input_html: { 
+                  class: 'h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600 mr-3',
+                  checked: @consolidated_by_seller
+                },
+                wrapper_html: { class: 'flex items-center' },
+                label_html: { class: 'text-sm font-medium text-gray-700 dark:text-gray-300' } %>
+          </div>
+        </div>
+      </div>
+
+      <div class="md:col-span-1 flex items-end">
+        <div class="flex flex-col gap-2 w-full">
+          <%= f.submit 'Filtrar', 
+              class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800' %>
+          
+          <%= link_to 'Quitar Filtros', 
+              admin_reports_flat_commission_products_report_path, 
+              class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600 dark:focus:ring-offset-slate-800' %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+  <% if @consolidated_by_seller %>
+    <table class="w-full">
+      <thead>
+        <tr>
+          <th>Tienda</th>
+          <th>Vendedor</th>
+          <th>Órdenes/Productos</th>
+          <th>Monto Total</th>
+          <th>Comisión Total</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  <% else %>
+    <table class="w-full">
+      <thead>
+        <tr>
+          <th>Tienda</th>
+          <th>Orden</th>
+          <th>Fecha</th>
+          <th>Vendedor</th>
+          <th>Comprobante</th>
+          <th>Producto</th>
+          <th>Cantidad</th>
+          <th>Precio</th>
+          <th>Total</th>
+          <th>% Comisión</th>
+          <th>Monto Comisión</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+      </tbody>
+    </table>
+  <% end %>
+</div>
