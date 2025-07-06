@@ -172,6 +172,9 @@ application.register("product-category-form", ProductCategoryFormController)
 import ProductPackFormController from "./product_pack_form_controller"
 application.register("product-pack-form", ProductPackFormController)
 
+import FlatCommissionController from "./flat_commission_controller"
+application.register("flat-commission", FlatCommissionController)
+
 import ReportDateController from "./report_date_controller"
 application.register("report-date", ReportDateController)
 

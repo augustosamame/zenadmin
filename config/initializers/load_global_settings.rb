@@ -20,7 +20,8 @@ Rails.application.config.after_initialize do
     { name: :feature_flag_notas_de_venta, default: false, data_type: "type_boolean", localized_name: "Permite generar notas de venta", internal: false },
     { name: :linked_cashiers_for_payment_methods, default: false, data_type: "type_boolean", localized_name: "Cada método de pago depositará en su propia caja", internal: false },
     { name: :address_for_dni, default: false, data_type: "type_boolean", localized_name: "Se mostrará y enviará a SUNAT dirección para boletas", internal: false },
-    { name: :feature_flag_sellers_can_void_orders, default: false, data_type: "type_boolean", localized_name: "Vendedores pueden anular órdenes", internal: false }
+    { name: :feature_flag_sellers_can_void_orders, default: false, data_type: "type_boolean", localized_name: "Vendedores pueden anular órdenes", internal: false },
+    { name: :feature_flag_sellers_products_can_have_flat_commissions, default: false, data_type: "type_boolean", localized_name: "Productos pueden tener comision plana", internal: false }
   ]
 
   def load_global_settings
@@ -43,17 +44,17 @@ Rails.application.config.after_initialize do
 
     # Load settings first to ensure $global_settings is populated
     load_global_settings if $global_settings.empty?
-    
+
     # Get all record types
     all_record_types = CustomNumbering.record_types.keys
-    
+
     # Identify purchase-related record types
     purchase_related_types = all_record_types.select do |record_type|
-      record_type.start_with?("purchases_") || 
-      record_type == "purchase" || 
+      record_type.start_with?("purchases_") ||
+      record_type == "purchase" ||
       record_type == "purchase_payment"
     end
-    
+
     # Filter out purchase-related record types if the feature flag is disabled
     record_types_to_check = if $global_settings[:feature_flag_purchases] == false
       all_record_types - purchase_related_types
@@ -78,12 +79,12 @@ Rails.application.config.after_initialize do
       "purchases_purchase_order" => { prefix: "POO", length: 6 },
       "purchase_payment" => { prefix: "PPR", length: 6 }
     }
-    
+
     record_types_to_check.each do |record_type|
       unless CustomNumbering.exists?(record_type: record_type)
         # Get default config or use a generic one
         config = default_configs[record_type] || { prefix: record_type[0, 3].upcase, length: 5 }
-        
+
         begin
           # Create the CustomNumbering record with the appropriate configuration
           CustomNumbering.create!(
@@ -97,12 +98,12 @@ Rails.application.config.after_initialize do
           # Log the error but don't raise it during initialization
           # This prevents the app from crashing during startup
           Rails.logger.error("Error creating CustomNumbering for #{record_type}: #{e.message}")
-          
+
           # Only raise for non-purchase related record types if feature flag is enabled
-          is_purchase_related = record_type.start_with?("purchases_") || 
-                              record_type == "purchase" || 
+          is_purchase_related = record_type.start_with?("purchases_") ||
+                              record_type == "purchase" ||
                               record_type == "purchase_payment"
-                              
+
           if !is_purchase_related || $global_settings[:feature_flag_purchases]
             raise e
           end

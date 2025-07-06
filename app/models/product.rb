@@ -37,6 +37,7 @@ class Product < ApplicationRecord
   validates :description, presence: true
   validates :permalink, presence: true
   validates :price_cents, presence: true
+  validates :flat_commission_percentage, numericality: { greater_than: 0 }, if: :flat_commission?
 
   monetize :price_cents, with_model_currency: :currency
   monetize :discounted_price_cents, with_model_currency: :currency

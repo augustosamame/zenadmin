@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_05_221733) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -854,6 +854,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_04_21_023333) do
     t.datetime "updated_at", null: false
     t.boolean "inafecto", default: false
     t.string "unit_of_measure", default: "NIU"
+    t.boolean "flat_commission", default: false
+    t.decimal "flat_commission_percentage", precision: 10, scale: 2
     t.index ["custom_id"], name: "index_products_on_custom_id", unique: true
     t.index ["is_test_product"], name: "index_products_on_is_test_product"
     t.index ["name"], name: "index_products_on_name"

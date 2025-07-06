@@ -42,6 +42,34 @@
       <%= form.input :inafecto, as: :boolean, label: "Inafecto (IGV 0%)", input_html: { class: "form-checkbox mr-2" }, label_html: { class: "form-label" } %>
     </div>
 
+    <% if $global_settings[:feature_flag_sellers_products_can_have_flat_commissions] %>
+    <div data-controller="flat-commission">
+      <div>
+        <%= form.input :flat_commission, as: :boolean, label: "Comisión Plana", 
+                      input_html: { 
+                        class: "form-checkbox mr-2", 
+                        data: { 
+                          action: "change->flat-commission#togglePercentageField",
+                          flat_commission_target: "checkbox"
+                        } 
+                      }, 
+                      label_html: { class: "form-label" } %>
+      </div>
+      <div>
+        <%= form.input :flat_commission_percentage, label: "Porcentaje de Comisión", 
+                      as: :decimal, 
+                      input_html: { 
+                        step: 0.01, 
+                        class: "form-input", 
+                        data: { 
+                          flat_commission_target: "percentageField" 
+                        } 
+                      }, 
+                      label_html: { class: "form-label" } %>
+      </div>
+    </div>
+    <% end %>
+
     <div>
       <%= form.input :status, label: "Estado", collection: Product.translated_statuses.map { |translation, k, _v| [translation.titleize, k] }, input_html: { class: "form-input" }, label_html: { class: "form-label" } %>
     </div>
