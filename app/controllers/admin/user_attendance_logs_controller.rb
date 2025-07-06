@@ -41,14 +41,21 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
 
   def create
     @user_attendance_log = UserAttendanceLog.new(user_attendance_log_params)
-    existing_log = UserAttendanceLog.find_by(user: @user_attendance_log.user, location: @user_attendance_log.location, checkout: nil)
+    
+    # Look for existing logs that are NOT just created (add a time buffer)
+    # This prevents accidentally checking out a log that was just created
+    existing_log = UserAttendanceLog.where(
+      user: @user_attendance_log.user, 
+      location: @user_attendance_log.location, 
+      checkout: nil
+    ).where("created_at < ?", 30.seconds.ago).first
 
     if existing_log
       if existing_log.update(checkout: Time.current)
         respond_to do |format|
           format.html { redirect_to admin_user_attendance_logs_path, notice: "El vendedor ha hecho checkout en #{existing_log.location.name}" }
-            format.json { render json: { message: "El vendedor ha hecho checkout en #{existing_log.location.name}" } }
-          end
+          format.json { render json: { message: "El vendedor ha hecho checkout en #{existing_log.location.name}" } }
+        end
       else
         set_form_variables
         respond_to do |format|
@@ -59,8 +66,7 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
     else
       if @user_attendance_log.save
         respond_to do |format|
-          format.html { redirect_to admin_user_attendance_logs_path, notice: "El vendedor ha hecho checkin en #{@user_attendance_log.location.name}"
-          }
+          format.html { redirect_to admin_user_attendance_logs_path, notice: "El vendedor ha hecho checkin en #{@user_attendance_log.location.name}" }
           format.json { render json: { message: "El vendedor ha hecho checkin en #{@user_attendance_log.location.name}" }, status: :created }
         end
       else
