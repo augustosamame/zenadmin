@@ -39,14 +39,19 @@ export default class extends Controller {
   initializeChart() {
     console.log("Initializing chart")
     this.destroyChart() // Ensure any existing chart is destroyed before creating a new one
-    if (this.hasTeamGoalsValue) {
+    
+    // Only initialize teamGoals chart if both the value and target exist
+    if (this.hasTeamGoalsValue && this.hasTeamGoalsTarget) {
       this.initializeTeamGoalsChart()
-    } else {
-      console.warn("Chart data not available yet")
+    } else if (this.hasTeamGoalsValue) {
+      console.warn("Team goals target not found, but value exists")
     }
     
-    if (this.hasTeamGoalsJardindelzenValue) {
+    // Only initialize teamGoalsJardindelzen chart if both the value and target exist
+    if (this.hasTeamGoalsJardindelzenValue && this.hasTeamGoalsJardindelzenTarget) {
       this.initializeTeamGoalsJardindelzenChart()
+    } else if (this.hasTeamGoalsJardindelzenValue) {
+      console.warn("Jardín del Zen team goals target not found, but value exists")
     }
   }
 
@@ -258,6 +263,40 @@ export default class extends Controller {
     }
   }
 
+  teamGoalsValueChanged() {
+    console.log("Team goals value changed")
+    if (this.hasTeamGoalsTarget) {
+      this.updateTeamGoalsChart()
+    }
+  }
+  
+  teamGoalsJardindelzenValueChanged() {
+    console.log("Jardín del Zen team goals value changed")
+    if (this.hasTeamGoalsJardindelzenTarget) {
+      this.updateTeamGoalsJardindelzenChart()
+    }
+  }
+
+  updateTeamGoalsChart() {
+    console.log("Updating team goals chart")
+    if (this.teamGoalsChart) {
+      const options = this.getTeamGoalsChartOptions()
+      this.teamGoalsChart.updateOptions(options)
+    } else if (this.hasTeamGoalsTarget) {
+      this.initializeTeamGoalsChart()
+    }
+  }
+  
+  updateTeamGoalsJardindelzenChart() {
+    console.log("Updating Jardín del Zen team goals chart")
+    if (this.teamGoalsJardindelzenChart) {
+      const options = this.getTeamGoalsJardindelzenChartOptions()
+      this.teamGoalsJardindelzenChart.updateOptions(options)
+    } else if (this.hasTeamGoalsJardindelzenTarget) {
+      this.initializeTeamGoalsJardindelzenChart()
+    }
+  }
+
   handleResize() {
     if (this.teamGoalsChart) {
       this.teamGoalsChart.updateOptions({
@@ -273,36 +312,6 @@ export default class extends Controller {
           width: '100%'
         }
       })
-    }
-  }
-
-  teamGoalsValueChanged() {
-    console.log("Team goals value changed")
-    this.updateTeamGoalsChart()
-  }
-  
-  teamGoalsJardindelzenValueChanged() {
-    console.log("Jardín del Zen team goals value changed")
-    this.updateTeamGoalsJardindelzenChart()
-  }
-
-  updateTeamGoalsChart() {
-    console.log("Updating team goals chart")
-    if (this.teamGoalsChart) {
-      const options = this.getTeamGoalsChartOptions()
-      this.teamGoalsChart.updateOptions(options)
-    } else {
-      this.initializeTeamGoalsChart()
-    }
-  }
-  
-  updateTeamGoalsJardindelzenChart() {
-    console.log("Updating Jardín del Zen team goals chart")
-    if (this.teamGoalsJardindelzenChart) {
-      const options = this.getTeamGoalsJardindelzenChartOptions()
-      this.teamGoalsJardindelzenChart.updateOptions(options)
-    } else {
-      this.initializeTeamGoalsJardindelzenChart()
     }
   }
 }
