@@ -9,26 +9,26 @@
           <%= form_tag admin_user_attendance_logs_path, method: :get, class: "flex items-center gap-4", 
               data: { action: "submit->attendance-logs#refreshTable" } do %>
             <%= select_tag :location_id, 
-                         options_from_collection_for_select(@locations, :id, :name, params[:location_id]), 
+                         options_from_collection_for_select(@locations, :id, :name, @filter_location_id), 
                          prompt: "Todas las ubicaciones",
                          class: "form-select w-[220px] max-w-[220px]",
                          data: { action: "change->attendance-logs#refreshTable" } %>
             
             <div class="flex items-center gap-2">
               <%= datetime_field_tag :begin_datetime, 
-                                   params[:begin_datetime], 
+                                   @filter_begin_datetime, 
                                    class: "form-input",
                                    placeholder: "Fecha inicial" %>
               <%= datetime_field_tag :end_datetime, 
-                                   params[:end_datetime], 
+                                   @filter_end_datetime, 
                                    class: "form-input",
                                    placeholder: "Fecha final" %>
             </div>
             
             <%= submit_tag "Filtrar", class: "btn btn-primary" %>
             
-            <% if params[:location_id].present? || params[:begin_datetime].present? || params[:end_datetime].present? %>
-              <%= link_to admin_user_attendance_logs_path, 
+            <% if params[:location_id].present? || params[:begin_datetime].present? || params[:end_datetime].present? || session[:user_attendance_filter_location_id].present? || session[:user_attendance_filter_begin_datetime].present? || session[:user_attendance_filter_end_datetime].present? %>
+              <%= link_to admin_user_attendance_logs_path(clear_filters: true), 
                 class: "btn btn-secondary w-[300px] max-w-[160px]", 
                   data: { action: "attendance-logs#removeFilters" } do %>
                 <i class="mr-1 fas fa-times"></i> Quitar Filtros
@@ -51,18 +51,7 @@
         </tr>
       </thead>
       <tbody>
-        <% @user_attendance_logs.each do |log| %>
-          <tr>
-            <td class="px-4 py-2"><%= log.user.name %></td>
-            <td class="px-4 py-2"><%= log.location.name %></td>
-            <td class="px-4 py-2"><%= log.checkin.strftime("%d/%m/%Y %H:%M") %></td>
-            <td class="px-4 py-2"><%= log.checkout&.strftime("%d/%m/%Y %H:%M") || '' %></td>
-            <td class="px-4 py-2"><%= log.checkout.nil? ? 'Activo' : 'Cerrado' %></td>
-            <td class="px-4 py-2">
-              <%= render partial: "admin/user_attendance_logs/actions", locals: { user_attendance_log: log, default_object_options_array: @default_object_options_array } %>
-            </td>
-          </tr>
-        <% end %>
+        <!-- Table body will be populated by DataTables -->
       </tbody>
     </table>
   </div>

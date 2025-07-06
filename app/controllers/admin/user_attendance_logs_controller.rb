@@ -3,29 +3,34 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
   before_action :set_location, only: [ :seller_checkout, :seller_checkin_status ]
 
   def index
-    if current_user.any_admin_or_supervisor?
-      locations_ids = Location.all.pluck(:id)
-      @user_attendance_logs = UserAttendanceLog.includes(:user, :location)
-                                             .where(location_id: locations_ids)
-                                             .order(status: :asc)
-    else
-      locations_ids = [ current_user.location_id ]
-      @user_attendance_logs = UserAttendanceLog.includes(:user, :location)
-                                             .where(location_id: locations_ids)
-                                             .order(status: :asc)
+    # Check if we need to clear filters
+    if params[:clear_filters].present?
+      clear_session_filters
+      redirect_to admin_user_attendance_logs_path and return
     end
 
+    # Get locations based on user role
+    if current_user.any_admin_or_supervisor?
+      locations_ids = Location.all.pluck(:id)
+    else
+      locations_ids = [ current_user.location_id ]
+    end
     @locations = Location.where(id: locations_ids)
 
-    # Apply filters
-    @user_attendance_logs = apply_filters(@user_attendance_logs)
-
-    @datatable_options = build_datatable_options
+    # Set filter values for the view (from params or session)
+    @filter_location_id = params[:location_id].presence || session[:user_attendance_filter_location_id].presence
+    @filter_begin_datetime = params[:begin_datetime].presence || session[:user_attendance_filter_begin_datetime].presence
+    @filter_end_datetime = params[:end_datetime].presence || session[:user_attendance_filter_end_datetime].presence
 
     respond_to do |format|
-      format.html
-      format.json { render json: @user_attendance_logs }
-      format.csv { send_data generate_csv, filename: "asistencias_#{Time.current.strftime('%Y%m%d')}.csv" }
+      format.html do
+        # Build datatable options with server-side processing
+        @datatable_options = "server_side:true;resource_name:'UserAttendanceLog';ajax_url:'#{admin_user_attendance_logs_path(format: :json)}';sort_4_asc;sort_1_asc;"
+      end
+
+      format.json do
+        render json: datatable_json
+      end
     end
   end
 
@@ -249,77 +254,85 @@ class Admin::UserAttendanceLogsController < Admin::AdminController
       @location = Location.find(params[:location_id])
     end
 
-    def apply_filters(scope)
-      scope = scope.where(location_id: params[:location_id]) if params[:location_id].present?
+    def clear_session_filters
+      session.delete(:user_attendance_filter_location_id)
+      session.delete(:user_attendance_filter_begin_datetime)
+      session.delete(:user_attendance_filter_end_datetime)
+      Rails.logger.debug "All session filters cleared"
+    end
 
-      if params[:begin_datetime].present?
-        scope = scope.where("checkin >= ?", params[:begin_datetime])
+    def apply_filters(scope)
+      # Store filter values in session for persistence (only if they are present)
+      session[:user_attendance_filter_location_id] = params[:location_id] if params[:location_id].present?
+      session[:user_attendance_filter_begin_datetime] = params[:begin_datetime] if params[:begin_datetime].present?
+      session[:user_attendance_filter_end_datetime] = params[:end_datetime] if params[:end_datetime].present?
+
+      # Debug the session values
+      Rails.logger.debug "Session filters: location=#{session[:user_attendance_filter_location_id].inspect}, begin=#{session[:user_attendance_filter_begin_datetime].inspect}, end=#{session[:user_attendance_filter_end_datetime].inspect}"
+
+      # Apply location filter (only if there's an actual value)
+      location_id = params[:location_id].presence || session[:user_attendance_filter_location_id].presence
+      if location_id.present?
+        Rails.logger.debug "Applying location filter: #{location_id}"
+        scope = scope.where(location_id: location_id)
       end
 
-      if params[:end_datetime].present?
-        scope = scope.where("checkin <= ?", params[:end_datetime])
+      # Apply begin date filter (only if there's an actual value)
+      begin_date = params[:begin_datetime].presence || session[:user_attendance_filter_begin_datetime].presence
+      if begin_date.present?
+        Rails.logger.debug "Applying begin date filter: #{begin_date}"
+        scope = scope.where("checkin >= ?", begin_date)
+      end
+
+      # Apply end date filter (only if there's an actual value)
+      end_date = params[:end_datetime].presence || session[:user_attendance_filter_end_datetime].presence
+      if end_date.present?
+        Rails.logger.debug "Applying end date filter: #{end_date}"
+        scope = scope.where("checkin <= ?", end_date)
       end
 
       scope
     end
 
-    def build_datatable_options
-      options = [ "server_side:false", "resource_name:'UserAttendanceLog'", "sort_4_asc", "sort_1_asc" ]
+    def datatable_json
+      # Get locations based on user role
+      if current_user.any_admin_or_supervisor?
+        locations_ids = Location.all.pluck(:id)
+      else
+        locations_ids = [ current_user.location_id ]
+      end
 
-      # Build the export URL with current filters
-      export_url = admin_user_attendance_logs_path(format: :csv)
-      export_url += "?#{filter_params.to_query}" if filter_params.present?
+      # Store filter values in session for persistence (only if they are present)
+      session[:user_attendance_filter_location_id] = params[:location_id] if params[:location_id].present?
+      session[:user_attendance_filter_begin_datetime] = params[:begin_datetime] if params[:begin_datetime].present?
+      session[:user_attendance_filter_end_datetime] = params[:end_datetime] if params[:end_datetime].present?
 
-      # Add export buttons with filtered data
-      options << "buttons:[
-        'copy',
-        {
-          extend: 'csv',
-          filename: 'asistencias_#{Time.current.strftime('%Y%m%d')}',
-          exportOptions: {
-            columns: ':visible'
-          },
-          action: function(e, dt, button, config) {
-            window.location = '#{export_url}';
-          }
-        },
-        {
-          extend: 'print',
-          exportOptions: {
-            columns: ':visible'
-          },
-          customize: function(win) {
-            // Get the current filtered data
-            var filteredData = dt.rows({ search: 'applied' }).data();
-            // Update the print view to only show filtered data
-            $(win.document.body).find('table tbody tr').each(function(index) {
-              if (index >= filteredData.length) {
-                $(this).remove();
-              }
-            });
-          }
-        }
-      ]"
+      # Base query with includes for performance
+      base_query = UserAttendanceLog.includes(:user, :location)
+                                .where(location_id: locations_ids)
 
-      options.join(";")
-    end
+      # Apply filters
+      filtered_logs = apply_filters(base_query)
 
-    def generate_csv
-      require "csv"
+      # Debug log to check if we have records
+      Rails.logger.debug "Found #{filtered_logs.count} logs after filtering"
 
-      CSV.generate(headers: true) do |csv|
-        csv << [ "Vendedor", "Ubicación", "Hora de Check-in", "Hora de Check-out", "Estado" ]
-
-        @user_attendance_logs.each do |log|
-          csv << [
+      # Format the response for DataTables
+      {
+        draw: params[:draw].to_i,
+        recordsTotal: UserAttendanceLog.where(location_id: locations_ids).count,
+        recordsFiltered: filtered_logs.count,
+        data: filtered_logs.map do |log|
+          [
             log.user.name,
             log.location.name,
             log.checkin.strftime("%d/%m/%Y %H:%M"),
-            log.checkout&.strftime("%d/%m/%Y %H:%M") || "",
-            log.checkout.nil? ? "Activo" : "Cerrado"
+            log.checkout&.strftime("%d/%m/%Y %H:%M") || '',
+            log.checkout.nil? ? 'Activo' : 'Cerrado',
+            "<a href=\"#{edit_admin_user_attendance_log_path(log)}\" class=\"btn btn-sm btn-primary\"><i class=\"fas fa-pencil-alt\"></i></a>"
           ]
         end
-      end
+      }
     end
 
     def filter_params
