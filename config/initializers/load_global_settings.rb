@@ -21,7 +21,8 @@ Rails.application.config.after_initialize do
     { name: :linked_cashiers_for_payment_methods, default: false, data_type: "type_boolean", localized_name: "Cada método de pago depositará en su propia caja", internal: false },
     { name: :address_for_dni, default: false, data_type: "type_boolean", localized_name: "Se mostrará y enviará a SUNAT dirección para boletas", internal: false },
     { name: :feature_flag_sellers_can_void_orders, default: false, data_type: "type_boolean", localized_name: "Vendedores pueden anular órdenes", internal: false },
-    { name: :feature_flag_sellers_products_can_have_flat_commissions, default: false, data_type: "type_boolean", localized_name: "Productos pueden tener comision plana", internal: false }
+    { name: :feature_flag_sellers_products_can_have_flat_commissions, default: false, data_type: "type_boolean", localized_name: "Productos pueden tener comision plana", internal: false },
+    { name: :feature_flag_max_discount_per_location, default: false, data_type: "type_boolean", localized_name: "Descuento máximo por tienda", internal: false }
   ]
 
   def load_global_settings

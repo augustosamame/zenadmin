@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_05_221733) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_05_234055) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -480,6 +480,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_05_221733) do
     t.datetime "updated_at", null: false
     t.boolean "is_main", default: false
     t.string "ubigeo"
+    t.decimal "max_discount", precision: 5, scale: 2
     t.index ["region_id"], name: "index_locations_on_region_id"
   end
 

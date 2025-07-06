@@ -32,6 +32,7 @@ setting_30 = Setting.find_or_create_by!(name: 'linked_cashiers_for_payment_metho
 setting_31 = Setting.find_or_create_by!(name: 'address_for_dni', data_type: 'type_boolean', internal: false, localized_name: 'Se mostrará y enviará a SUNAT dirección para boletas', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 setting_32 = Setting.find_or_create_by!(name: 'feature_flag_sellers_can_void_orders', data_type: 'type_boolean', internal: false, localized_name: 'Vendedores pueden anular órdenes', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: false, hash_value: nil, status: 'active')
 setting_33 = Setting.find_or_create_by!(name: 'feature_flag_sellers_products_can_have_flat_commissions', data_type: 'type_boolean', internal: false, localized_name: 'Productos pueden tener comision plana', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
+setting_34 = Setting.find_or_create_by!(name: 'feature_flag_max_discount_per_location', data_type: 'type_boolean', internal: false, localized_name: 'Descuento máximo por tienda', string_value: nil, integer_value: nil, float_value: nil, datetime_value: nil, boolean_value: true, hash_value: nil, status: 'active')
 
 Role.find_or_create_by!(name: 'super_admin')
 Role.find_or_create_by!(name: 'admin')
