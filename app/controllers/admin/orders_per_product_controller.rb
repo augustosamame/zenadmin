@@ -4,7 +4,7 @@ class Admin::OrdersPerProductController < Admin::AdminController
     # Clear session values
     session.delete(:orders_per_product_from_date)
     session.delete(:orders_per_product_to_date)
-    
+
     # Redirect back to index with a notice
     redirect_to admin_orders_per_product_index_path, notice: "Filtros eliminados"
   end
@@ -151,7 +151,7 @@ class Admin::OrdersPerProductController < Admin::AdminController
           0 => record.product_name,
           1 => record.quantity,
           2 => Money.new(record.price_cents, "PEN").format,
-          3 => record.order_date.strftime("%Y-%m-%d %H:%M:%S"),
+          3 => record.order_date.in_time_zone("America/Lima").strftime("%Y-%m-%d %H:%M:%S"),
           4 => record.location_name,
           5 => record.order_custom_id,
           6 => record.pack_name || "-",
