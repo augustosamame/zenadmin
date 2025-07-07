@@ -284,7 +284,11 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :orders_per_product, only: [ :index ]
+    resources :orders_per_product, only: [ :index ] do
+      collection do
+        get :reset_filters
+      end
+    end
 
     get "sales_dashboard", to: "dashboards#sales_dashboard"
     get "cashiers_dashboard", to: "dashboards#cashiers_dashboard"

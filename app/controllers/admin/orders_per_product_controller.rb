@@ -1,17 +1,66 @@
 class Admin::OrdersPerProductController < Admin::AdminController
+  # GET /admin/orders_per_product/reset_filters
+  def reset_filters
+    # Clear session values
+    session.delete(:orders_per_product_from_date)
+    session.delete(:orders_per_product_to_date)
+    
+    # Redirect back to index with a notice
+    redirect_to admin_orders_per_product_index_path, notice: "Filtros eliminados"
+  end
   def index
-    filter_params = params.fetch(:filter, {})
-    if filter_params.is_a?(String)
-      # Parse the filter string into a hash
-      filter_hash = {}
-      filter_params.split(" ").each_slice(2) do |key, value|
-        filter_hash[key] = value
-      end
-      filter_params = filter_hash
+    # Extract filter parameters from various sources
+    filter_params = {}
+
+    if params[:filter].is_a?(String)
+      # Handle the case where filter is a string (from location dropdown)
+      Rails.logger.debug "Filter is a string: #{params[:filter]}"
+      # Parse the string format "from_date VALUE to_date VALUE"
+      filter_string = params[:filter]
+
+      # Extract from_date
+      from_date_match = filter_string.match(/from_date\s+(\S+)/)
+      filter_params[:from_date] = from_date_match[1] if from_date_match
+
+      # Extract to_date
+      to_date_match = filter_string.match(/to_date\s+(\S+)/)
+      filter_params[:to_date] = to_date_match[1] if to_date_match
+    elsif params[:filterParams].present?
+      # Handle the case where parameters are in filterParams (from JavaScript)
+      filter_params = params[:filterParams]
+    elsif params[:from_date].present? || params[:to_date].present?
+      # Handle direct parameters in the URL or AJAX request
+      filter_params[:from_date] = params[:from_date] if params[:from_date].present?
+      filter_params[:to_date] = params[:to_date] if params[:to_date].present?
+    else
+      # Normal case - filter is a hash
+      filter_params = params[:filter] || {}
     end
 
-    @from_date = filter_params["from_date"].presence&.to_date || Date.current.beginning_of_month
-    @to_date = filter_params["to_date"].presence&.to_date || Date.current
+    Rails.logger.debug "FILTER PARAMS: #{filter_params.inspect}"
+
+    # Set date filters from params or session
+    if filter_params[:from_date].present?
+      @from_date = filter_params[:from_date].to_date
+      session[:orders_per_product_from_date] = @from_date.to_s
+    elsif session[:orders_per_product_from_date].present?
+      @from_date = Date.parse(session[:orders_per_product_from_date])
+    else
+      @from_date = Date.current.beginning_of_month
+      session[:orders_per_product_from_date] = @from_date.to_s
+    end
+
+    if filter_params[:to_date].present?
+      @to_date = filter_params[:to_date].to_date
+      session[:orders_per_product_to_date] = @to_date.to_s
+    elsif session[:orders_per_product_to_date].present?
+      @to_date = Date.parse(session[:orders_per_product_to_date])
+    else
+      @to_date = Date.current
+      session[:orders_per_product_to_date] = @to_date.to_s
+    end
+
+    Rails.logger.debug "Date range: #{@from_date} to #{@to_date}"
     @date_range = @from_date.beginning_of_day..@to_date.end_of_day
 
     base_query = OrderItem.joins(:order, :product)
