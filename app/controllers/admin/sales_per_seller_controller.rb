@@ -243,7 +243,8 @@ class Admin::SalesPerSellerController < Admin::AdminController
         'payments.amount_cents as payment_total',
         'payments.processor_transacion_id as payment_tx',
         'invoices.custom_id as invoice_custom_id',
-        'invoices.sunat_status as invoice_status'
+        'invoices.sunat_status as invoice_status',
+        'invoices.invoice_url as invoice_url'
       ]
       
       # Order by location name descending
@@ -330,7 +331,7 @@ class Admin::SalesPerSellerController < Admin::AdminController
       helpers.number_to_currency(record.order_total.to_f / 100, unit: "S/", format: "%u %n"),
       "#{record.commission_percentage}%",
       helpers.number_to_currency(record.calculated_commission.to_f / 100, unit: "S/", format: "%u %n"),
-      record.invoice_custom_id.present? ? helpers.link_to(record.invoice_custom_id, admin_invoice_path(Invoice.find_by(custom_id: record.invoice_custom_id)), target: "_blank") : "",
+      record.invoice_custom_id.present? ? helpers.link_to(record.invoice_custom_id, record.invoice_url, target: "_blank") : "",
       record.order_id.present? ? helpers.link_to("Ver Orden", admin_order_path(record.order_id), class: "text-blue-600 hover:text-blue-800 underline") : ""
     ]
   end
