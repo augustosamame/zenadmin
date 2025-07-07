@@ -6,13 +6,23 @@ export default class extends Controller {
     languageCdn: { type: String, default: '/datatables/i18n/es-ES.json' },
     options: { type: String, default: '' },
     ajaxUrl: { type: String, default: '' },
-    ajaxData: { type: Object, default: {} }
+    ajaxData: { type: String, default: '{}' }
   }
 
   static resourceMappings = resourceMappings;
 
   connect() {
     console.log("Datatable controller connected");
+    console.log("Options value:", this.optionsValue);
+    console.log("AJAX data value:", this.ajaxDataValue);
+    
+    try {
+      const parsedData = JSON.parse(this.ajaxDataValue);
+      console.log("Parsed AJAX data:", parsedData);
+    } catch (e) {
+      console.error("Error parsing AJAX data:", e);
+    }
+    
     this.initializeMoment();
     this.initializeDataTable();
   }
@@ -117,63 +127,80 @@ export default class extends Controller {
         url: resourceMapping.ajaxUrl || this.ajaxUrlValue,
         type: "GET",
         data: (d) => {
-          // Merge any existing filter parameters
-          let filterParams = { ...this.ajaxDataValue };
+          // Start with the DataTables parameters
+          const finalPayload = { ...d };
           
-          // If date_filter is enabled, add the date filter parameters
-          if (allAdditionalOptions.includes("date_filter:true")) {
-            // Removed duplicate code - now handled in the general form collection below
+          // Add any initial data values from the controller
+          let initialData = {};
+          try {
+            // Handle both object and JSON string formats
+            if (typeof this.ajaxDataValue === 'string') {
+              initialData = JSON.parse(this.ajaxDataValue);
+            } else {
+              initialData = { ...this.ajaxDataValue };
+            }
+            console.log('Parsed initial data:', initialData);
+          } catch (e) {
+            console.error('Error parsing ajaxDataValue:', e);
+            initialData = {};
           }
+          
+          // Add each property to the final payload
+          Object.keys(initialData).forEach(key => {
+            if (initialData[key] !== null && initialData[key] !== undefined) {
+              finalPayload[key] = initialData[key];
+            }
+          });
           
           // Add location_id parameter if it exists in the URL
           const urlParams = new URLSearchParams(window.location.search);
           const locationId = urlParams.get('location_id');
           if (locationId) {
-            filterParams.location_id = locationId;
+            finalPayload.location_id = locationId;
           }
+          
+          // Extract date parameters from URL if they exist
+          const fromDate = urlParams.get('from_date');
+          const toDate = urlParams.get('to_date');
+          if (fromDate) finalPayload.from_date = fromDate;
+          if (toDate) finalPayload.to_date = toDate;
           
           // Get all form elements and add them to the filter params
           const filterForm = document.querySelector('form[data-turbo="false"]');
           if (filterForm) {
             const formData = new FormData(filterForm);
+            console.log('Form data entries:', [...formData.entries()]);
+            
+            // Process form fields
             for (const [key, value] of formData.entries()) {
               if (key.startsWith('filter[') && value) {
                 const filterKey = key.replace('filter[', '').replace(']', '');
                 
+                // Skip consolidated_by_seller as we're using separate routes now
+                if (filterKey === 'consolidated_by_seller') continue;
+                
                 // For checkbox inputs, handle boolean values correctly
                 if (filterKey === 'status_paid_out') {
-                  filterParams[filterKey] = value === '1' || value === 'true' || value === true;
+                  finalPayload[filterKey] = value === '1' || value === 'true' || value === true;
                 } else {
-                  filterParams[filterKey] = value;
-                }
-                
-                // Also store in session via URL parameters for the first request
-                if (urlParams.has(key) && !urlParams.get(key)) {
-                  urlParams.set(key, value);
+                  finalPayload[filterKey] = value;
                 }
               }
             }
-            
-            // Log the filter parameters for debugging
-            console.log('Filter params:', filterParams);
           } else if (allAdditionalOptions.includes("date_filter:true")) {
             // Fallback to individual field selection if form not found
-            const fromDate = document.querySelector('[name="filter[from_date]"]')?.value;
-            const toDate = document.querySelector('[name="filter[to_date]"]')?.value;
-            const statusPaidOut = document.querySelector('[name="filter[status_paid_out]"]')?.checked;
-
-            // Only add filter params if they exist
-            if (fromDate || toDate || statusPaidOut !== undefined) {
-              filterParams.from_date = fromDate;
-              filterParams.to_date = toDate;
-              filterParams.status_paid_out = statusPaidOut;
-              
-              // Log the filter parameters for debugging
-              console.log('Filter params (fallback):', filterParams);
-            }
+            const fromDateInput = document.querySelector('[name="filter[from_date]"]')?.value;
+            const toDateInput = document.querySelector('[name="filter[to_date]"]')?.value;
+            
+            // Only add filter params if they exist and aren't already in the payload
+            if (fromDateInput && !finalPayload.from_date) finalPayload.from_date = fromDateInput;
+            if (toDateInput && !finalPayload.to_date) finalPayload.to_date = toDateInput;
           }
           
-          return { ...d, filterParams };
+          // Debug the final AJAX payload
+          console.log('Final AJAX payload:', finalPayload);
+          
+          return finalPayload;
         }
       };
     }

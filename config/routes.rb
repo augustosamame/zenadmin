@@ -306,8 +306,13 @@ Rails.application.routes.draw do
     resources :consolidated_sales, only: [ :index ]
     get "reports/consolidated_sales", to: "consolidated_sales#index"
 
-    resources :sales_per_seller, only: [ :index ]
+    resources :sales_per_seller, only: [ :index ] do
+      collection do
+        get :consolidated
+      end
+    end
     get "reports/sales_per_seller", to: "sales_per_seller#index"
+    get "reports/sales_per_seller/consolidated", to: "sales_per_seller#consolidated"
 
     resources :flat_commission_products_report, only: [ :index ]
     get "reports/flat_commission_products_report", to: "flat_commission_products_report#index"

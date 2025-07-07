@@ -1,4 +1,12 @@
 export const resourceMappings = {
+  sales_per_seller: {
+    buttonText: "Reporte de Ventas por Vendedor",
+    ajaxUrl: "/admin/sales_per_seller.json"
+  },
+  consolidated_sales_per_seller: {
+    buttonText: "Reporte Consolidado de Ventas por Vendedor",
+    ajaxUrl: "/admin/sales_per_seller/consolidated.json"
+  },
   LoyaltyTier: {
     buttonText: "Crear Rangos de Loyalty",
     buttonUrl: "/admin/loyalty_tiers/new",

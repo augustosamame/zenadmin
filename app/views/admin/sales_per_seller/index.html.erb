@@ -31,16 +31,15 @@
 
       <div class="md:col-span-1">
         <div class="flex flex-col gap-4 h-full justify-center">
-          <div class="flex items-center">
-            <%= f.input :consolidated_by_seller,
-                as: :boolean,
-                label: "Consolidado por Vendedor",
-                input_html: { 
-                  class: 'h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-500 dark:bg-slate-800 dark:border-slate-600 mr-3',
-                  checked: @consolidated_by_seller
-                },
-                wrapper_html: { class: 'flex items-center' },
-                label_html: { class: 'text-sm font-medium text-gray-700 dark:text-gray-300' } %>
+          <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Tipo de Vista</p>
+          <div class="flex items-center space-x-4">
+            <%= link_to 'Vista Detallada', 
+                admin_sales_per_seller_index_path(from_date: @from_date, to_date: @to_date),
+                class: "px-3 py-2 text-sm font-medium rounded-md #{!@consolidated_by_seller ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600'}" %>
+            
+            <%= link_to 'Vista Consolidada', 
+                consolidated_admin_sales_per_seller_index_path(from_date: @from_date, to_date: @to_date),
+                class: "px-3 py-2 text-sm font-medium rounded-md #{@consolidated_by_seller ? 'bg-indigo-600 text-white' : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600'}" %>
           </div>
         </div>
       </div>
@@ -59,7 +58,10 @@
   </div>
 </div>
 
-<div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">
+<div class="px-4 mb-16" 
+     data-controller="datatable" 
+     data-datatable-options-value="<%= @datatable_options %>" 
+     data-datatable-ajax-data-value="<%= { from_date: @from_date, to_date: @to_date }.to_json %>">
   <table class="w-full">
     <thead>
       <tr>
