@@ -226,7 +226,6 @@ class Admin::SalesPerSellerController < Admin::AdminController
       
       # Select fields for detailed view
       select_fields = [
-        'commissions.id',
         'orders.id as order_id',
         'orders.custom_id',
         'orders.order_date as order_datetime',
@@ -235,10 +234,10 @@ class Admin::SalesPerSellerController < Admin::AdminController
         'CONCAT(sellers.first_name, \' \', sellers.last_name) as seller_name',
         'customers.id as customer_user_id',
         'CONCAT(customers.first_name, \' \', customers.last_name) as customer_name',
-        'commissions.sale_amount_cents as order_total',
+        'orders.total_price_cents as order_total',
         'commissions.percentage as commission_percentage',
         'commissions.amount_cents as commission_amount',
-        '(commissions.sale_amount_cents * commissions.percentage / 100) as calculated_commission',
+        '(orders.total_price_cents * commissions.percentage / 100) as calculated_commission',
         'payment_methods.description as payment_method',
         'payments.amount_cents as payment_total',
         'payments.processor_transacion_id as payment_tx',
@@ -279,7 +278,7 @@ class Admin::SalesPerSellerController < Admin::AdminController
     when 3 # Seller
       "seller_name #{direction}"
     when 4 # Order Total
-      "commissions.sale_amount_cents #{direction}"
+      "orders.total_price_cents #{direction}"
     when 5 # Commission Percentage
       "commissions.percentage #{direction}"
     when 6 # Commission Amount
