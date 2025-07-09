@@ -1,10 +1,10 @@
-<%= render "shared/admin/nav", { header_title: "Ventas por Vendedor" } do %>
+<%= render "shared/admin/nav", { header_title: "Ventas por Vendedor (Consolidado)" } do %>
   <%= render "shared/admin/location_dropdown" %>
 <% end %>
 
 <div class="container p-6 mx-auto mt-6 bg-white rounded-lg border shadow border-slate-300/80 shadow-slate-100 dark:shadow-slate-950 dark:bg-slate-800 dark:border-slate-600/80">
   <div class="grid grid-cols-1 gap-4 mb-6 md:grid-cols-4">
-    <%= simple_form_for :filter, url: admin_sales_per_seller_index_path, method: :get, html: { class: 'contents' } do |f| %>
+    <%= simple_form_for :filter, url: consolidated_admin_sales_per_seller_index_path, method: :get, html: { class: 'contents' } do |f| %>
       <div class="md:col-span-1">
         <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Desde</p>
         <%= f.input :from_date, 
@@ -50,7 +50,7 @@
               class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-white bg-indigo-600 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-slate-800' %>
           
           <%= link_to 'Quitar Filtros', 
-              admin_sales_per_seller_index_path, 
+              consolidated_admin_sales_per_seller_index_path, 
               class: 'inline-flex justify-center px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md shadow-sm hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:bg-slate-700 dark:text-gray-200 dark:border-slate-600 dark:hover:bg-slate-600 dark:focus:ring-offset-slate-800' %>
         </div>
       </div>
@@ -66,14 +66,14 @@
     <thead>
       <tr>
         <th>Tienda</th>
-        <th>Orden</th>
-        <th>Fecha</th>
+        <th></th>
+        <th></th>
         <th>Vendedor</th>
-        <th>Total Orden</th>
-        <th>Porcentaje</th>
         <th>Venta Comisionable</th>
-        <th>Comprobante</th>
-        <th>Acciones</th>
+        <th>Cantidad de Órdenes</th>
+        <th></th>
+        <th></th>
+        <th></th>
       </tr>
     </thead>
     <tbody>
