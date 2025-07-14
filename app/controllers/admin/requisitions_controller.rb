@@ -163,16 +163,17 @@ class Admin::RequisitionsController < Admin::AdminController
           when "plan"
             Rails.logger.info "Attempting to plan requisition"
             if @requisition.req_submitted?
-              # Check if all requisition lines have planned quantities
-              missing_planned_quantities = @requisition.requisition_lines.any? { |line| line.planned_quantity.blank? || line.planned_quantity.to_i <= 0 }
-              
-              if missing_planned_quantities
-                # Set error message for missing planned quantities
-                flash.now[:alert] = "Debe indicar cantidad planificada para cada producto pedido"
-                set_locations_and_warehouses
-                render :edit, status: :unprocessable_entity
-                return
+              # Set nil or blank planned quantities to 0
+              @requisition.requisition_lines.each do |line|
+                if line.planned_quantity.blank?
+                  line.planned_quantity = 0
+                  line.save(validate: false)
+                  Rails.logger.info "Set blank planned_quantity to 0 for line ##{line.id}"
+                end
               end
+              
+              # We'll proceed with planning even if some quantities are 0
+              # This allows users to not have to manually enter 0 for lines they don't want to plan
               
               # If we get here, all lines have planned quantities
               Rails.logger.info "About to plan! requisition ##{@requisition.id}"
