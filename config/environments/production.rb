@@ -55,7 +55,7 @@ Rails.application.configure do
     if request&.host
       "https://#{request.host}"
     else
-      "https://jardindelzen.devtechperu.com"
+      "https://jardindelzen.devtechperu.net"
     end
   end
 
