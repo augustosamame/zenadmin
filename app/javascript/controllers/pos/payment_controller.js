@@ -91,10 +91,11 @@ export default class extends Controller {
     }
     if (!this.validateCustomerForLargeOrder()) return;
 
-    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    const selectedUserId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedUserId;
+    const selectedCustomerObjectId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
     const selectedRuc = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedRuc;
     if (selectedRuc && selectedRuc.trim() !== '') {
-      this.getRucData(selectedCustomerId)
+      this.getRucData(selectedCustomerObjectId)
         .then(ruc_data => {
           console.log('response', ruc_data);
           this.rucSectionTarget.classList.remove('hidden');
@@ -149,7 +150,7 @@ export default class extends Controller {
     const totalAmount = parseFloat(orderItemsTotal.replace('S/', ''));
 
     if (totalAmount >= this.maxTotalSaleWithoutCustomer) {
-      const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+      const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedUserId;
       const genericCustomerId = '1'; // Assuming 1 is the ID of the generic customer, adjust if needed
 
       if (!selectedCustomerId || selectedCustomerId === genericCustomerId) {
@@ -165,7 +166,7 @@ export default class extends Controller {
   }
 
   validateCustomerForCreditSale() {
-    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedUserId;
     const genericCustomerId = '1'; // Assuming 1 is the ID of the generic customer, adjust if needed
     
     // Check if the can_create_unpaid_orders checkbox is checked
@@ -431,11 +432,12 @@ export default class extends Controller {
       payments.push(payment);
     });
 
-    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedObjectId;
+    const selectedCustomerId = document.querySelector('[data-action="click->customer-table-modal#open"]').dataset.selectedUserId;
     const clienteButton = document.querySelector('[data-action="click->customer-table-modal#open"]');
     const selectedPriceListId = this.priceListsEnabled ? clienteButton.dataset.selectedPriceListId : null;
-    console.log('selectedCustomerId', selectedCustomerId);
-    console.log('selectedPriceListId', selectedPriceListId);
+    console.log('selectedCustomerId (user_id):', selectedCustomerId);
+    console.log('selectedPriceListId:', selectedPriceListId);
+    console.log('All button data attributes:', clienteButton.dataset);
     
     const comment = document.querySelector('[data-controller="pos--order-items"]').dataset.comment || '';
     const sellersButton = document.querySelector('[data-action="click->pos--sellers-modal#open"]');

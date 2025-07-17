@@ -68,8 +68,15 @@ class Admin::CustomersController < Admin::AdminController
     respond_to do |format|
       if @user.save
         format.turbo_stream { 
+          # Load only a small subset for initial page load, DataTables will handle the rest via server-side processing
+          initial_customers = Customer.includes(:user, :price_list)
+                                     .joins(:user)
+                                     .merge(User.customers)
+                                     .limit(10)  # Just for initial display
+                                     .order('users.id DESC')
+          
           render turbo_stream: [
-            turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: optimized_customers_for_modal, in_modal: params[:in_modal] }),
+            turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: initial_customers, in_modal: params[:in_modal] }),
             turbo_stream.append("switchable-container",
               "<script>document.dispatchEvent(new CustomEvent('customer-form-result', { detail: { success: true } }))</script>"
             )
