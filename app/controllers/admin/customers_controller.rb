@@ -253,12 +253,16 @@ class Admin::CustomersController < Admin::AdminController
       loyalty_tiers = LoyaltyTier.where(id: paginated_users.map(&:loyalty_tier_id).compact.uniq).index_by(&:id)
 
       # Debug: let's see what the actual counts are
-      total_customers = User.joins(:customer).where(internal: false).joins(:roles).where(roles: { name: 'customer' }).count
-      Rails.logger.info "DEBUG: Total customers: #{total_customers}, Filtered: #{filtered_count}"
+      total_customers_joins = User.joins(:customer).where(internal: false).joins(:roles).where(roles: { name: 'customer' }).count
+      total_customers_scope = User.customers.count
+      total_customers_with_customer_record = User.customers.joins(:customer).count
+      
+      Rails.logger.info "DEBUG: Total customers (joins): #{total_customers_joins}, Total customers (scope): #{total_customers_scope}, With customer record: #{total_customers_with_customer_record}, Filtered: #{filtered_count}"
+      Rails.logger.info "DEBUG: Paginated users count: #{paginated_users.length}"
       
       {
         draw: params[:draw].to_i,
-        recordsTotal: total_customers,
+        recordsTotal: total_customers_with_customer_record,
         recordsFiltered: filtered_count,
         data: paginated_users.map do |user|
           row = []
