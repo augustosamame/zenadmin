@@ -215,6 +215,9 @@ class Admin::CustomersController < Admin::AdminController
       # Pagination
       paginated_users = users.page(params[:start].to_i / params[:length].to_i + 1)
                             .per(params[:length].to_i)
+      
+      # Load customer associations for the paginated results
+      paginated_users = paginated_users.includes(:customer)
 
       # Get total count
       total_customers_with_customer_record = User.customers.joins(:customer).count
@@ -225,6 +228,7 @@ class Admin::CustomersController < Admin::AdminController
         recordsFiltered: filtered_count,
         data: paginated_users.map do |user|
           # Return data matching the modal table structure with row attributes
+          # Note: Modal table has NO price list column (see template condition)
           {
             "0" => user.id,
             "1" => user.doc_id,
@@ -234,14 +238,19 @@ class Admin::CustomersController < Admin::AdminController
             "5" => user.factura_ruc,
             "6" => render_modal_actions(user),
             "DT_RowData" => {
-              "object-id" => user.customer.id,
+              "object-id" => user.customer&.id,
               "user-id" => user.id,
               "phone" => user.phone,
               "email" => user.email,
               "price-list-id" => user.price_list_id
             },
             "DT_RowAttr" => {
-              "data-action" => "click->customer-table-modal#selectObject"
+              "data-action" => "click->customer-table-modal#selectObject",
+              "data-object-id" => user.customer&.id,
+              "data-user-id" => user.id,
+              "data-phone" => user.phone,
+              "data-email" => user.email,
+              "data-price-list-id" => user.price_list_id
             }
           }
         end
@@ -452,8 +461,8 @@ class Admin::CustomersController < Admin::AdminController
     end
     
     def render_modal_actions(user)
-      # For modal, we need to return the "Seleccionar" button with the row data attributes
-      # The data attributes will be handled by the table row, not the button
-      '<button class="btn btn-primary">Seleccionar</button>'.html_safe
+      # For modal, we need to return the "Seleccionar" button
+      # The click handler is attached to the row, not the button
+      '<button class="btn btn-primary" type="button">Seleccionar</button>'.html_safe
     end
 end

@@ -128,9 +128,29 @@ export default class extends Controller {
     const phone = selectedRow.dataset.phone;
     const email = selectedRow.dataset.email;
     const priceListId = this.priceListsEnabled ? selectedRow.dataset.priceListId : null;
-    const firstName = selectedRow.querySelector('td:nth-child(1)').textContent.trim();
-    const lastName = selectedRow.querySelector('td:nth-child(2)').textContent.trim();
-    const ruc = selectedRow.querySelector('td:nth-child(4)').textContent.trim();
+    
+    // Debug logging
+    console.log('Selected row:', selectedRow);
+    console.log('Row dataset:', selectedRow.dataset);
+    console.log('Available data attributes:', Object.keys(selectedRow.dataset));
+    console.log('Table cells:', selectedRow.querySelectorAll('td'));
+    
+    // Let's also check what columns are available
+    const allCells = selectedRow.querySelectorAll('td');
+    console.log('All cell contents:', Array.from(allCells).map((cell, index) => `${index+1}: ${cell.textContent}`));
+    
+    // Null-safe cell access (columns 0 and 1 are hidden, so visible columns are shifted)
+    const firstNameCell = selectedRow.querySelector('td:nth-child(1)'); // Actually column 2 in data
+    const lastNameCell = selectedRow.querySelector('td:nth-child(2)'); // Actually column 3 in data
+    const rucCell = selectedRow.querySelector('td:nth-child(4)'); // Actually column 5 in data
+    
+    console.log('First name cell:', firstNameCell);
+    console.log('Last name cell:', lastNameCell);
+    console.log('RUC cell:', rucCell);
+    
+    const firstName = firstNameCell ? firstNameCell.textContent.trim() : '';
+    const lastName = lastNameCell ? lastNameCell.textContent.trim() : '';
+    const ruc = rucCell ? rucCell.textContent.trim() : '';
     const fullName = ruc ? `${firstName} ${lastName} - RUC: ${ruc}` : `${firstName} ${lastName}`;
 
     // Update the Cliente button
