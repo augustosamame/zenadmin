@@ -36,7 +36,14 @@ class Admin::CustomersController < Admin::AdminController
         # Check if the request is coming from the POS modal
         in_modal = request.referer&.include?("/admin/orders/pos") || params[:in_modal].present?
         
-        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: optimized_customers_for_modal, in_modal: in_modal })
+        # Load only a small subset for initial page load, DataTables will handle the rest via server-side processing
+        initial_customers = Customer.includes(:user, :price_list)
+                                   .joins(:user)
+                                   .merge(User.customers)
+                                   .limit(10)  # Just for initial display
+                                   .order('users.id DESC')
+        
+        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: initial_customers, in_modal: in_modal })
       end
     end
   end
@@ -148,15 +155,106 @@ class Admin::CustomersController < Admin::AdminController
       params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :dni_address, :factura_direccion, :price_list_id, :_destroy ])
     end
 
-    def optimized_customers_for_modal
-      Customer.includes(:user, :price_list)
-              .joins(:user)
-              .merge(User.customers)
-              .limit(1000)  # Reasonable limit for modal display
-              .order('users.id DESC')
+    def modal_datatable_json
+      base_query = User.customers
+                       .joins(:customer)
+                       .select("users.*,
+                               customers.doc_id,
+                               customers.doc_type,
+                               customers.factura_ruc,
+                               customers.factura_razon_social,
+                               customers.price_list_id")
+
+      # Apply search filter
+      if params[:search][:value].present?
+        search_term = "%#{params[:search][:value]}%"
+        base_query = base_query.where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ? OR users.phone ILIKE ? OR customers.doc_id ILIKE ? OR customers.factura_ruc ILIKE ?", 
+                                      search_term, search_term, search_term, search_term, search_term, search_term)
+      end
+
+      users = base_query
+
+      # Apply sorting
+      if params[:order].present?
+        column_index = params[:order]["0"][:column].to_i
+        direction = params[:order]["0"][:dir]
+
+        order_clause = case column_index
+        when 0
+          [ "users.id", direction ]
+        when 1
+          [ "customers.doc_id", direction ]
+        when 2
+          [ "users.first_name", direction ]
+        when 3
+          [ "users.last_name", direction ]
+        when 4
+          [ "users.phone", direction ]
+        when 5
+          [ "customers.factura_ruc", direction ]
+        else
+          [ "users.id", "DESC" ]
+        end
+
+        if order_clause.present?
+          users = users.reorder(Arel.sql("#{order_clause[0]} #{order_clause[1]}"))
+        end
+      else
+        users = users.order(id: :desc) # Default sorting
+      end
+
+      # Get the filtered count
+      count_query = User.customers.joins(:customer)
+      if params[:search][:value].present?
+        search_term = "%#{params[:search][:value]}%"
+        count_query = count_query.where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ? OR users.phone ILIKE ? OR customers.doc_id ILIKE ? OR customers.factura_ruc ILIKE ?", 
+                                        search_term, search_term, search_term, search_term, search_term, search_term)
+      end
+      filtered_count = count_query.count
+      
+      # Pagination
+      paginated_users = users.page(params[:start].to_i / params[:length].to_i + 1)
+                            .per(params[:length].to_i)
+
+      # Get total count
+      total_customers_with_customer_record = User.customers.joins(:customer).count
+      
+      {
+        draw: params[:draw].to_i,
+        recordsTotal: total_customers_with_customer_record,
+        recordsFiltered: filtered_count,
+        data: paginated_users.map do |user|
+          # Return data matching the modal table structure with row attributes
+          {
+            "0" => user.id,
+            "1" => user.doc_id,
+            "2" => user.first_name,
+            "3" => user.last_name,
+            "4" => user.phone,
+            "5" => user.factura_ruc,
+            "6" => render_modal_actions(user),
+            "DT_RowData" => {
+              "object-id" => user.customer.id,
+              "user-id" => user.id,
+              "phone" => user.phone,
+              "email" => user.email,
+              "price-list-id" => user.price_list_id
+            },
+            "DT_RowAttr" => {
+              "data-action" => "click->customer-table-modal#selectObject"
+            }
+          }
+        end
+      }
     end
     
     def datatable_json
+      # Check if this is a modal request
+      in_modal = request.referer&.include?("/admin/orders/pos") || params[:in_modal].present?
+      
+      if in_modal
+        return modal_datatable_json
+      end
       base_query = User.customers
                        .joins(:customer)
                        .select("users.*,
@@ -351,5 +449,11 @@ class Admin::CustomersController < Admin::AdminController
       end
       
       actions.join(" ").html_safe
+    end
+    
+    def render_modal_actions(user)
+      # For modal, we need to return the "Seleccionar" button with the row data attributes
+      # The data attributes will be handled by the table row, not the button
+      '<button class="btn btn-primary">Seleccionar</button>'.html_safe
     end
 end
