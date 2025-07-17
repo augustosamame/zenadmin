@@ -332,7 +332,8 @@ export default class extends Controller {
     }
 
     const totalOrderAmount = parseFloat(this.totalTarget.textContent.replace('S/', ''));
-    const totalDiscountAmount = parseFloat(this.totalDiscountTarget.textContent.replace(/\(S\/\s*|\)/g, ''));
+    const discountText = this.totalDiscountTarget.textContent.trim();
+    const totalDiscountAmount = discountText ? parseFloat(discountText.replace(/\(S\/\s*|\)/g, '')) || 0 : 0;
     let totalPayments = 0;
 
     this.paymentListTarget.querySelectorAll('.payment-amount').forEach(input => {

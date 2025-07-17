@@ -50,8 +50,13 @@ class Admin::OrdersController < Admin::AdminController
         if @order.user_id.blank?
           @order.user_id = User.find(get_generic_customer_id)&.id
         else
-          # id passed is actually the customer id
-          @order.user_id = Customer.find(@order.user_id)&.user_id
+          # id passed is now correctly the user id
+          # Validate that the user exists and has a customer record
+          user = User.find(@order.user_id)
+          unless user&.customer
+            raise ActiveRecord::RecordNotFound, "User #{@order.user_id} does not have a customer record"
+          end
+          @order.user_id = user.id
         end
         @order.location_id = @current_location.id
       elsif @order.origin == "ecommerce"
