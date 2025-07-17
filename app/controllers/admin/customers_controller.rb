@@ -230,6 +230,15 @@ class Admin::CustomersController < Admin::AdminController
         users = users.order(id: :desc) # Default sorting
       end
 
+      # Get the filtered count before pagination (create count query without GROUP BY)
+      count_query = User.customers.joins(:customer)
+      if params[:search][:value].present?
+        search_term = "%#{params[:search][:value]}%"
+        count_query = count_query.where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ? OR users.phone ILIKE ? OR customers.doc_id ILIKE ? OR customers.factura_ruc ILIKE ?", 
+                                        search_term, search_term, search_term, search_term, search_term, search_term)
+      end
+      filtered_count = count_query.count
+      
       # Pagination
       paginated_users = users.page(params[:start].to_i / params[:length].to_i + 1)
                             .per(params[:length].to_i)
@@ -243,10 +252,14 @@ class Admin::CustomersController < Admin::AdminController
       
       loyalty_tiers = LoyaltyTier.where(id: paginated_users.map(&:loyalty_tier_id).compact.uniq).index_by(&:id)
 
+      # Debug: let's see what the actual counts are
+      total_customers = User.joins(:customer).where(internal: false).joins(:roles).where(roles: { name: 'customer' }).count
+      Rails.logger.info "DEBUG: Total customers: #{total_customers}, Filtered: #{filtered_count}"
+      
       {
         draw: params[:draw].to_i,
-        recordsTotal: User.customers.count,
-        recordsFiltered: users.length,
+        recordsTotal: total_customers,
+        recordsFiltered: filtered_count,
         data: paginated_users.map do |user|
           row = []
 
