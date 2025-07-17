@@ -34,6 +34,8 @@ class User < ApplicationRecord
 
   scope :with_role, ->(role_name) { joins(:roles).where(roles: { name: role_name }) }
   scope :with_any_role, ->(*role_names) { joins(:roles).where(roles: { name: role_names }).distinct }
+  scope :customers, -> { where(internal: false).with_role('customer') }
+  scope :active_customers, -> { customers.where(status: :active) }
 
   accepts_nested_attributes_for :customer, allow_destroy: true
   accepts_nested_attributes_for :user_seller_photo, allow_destroy: true
@@ -111,6 +113,27 @@ class User < ApplicationRecord
 
   def total_order_amount
     Money.new(total_order_amount_cents || 0, "PEN") # Replace 'PEN' with your default currency if different
+  end
+
+  # For dynamic attributes from select queries
+  def doc_id
+    attributes['doc_id']
+  end
+
+  def doc_type
+    attributes['doc_type']
+  end
+
+  def factura_ruc
+    attributes['factura_ruc']
+  end
+
+  def factura_razon_social
+    attributes['factura_razon_social']
+  end
+
+  def price_list_id
+    attributes['price_list_id']
   end
 
   private

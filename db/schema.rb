@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_05_234055) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_17_213557) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
   enable_extension "pg_trgm"
@@ -283,8 +283,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_05_234055) do
     t.datetime "updated_at", null: false
     t.bigint "price_list_id"
     t.string "dni_address"
+    t.index ["doc_id"], name: "index_customers_on_doc_id"
+    t.index ["factura_ruc"], name: "index_customers_on_factura_ruc"
     t.index ["price_list_id"], name: "index_customers_on_price_list_id"
     t.index ["referrer_id"], name: "index_customers_on_referrer_id"
+    t.index ["user_id", "price_list_id"], name: "index_customers_on_user_id_and_price_list_id"
     t.index ["user_id"], name: "index_customers_on_user_id"
   end
 
@@ -614,6 +617,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_05_234055) do
     t.index ["seller_id"], name: "index_orders_on_seller_id"
     t.index ["servicio_transporte"], name: "index_orders_on_servicio_transporte"
     t.index ["transportista_id"], name: "index_orders_on_transportista_id"
+    t.index ["user_id", "status"], name: "index_orders_on_user_id_and_status"
     t.index ["user_id"], name: "index_orders_on_user_id"
   end
 
@@ -1219,6 +1223,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_05_234055) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["role_id"], name: "index_user_roles_on_role_id"
+    t.index ["user_id", "role_id"], name: "index_user_roles_on_user_id_and_role_id", unique: true
     t.index ["user_id"], name: "index_user_roles_on_user_id"
   end
 

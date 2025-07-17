@@ -11,9 +11,8 @@ class Admin::CustomersController < Admin::AdminController
     respond_to do |format|
       format.html do
         # Load only a small subset of customers for initial page load
-        @users = User.includes(:loyalty_tier, customer: :price_list)
-                     .where(internal: false)
-                     .with_role("customer")
+        @users = User.customers
+                     .includes(:loyalty_tier, customer: :price_list)
                      .select("users.*,
                               COUNT(DISTINCT orders.id) as orders_count,
                               COALESCE(SUM(orders.total_price_cents), 0) as total_order_amount_cents")
@@ -28,7 +27,7 @@ class Admin::CustomersController < Admin::AdminController
         if params[:draw].present?
           render json: datatable_json
         else
-          @customers = User.with_role("customer")
+          @customers = User.customers.limit(1000)
           # query for customers modal in pos
           render json: @customers.select(:id, :first_name, :last_name, :email, :phone, :user_id)
         end
@@ -36,7 +35,8 @@ class Admin::CustomersController < Admin::AdminController
       format.turbo_stream do
         # Check if the request is coming from the POS modal
         in_modal = request.referer&.include?("/admin/orders/pos") || params[:in_modal].present?
-        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.includes(:user, :price_list).all, in_modal: in_modal })
+        
+        render turbo_stream: turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: optimized_customers_for_modal, in_modal: in_modal })
       end
     end
   end
@@ -60,13 +60,14 @@ class Admin::CustomersController < Admin::AdminController
     @user.password ||= SecureRandom.alphanumeric(8)
     respond_to do |format|
       if @user.save
-        format.turbo_stream { render turbo_stream: [
-          turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: Customer.all, in_modal: params[:in_modal] }),
-          turbo_stream.append("switchable-container",
-            "<script>document.dispatchEvent(new CustomEvent('customer-form-result', { detail: { success: true } }))</script>"
-        )
-        ]
-      }
+        format.turbo_stream { 
+          render turbo_stream: [
+            turbo_stream.replace("switchable-container", partial: "admin/customers/table", locals: { customers: optimized_customers_for_modal, in_modal: params[:in_modal] }),
+            turbo_stream.append("switchable-container",
+              "<script>document.dispatchEvent(new CustomEvent('customer-form-result', { detail: { success: true } }))</script>"
+            )
+          ]
+        }
       else
         format.html { render :new }
         format.turbo_stream {
@@ -146,24 +147,37 @@ class Admin::CustomersController < Admin::AdminController
     def user_params
       params.require(:user).permit(:first_name, :last_name, :email, :phone, customer_attributes: [ :id, :doc_type, :doc_id, :birthdate, :wants_factura, :factura_ruc, :factura_razon_social, :dni_address, :factura_direccion, :price_list_id, :_destroy ])
     end
+
+    def optimized_customers_for_modal
+      Customer.includes(:user, :price_list)
+              .joins(:user)
+              .merge(User.customers)
+              .limit(1000)  # Reasonable limit for modal display
+              .order('users.id DESC')
+    end
     
     def datatable_json
-      users = User.includes(:loyalty_tier, customer: :price_list)
-                  .where(internal: false)
-                  .with_role("customer")
-                  .select("users.*,
-                          COUNT(DISTINCT orders.id) as orders_count,
-                          COALESCE(SUM(orders.total_price_cents), 0) as total_order_amount_cents")
-                  .left_joins(:orders)
-                  .group("users.id")
+      base_query = User.customers
+                       .joins(:customer)
+                       .select("users.*,
+                               customers.doc_id,
+                               customers.doc_type,
+                               customers.factura_ruc,
+                               customers.factura_razon_social,
+                               customers.price_list_id,
+                               COUNT(DISTINCT orders.id) as orders_count,
+                               COALESCE(SUM(orders.total_price_cents), 0) as total_order_amount_cents")
+                       .left_joins(:orders)
+                       .group("users.id, users.first_name, users.last_name, users.email, users.phone, users.status, users.loyalty_tier_id, users.created_at, users.updated_at, customers.id, customers.doc_id, customers.doc_type, customers.factura_ruc, customers.factura_razon_social, customers.price_list_id")
 
       # Apply search filter
       if params[:search][:value].present?
         search_term = "%#{params[:search][:value]}%"
-        users = users.where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ? OR users.phone ILIKE ? OR customers.doc_id ILIKE ? OR customers.factura_ruc ILIKE ?", 
-                           search_term, search_term, search_term, search_term, search_term, search_term)
-                     .joins("LEFT JOIN customers ON customers.user_id = users.id")
+        base_query = base_query.where("users.first_name ILIKE ? OR users.last_name ILIKE ? OR users.email ILIKE ? OR users.phone ILIKE ? OR customers.doc_id ILIKE ? OR customers.factura_ruc ILIKE ?", 
+                                      search_term, search_term, search_term, search_term, search_term, search_term)
       end
+
+      users = base_query
 
       # Apply sorting
       if params[:order].present?
@@ -180,15 +194,12 @@ class Admin::CustomersController < Admin::AdminController
         when 3
           [ "users.phone", direction ]
         when 4
-          users = users.joins("LEFT JOIN customers ON customers.user_id = users.id")
           [ "customers.doc_type", direction ]
         when 5
-          users = users.joins("LEFT JOIN customers ON customers.user_id = users.id")
           [ "COALESCE(customers.doc_id, customers.factura_ruc)", direction ]
         when 6
           if $global_settings[:feature_flag_price_lists]
-            users = users.joins("LEFT JOIN customers ON customers.user_id = users.id")
-                        .joins("LEFT JOIN price_lists ON price_lists.id = customers.price_list_id")
+            users = users.joins("LEFT JOIN price_lists ON price_lists.id = customers.price_list_id")
             [ "price_lists.name", direction ]
           else
             [ "users.id", "DESC" ]
@@ -223,33 +234,49 @@ class Admin::CustomersController < Admin::AdminController
       paginated_users = users.page(params[:start].to_i / params[:length].to_i + 1)
                             .per(params[:length].to_i)
 
+      # Load price lists and loyalty tiers for the selected users
+      price_lists = if $global_settings[:feature_flag_price_lists]
+        PriceList.where(id: paginated_users.map(&:price_list_id).compact.uniq).index_by(&:id)
+      else
+        {}
+      end
+      
+      loyalty_tiers = LoyaltyTier.where(id: paginated_users.map(&:loyalty_tier_id).compact.uniq).index_by(&:id)
+
       {
         draw: params[:draw].to_i,
-        recordsTotal: User.where(internal: false).with_role("customer").count,
+        recordsTotal: User.customers.count,
         recordsFiltered: users.length,
         data: paginated_users.map do |user|
           row = []
 
+          # Use the data from the optimized query
+          customer_name = user.name.blank? ? user.factura_razon_social : user.name
+          doc_type = user.doc_id.blank? ? (user.factura_ruc.present? ? "ruc" : "dni") : user.doc_type
+          doc_number = user.doc_id.blank? ? user.factura_ruc : user.doc_id
+
           row.concat([
             user.id,
-            user.name.blank? ? user&.customer&.customer_name : user.name,
+            customer_name,
             user.email,
             user.phone,
-            user&.customer&.doc_id.blank? ? ((user&.customer&.factura_ruc.present? ? "ruc" : "dni")) : user&.customer&.doc_type,
-            user&.customer&.doc_id.blank? ? user&.customer&.factura_ruc : user&.customer&.doc_id
+            doc_type,
+            doc_number
           ])
 
           if $global_settings[:feature_flag_price_lists]
-            if user&.customer&.price_list
-              price_list_cell = %(<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-500/20">#{user&.customer&.price_list&.name}</span>)
+            if user.price_list_id && price_lists[user.price_list_id]
+              price_list_cell = %(<span class="inline-flex items-center rounded-md bg-blue-50 px-2 py-1 text-xs font-medium text-blue-700 ring-1 ring-inset ring-blue-600/10 dark:bg-blue-900/20 dark:text-blue-400 dark:ring-blue-500/20">#{price_lists[user.price_list_id].name}</span>)
             else
               price_list_cell = %(<span class="text-gray-400 dark:text-gray-500">Predeterminada</span>)
             end
             row << price_list_cell
           end
 
+          loyalty_tier_name = user.loyalty_tier_id ? loyalty_tiers[user.loyalty_tier_id]&.name : nil
+
           row.concat([
-            user&.loyalty_tier&.name,
+            loyalty_tier_name,
             user.orders_count,
             format_currency(user.total_order_amount),
             user.translated_status,
@@ -270,7 +297,7 @@ class Admin::CustomersController < Admin::AdminController
       actions = []
       
       # Skip for generic customer
-      unless user&.email == "generic_customer@devtechperu.com"
+      unless user.email == "generic_customer@devtechperu.com"
         # Edit link
         edit_link = link_to(
           pencil_icon.html_safe,
@@ -293,8 +320,8 @@ class Admin::CustomersController < Admin::AdminController
           actions << account_link
         end
         
-        # Delete link if no orders
-        if user.orders_count == 0
+        # Delete link if no orders (use orders_count from the query)
+        if user.orders_count.to_i == 0
           delete_link = link_to(
             trash_icon.html_safe,
             admin_customer_path(user),
