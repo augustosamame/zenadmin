@@ -50,6 +50,7 @@ class Admin::RequisitionsController < Admin::AdminController
                                 warehouse_id: @current_warehouse.id,
                                 stock: ...-1  # Using Ruby range syntax for "less than 0"
                               })
+                              .order(:name)
     negative_stock_products.each do |product|
       current_stock = product.stock(@current_warehouse)
       @requisition.requisition_lines.build(
@@ -64,6 +65,7 @@ class Admin::RequisitionsController < Admin::AdminController
 
   def new_automatic
     main_warehouse = Warehouse.main_warehouse
+    current_warehouse = @current_warehouse
 
     # Create a new requisition object (not saved to database)
     @requisition = Requisition.new(
@@ -80,12 +82,13 @@ class Admin::RequisitionsController < Admin::AdminController
               .where(warehouse_inventories: {
                 warehouse_id: @current_warehouse.id
               })
+              .order(:name)
 
     products.each do |product|
-      current_stock = product.stock(@current_warehouse)
+      current_stock = product.stock(current_warehouse)
       automatic_qty = Services::Inventory::AutomaticRequisitionsService.automatic_weekly_requisition_quantity(product, @current_location)
       presold_qty = Services::Inventory::AutomaticRequisitionsService.unrequisitioned_presold_quantity(product, @current_location)
-      
+
       @requisition.requisition_lines.build(
         product: product,
         current_stock: current_stock,
