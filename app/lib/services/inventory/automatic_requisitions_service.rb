@@ -3,6 +3,18 @@ module Services
     class AutomaticRequisitionsService
       def self.create_weekly_requisitions
         Location.active.each do |location|
+          # Check if an automatic requisition already exists for this location in the last 7 days
+          existing_requisition = Requisition.where(
+            location: location,
+            requisition_type: :automatic,
+            created_at: 7.days.ago..Time.current
+          ).exists?
+
+          if existing_requisition
+            Rails.logger.info "Skipping automatic requisition creation for location #{location.name} - requisition already exists in the last 7 days"
+            next
+          end
+
           main_warehouse = Warehouse.main_warehouse # TODO: change to the specific warehouse assigned to supply the location
           user = User.where(location_id: location.id, internal: true).first # tienda user
 
@@ -13,6 +25,7 @@ module Services
                 warehouse_id: main_warehouse.id,
                 location_id: location.id,
                 user_id: user.id,
+                requisition_type: :automatic,
                 comments: "Pedido de reposición automático semanal para la ubicación #{location.name}"
               )
 
@@ -27,7 +40,10 @@ module Services
               end
 
               requisition.save!
+              Rails.logger.info "Created automatic requisition for location #{location.name}"
             end
+          else
+            Rails.logger.warn "Cannot create automatic requisition for location #{location.name} - missing main_warehouse or user"
           end
         end
       end

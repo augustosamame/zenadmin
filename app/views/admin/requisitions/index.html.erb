@@ -1,5 +1,8 @@
 <%= render "shared/admin/nav", { header_title: "Pedidos" } do %>
-  <%= render "shared/admin/create_dropdown" %>
+  <div class="flex space-x-2">
+    <%= link_to "Crear Pedido", new_admin_requisition_path, class: "btn btn-primary" %>
+    <%= link_to "Crear Pedido Automático", new_automatic_admin_requisitions_path, class: "btn btn-info" %>
+  </div>
 <% end %>
 
 <div class="px-4 mb-16" data-controller="datatable" data-datatable-options-value="<%= @datatable_options %>">

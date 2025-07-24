@@ -96,6 +96,9 @@ Rails.application.routes.draw do
 
 
     resources :requisitions do
+      collection do
+        get :new_automatic
+      end
       member do
         patch :fulfill
       end

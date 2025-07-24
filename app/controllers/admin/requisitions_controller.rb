@@ -1,6 +1,6 @@
 class Admin::RequisitionsController < Admin::AdminController
   before_action :set_requisition, only: [ :show, :update, :destroy, :approve, :reject, :fulfill ]
-  before_action :set_locations_and_warehouses, only: [ :new, :create, :edit, :update ]
+  before_action :set_locations_and_warehouses, only: [ :new, :create, :edit, :update, :new_automatic ]
 
   def index
     respond_to do |format|
@@ -10,7 +10,7 @@ class Admin::RequisitionsController < Admin::AdminController
         else
           @requisitions = Requisition.where(location: @current_location).includes(:location, :warehouse, :user).order(id: :desc)
         end
-        @datatable_options = "resource_name:'Requisition'; sort_0_desc; hide_0;"
+        @datatable_options = "resource_name:'Requisition'; sort_0_desc; hide_0; create_button:false;"
       end
 
       format.json do
@@ -62,11 +62,48 @@ class Admin::RequisitionsController < Admin::AdminController
     end
   end
 
+  def new_automatic
+    main_warehouse = Warehouse.main_warehouse
+
+    # Create a new requisition object (not saved to database)
+    @requisition = Requisition.new(
+      requisition_date: Time.current,
+      user_id: current_user.id,
+      requisition_type: "automatic",
+      location_id: @current_location.id,
+      warehouse_id: main_warehouse.id
+    )
+
+    # Build requisition lines for ALL products that exist in the warehouse
+    products = Product.includes(:warehouse_inventories)
+              .joins(:warehouse_inventories)
+              .where(warehouse_inventories: {
+                warehouse_id: @current_warehouse.id
+              })
+
+    products.each do |product|
+      current_stock = product.stock(@current_warehouse)
+      automatic_qty = Services::Inventory::AutomaticRequisitionsService.automatic_weekly_requisition_quantity(product, @current_location)
+      presold_qty = Services::Inventory::AutomaticRequisitionsService.unrequisitioned_presold_quantity(product, @current_location)
+      
+      @requisition.requisition_lines.build(
+        product: product,
+        current_stock: current_stock,
+        presold_quantity: presold_qty,
+        automatic_quantity: automatic_qty,
+        manual_quantity: automatic_qty  # Use automatic quantity as initial manual quantity
+      )
+    end
+
+    render :new
+  end
+
   def create
     @requisition = Requisition.new(requisition_params)
     @requisition.warehouse_id = @requisition.location&.warehouses&.first&.id
     @requisition.user_id = current_user.id
-    @requisition.requisition_type = "manual"
+    # Only set to manual if no requisition_type was provided in params
+    @requisition.requisition_type = "manual" if @requisition.requisition_type.blank?
 
     begin
       Requisition.transaction do
@@ -171,10 +208,10 @@ class Admin::RequisitionsController < Admin::AdminController
                   Rails.logger.info "Set blank planned_quantity to 0 for line ##{line.id}"
                 end
               end
-              
+
               # We'll proceed with planning even if some quantities are 0
               # This allows users to not have to manually enter 0 for lines they don't want to plan
-              
+
               # If we get here, all lines have planned quantities
               Rails.logger.info "About to plan! requisition ##{@requisition.id}"
               @requisition.plan!
