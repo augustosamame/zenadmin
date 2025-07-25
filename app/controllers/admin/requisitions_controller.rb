@@ -47,7 +47,9 @@ class Admin::RequisitionsController < Admin::AdminController
                end
 
     main_warehouse = Warehouse.main_warehouse
-    current_warehouse = @current_warehouse
+    # Update current location and warehouse to match the selected location
+    @current_location = location
+    @current_warehouse = location.warehouses.first || @current_warehouse
 
     @requisition = Requisition.new(
       user_id: current_user.id,
@@ -59,12 +61,12 @@ class Admin::RequisitionsController < Admin::AdminController
     negative_stock_products = Product.includes(:warehouse_inventories)
                               .joins(:warehouse_inventories)
                               .where(warehouse_inventories: {
-                                warehouse_id: current_warehouse.id,
+                                warehouse_id: @current_warehouse.id,
                                 stock: ...-1  # Using Ruby range syntax for "less than 0"
                               })
                               .order(:name)
     negative_stock_products.each do |product|
-      current_stock = product.stock(current_warehouse)
+      current_stock = product.stock(@current_warehouse)
       @requisition.requisition_lines.build(
         product_id: product.id,
         current_stock: current_stock,
