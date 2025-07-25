@@ -54,7 +54,7 @@ class Admin::RequisitionsController < Admin::AdminController
     negative_stock_products.each do |product|
       current_stock = product.stock(@current_warehouse)
       @requisition.requisition_lines.build(
-        product: product,
+        product_id: product.id,
         current_stock: current_stock,
         presold_quantity: current_stock.abs,  # Convert negative stock to positive number
         automatic_quantity: 0,
@@ -90,7 +90,7 @@ class Admin::RequisitionsController < Admin::AdminController
       presold_qty = Services::Inventory::AutomaticRequisitionsService.unrequisitioned_presold_quantity(product, @current_location)
 
       @requisition.requisition_lines.build(
-        product: product,
+        product_id: product.id,
         current_stock: current_stock,
         presold_quantity: presold_qty,
         automatic_quantity: automatic_qty,
