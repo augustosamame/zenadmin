@@ -39,20 +39,32 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def new
-    @requisition = Requisition.new
-    @requisition.user_id = current_user.id
-    @requisition.requisition_date = Time.current
-    # @requisition.requisition_lines.build
+    # Get user's current location or first location if admin
+    location = if current_user.any_admin_or_supervisor?
+                 params[:location_id].present? ? Location.find(params[:location_id]) : Location.first
+               else
+                 @current_location
+               end
+
+    main_warehouse = Warehouse.main_warehouse
+    current_warehouse = @current_warehouse
+
+    @requisition = Requisition.new(
+      user_id: current_user.id,
+      requisition_date: Time.current,
+      location_id: location.id,
+      warehouse_id: main_warehouse.id
+    )
 
     negative_stock_products = Product.includes(:warehouse_inventories)
                               .joins(:warehouse_inventories)
                               .where(warehouse_inventories: {
-                                warehouse_id: @current_warehouse.id,
+                                warehouse_id: current_warehouse.id,
                                 stock: ...-1  # Using Ruby range syntax for "less than 0"
                               })
                               .order(:name)
     negative_stock_products.each do |product|
-      current_stock = product.stock(@current_warehouse)
+      current_stock = product.stock(current_warehouse)
       @requisition.requisition_lines.build(
         product_id: product.id,
         current_stock: current_stock,
