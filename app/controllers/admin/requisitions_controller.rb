@@ -39,9 +39,9 @@ class Admin::RequisitionsController < Admin::AdminController
   end
 
   def new
-    # Get user's current location or first location if admin
+    # Get user's current location or use session location for admin
     location = if current_user.any_admin_or_supervisor?
-                 params[:location_id].present? ? Location.find(params[:location_id]) : Location.first
+                 params[:location_id].present? ? Location.find(params[:location_id]) : @current_location
                else
                  @current_location
                end
